@@ -3,8 +3,8 @@
 import 'package:flutter/material.dart';
 //import 'package:kaloricke_tabulky/main.dart';
 
-class FirstPage extends StatelessWidget {
-  const FirstPage({super.key});
+class SecondPage extends StatelessWidget {
+  const SecondPage({super.key});
 
   @override
   Widget build(BuildContext context) {
