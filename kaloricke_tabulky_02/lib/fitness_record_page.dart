@@ -1,24 +1,24 @@
-// ignore_for_file: prefer_const_constructors, use_key_in_widget_constructors
+
 
 import 'package:flutter/material.dart';
 
 class FitnessRecordAppBar extends StatelessWidget {
-  const FitnessRecordAppBar();
+  const FitnessRecordAppBar({super.key});
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: Text('Záznam tréninku'),
+      title: const Text('Záznam tréninku'),
     );
   }
 }
 
 class FitnessRecordScreen extends StatelessWidget {
-  const FitnessRecordScreen();
+  const FitnessRecordScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return const Center(
       child: Text('Záznam tréninku'),
     );
   }

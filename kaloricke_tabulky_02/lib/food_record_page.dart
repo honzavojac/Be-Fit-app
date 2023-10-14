@@ -1,24 +1,31 @@
-// ignore_for_file: prefer_const_constructors, use_key_in_widget_constructors
-
 import 'package:flutter/material.dart';
 
 class FoodRecordAppBar extends StatelessWidget {
-  const FoodRecordAppBar();
+  const FoodRecordAppBar({super.key});
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: Text('Záznam jídel'),
+      title: const Text('Záznam jídel'),
     );
   }
 }
+
 class FoodRecordScreen extends StatelessWidget {
-  const FoodRecordScreen();
+  const FoodRecordScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text('Záznam jídel'),
+    return const Column(
+      children: [
+        SizedBox(
+          height: 50,
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [],
+        ),
+      ],
     );
   }
 }

@@ -1,16 +1,20 @@
-// ignore_for_file: prefer_const_constructors, use_key_in_widget_constructors
+// ignore_for_file: library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
+
 import 'home_page.dart';
 import 'food_record_page.dart';
 import 'fitness_record_page.dart';
 import 'settings_page.dart';
+import 'food_add_page.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
   @override
   _MyAppState createState() => _MyAppState();
 }
@@ -23,6 +27,7 @@ class _MyAppState extends State<MyApp> {
   static final List<Widget> _pages = [
     const HomeScreen(),
     const FoodRecordScreen(),
+    const FoodAddcreen(),
     const FitnessRecordScreen(),
     const SettingsScreen(),
   ];
@@ -30,6 +35,7 @@ class _MyAppState extends State<MyApp> {
   static final List<Widget> _appBars = [
     const HomeAppBar(),
     const FoodRecordAppBar(),
+    const FoodAddAppBar(),
     const FitnessRecordAppBar(),
     const SettingsAppBar(),
   ];
@@ -46,47 +52,52 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       theme: ThemeData.dark(useMaterial3: true),
       home: Scaffold(
         appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(56), // 56 is the default height
+          preferredSize: const Size.fromHeight(50), //56 je defaultně
           child: _appBars[_selectedIndex],
         ),
         body: _pages[_selectedIndex],
         key: scaffoldKey,
         drawer: Drawer(
-          // backgroundColor: Colors.blue,
           child: ListView(
             children: [
               ListTile(
-                title: Text('Domovská stránka'),
-                leading: Icon(Icons.home),
+                title: const Text('Domovská stránka'),
+                leading: const Icon(Icons.home),
                 onTap: () {
                   _onItemTapped(0);
                 },
               ),
               ListTile(
-                title: Text('Záznam jídla'),
-                leading: Icon(Icons.fastfood),
+                title: const Text('Záznam jídla'),
+                leading: const Icon(Icons.fastfood),
                 onTap: () {
-                  _onItemTapped(
-                      1); // Zavolat metodu s indexem 0 při klepnutí na položku
+                  _onItemTapped(1); // Zavolat metodu s indexem 1
                 },
               ),
               ListTile(
-                title: Text('Záznam tréninku'),
-                leading: Icon(Icons.fitness_center),
+                title: const Text('Přidání potraviny'),
+                leading: const Icon(Icons.settings),
                 onTap: () {
-                  _onItemTapped(
-                      2); // Zavolat metodu s indexem 0 při klepnutí na položku
+                  _onItemTapped(2); // Zavolat metodu s indexem 2
                 },
               ),
               ListTile(
-                title: Text('Nastavení'),
-                leading: Icon(Icons.settings),
+                title: const Text('Záznam tréninku'),
+                leading: const Icon(Icons.fitness_center),
                 onTap: () {
                   _onItemTapped(
-                      3); // Zavolat metodu s indexem 0 při k  //Navigator.pop(context); // Zavřít menu
+                      3); // Zavolat metodu s indexem 0 při klepnutí na položku
+                },
+              ),
+              ListTile(
+                title: const Text('Nastavení'),
+                leading: const Icon(Icons.settings),
+                onTap: () {
+                  _onItemTapped(4); // Zavolat metodu s indexem 0
                 },
               ),
             ],
@@ -97,13 +108,8 @@ class _MyAppState extends State<MyApp> {
   }
 }
 
-
-
-
-
-
 //Poznámky:
- /* final scaffoldKey = GlobalKey<ScaffoldState>();
+/* final scaffoldKey = GlobalKey<ScaffoldState>();
 
 Scaffold(
    key: scaffoldKey,
