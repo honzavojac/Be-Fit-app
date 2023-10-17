@@ -1,4 +1,4 @@
-
+// ignore_for_file: avoid_unnecessary_containers, prefer_const_constructors
 
 import 'package:flutter/material.dart';
 
@@ -18,8 +18,9 @@ class FitnessRecordScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    return Center(
+        child: Container(
       child: Text('Záznam tréninku'),
-    );
+    ));
   }
 }

@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, avoid_unnecessary_containers
 
 import 'package:flutter/material.dart';
 
@@ -15,9 +15,20 @@ class FoodAddAppBar extends StatelessWidget {
   }
 }
 
-class FoodAddcreen extends StatelessWidget {
-  const FoodAddcreen({super.key});
+class FoodAddScreen extends StatefulWidget {
+  const FoodAddScreen({super.key});
 
+  @override
+  State<FoodAddScreen> createState() => _FoodAddScreenState();
+}
+
+const List<String> selectedWeight = <String>[
+  'g',
+  '100g',
+];
+String selected = 'g';
+
+class _FoodAddScreenState extends State<FoodAddScreen> {
   @override
   Widget build(BuildContext context) {
     String textFood;
@@ -25,6 +36,8 @@ class FoodAddcreen extends StatelessWidget {
     double numberCarbs;
     double numberFats;
     double numberFiber;
+    double numberKcal;
+    double numberWeight;
     return Column(
       children: [
         const SizedBox(
@@ -34,16 +47,25 @@ class FoodAddcreen extends StatelessWidget {
           width: 250,
           child: TextField(
             inputFormatters: [
-              FilteringTextInputFormatter.allow(RegExp(
-                  r'[A-Za-z]')), // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
-              LengthLimitingTextInputFormatter(15)
+              FilteringTextInputFormatter.allow(
+                  RegExp(r'[A-Za-zěščřžýáíéóůú)(\-_\s]')),
+// povoluje zadat pouze string hodnotu => použiju pro vyhledávání v databázi
+              LengthLimitingTextInputFormatter(25)
             ],
+            keyboardType: TextInputType.text,
             decoration: const InputDecoration(
-              labelText: 'Food',
-              hintText:
-                  'Enter name of food:', // zobrazí se pokud je textové pole prázdné
-              //  icon: Icon(Icons.text_fields), //
-            ),
+                labelText: 'Food',
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                    borderSide:
+                        BorderSide(strokeAlign: BorderSide.strokeAlignInside)),
+                contentPadding:
+                    EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                hintText: 'Enter name of food:',
+                hintStyle: TextStyle(
+                    fontSize: 15) // zobrazí se pokud je textové pole prázdné
+                //  icon: Icon(Icons.text_fields), //
+                ),
             onChanged: (input) {
               textFood = input;
               print('Text changed to: $textFood');
@@ -57,7 +79,44 @@ class FoodAddcreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             SizedBox(
-              width: 150,
+              width: 110,
+              child: TextField(
+                keyboardType: const TextInputType.numberWithOptions(
+                    signed: true, decimal: true),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                  LengthLimitingTextInputFormatter(
+                      4) // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
+                ],
+                decoration: const InputDecoration(
+                    labelText: 'Kcal',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(12)),
+                    ),
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                    hintText: 'Enter value:',
+                    hintStyle: TextStyle(
+                        fontSize:
+                            15) // zobrazí se pokud je textové pole prázdné
+                    //  icon: Icon(Icons.text_fields), //
+                    ),
+                onChanged: (input) {
+                  numberKcal = double.parse(input);
+                  print('Text changed to: $numberKcal');
+                },
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(
+          height: 5,
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            SizedBox(
+              width: 110,
               child: TextField(
                 keyboardType: const TextInputType.numberWithOptions(
                     signed: true, decimal: true),
@@ -69,11 +128,18 @@ class FoodAddcreen extends StatelessWidget {
                       4) //omezí kolik znaků je možno zadat
                 ],
                 decoration: const InputDecoration(
-                  labelText: 'Protein',
-                  hintText:
-                      'Enter value:', // zobrazí se pokud je textové pole prázdné
-                  //  icon: Icon(Icons.text_fields), //
-                ),
+                    labelText: 'Protein',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(12)),
+                    ),
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                    hintText: 'Enter value:',
+                    hintStyle: TextStyle(
+                        fontSize:
+                            15) // zobrazí se pokud je textové pole prázdné
+                    //  icon: Icon(Icons.text_fields), //
+                    ),
                 onChanged: (input) {
                   numberProtein = double.parse(input);
                   print('Text changed to: $numberProtein');
@@ -81,7 +147,7 @@ class FoodAddcreen extends StatelessWidget {
               ),
             ),
             SizedBox(
-              width: 150,
+              width: 110,
               child: TextField(
                 keyboardType: const TextInputType.numberWithOptions(
                     signed: true, decimal: true),
@@ -91,11 +157,18 @@ class FoodAddcreen extends StatelessWidget {
                   LengthLimitingTextInputFormatter(4)
                 ],
                 decoration: const InputDecoration(
-                  labelText: 'Carbs',
-                  hintText:
-                      'Enter value:', // zobrazí se pokud je textové pole prázdné
-                  //  icon: Icon(Icons.text_fields), //
-                ),
+                    labelText: 'Carbs',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(12)),
+                    ),
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                    hintText: 'Enter value:',
+                    hintStyle: TextStyle(
+                        fontSize:
+                            15) // zobrazí se pokud je textové pole prázdné
+                    //  icon: Icon(Icons.text_fields), //
+                    ),
                 onChanged: (input) {
                   numberCarbs = double.parse(input);
                   print('Text changed to: $numberCarbs');
@@ -104,11 +177,14 @@ class FoodAddcreen extends StatelessWidget {
             ),
           ],
         ),
+        const SizedBox(
+          height: 5,
+        ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             SizedBox(
-              width: 150,
+              width: 110,
               child: TextField(
                 keyboardType: const TextInputType.numberWithOptions(
                     signed: true, decimal: true),
@@ -118,11 +194,18 @@ class FoodAddcreen extends StatelessWidget {
                       4) // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
                 ],
                 decoration: const InputDecoration(
-                  labelText: 'Fats',
-                  hintText:
-                      'Enter value:', // zobrazí se pokud je textové pole prázdné
-                  //  icon: Icon(Icons.text_fields), //
-                ),
+                    labelText: 'Fats',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(12)),
+                    ),
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                    hintText: 'Enter value:',
+                    hintStyle: TextStyle(
+                        fontSize:
+                            15) // zobrazí se pokud je textové pole prázdné
+                    //  icon: Icon(Icons.text_fields), //
+                    ),
                 onChanged: (input) {
                   numberFats = double.parse(input);
                   print('Text changed to: $numberFats');
@@ -130,28 +213,107 @@ class FoodAddcreen extends StatelessWidget {
               ),
             ),
             SizedBox(
-              width: 150,
+              width: 110,
               child: TextField(
                 keyboardType: const TextInputType.numberWithOptions(
-                    signed: true, decimal: true),
+                  signed: true,
+                  decimal: true,
+                ),
                 inputFormatters: [
                   FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
-                  LengthLimitingTextInputFormatter(
-                      4) // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
+                  LengthLimitingTextInputFormatter(4),
                 ],
                 decoration: const InputDecoration(
                   labelText: 'Fiber',
-                  hintText:
-                      'Enter value:', // zobrazí se pokud je textové pole prázdné
-                  //  icon: Icon(Icons.text_fields), //
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                    borderSide: BorderSide(
+                      color: Colors.blue, // Barva levé strany rámečku
+                      width: 2.0, // Šířka levé strany rámečku
+                    ),
+                  ),
+                  contentPadding:
+                      EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                  hintText: 'Enter value:',
+                  hintStyle: TextStyle(fontSize: 15),
                 ),
                 onChanged: (input) {
                   numberFiber = double.parse(input);
                   print('Text changed to: $numberFiber');
                 },
               ),
-            ),
+            )
           ],
+        ),
+        const SizedBox(
+          height: 5,
+        ),
+        Container(
+          width: 200,
+          // height: 40,
+          decoration: BoxDecoration(
+              border: Border.all(
+                color: Colors.white54,
+                width: 1,
+                style: BorderStyle.solid,
+              ),
+              borderRadius: const BorderRadius.all(Radius.circular(12))),
+          child: Row(
+            // crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: const EdgeInsets.only(left: 10, top: 0),
+                width: 100,
+                height: 40,
+                child: TextField(
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                    LengthLimitingTextInputFormatter(5),
+                  ],
+                  keyboardType: const TextInputType.numberWithOptions(
+                    signed: true,
+                    decimal: true,
+                  ),
+                  //cursorHeight: 20.0,
+                  cursorColor: Colors.white,
+                  decoration: const InputDecoration(
+                    border: InputBorder.none,
+                    labelText: 'Weight',
+                    labelStyle: TextStyle(color: Colors.amber),
+                    // hintText: 'Enter value:',
+                    hintStyle: TextStyle(fontSize: 15),
+                  ),
+                  onChanged: (input) {
+                    numberWeight = double.parse(input);
+                    print('Text changed to: $numberWeight');
+                  },
+                ),
+              ),
+              Text(
+                ' $selected',
+                style: const TextStyle(fontSize: 15),
+              ),
+              Container(
+                child: PopupMenuButton<int>(
+                  itemBuilder: (context) {
+                    return List<PopupMenuEntry<int>>.generate(
+                        selectedWeight.length, (int index) {
+                      return PopupMenuItem<int>(
+                        value: index,
+                        child: Text(selectedWeight[index]),
+                      );
+                    });
+                  },
+                  onSelected: (int value) {
+                    setState(() {
+                      selected = selectedWeight[value]; // Aktualizace proměnné
+                    });
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     );

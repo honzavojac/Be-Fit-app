@@ -1,7 +1,13 @@
+// ignore_for_file: no_leading_underscores_for_local_identifiers, prefer_const_constructors, sort_child_properties_last, avoid_unnecessary_containers, avoid_print
+
 import 'package:flutter/material.dart';
+import 'package:two_dimensional_scrollables/two_dimensional_scrollables.dart';
+
+DateTime now = DateTime.now();
+String formattedDate = "${now.day}.${now.month}.${now.year}";
 
 class HomeAppBar extends StatelessWidget {
-  const HomeAppBar();
+  const HomeAppBar({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -16,123 +22,300 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    EdgeInsets globalPadding = const EdgeInsets.fromLTRB(20, 3, 20, 3);
+//deklarace dvourozměrného pole jídel
+    List<List<dynamic>> listOfFood = [
+      [1, 100, 'kuřecí maso', 21, 0, 1, 0, 121],
+      [2, 20, 'rohlík', 1, 2, 3, 4, 90],
+      [3, 30, 'protein', 21, 0, 0, 0, 100],
+      [4, 150, 'brambory', 2, 35, 0, 4, 160],
+      [5, 50, 'Svíčková na smetaně s hosukovým knedlíkem', 1, 5, 0, 2, 20],
+      [6, 25, 'mrkev', 0, 6, 0, 3, 10],
+    ];
 
+    EdgeInsets globalPadding = const EdgeInsets.fromLTRB(25, 3, 25, 3);
+    final _verticalController = ScrollController();
     Border borderBorder = Border.all(width: 1, color: Colors.white);
-    return Column(
+    return Stack(
       children: [
-        const SizedBox(
-          height: 15,
-        ),
-        SizedBox(
-          height: 50,
-          child: Container(
-            padding: const EdgeInsets.fromLTRB(0, 0, 0, 5),
-            child: const Text('Date',
-                style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w900,
-                    color: Colors.white)),
-          ),
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        /*   Positioned(
+            top: 280,
+            right: 10,
+            child: ElevatedButton(
+              onPressed: () {},
+              style: ElevatedButton.styleFrom(
+                  shape: const CircleBorder(),
+                  padding: const EdgeInsets.all(20),
+                  backgroundColor: Colors.black87),
+              child: const Icon(
+                Icons.add,
+                size: 20,
+                color: Colors.white,
+              ),
+            ),),*/
+        Column(
           children: [
             Container(
-              decoration: BoxDecoration(
-                border: borderBorder,
-                borderRadius: BorderRadius.circular(7), // Zaoblení rohů
-              ),
-              padding: const EdgeInsets.fromLTRB(20, 5, 20, 5),
-              child: const Column(
+              padding: EdgeInsets.all(15),
+              // color: Colors.amber,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'Kalories',
-                    style: TextStyle(fontSize: 10),
+                  ElevatedButton(
+                    onPressed: () {},
+                    child: Icon(
+                      Icons.arrow_back_ios_new_rounded,
+                      color: Colors.white,
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      fixedSize: Size(80, 30),
+                    ),
                   ),
-                  Text('data')
-                ],
-              ),
-            )
-          ],
-        ),
-        const SizedBox(
-          height: 15,
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                border: borderBorder,
-                borderRadius: BorderRadius.circular(7), // Zaoblení rohů
-              ),
-              padding: globalPadding,
-              child: const Column(
-                children: [
-                  Text(
-                    'Protein',
-                    style: TextStyle(fontSize: 10),
+                  SizedBox(
+                    child: Container(
+                      //padding: const EdgeInsets.fromLTRB(0, 0, 0, 5),
+                      //color: Colors.blue,
+                      child: Text(
+                        formattedDate,
+                        style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.white),
+                      ),
+                    ),
                   ),
-                  Text('data')
+                  ElevatedButton(
+                    onPressed: () {},
+                    child: Icon(Icons.arrow_forward_ios_rounded,
+                        color: Colors.white),
+                    style: ElevatedButton.styleFrom(
+                      fixedSize: Size(80, 30),
+                    ),
+                  )
                 ],
               ),
             ),
-            Container(
-              decoration: BoxDecoration(
-                border: borderBorder,
-                borderRadius: BorderRadius.circular(7), // Zaoblení rohů
-              ),
-              padding: globalPadding,
-              child: const Column(
-                children: [
-                  Text(
-                    'Carbs',
-                    style: TextStyle(fontSize: 10),
-                  ),
-                  Text('data')
-                ],
-              ),
+            const SizedBox(
+              height: 40,
             ),
-          ],
-        ),
-        const SizedBox(
-          height: 10,
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                border: borderBorder,
-                borderRadius: BorderRadius.circular(7), // Zaoblení rohů
-              ),
-              padding: globalPadding,
-              child: const Column(
-                children: [
-                  Text(
-                    'Fats',
-                    style: TextStyle(fontSize: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Container(
+                  width: 120,
+                  decoration: BoxDecoration(
+                    border: borderBorder,
+                    borderRadius: BorderRadius.circular(7), // Zaoblení rohů
                   ),
-                  Text('data')
-                ],
-              ),
+                  padding: const EdgeInsets.fromLTRB(20, 5, 20, 2),
+                  child: const Column(
+                    children: [
+                      Text(
+                        'Calories',
+                        style: TextStyle(fontSize: 15),
+                      ),
+                      Text(
+                        '4000',
+                        style:
+                            TextStyle(fontSize: 20, color: Colors.yellowAccent),
+                        strutStyle: StrutStyle(fontWeight: FontWeight.bold),
+                      )
+                    ],
+                  ),
+                )
+              ],
             ),
-            Container(
-              decoration: BoxDecoration(
-                border: borderBorder,
-                borderRadius: BorderRadius.circular(7), // Zaoblení rohů
-              ),
-              padding: globalPadding,
-              child: const Column(
-                children: [
-                  Text(
-                    'Fiber',
-                    style: TextStyle(fontSize: 10),
+            const SizedBox(
+              height: 15,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Container(
+                  width: 120,
+                  decoration: BoxDecoration(
+                    border: borderBorder,
+                    borderRadius: BorderRadius.circular(7), // Zaoblení rohů
                   ),
-                  Text('data')
-                ],
-              ),
+                  padding: globalPadding,
+                  child: const Column(
+                    children: [
+                      Text(
+                        'Protein',
+                        style: TextStyle(fontSize: 15),
+                      ),
+                      Text(
+                        'data',
+                        style:
+                            TextStyle(fontSize: 18, color: Colors.yellowAccent),
+                        strutStyle: StrutStyle(fontWeight: FontWeight.bold),
+                      )
+                    ],
+                  ),
+                ),
+                Container(
+                  width: 120,
+                  decoration: BoxDecoration(
+                    border: borderBorder,
+                    borderRadius: BorderRadius.circular(7), // Zaoblení rohů
+                  ),
+                  padding: globalPadding,
+                  child: const Column(
+                    children: [
+                      Text(
+                        'Carbs',
+                        style: TextStyle(fontSize: 15),
+                      ),
+                      Text(
+                        'data',
+                        style:
+                            TextStyle(fontSize: 18, color: Colors.yellowAccent),
+                        strutStyle: StrutStyle(fontWeight: FontWeight.bold),
+                      )
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Container(
+                  width: 120,
+                  decoration: BoxDecoration(
+                    border: borderBorder,
+                    borderRadius: BorderRadius.circular(7), // Zaoblení rohů
+                  ),
+                  padding: globalPadding,
+                  child: const Column(
+                    children: [
+                      Text(
+                        'Fats',
+                        style: TextStyle(fontSize: 15),
+                      ),
+                      Text(
+                        'data',
+                        style:
+                            TextStyle(fontSize: 18, color: Colors.yellowAccent),
+                        strutStyle: StrutStyle(fontWeight: FontWeight.bold),
+                      )
+                    ],
+                  ),
+                ),
+                Container(
+                  width: 120,
+                  decoration: BoxDecoration(
+                    border: borderBorder,
+                    borderRadius: BorderRadius.circular(7), // Zaoblení rohů
+                  ),
+                  padding: globalPadding,
+                  child: const Column(
+                    children: [
+                      Text(
+                        'Fiber',
+                        style: TextStyle(fontSize: 15),
+                      ),
+                      Text(
+                        'data',
+                        style:
+                            TextStyle(fontSize: 18, color: Colors.yellowAccent),
+                        strutStyle: StrutStyle(fontWeight: FontWeight.bold),
+                      )
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(
+              height: 40,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: () {},
+                  icon: Icon(Icons.add),
+                  label: Text(
+                    'Add',
+                  ),
+                  style: ButtonStyle(
+                    minimumSize: MaterialStateProperty.all(Size(150, 40)),
+                    foregroundColor: MaterialStateProperty.all(Colors.white),
+                  ),
+                ),
+                SizedBox(
+                  width: 10,
+                ),
+              ],
+            ),
+            Expanded(
+              child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10.0),
+                    border: Border.all(color: Colors.white),
+                  ),
+                  margin: const EdgeInsets.all(5),
+                  //tableview 2D
+                  child: Container(
+                    child: TableView.builder(
+                      verticalDetails: ScrollableDetails.vertical(
+                          controller: _verticalController),
+                      cellBuilder: (
+                        BuildContext context,
+                        TableVicinity vicinity,
+                      ) {
+                        return Row(
+                          children: [
+                            Container(
+                              child: Text(
+                                  '${listOfFood[vicinity.row][1]}g ${listOfFood[vicinity.row][2]}  B:${listOfFood[vicinity.row][3]} S:${listOfFood[vicinity.row][4]} T:${listOfFood[vicinity.row][4]} V:${listOfFood[vicinity.row][6]} Kcal:${listOfFood[vicinity.row][7]}'),
+                            ),
+                            InkWell(
+                              child: Icon(Icons.edit),
+                              onTap: () {
+                                print('you can edit this row');
+                              },
+                            ),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            InkWell(
+                              child: Icon(Icons.delete_outline),
+                              onTap: () {
+                                print('you delete this row');
+                              },
+                            )
+                          ],
+                        );
+                      },
+                      columnCount: 1,
+                      columnBuilder: (int index) {
+                        return const TableSpan(
+                          extent: FractionalTableSpanExtent(2),
+                          //onEnter: (_) => print('Entered column $index'),
+                        );
+                      },
+                      rowCount: listOfFood.length,
+                      rowBuilder: (int index) {
+                        return const TableSpan(
+                          backgroundDecoration: TableSpanDecoration(
+                            border: TableSpanBorder(
+                              trailing:
+                                  BorderSide(width: 1, color: Colors.amber),
+                            ),
+                          ),
+                          extent: FixedTableSpanExtent(50), //přiblížení tabulky
+                          //  cursor: SystemMouseCursors.click,
+                        );
+                      },
+                    ),
+                  )),
+            ),
+            SizedBox(
+              height: 10,
             ),
           ],
         ),
