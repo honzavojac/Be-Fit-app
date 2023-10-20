@@ -7,8 +7,7 @@ import 'home_page.dart';
 import 'food_record_page.dart';
 import 'fitness_record_page.dart';
 import 'settings_page.dart';
-import 'food_add_page.dart';
-
+import 'foodAdd/food_add_page.dart';
 
 import 'globals_variables/nutri_data.dart';
 
@@ -70,6 +69,7 @@ class _MyAppState extends State<MyApp> {
             key: scaffoldKey,
             //bottomnavigationbar------------------------
             bottomNavigationBar: NavigationBar(
+              height: 70,
               onDestinationSelected: (index) {
                 //controller;
                 _selectedIndex = index;

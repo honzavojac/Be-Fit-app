@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:kaloricke_tabulky_02/foodAdd/change_weight.dart';
 
 class FoodRecordAppBar extends StatelessWidget {
   const FoodRecordAppBar({super.key});
@@ -80,7 +81,6 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
       'Caprese salát',
       'Tiramisu'
     ];
-    double numberWeight;
     return Stack(
       children: [
         /*Positioned(
@@ -143,80 +143,38 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                 },
               ),
             ),
-
-            
-            /*       Container(
-              width: 200,
-              height: 40,
-              decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Colors.white54,
-                    width: 1,
-                    style: BorderStyle.solid,
-                  ),
-                  borderRadius: const BorderRadius.all(Radius.circular(12))),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.only(left: 10, top: 0),
-                    width: 70,
-                    //height: 40,
-                    child: TextField(
-                      inputFormatters: [
-                        FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
-                        LengthLimitingTextInputFormatter(5),
-                      ],
-                      keyboardType: const TextInputType.numberWithOptions(
-                        signed: true,
-                        decimal: true,
-                      ),
-                      //cursorHeight: 20.0,
-                      cursorColor: Colors.white,
-                      decoration: const InputDecoration(
-                        border: InputBorder.none,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                SizedBox(
+                  width: 150,
+                  child: TextField(
+                    keyboardType: const TextInputType.numberWithOptions(
+                        signed: true, decimal: true),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                      LengthLimitingTextInputFormatter(
+                          4) // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
+                    ],
+                    decoration: const InputDecoration(
                         labelText: 'Weight',
-                        labelStyle: TextStyle(color: Colors.amber),
-                        // hintText: 'Enter value:',
-                        hintStyle: TextStyle(fontSize: 15),
-                      ),
-                      onChanged: (input) {
-                        setState(() {
-                          numberWeight = double.parse(input);
-                          print('Text changed to: $numberWeight');
-                        });
-                      },
-                    ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(12)),
+                        ),
+                        contentPadding:
+                            EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                        hintText: 'Enter value:',
+                        hintStyle: TextStyle(
+                            fontSize:
+                                15) // zobrazí se pokud je textové pole prázdné
+                        //  icon: Icon(Icons.text_fields), //
+                        ),
+                    onChanged: (input) {},
                   ),
-                  Text(
-                    ' $selected',
-                    style: const TextStyle(fontSize: 15),
-                  ),
-                  Container(
-                    child: PopupMenuButton<int>(
-                      itemBuilder: (context) {
-                        return List<PopupMenuEntry<int>>.generate(
-                            selectedWeight.length, (int index) {
-                          return PopupMenuItem<int>(
-                            value: index,
-                            child: Text(selectedWeight[index]),
-                          );
-                        });
-                      },
-                      onSelected: (int value) {
-                        setState(() {
-                          selected =
-                              selectedWeight[value]; // Aktualizace proměnné
-                        });
-                      },
-                    ),
-                  ),
-                  SizedBox(
-                    height: 100,
-                  ),
-                ],
-              ),
-            ),*/
+                ),
+                changeWeight(),
+              ],
+            ),
             Expanded(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
