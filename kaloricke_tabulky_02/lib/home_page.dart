@@ -1,6 +1,8 @@
 // ignore_for_file: no_leading_underscores_for_local_identifiers, prefer_const_constructors, sort_child_properties_last, avoid_unnecessary_containers, avoid_print
 
 import 'package:flutter/material.dart';
+import 'package:kaloricke_tabulky_02/globals_variables/nutri_data.dart';
+import 'package:provider/provider.dart';
 import 'package:two_dimensional_scrollables/two_dimensional_scrollables.dart';
 
 DateTime now = DateTime.now();
@@ -34,290 +36,290 @@ class HomeScreen extends StatelessWidget {
 
     EdgeInsets globalPadding = const EdgeInsets.fromLTRB(25, 3, 25, 3);
     final _verticalController = ScrollController();
-    Border borderBorder = Border.all(width: 1, color: Colors.white);
+    final nutrition = Provider.of<NutritionIncremment>(context);
     return Stack(
       children: [
-        /*   Positioned(
-            top: 280,
-            right: 10,
-            child: ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                  shape: const CircleBorder(),
-                  padding: const EdgeInsets.all(20),
-                  backgroundColor: Colors.black87),
-              child: const Icon(
-                Icons.add,
-                size: 20,
-                color: Colors.white,
-              ),
-            ),),*/
-        Column(
-          children: [
-            Container(
-              padding: EdgeInsets.all(15),
-              // color: Colors.amber,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {},
-                    child: Icon(
-                      Icons.arrow_back_ios_new_rounded,
-                      color: Colors.white,
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      fixedSize: Size(80, 30),
-                    ),
-                  ),
-                  SizedBox(
-                    child: Container(
-                      //padding: const EdgeInsets.fromLTRB(0, 0, 0, 5),
-                      //color: Colors.blue,
-                      child: Text(
-                        formattedDate,
-                        style: TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w900,
-                            color: Colors.white),
+        Container(
+          //color: Colors.black26,
+          child: Column(
+            children: [
+              Container(
+                padding: EdgeInsets.all(15),
+                //color: Colors.amber,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {},
+                      child: Icon(
+                        Icons.arrow_back_ios_new_rounded,
+                        color: Colors.white,
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        fixedSize: Size(80, 30),
                       ),
                     ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {},
-                    child: Icon(Icons.arrow_forward_ios_rounded,
-                        color: Colors.white),
-                    style: ElevatedButton.styleFrom(
-                      fixedSize: Size(80, 30),
+                    SizedBox(
+                      child: Container(
+                        //padding: const EdgeInsets.fromLTRB(0, 0, 0, 5),
+                        //color: Colors.blue,
+                        child: Text(
+                          formattedDate,
+                          style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w900,
+                              color: Colors.white),
+                        ),
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        nutrition.incrementKcal();
+                      },
+                      child: Icon(Icons.arrow_forward_ios_rounded,
+                          color: Colors.white),
+                      style: ElevatedButton.styleFrom(
+                        fixedSize: Size(80, 30),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              const SizedBox(
+                height: 40,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Container(
+                    width: 120,
+                    decoration: BoxDecoration(
+                      //   border: borderBorder,
+                      color: Colors.black26,
+                      borderRadius: BorderRadius.circular(7), // Zaoblení rohů
+                    ),
+                    padding: const EdgeInsets.fromLTRB(20, 5, 20, 2),
+                    child: Column(
+                      children: [
+                        Text(
+                          'Calories:',
+                          style: TextStyle(fontSize: 15),
+                        ),
+                        Text(
+                          '${nutrition.kcalData}',
+                          style: TextStyle(
+                              fontSize: 20, color: Colors.yellowAccent),
+                          strutStyle: StrutStyle(fontWeight: FontWeight.bold),
+                        )
+                      ],
                     ),
                   )
                 ],
               ),
-            ),
-            const SizedBox(
-              height: 40,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Container(
-                  width: 120,
-                  decoration: BoxDecoration(
-                    border: borderBorder,
-                    borderRadius: BorderRadius.circular(7), // Zaoblení rohů
-                  ),
-                  padding: const EdgeInsets.fromLTRB(20, 5, 20, 2),
-                  child: const Column(
-                    children: [
-                      Text(
-                        'Calories',
-                        style: TextStyle(fontSize: 15),
-                      ),
-                      Text(
-                        '4000',
-                        style:
-                            TextStyle(fontSize: 20, color: Colors.yellowAccent),
-                        strutStyle: StrutStyle(fontWeight: FontWeight.bold),
-                      )
-                    ],
-                  ),
-                )
-              ],
-            ),
-            const SizedBox(
-              height: 15,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Container(
-                  width: 120,
-                  decoration: BoxDecoration(
-                    border: borderBorder,
-                    borderRadius: BorderRadius.circular(7), // Zaoblení rohů
-                  ),
-                  padding: globalPadding,
-                  child: const Column(
-                    children: [
-                      Text(
-                        'Protein',
-                        style: TextStyle(fontSize: 15),
-                      ),
-                      Text(
-                        'data',
-                        style:
-                            TextStyle(fontSize: 18, color: Colors.yellowAccent),
-                        strutStyle: StrutStyle(fontWeight: FontWeight.bold),
-                      )
-                    ],
-                  ),
-                ),
-                Container(
-                  width: 120,
-                  decoration: BoxDecoration(
-                    border: borderBorder,
-                    borderRadius: BorderRadius.circular(7), // Zaoblení rohů
-                  ),
-                  padding: globalPadding,
-                  child: const Column(
-                    children: [
-                      Text(
-                        'Carbs',
-                        style: TextStyle(fontSize: 15),
-                      ),
-                      Text(
-                        'data',
-                        style:
-                            TextStyle(fontSize: 18, color: Colors.yellowAccent),
-                        strutStyle: StrutStyle(fontWeight: FontWeight.bold),
-                      )
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Container(
-                  width: 120,
-                  decoration: BoxDecoration(
-                    border: borderBorder,
-                    borderRadius: BorderRadius.circular(7), // Zaoblení rohů
-                  ),
-                  padding: globalPadding,
-                  child: const Column(
-                    children: [
-                      Text(
-                        'Fats',
-                        style: TextStyle(fontSize: 15),
-                      ),
-                      Text(
-                        'data',
-                        style:
-                            TextStyle(fontSize: 18, color: Colors.yellowAccent),
-                        strutStyle: StrutStyle(fontWeight: FontWeight.bold),
-                      )
-                    ],
-                  ),
-                ),
-                Container(
-                  width: 120,
-                  decoration: BoxDecoration(
-                    border: borderBorder,
-                    borderRadius: BorderRadius.circular(7), // Zaoblení rohů
-                  ),
-                  padding: globalPadding,
-                  child: const Column(
-                    children: [
-                      Text(
-                        'Fiber',
-                        style: TextStyle(fontSize: 15),
-                      ),
-                      Text(
-                        'data',
-                        style:
-                            TextStyle(fontSize: 18, color: Colors.yellowAccent),
-                        strutStyle: StrutStyle(fontWeight: FontWeight.bold),
-                      )
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(
-              height: 40,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                ElevatedButton.icon(
-                  onPressed: () {},
-                  icon: Icon(Icons.add),
-                  label: Text(
-                    'Add',
-                  ),
-                  style: ButtonStyle(
-                    minimumSize: MaterialStateProperty.all(Size(150, 40)),
-                    foregroundColor: MaterialStateProperty.all(Colors.white),
-                  ),
-                ),
-                SizedBox(
-                  width: 10,
-                ),
-              ],
-            ),
-            Expanded(
-              child: Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10.0),
-                    border: Border.all(color: Colors.white),
-                  ),
-                  margin: const EdgeInsets.all(5),
-                  //tableview 2D
-                  child: Container(
-                    child: TableView.builder(
-                      verticalDetails: ScrollableDetails.vertical(
-                          controller: _verticalController),
-                      cellBuilder: (
-                        BuildContext context,
-                        TableVicinity vicinity,
-                      ) {
-                        return Row(
-                          children: [
-                            Container(
-                              child: Text(
-                                  '${listOfFood[vicinity.row][1]}g ${listOfFood[vicinity.row][2]}  B:${listOfFood[vicinity.row][3]} S:${listOfFood[vicinity.row][4]} T:${listOfFood[vicinity.row][4]} V:${listOfFood[vicinity.row][6]} Kcal:${listOfFood[vicinity.row][7]}'),
-                            ),
-                            InkWell(
-                              child: Icon(Icons.edit),
-                              onTap: () {
-                                print('you can edit this row');
-                              },
-                            ),
-                            SizedBox(
-                              width: 5,
-                            ),
-                            InkWell(
-                              child: Icon(Icons.delete_outline),
-                              onTap: () {
-                                print('you delete this row');
-                              },
-                            )
-                          ],
-                        );
-                      },
-                      columnCount: 1,
-                      columnBuilder: (int index) {
-                        return const TableSpan(
-                          extent: FractionalTableSpanExtent(2),
-                          //onEnter: (_) => print('Entered column $index'),
-                        );
-                      },
-                      rowCount: listOfFood.length,
-                      rowBuilder: (int index) {
-                        return const TableSpan(
-                          backgroundDecoration: TableSpanDecoration(
-                            border: TableSpanBorder(
-                              trailing:
-                                  BorderSide(width: 1, color: Colors.amber),
-                            ),
-                          ),
-                          extent: FixedTableSpanExtent(50), //přiblížení tabulky
-                          //  cursor: SystemMouseCursors.click,
-                        );
-                      },
+              const SizedBox(
+                height: 15,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Container(
+                    width: 120,
+                    decoration: BoxDecoration(
+                      //   border: borderBorder,
+                      color: Colors.black26,
+                      borderRadius: BorderRadius.circular(7), // Zaoblení rohů
                     ),
-                  )),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-          ],
+                    padding: globalPadding,
+                    child: Column(
+                      children: [
+                        Text(
+                          'Protein',
+                          style: TextStyle(fontSize: 15),
+                        ),
+                        Text(
+                          '${nutrition.proteinData}',
+                          style: TextStyle(
+                              fontSize: 18, color: Colors.yellowAccent),
+                          strutStyle: StrutStyle(fontWeight: FontWeight.bold),
+                        )
+                      ],
+                    ),
+                  ),
+                  Container(
+                    width: 120,
+                    decoration: BoxDecoration(
+                      //   border: borderBorder,
+                      color: Colors.black26,
+                      borderRadius: BorderRadius.circular(7), // Zaoblení rohů
+                    ),
+                    padding: globalPadding,
+                    child: Column(
+                      children: [
+                        Text(
+                          'Carbs',
+                          style: TextStyle(fontSize: 15),
+                        ),
+                        Text(
+                          '${nutrition.carbsData}',
+                          style: TextStyle(
+                              fontSize: 18, color: Colors.yellowAccent),
+                          strutStyle: StrutStyle(fontWeight: FontWeight.bold),
+                        )
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Container(
+                    width: 120,
+                    decoration: BoxDecoration(
+                      //   border: borderBorder,
+                      color: Colors.black26,
+                      borderRadius: BorderRadius.circular(7), // Zaoblení rohů
+                    ),
+                    padding: globalPadding,
+                    child: const Column(
+                      children: [
+                        Text(
+                          'Fats',
+                          style: TextStyle(fontSize: 15),
+                        ),
+                        Text(
+                          'data',
+                          style: TextStyle(
+                              fontSize: 18, color: Colors.yellowAccent),
+                          strutStyle: StrutStyle(fontWeight: FontWeight.bold),
+                        )
+                      ],
+                    ),
+                  ),
+                  Container(
+                    width: 120,
+                    decoration: BoxDecoration(
+                      //   border: borderBorder,
+                      color: Colors.black26,
+                      borderRadius: BorderRadius.circular(7), // Zaoblení rohů
+                    ),
+                    padding: globalPadding,
+                    child: const Column(
+                      children: [
+                        Text(
+                          'Fiber',
+                          style: TextStyle(fontSize: 15),
+                        ),
+                        Text(
+                          'data',
+                          style: TextStyle(
+                              fontSize: 18, color: Colors.yellowAccent),
+                          strutStyle: StrutStyle(fontWeight: FontWeight.bold),
+                        )
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(
+                height: 40,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      nutrition.incrementKcal();
+                      nutrition.incrementProtein();
+                      nutrition.incrementCarbs();
+                    },
+                    icon: Icon(Icons.add),
+                    label: Text(
+                      'Add',
+                    ),
+                    style: ButtonStyle(
+                      minimumSize: MaterialStateProperty.all(Size(150, 40)),
+                      foregroundColor: MaterialStateProperty.all(Colors.white),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                ],
+              ),
+              Expanded(
+                child: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10.0),
+                        border: Border.all(color: Colors.transparent),
+                        color: Colors.black12),
+                    margin: const EdgeInsets.all(5),
+                    //tableview 2D
+                    child: Container(
+                      child: TableView.builder(
+                        verticalDetails: ScrollableDetails.vertical(
+                            controller: _verticalController),
+                        cellBuilder: (
+                          BuildContext context,
+                          TableVicinity vicinity,
+                        ) {
+                          return Row(
+                            children: [
+                              Container(
+                                child: Text(
+                                    '${listOfFood[vicinity.row][1]}g ${listOfFood[vicinity.row][2]}  B:${listOfFood[vicinity.row][3]} S:${listOfFood[vicinity.row][4]} T:${listOfFood[vicinity.row][4]} V:${listOfFood[vicinity.row][6]} Kcal:${listOfFood[vicinity.row][7]}'),
+                              ),
+                              InkWell(
+                                child: Icon(Icons.edit),
+                                onTap: () {
+                                  print('you can edit this row');
+                                },
+                              ),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              InkWell(
+                                child: Icon(Icons.delete_outline),
+                                onTap: () {
+                                  print('you delete this row');
+                                },
+                              )
+                            ],
+                          );
+                        },
+                        columnCount: 1,
+                        columnBuilder: (int index) {
+                          return const TableSpan(
+                            extent: FractionalTableSpanExtent(2),
+                            //onEnter: (_) => print('Entered column $index'),
+                          );
+                        },
+                        rowCount: listOfFood.length,
+                        rowBuilder: (int index) {
+                          return const TableSpan(
+                            backgroundDecoration: TableSpanDecoration(
+                              border: TableSpanBorder(
+                                trailing:
+                                    BorderSide(width: 1, color: Colors.amber),
+                              ),
+                            ),
+                            extent:
+                                FixedTableSpanExtent(50), //přiblížení tabulky
+                            //  cursor: SystemMouseCursors.click,
+                          );
+                        },
+                      ),
+                    )),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+            ],
+          ),
         ),
       ],
     );

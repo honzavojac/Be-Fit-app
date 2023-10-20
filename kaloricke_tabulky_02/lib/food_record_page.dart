@@ -9,28 +9,7 @@ class FoodRecordAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: Row(
-        children: [
-          const Text('Záznam jídel'),
-          SizedBox(
-            width: 60,
-          ),
-          ElevatedButton(
-            onPressed: () {},
-            style: ButtonStyle(
-              minimumSize:
-                  MaterialStateProperty.all(Size(45, 45)), // Velikost tlačítka
-              shape: MaterialStateProperty.all(
-                  CircleBorder()), // Tvar tlačítka (kruhové)
-            ),
-            child: Icon(
-              Icons.add,
-              color: Colors.white, // Barva ikony
-              size: 24, // Velikost ikony
-            ),
-          )
-        ],
-      ),
+      title: const Text('Záznam jídel'),
     );
   }
 }
@@ -122,8 +101,12 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
               height: 90,
               padding: EdgeInsets.all(25),
               child: SearchAnchor(
+                //isFullScreen: false,
+
                 builder: (BuildContext context, SearchController controller) {
                   return SearchBar(
+                    elevation: MaterialStatePropertyAll(1),
+                    shadowColor: MaterialStatePropertyAll(Colors.transparent),
                     controller: controller,
                     padding: const MaterialStatePropertyAll<EdgeInsets>(
                       EdgeInsets.symmetric(horizontal: 10.0),
@@ -160,7 +143,9 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                 },
               ),
             ),
-            Container(
+
+            
+            /*       Container(
               width: 200,
               height: 40,
               decoration: BoxDecoration(
@@ -174,34 +159,35 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Container(
-                      padding: const EdgeInsets.only(left: 10, top: 0),
-                      width: 70,
-                      //height: 40,
-                      child: TextField(
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
-                          LengthLimitingTextInputFormatter(5),
-                        ],
-                        keyboardType: const TextInputType.numberWithOptions(
-                          signed: true,
-                          decimal: true,
-                        ),
-                        //cursorHeight: 20.0,
-                        cursorColor: Colors.white,
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          labelText: 'Weight',
-                          labelStyle: TextStyle(color: Colors.amber),
-                          // hintText: 'Enter value:',
-                          hintStyle: TextStyle(fontSize: 15),
-                        ),
-                        onChanged: (input) {
-                          setState(() {
-                            numberWeight = double.parse(input);
-                            print('Text changed to: $numberWeight');
-                          });
-                        },
-                      )),
+                    padding: const EdgeInsets.only(left: 10, top: 0),
+                    width: 70,
+                    //height: 40,
+                    child: TextField(
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                        LengthLimitingTextInputFormatter(5),
+                      ],
+                      keyboardType: const TextInputType.numberWithOptions(
+                        signed: true,
+                        decimal: true,
+                      ),
+                      //cursorHeight: 20.0,
+                      cursorColor: Colors.white,
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        labelText: 'Weight',
+                        labelStyle: TextStyle(color: Colors.amber),
+                        // hintText: 'Enter value:',
+                        hintStyle: TextStyle(fontSize: 15),
+                      ),
+                      onChanged: (input) {
+                        setState(() {
+                          numberWeight = double.parse(input);
+                          print('Text changed to: $numberWeight');
+                        });
+                      },
+                    ),
+                  ),
                   Text(
                     ' $selected',
                     style: const TextStyle(fontSize: 15),
@@ -225,11 +211,38 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                       },
                     ),
                   ),
+                  SizedBox(
+                    height: 100,
+                  ),
                 ],
               ),
-            ),
-            Container(
-              height: 50,
+            ),*/
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Container(
+                    //color: Colors.blue,
+                    height: 40,
+                    width: 150,
+                    child: ElevatedButton.icon(
+                      onPressed: () {},
+                      icon: Icon(Icons.add, size: 30),
+                      label: Text('Add',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(Colors.amber[800]),
+                          foregroundColor: MaterialStateProperty.all(
+                              Colors.black) // Nastavení barvy zde
+                          ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                ],
+              ),
             )
           ],
         ),

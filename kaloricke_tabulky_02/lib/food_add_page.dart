@@ -3,9 +3,12 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
-class FoodAddAppBar extends StatelessWidget {
-  const FoodAddAppBar({super.key});
+import 'globals_variables/nutri_data.dart';
+
+class FoodNewAppbar extends StatelessWidget {
+  const FoodNewAppbar({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -15,11 +18,11 @@ class FoodAddAppBar extends StatelessWidget {
   }
 }
 
-class FoodAddScreen extends StatefulWidget {
-  const FoodAddScreen({super.key});
+class FoodNewScreen extends StatefulWidget {
+  const FoodNewScreen({super.key});
 
   @override
-  State<FoodAddScreen> createState() => _FoodAddScreenState();
+  State<FoodNewScreen> createState() => _FoodNewScreenState();
 }
 
 const List<String> selectedWeight = <String>[
@@ -28,7 +31,7 @@ const List<String> selectedWeight = <String>[
 ];
 String selected = 'g';
 
-class _FoodAddScreenState extends State<FoodAddScreen> {
+class _FoodNewScreenState extends State<FoodNewScreen> {
   @override
   Widget build(BuildContext context) {
     String textFood;
@@ -38,6 +41,9 @@ class _FoodAddScreenState extends State<FoodAddScreen> {
     double numberFiber;
     double numberKcal;
     double numberWeight;
+
+    final nutritionChange = Provider.of<NutritionIncremment>(context);
+
     return Column(
       children: [
         const SizedBox(
@@ -48,7 +54,7 @@ class _FoodAddScreenState extends State<FoodAddScreen> {
           child: TextField(
             inputFormatters: [
               FilteringTextInputFormatter.allow(
-                  RegExp(r'[A-Za-zěščřžýáíéóůú)(\-_\s]')),
+                  RegExp(r'[A-Za-z0-9ěščřžýáíéóůú)(\-_\s]')),
 // povoluje zadat pouze string hodnotu => použiju pro vyhledávání v databázi
               LengthLimitingTextInputFormatter(25)
             ],
@@ -68,6 +74,7 @@ class _FoodAddScreenState extends State<FoodAddScreen> {
                 ),
             onChanged: (input) {
               textFood = input;
+              nutritionChange.updateKcal(input as double);
               print('Text changed to: $textFood');
             },
           ),
@@ -103,6 +110,8 @@ class _FoodAddScreenState extends State<FoodAddScreen> {
                     ),
                 onChanged: (input) {
                   numberKcal = double.parse(input);
+                  nutritionChange.updateKcal(numberKcal);
+
                   print('Text changed to: $numberKcal');
                 },
               ),
@@ -268,7 +277,9 @@ class _FoodAddScreenState extends State<FoodAddScreen> {
                 height: 40,
                 child: TextField(
                   inputFormatters: [
-                    FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                    FilteringTextInputFormatter.allow(
+                      RegExp(r'[0-9]'),
+                    ),
                     LengthLimitingTextInputFormatter(5),
                   ],
                   keyboardType: const TextInputType.numberWithOptions(
@@ -315,6 +326,33 @@ class _FoodAddScreenState extends State<FoodAddScreen> {
             ],
           ),
         ),
+        Expanded(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Container(
+                //color: Colors.blue,
+                height: 40,
+                width: 150,
+                child: ElevatedButton.icon(
+                  onPressed: () {},
+                  icon: Icon(Icons.add, size: 30),
+                  label: Text('Add',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all(Colors.amber[800]),
+                      foregroundColor: MaterialStateProperty.all(
+                          Colors.black) // Nastavení barvy zde
+                      ),
+                ),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+            ],
+          ),
+        )
       ],
     );
   }
