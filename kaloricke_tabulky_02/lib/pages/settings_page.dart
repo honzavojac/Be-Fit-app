@@ -9,7 +9,7 @@ class SettingsAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: Text('Nastavení'),
+      title: Text('Settings'),
     );
   }
 }

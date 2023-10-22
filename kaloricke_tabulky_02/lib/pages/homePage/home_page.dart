@@ -14,7 +14,7 @@ class HomeAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: const Text('Domovská obrazovka'),
+      title: const Text('Home page'),
     );
   }
 }

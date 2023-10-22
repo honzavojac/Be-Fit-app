@@ -10,7 +10,7 @@ class FoodRecordAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: const Text('Záznam jídel'),
+      title: const Text('Food entry'),
     );
   }
 }
@@ -27,7 +27,6 @@ class FoodRecordScreen extends StatefulWidget {
 class _FoodRecordScreenState extends State<FoodRecordScreen> {
   @override
   Widget build(BuildContext context) {
-
     final List<String> jidla = [
       'Hovězí steak',
       'Kuřecí maso na smetanové omáčce',

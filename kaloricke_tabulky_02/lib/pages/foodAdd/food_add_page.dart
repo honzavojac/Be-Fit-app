@@ -12,7 +12,7 @@ class FoodNewAppbar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: const Text('Přidání potraviny'),
+      title: const Text('Add new food'),
     );
   }
 }
