@@ -3,12 +3,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter/services.dart';
-import 'package:kaloricke_tabulky_02/foodAdd/change_weight.dart';
-import 'package:kaloricke_tabulky_02/foodAdd/food_main_add_boxes.dart';
-import 'package:kaloricke_tabulky_02/foodAdd/food_secondary_add_boxes.dart';
-import 'package:provider/provider.dart';
-
-import '../globals_variables/nutri_data.dart';
+import 'package:kaloricke_tabulky_02/pages/foodAdd/food_main_add_boxes.dart';
+import 'package:kaloricke_tabulky_02/pages/foodAdd/food_secondary_add_boxes.dart';
 
 class FoodNewAppbar extends StatelessWidget {
   const FoodNewAppbar({super.key});
@@ -42,12 +38,15 @@ class _FoodNewScreenState extends State<FoodNewScreen> {
         ListView(
           children: [
             foodMainAddBoxes(),
+            SizedBox(
+              height: 30,
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
                   padding: EdgeInsets.all(20),
-                  child: Text('Secondary', style: TextStyle(fontSize: 20)),
+                  child: Text('Others values', style: TextStyle(fontSize: 20)),
                 ),
               ],
             ),

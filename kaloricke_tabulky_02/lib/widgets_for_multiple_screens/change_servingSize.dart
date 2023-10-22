@@ -2,11 +2,11 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class changeWeight extends StatefulWidget {
-  const changeWeight({super.key});
+class changeServingSize extends StatefulWidget {
+  const changeServingSize({super.key});
 
   @override
-  State<changeWeight> createState() => _changeWeightState();
+  State<changeServingSize> createState() => _changeServingSizeState();
 }
 
 final List<String> items = [
@@ -15,7 +15,7 @@ final List<String> items = [
 ];
 String selectedValue = items[0];
 
-class _changeWeightState extends State<changeWeight> {
+class _changeServingSizeState extends State<changeServingSize> {
   @override
   Widget build(BuildContext context) {
     return Row(

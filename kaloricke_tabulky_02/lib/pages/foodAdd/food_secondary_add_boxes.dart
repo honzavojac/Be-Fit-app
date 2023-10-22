@@ -14,10 +14,19 @@ class _foodSecondaryAddBoxesState extends State<foodSecondaryAddBoxes> {
     return Column(
       children: [
         Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: EdgeInsets.fromLTRB(20, 0, 20, 10),
+              child: Text('Fats', style: TextStyle(fontSize: 20)),
+            ),
+          ],
+        ),
+        Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             SizedBox(
-              width: 120,
+              width: 150,
               child: TextField(
                 keyboardType: const TextInputType.numberWithOptions(
                     signed: true, decimal: true),
@@ -27,7 +36,8 @@ class _foodSecondaryAddBoxesState extends State<foodSecondaryAddBoxes> {
                       4) // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
                 ],
                 decoration: const InputDecoration(
-                    labelText: 'Kcal',
+                    labelText: 'Saturated Fatty Acids',
+                    labelStyle: TextStyle(fontSize: 10),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(12)),
                     ),
@@ -36,14 +46,14 @@ class _foodSecondaryAddBoxesState extends State<foodSecondaryAddBoxes> {
                     hintText: 'Enter value:',
                     hintStyle: TextStyle(
                         fontSize:
-                            15) // zobrazí se pokud je textové pole prázdné
+                            10) // zobrazí se pokud je textové pole prázdné
                     //  icon: Icon(Icons.text_fields), //
                     ),
                 onChanged: (input) {},
               ),
             ),
             SizedBox(
-              width: 120,
+              width: 150,
               child: TextField(
                 keyboardType: const TextInputType.numberWithOptions(
                     signed: true, decimal: true),
@@ -53,7 +63,8 @@ class _foodSecondaryAddBoxesState extends State<foodSecondaryAddBoxes> {
                       4) // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
                 ],
                 decoration: const InputDecoration(
-                    labelText: 'Kcal',
+                    labelText: 'Trans Fatty Acids',
+                    labelStyle: TextStyle(fontSize: 10),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(12)),
                     ),
@@ -62,7 +73,7 @@ class _foodSecondaryAddBoxesState extends State<foodSecondaryAddBoxes> {
                     hintText: 'Enter value:',
                     hintStyle: TextStyle(
                         fontSize:
-                            15) // zobrazí se pokud je textové pole prázdné
+                            10) // zobrazí se pokud je textové pole prázdné
                     //  icon: Icon(Icons.text_fields), //
                     ),
                 onChanged: (input) {},
@@ -77,19 +88,18 @@ class _foodSecondaryAddBoxesState extends State<foodSecondaryAddBoxes> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             SizedBox(
-              width: 120,
+              width: 150,
               child: TextField(
                 keyboardType: const TextInputType.numberWithOptions(
                     signed: true, decimal: true),
                 inputFormatters: [
-                  FilteringTextInputFormatter.allow(
-                    RegExp(r'[0-9]'),
-                  ), // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
+                  FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
                   LengthLimitingTextInputFormatter(
-                      4) //omezí kolik znaků je možno zadat
+                      4) // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
                 ],
                 decoration: const InputDecoration(
-                    labelText: 'Protein',
+                    labelText: 'Monounsaturated Fats',
+                    labelStyle: TextStyle(fontSize: 10),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(12)),
                     ),
@@ -98,24 +108,25 @@ class _foodSecondaryAddBoxesState extends State<foodSecondaryAddBoxes> {
                     hintText: 'Enter value:',
                     hintStyle: TextStyle(
                         fontSize:
-                            15) // zobrazí se pokud je textové pole prázdné
+                            10) // zobrazí se pokud je textové pole prázdné
                     //  icon: Icon(Icons.text_fields), //
                     ),
                 onChanged: (input) {},
               ),
             ),
             SizedBox(
-              width: 120,
+              width: 150,
               child: TextField(
                 keyboardType: const TextInputType.numberWithOptions(
                     signed: true, decimal: true),
                 inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(
-                      r'[0-9]')), // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
-                  LengthLimitingTextInputFormatter(4)
+                  FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                  LengthLimitingTextInputFormatter(
+                      4) // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
                 ],
                 decoration: const InputDecoration(
-                    labelText: 'Carbs',
+                    labelText: 'Polyunsaturated Fats',
+                    labelStyle: TextStyle(fontSize: 10),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(12)),
                     ),
@@ -124,7 +135,7 @@ class _foodSecondaryAddBoxesState extends State<foodSecondaryAddBoxes> {
                     hintText: 'Enter value:',
                     hintStyle: TextStyle(
                         fontSize:
-                            15) // zobrazí se pokud je textové pole prázdné
+                            10) // zobrazí se pokud je textové pole prázdné
                     //  icon: Icon(Icons.text_fields), //
                     ),
                 onChanged: (input) {},
@@ -132,76 +143,20 @@ class _foodSecondaryAddBoxesState extends State<foodSecondaryAddBoxes> {
             ),
           ],
         ),
-        const SizedBox(
-          height: 20,
-        ),
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SizedBox(
-              width: 120,
-              child: TextField(
-                keyboardType: const TextInputType.numberWithOptions(
-                    signed: true, decimal: true),
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
-                  LengthLimitingTextInputFormatter(
-                      4) // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
-                ],
-                decoration: const InputDecoration(
-                    labelText: 'Fats',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(12)),
-                    ),
-                    contentPadding:
-                        EdgeInsets.symmetric(vertical: 0, horizontal: 15),
-                    hintText: 'Enter value:',
-                    hintStyle: TextStyle(
-                        fontSize:
-                            15) // zobrazí se pokud je textové pole prázdné
-                    //  icon: Icon(Icons.text_fields), //
-                    ),
-                onChanged: (input) {},
-              ),
+            Container(
+              padding: EdgeInsets.fromLTRB(20, 20, 20, 10),
+              child: Text('Carbs', style: TextStyle(fontSize: 20)),
             ),
-            SizedBox(
-              width: 120,
-              child: TextField(
-                keyboardType: const TextInputType.numberWithOptions(
-                  signed: true,
-                  decimal: true,
-                ),
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
-                  LengthLimitingTextInputFormatter(4),
-                ],
-                decoration: const InputDecoration(
-                  labelText: 'Fiber',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(12)),
-                    borderSide: BorderSide(
-                      color: Colors.blue, // Barva levé strany rámečku
-                      width: 2.0, // Šířka levé strany rámečku
-                    ),
-                  ),
-                  contentPadding:
-                      EdgeInsets.symmetric(vertical: 0, horizontal: 15),
-                  hintText: 'Enter value:',
-                  hintStyle: TextStyle(fontSize: 15),
-                ),
-                onChanged: (input) {},
-              ),
-            )
           ],
         ),
-        const SizedBox(
-          height: 20,
-        ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             SizedBox(
-              width: 120,
+              width: 150,
               child: TextField(
                 keyboardType: const TextInputType.numberWithOptions(
                     signed: true, decimal: true),
@@ -211,7 +166,8 @@ class _foodSecondaryAddBoxesState extends State<foodSecondaryAddBoxes> {
                       4) // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
                 ],
                 decoration: const InputDecoration(
-                    labelText: 'Weight',
+                    labelText: 'Sugars',
+                    labelStyle: TextStyle(fontSize: 10),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(12)),
                     ),
@@ -220,14 +176,55 @@ class _foodSecondaryAddBoxesState extends State<foodSecondaryAddBoxes> {
                     hintText: 'Enter value:',
                     hintStyle: TextStyle(
                         fontSize:
-                            15) // zobrazí se pokud je textové pole prázdné
+                            10) // zobrazí se pokud je textové pole prázdné
+                    //  icon: Icon(Icons.text_fields), //
+                    ),
+                onChanged: (input) {},
+              ),
+            ),
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: EdgeInsets.fromLTRB(20, 20, 20, 10),
+              child: Text('Others', style: TextStyle(fontSize: 20)),
+            ),
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            SizedBox(
+              width: 100,
+              child: TextField(
+                keyboardType: const TextInputType.numberWithOptions(
+                    signed: true, decimal: true),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                  LengthLimitingTextInputFormatter(
+                      4) // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
+                ],
+                decoration: const InputDecoration(
+                    labelText: 'Salt',
+                    labelStyle: TextStyle(fontSize: 10),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(12)),
+                    ),
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                    hintText: 'Enter value:',
+                    hintStyle: TextStyle(
+                        fontSize:
+                            10) // zobrazí se pokud je textové pole prázdné
                     //  icon: Icon(Icons.text_fields), //
                     ),
                 onChanged: (input) {},
               ),
             ),
             SizedBox(
-              width: 120,
+              width: 100,
               child: TextField(
                 keyboardType: const TextInputType.numberWithOptions(
                     signed: true, decimal: true),
@@ -237,7 +234,8 @@ class _foodSecondaryAddBoxesState extends State<foodSecondaryAddBoxes> {
                       4) // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
                 ],
                 decoration: const InputDecoration(
-                    labelText: 'Weight',
+                    labelText: 'Water',
+                    labelStyle: TextStyle(fontSize: 10),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(12)),
                     ),
@@ -246,7 +244,7 @@ class _foodSecondaryAddBoxesState extends State<foodSecondaryAddBoxes> {
                     hintText: 'Enter value:',
                     hintStyle: TextStyle(
                         fontSize:
-                            15) // zobrazí se pokud je textové pole prázdné
+                            10) // zobrazí se pokud je textové pole prázdné
                     //  icon: Icon(Icons.text_fields), //
                     ),
                 onChanged: (input) {},

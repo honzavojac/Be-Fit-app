@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:kaloricke_tabulky_02/foodAdd/change_weight.dart';
+import 'package:kaloricke_tabulky_02/widgets_for_multiple_screens/change_servingSize.dart';
 
 class FoodRecordAppBar extends StatelessWidget {
   const FoodRecordAppBar({super.key});
@@ -27,7 +27,6 @@ class FoodRecordScreen extends StatefulWidget {
 class _FoodRecordScreenState extends State<FoodRecordScreen> {
   @override
   Widget build(BuildContext context) {
-    List<String> selectedWeight = ['g', 'x 100g'];
 
     final List<String> jidla = [
       'Hovězí steak',
@@ -157,7 +156,7 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                           4) // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
                     ],
                     decoration: const InputDecoration(
-                        labelText: 'Weight',
+                        labelText: 'Serving size',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(12)),
                         ),
@@ -172,7 +171,7 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                     onChanged: (input) {},
                   ),
                 ),
-                changeWeight(),
+                changeServingSize(),
               ],
             ),
             Expanded(

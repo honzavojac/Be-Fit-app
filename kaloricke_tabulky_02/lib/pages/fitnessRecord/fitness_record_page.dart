@@ -3,6 +3,7 @@
 //import 'dart:html';
 
 import 'package:flutter/material.dart';
+import 'package:kaloricke_tabulky_02/pages/fitnessRecord/chose_your_split.dart';
 import 'split_page.dart';
 
 class FitnessRecordAppBar extends StatelessWidget {
@@ -34,16 +35,20 @@ List<NavigationDestination> generateNavigationDestinations(List<String> data) {
   List<NavigationDestination> destinations = [];
 
   for (String item in data) {
-    destinations.add(NavigationDestination(
-      selectedIcon: Text(
-        item,
-        style: TextStyle(color: Colors.black),
+    destinations.add(
+      NavigationDestination(
+        selectedIcon: Text(
+          item,
+          style: TextStyle(
+            color: Colors.black,
+          ),
+        ),
+        icon: Text(
+          item,
+        ), // Také zde nastavte ikonu dle vašich požadavků
+        label: '', // Použijete položku ze seznamu jako popisek
       ),
-      icon: Text(
-        item,
-      ), // Také zde nastavte ikonu dle vašich požadavků
-      label: '', // Použijete položku ze seznamu jako popisek
-    ));
+    );
   }
 
   return destinations;
@@ -59,18 +64,11 @@ class FitnessRecordScreen extends StatefulWidget {
 ScrollController _scrollController = ScrollController();
 
 class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
-  int _selectedIndex = 0;
   List<String> exerciseIndex = [];
 
   //final controller = PageController(initialPage: 0);
   @override
   Widget build(BuildContext context) {
-    List<String> data = [
-      'Push',
-      'Pull',
-      'Legs',
-    ];
-
     // List<NavigationDestination> destinations =
 
     return Stack(
@@ -78,8 +76,9 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
         Column(
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
+                choseYourSplit(),
                 Padding(
                   padding: const EdgeInsets.only(left: 20.0),
                   child: TextButton(
@@ -101,12 +100,12 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                           Text(
                             'Edit split',
                             style: TextStyle(color: Colors.white),
-                          )
+                          ),
                         ],
                       ),
                     ),
                   ),
-                )
+                ),
               ],
             ),
             Expanded(
@@ -120,29 +119,6 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                     borderRadius: BorderRadius.all(Radius.circular(10))),
                 child: Column(
                   children: [
-                    NavigationBar(
-                      onDestinationSelected: (index) {
-                        setState(() {
-                          _selectedIndex = index;
-                          //controller.jumpToPage(_selectedIndex);
-                        });
-                        print(_selectedIndex);
-                      },
-                      labelBehavior:
-                          NavigationDestinationLabelBehavior.alwaysHide,
-                      //shadowColor: Colors.greenAccent,
-                      // surfaceTintColor: Colors.blue,
-                      animationDuration: Duration(milliseconds: 500),
-                      height: 50,
-                      indicatorColor: Colors.amber[800],
-                      selectedIndex: _selectedIndex,
-                      backgroundColor: Colors.transparent,
-                      indicatorShape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(50))),
-                      destinations: generateNavigationDestinations(data),
-                      elevation: 0,
-                      //surfaceTintColor: Colors.white,
-                    ),
                     Expanded(
                       child: ListView.builder(
                           controller: _scrollController,

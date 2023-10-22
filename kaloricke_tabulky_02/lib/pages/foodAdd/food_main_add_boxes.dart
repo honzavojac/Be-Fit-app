@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
-import '../globals_variables/nutri_data.dart';
-import 'change_weight.dart';
+import '../../globals_variables/nutri_data.dart';
+import '../../widgets_for_multiple_screens/change_servingSize.dart';
 
 class foodMainAddBoxes extends StatefulWidget {
   const foodMainAddBoxes({super.key});
@@ -56,6 +56,40 @@ class _foodMainAddBoxesState extends State<foodMainAddBoxes> {
             print('Text changed to: $textFood');
           },
         ),
+      ),
+      const SizedBox(
+        height: 20,
+      ),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          SizedBox(
+            width: 150,
+            child: TextField(
+              keyboardType: const TextInputType.numberWithOptions(
+                  signed: true, decimal: true),
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                LengthLimitingTextInputFormatter(
+                    4) // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
+              ],
+              decoration: const InputDecoration(
+                  labelText: 'Serving size',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                  ),
+                  contentPadding:
+                      EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                  hintText: 'Enter value:',
+                  hintStyle: TextStyle(
+                      fontSize: 15) // zobrazí se pokud je textové pole prázdné
+                  //  icon: Icon(Icons.text_fields), //
+                  ),
+              onChanged: (input) {},
+            ),
+          ),
+          changeServingSize(),
+        ],
       ),
       const SizedBox(
         height: 20,
@@ -226,40 +260,6 @@ class _foodMainAddBoxesState extends State<foodMainAddBoxes> {
               },
             ),
           )
-        ],
-      ),
-      const SizedBox(
-        height: 20,
-      ),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          SizedBox(
-            width: 120,
-            child: TextField(
-              keyboardType: const TextInputType.numberWithOptions(
-                  signed: true, decimal: true),
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
-                LengthLimitingTextInputFormatter(
-                    4) // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
-              ],
-              decoration: const InputDecoration(
-                  labelText: 'Weight',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(12)),
-                  ),
-                  contentPadding:
-                      EdgeInsets.symmetric(vertical: 0, horizontal: 15),
-                  hintText: 'Enter value:',
-                  hintStyle: TextStyle(
-                      fontSize: 15) // zobrazí se pokud je textové pole prázdné
-                  //  icon: Icon(Icons.text_fields), //
-                  ),
-              onChanged: (input) {},
-            ),
-          ),
-          changeWeight(),
         ],
       ),
     ]);

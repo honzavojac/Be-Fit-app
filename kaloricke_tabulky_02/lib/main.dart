@@ -1,13 +1,14 @@
 // ignore_for_file: library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
+import 'package:kaloricke_tabulky_02/pages/fitnessRecord/fitness_global_variables.dart';
 import 'package:provider/provider.dart';
 
-import 'home_page.dart';
-import 'food_record_page.dart';
-import 'fitness_record_page.dart';
-import 'settings_page.dart';
-import 'foodAdd/food_add_page.dart';
+import 'pages/foodRecord/food_record_page.dart';
+import 'pages/homePage/home_page.dart';
+import 'pages/fitnessRecord/fitness_record_page.dart';
+import 'pages/settings_page.dart';
+import 'pages/foodAdd/food_add_page.dart';
 
 import 'globals_variables/nutri_data.dart';
 
@@ -46,8 +47,15 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => NutritionIncremment(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<NutritionIncremment>(
+          create: (_) => NutritionIncremment(),
+        ),
+        ChangeNotifierProvider<fitnessGlobalVariables>(
+          create: (_) => fitnessGlobalVariables(),
+        ),
+      ],
       child: MaterialApp(
           debugShowCheckedModeBanner: false,
           theme: ThemeData.dark(useMaterial3: true),
