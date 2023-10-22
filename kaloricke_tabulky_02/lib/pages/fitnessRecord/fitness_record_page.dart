@@ -15,7 +15,7 @@ class FitnessRecordAppBar extends StatelessWidget {
         title: Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text('Exercise recording'),
+        Text('Exercise recording '),
         ElevatedButton.icon(
           onPressed: () {},
           icon: Icon(Icons.moving),
