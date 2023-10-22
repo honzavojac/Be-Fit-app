@@ -15,7 +15,7 @@ class FitnessRecordAppBar extends StatelessWidget {
         title: Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text('Exercise'),
+        Text('Exercise recording'),
         ElevatedButton.icon(
           onPressed: () {},
           icon: Icon(Icons.moving),
@@ -107,6 +107,9 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                   ),
                 ),
               ],
+            ),
+            SizedBox(
+              height: 10,
             ),
             Expanded(
               child: Container(

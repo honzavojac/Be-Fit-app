@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/fitness_global_variables.dart';
 import 'package:provider/provider.dart';
 
-import 'pages/foodRecord/food_record_page.dart';
+import 'pages/foodRecord/food_entry_page.dart';
 import 'pages/homePage/home_page.dart';
 import 'pages/fitnessRecord/fitness_record_page.dart';
-import 'pages/settings_page.dart';
+import 'pages/exercises_page.dart';
 import 'pages/foodAdd/food_add_page.dart';
 
 import 'globals_variables/nutri_data.dart';

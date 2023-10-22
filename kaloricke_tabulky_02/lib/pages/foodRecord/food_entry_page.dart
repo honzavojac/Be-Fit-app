@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:kaloricke_tabulky_02/widgets_for_multiple_screens/change_servingSize.dart';
 
+DateTime now = DateTime.now();
+String formattedDate = "${now.day}.${now.month}.${now.year}";
+
 class FoodRecordAppBar extends StatelessWidget {
   const FoodRecordAppBar({super.key});
 
@@ -173,9 +176,99 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                 changeServingSize(),
               ],
             ),
+            SizedBox(
+              height: 20,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 25),
+                  child: Text('Food diary', style: TextStyle(fontSize: 20)),
+                ),
+              ],
+            ),
             Expanded(
+              child: Container(
+                margin: EdgeInsets.fromLTRB(10, 0, 10, 10),
+                decoration: BoxDecoration(
+                  color: Colors.black26,
+                  borderRadius: BorderRadius.circular(10), // Rounded corners
+                  border: Border.all(style: BorderStyle.none),
+                  // Default border style
+                ),
+                child: ListView.builder(
+                    physics: BouncingScrollPhysics(),
+                    //reverse: true,
+                    itemCount: jidla.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return Column(
+                        children: [
+                          Container(
+                            height: 50,
+                            padding: EdgeInsets.only(left: 15),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Stack(
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Container(child: Text('100g ')),
+                                          Container(child: Text(jidla[index])),
+                                        ],
+                                      ),
+                                      Positioned(
+                                        right: 0,
+                                        child: Row(
+                                          children: [
+                                            Container(
+                                              padding:
+                                                  EdgeInsets.only(right: 15),
+                                              child: InkWell(
+                                                onTap: () {},
+                                                child: Icon(Icons.edit),
+                                              ),
+                                            ),
+                                            Container(
+                                              padding:
+                                                  EdgeInsets.only(right: 15),
+                                              child: InkWell(
+                                                onTap: () {},
+                                                child:
+                                                    Icon(Icons.delete_outline),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            width: double.infinity,
+                            height: 0.15,
+                            color: Colors.amber[800],
+                          )
+                        ],
+                      );
+                    }),
+              ),
+            ),
+            SizedBox(
+              height: 65,
+            )
+          ],
+        ),
+        Stack(
+          alignment: Alignment.bottomCenter,
+          children: [
+            Positioned(
+              bottom: 15,
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Container(
                     //color: Colors.blue,
@@ -189,17 +282,13 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                       style: ButtonStyle(
                           backgroundColor:
                               MaterialStateProperty.all(Colors.amber[800]),
-                          foregroundColor: MaterialStateProperty.all(
-                              Colors.black) // Nastavení barvy zde
-                          ),
+                          foregroundColor:
+                              MaterialStateProperty.all(Colors.black)),
                     ),
-                  ),
-                  SizedBox(
-                    height: 20,
                   ),
                 ],
               ),
-            )
+            ),
           ],
         ),
       ],

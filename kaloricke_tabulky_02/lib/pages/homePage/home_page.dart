@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/globals_variables/nutri_data.dart';
 import 'package:provider/provider.dart';
-import 'package:two_dimensional_scrollables/two_dimensional_scrollables.dart';
 
 DateTime now = DateTime.now();
 String formattedDate = "${now.day}.${now.month}.${now.year}";
@@ -14,7 +13,13 @@ class HomeAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: const Text('Home page'),
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text('Home page'),
+          IconButton(onPressed: () {}, icon: Icon(Icons.settings))
+        ],
+      ),
     );
   }
 }
@@ -35,7 +40,6 @@ class HomeScreen extends StatelessWidget {
     ];
 
     EdgeInsets globalPadding = const EdgeInsets.fromLTRB(25, 3, 25, 3);
-    final _verticalController = ScrollController();
     final nutrition = Provider.of<NutritionIncremment>(context);
     return Stack(
       children: [
@@ -225,7 +229,7 @@ class HomeScreen extends StatelessWidget {
                 ],
               ),
               const SizedBox(
-                height: 40,
+                height: 30,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -252,68 +256,77 @@ class HomeScreen extends StatelessWidget {
               ),
               Expanded(
                 child: Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10.0),
-                        border: Border.all(color: Colors.transparent),
-                        color: Colors.black12),
-                    margin: const EdgeInsets.all(5),
-                    //tableview 2D
-                    child: Container(
-                      child: TableView.builder(
-                        verticalDetails: ScrollableDetails.vertical(
-                            controller: _verticalController),
-                        cellBuilder: (
-                          BuildContext context,
-                          TableVicinity vicinity,
-                        ) {
-                          return Row(
-                            children: [
-                              Container(
-                                child: Text(
-                                    '${listOfFood[vicinity.row][1]}g ${listOfFood[vicinity.row][2]}  B:${listOfFood[vicinity.row][3]} S:${listOfFood[vicinity.row][4]} T:${listOfFood[vicinity.row][4]} V:${listOfFood[vicinity.row][6]} Kcal:${listOfFood[vicinity.row][7]}'),
-                              ),
-                              InkWell(
-                                child: Icon(Icons.edit),
-                                onTap: () {
-                                  print('you can edit this row');
-                                },
-                              ),
-                              SizedBox(
-                                width: 5,
-                              ),
-                              InkWell(
-                                child: Icon(Icons.delete_outline),
-                                onTap: () {
-                                  print('you delete this row');
-                                },
-                              )
-                            ],
-                          );
-                        },
-                        columnCount: 1,
-                        columnBuilder: (int index) {
-                          return const TableSpan(
-                            extent: FractionalTableSpanExtent(2),
-                            //onEnter: (_) => print('Entered column $index'),
-                          );
-                        },
-                        rowCount: listOfFood.length,
-                        rowBuilder: (int index) {
-                          return const TableSpan(
-                            backgroundDecoration: TableSpanDecoration(
-                              border: TableSpanBorder(
-                                trailing:
-                                    BorderSide(width: 1, color: Colors.amber),
+                  margin: EdgeInsets.fromLTRB(10, 0, 10, 10),
+                  decoration: BoxDecoration(
+                    color: Colors.black26,
+                    borderRadius: BorderRadius.circular(10), // Rounded corners
+                    border: Border.all(style: BorderStyle.none),
+                    // Default border style
+                  ),
+                  child: ListView.builder(
+                      physics: BouncingScrollPhysics(),
+                      //reverse: true,
+                      itemCount: listOfFood.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return Column(
+                          children: [
+                            Container(
+                              height: 50,
+                              padding: EdgeInsets.only(left: 15),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Stack(
+                                      children: [
+                                        Row(
+                                          children: [
+                                            //Container(
+                                            //  child: Text(
+                                            //    listOfFood[index])),
+                                            Container(
+                                              child: Text(listOfFood[index][2]),
+                                            ),
+                                          ],
+                                        ),
+                                        Positioned(
+                                          right: 0,
+                                          child: Row(
+                                            children: [
+                                              Container(
+                                                padding:
+                                                    EdgeInsets.only(right: 15),
+                                                child: InkWell(
+                                                  onTap: () {},
+                                                  child: Icon(Icons.edit),
+                                                ),
+                                              ),
+                                              Container(
+                                                padding:
+                                                    EdgeInsets.only(right: 15),
+                                                child: InkWell(
+                                                  onTap: () {},
+                                                  child: Icon(
+                                                      Icons.delete_outline),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            extent:
-                                FixedTableSpanExtent(50), //přiblížení tabulky
-                            //  cursor: SystemMouseCursors.click,
-                          );
-                        },
-                      ),
-                    )),
+                            Container(
+                              width: double.infinity,
+                              height: 0.15,
+                              color: Colors.amber[800],
+                            )
+                          ],
+                        );
+                      }),
+                ),
               ),
               SizedBox(
                 height: 10,

@@ -33,64 +33,70 @@ String selected = 'g';
 class _FoodNewScreenState extends State<FoodNewScreen> {
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        ListView(
+    return Expanded(
+      child: Container(
+        color: Color.fromARGB(255, 0, 6, 27),
+        child: Stack(
           children: [
-            foodMainAddBoxes(),
-            SizedBox(
-              height: 30,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+            ListView(
               children: [
-                Container(
-                  padding: EdgeInsets.all(20),
-                  child: Text('Others values', style: TextStyle(fontSize: 20)),
+                foodMainAddBoxes(),
+                SizedBox(
+                  height: 30,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(20),
+                      child:
+                          Text('Others values', style: TextStyle(fontSize: 20)),
+                    ),
+                  ],
+                ),
+                foodSecondaryAddBoxes(),
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [],
+                  ),
+                ),
+                SizedBox(
+                  height: 100,
+                )
+              ],
+            ),
+            Stack(
+              alignment: Alignment.bottomCenter,
+              children: [
+                Positioned(
+                  bottom: 15,
+                  child: Column(
+                    children: [
+                      Container(
+                        //color: Colors.blue,
+                        height: 40,
+                        width: 150,
+                        child: ElevatedButton.icon(
+                          onPressed: () {},
+                          icon: Icon(Icons.add, size: 30),
+                          label: Text('Add',
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                          style: ButtonStyle(
+                              backgroundColor:
+                                  MaterialStateProperty.all(Colors.amber[800]),
+                              foregroundColor:
+                                  MaterialStateProperty.all(Colors.black)),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
-            foodSecondaryAddBoxes(),
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [],
-              ),
-            ),
-            SizedBox(
-              height: 100,
-            )
           ],
         ),
-        Stack(
-          alignment: Alignment.bottomCenter,
-          children: [
-            Positioned(
-              bottom: 15,
-              child: Column(
-                children: [
-                  Container(
-                    //color: Colors.blue,
-                    height: 40,
-                    width: 150,
-                    child: ElevatedButton.icon(
-                      onPressed: () {},
-                      icon: Icon(Icons.add, size: 30),
-                      label: Text('Add',
-                          style: TextStyle(fontWeight: FontWeight.bold)),
-                      style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all(Colors.amber[800]),
-                          foregroundColor:
-                              MaterialStateProperty.all(Colors.black)),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        )
-      ],
+      ),
     );
   }
 }

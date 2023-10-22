@@ -1,7 +1,5 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
-import 'package:kaloricke_tabulky_02/pages/fitnessRecord/fitness_global_variables.dart';
-import 'package:provider/provider.dart';
 
 class choseYourSplit extends StatefulWidget {
   const choseYourSplit({super.key});
