@@ -11,8 +11,6 @@ import 'pages/fitnessRecord/fitness_record_page.dart';
 import 'pages/exercises_page.dart';
 
 import 'pages/foodAdd/food_add_page.dart';
-
-
 import 'globals_variables/nutri_data.dart';
 
 void main() {
