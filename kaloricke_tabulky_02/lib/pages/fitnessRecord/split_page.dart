@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-int _selectedIndex = 0;
+import 'dart:io';
 
 class SplitPage extends StatefulWidget {
   const SplitPage();
@@ -11,71 +10,77 @@ class SplitPage extends StatefulWidget {
 }
 
 class _SplitPageState extends State<SplitPage> {
+  List<Tab> tabs = [];
+
+  @override
+  void initState() {
+    super.initState();
+    tabs = loadTabsFromFile();
+  }
+
+  void addTab() {
+    setState(() {
+      tabs.add(Tab(
+        child: Text('New Tab'),
+      ));
+      saveTabsToFile(tabs);
+    });
+  }
+
+  void saveTabsToFile(List<Tab> tabs) async {
+    final file = File('tabs.txt');
+    final tabNames = tabs.map((tab) => tab.child.toString()).toList();
+    await file.writeAsString(tabNames.join('\n'));
+  }
+
+  List<Tab> loadTabsFromFile() {
+    final file = File('tabs.txt');
+    if (!file.existsSync()) {
+      return [];
+    }
+
+    final tabNames = file.readAsStringSync().split('\n');
+    final tabs = tabNames.map((name) => Tab(child: Text(name))).toList();
+    return tabs;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return DefaultTabController(
+      length: tabs.length,
+      child: Scaffold(
         appBar: AppBar(
           title: Text('Edit your split'),
-        ),
-        body: Column(
-          children: [
-            NavigationBar(
-              height: 70,
-              onDestinationSelected: (index) {
-                //controller;
-                _selectedIndex = index;
-                // controller.jumpToPage(_selectedIndex);
-                setState(() {});
-                //debugPrint('$_selectedIndex');
+          actions: [
+            IconButton(
+              icon: Icon(Icons.add),
+              onPressed: () {
+                addTab();
               },
-              indicatorColor: Colors.amber[800],
-              selectedIndex: _selectedIndex,
-              animationDuration: Duration(milliseconds: 1000),
-              destinations: const [
-                NavigationDestination(
-                  selectedIcon: Icon(
-                    Icons.settings,
-                    color: Colors.black,
-                  ),
-                  icon: Icon(Icons.settings),
-                  label: 'Settings',
-                ),
-                NavigationDestination(
-                  selectedIcon: Icon(
-                    Icons.fitness_center_rounded,
-                    color: Colors.black,
-                  ),
-                  icon: Icon(Icons.fitness_center_rounded),
-                  label: 'Fitness',
-                ),
-              ],
-            ),
-            Container(
-              margin: EdgeInsets.all(40),
-              child: TextField(
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(
-                    RegExp(r'[0-9]'),
-                  ),
-                  LengthLimitingTextInputFormatter(5),
-                ],
-                keyboardType: const TextInputType.numberWithOptions(
-                  signed: true,
-                  decimal: true,
-                ),
-                //cursorHeight: 20.0,
-                cursorColor: Colors.white,
-                decoration: const InputDecoration(
-                  //  border: InputBorder.none,
-                  labelText: 'Category 1',
-                  labelStyle: TextStyle(color: Colors.amber),
-                  // hintText: 'Enter value:',
-                  hintStyle: TextStyle(fontSize: 15),
-                ),
-                onChanged: (input) {},
-              ),
             ),
           ],
-        ));
+          bottom: TabBar(
+            tabs: tabs,
+
+            indicatorColor: Colors.amber,
+            indicatorSize: TabBarIndicatorSize.tab,
+            dividerColor: Colors.transparent,
+            labelColor: Colors.amber,
+            isScrollable: true,
+            //labelPadding: EdgeInsets.symmetric(horizontal: 16.0),
+            //overlayColor: MaterialStatePropertyAll(Colors.black),
+            // unselectedLabelColor: Colors.blue,
+          ),
+        ),
+      ),
+    );
   }
+}
+
+void main() {
+  runApp(
+    MaterialApp(
+      home: SplitPage(),
+    ),
+  );
 }
