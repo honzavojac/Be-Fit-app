@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/fitness_global_variables.dart';
 import 'package:provider/provider.dart';
 
-
 import 'pages/foodEntry/food_entry_page.dart';
 import 'pages/homePage/home_page.dart';
 import 'pages/fitnessRecord/fitness_record_page.dart';
@@ -25,7 +24,7 @@ class MyApp extends StatefulWidget {
 }
 
 final List<Widget> _pages = [
-  const SettingsScreen(),
+  const ExerciseScreen(),
   const FitnessRecordScreen(),
   const HomeScreen(),
   const FoodRecordScreen(),
@@ -33,7 +32,7 @@ final List<Widget> _pages = [
 ];
 
 final List<Widget> _appBars = [
-  const SettingsAppBar(),
+  const ExerciseAppBar(),
   const FitnessRecordAppBar(),
   const HomeAppBar(),
   const FoodRecordAppBar(),
@@ -92,11 +91,11 @@ class _MyAppState extends State<MyApp> {
               destinations: const [
                 NavigationDestination(
                   selectedIcon: Icon(
-                    Icons.settings,
+                    Icons.article,
                     color: Colors.black,
                   ),
-                  icon: Icon(Icons.settings),
-                  label: 'Settings',
+                  icon: Icon(Icons.article_outlined),
+                  label: 'Exercise',
                 ),
                 NavigationDestination(
                   selectedIcon: Icon(

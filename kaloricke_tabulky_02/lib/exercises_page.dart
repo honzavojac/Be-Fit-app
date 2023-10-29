@@ -2,8 +2,8 @@
 
 import 'package:flutter/material.dart';
 
-class SettingsAppBar extends StatelessWidget {
-  const SettingsAppBar();
+class ExerciseAppBar extends StatelessWidget {
+  const ExerciseAppBar();
 
   @override
   Widget build(BuildContext context) {
@@ -13,19 +13,19 @@ class SettingsAppBar extends StatelessWidget {
   }
 }
 
-class SettingsScreen extends StatefulWidget {
-  const SettingsScreen();
+class ExerciseScreen extends StatefulWidget {
+  const ExerciseScreen();
 
   @override
-  State<SettingsScreen> createState() => _SettingsScreenState();
+  State<ExerciseScreen> createState() => _ExerciseScreenState();
 }
 
-class _SettingsScreenState extends State<SettingsScreen> {
+class _ExerciseScreenState extends State<ExerciseScreen> {
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Text(
-          'bude tady obrazovka kde se bude dát podívat na progres u cviků list containerů cviků, místo nastavení které bude v homePageAppbaru,cviky se budou řadit podle poslední změny a budou mít 3 druhy ikon - routoucí(zelenou),klesající(červenou) a stoupající/rostoucí(bílá)'),
+          'bude tady obrazovka kde se bude dát podívat na progres u cviků list containerů cviků, cviky se budou řadit podle poslední změny a budou mít 3 druhy ikon - routoucí(zelenou),klesající(červenou) a stoupající/rostoucí(bílá)'),
     );
   }
 }
