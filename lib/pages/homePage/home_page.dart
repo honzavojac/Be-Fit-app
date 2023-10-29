@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 
 import 'data_boxes.dart';
 import 'data_listview.dart';
+import 'settings.dart';
 
 DateTime now = DateTime.now();
 String formattedDate = "${now.day}.${now.month}.${now.year}";
@@ -21,7 +22,14 @@ class HomeAppBar extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           const Text('Home page'),
-          IconButton(onPressed: () {}, icon: Icon(Icons.settings))
+          IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Settings()),
+                );
+              },
+              icon: Icon(Icons.settings))
         ],
       ),
     );

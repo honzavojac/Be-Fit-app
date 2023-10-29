@@ -13,17 +13,7 @@ class mySearchBar extends StatefulWidget {
   State<mySearchBar> createState() => _mySearchBarState();
 }
 
-class Dog {
-  final int id;
-  final String name;
-  final int age;
 
-  const Dog({
-    required this.id,
-    required this.name,
-    required this.age,
-  });
-}
 
 final List<String> jidla = [
   'Hovězí steak',
@@ -81,6 +71,7 @@ final List<String> jidla = [
 class _mySearchBarState extends State<mySearchBar> {
   @override
   Widget build(BuildContext context) {
+  
     return Container(
       height: 90,
       padding: EdgeInsets.all(25),
