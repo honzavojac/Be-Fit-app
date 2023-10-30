@@ -68,7 +68,7 @@ class _MyAppState extends State<MyApp> {
               controller: controller,
               onPageChanged: (index) {
                 _selectedIndex = index;
-                controller.jumpToPage(index);
+               // controller.jumpToPage(index);nesmí tady být
                 setState(() {});
                 debugPrint('$_selectedIndex');
               },
