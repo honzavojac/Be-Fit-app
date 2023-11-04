@@ -1,74 +1,129 @@
+import 'package:database_app/dbhelper.dart';
 import 'package:flutter/material.dart';
-
-import 'dbhelper.dart';
+import 'package:sqflite/sqflite.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'To do app',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const MyHomePage(title: 'To Do App'),
+      home: HomeScreen(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-  DbHelper dbHelper = new DbHelper();
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
+class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+        title: Text('Database App'),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'Button',
+      body: Column(
+        children: [
+          Row(
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  insertDbRows();
+                  printDatabaseContents();
+                  deleteDbRow(1);
+                },
+                child: Text('insert'),
+              ),
+            ],
+          ),
+          Expanded(
+            child: Container(
+              child: FutureBuilder<List<DbRow>>(
+                future: AllDbRows(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    final AllDbRowsList = snapshot.data;
+
+                    if (AllDbRowsList != null) {
+                      return ListView.builder(
+                        itemCount: AllDbRowsList.length,
+                        itemBuilder: (context, index) {
+                          final dog = AllDbRowsList[index];
+                          return ListTile(
+                            title: Text(dog.task),
+                            subtitle: Text(dog.info),
+                          );
+                        },
+                      );
+                    } else {
+                      return Center(
+                        child: Text('Databáze je prázdná.'),
+                      );
+                    }
+                  } else if (snapshot.hasError) {
+                    return Center(
+                      child:
+                          Text('Chyba při čtení databáze: ${snapshot.error}'),
+                    );
+                  } else {
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                },
+              ),
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          dbHelper.initDb();
-        },
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
+          ),
+        ],
       ),
     );
+  }
+}
+
+Future<void> printDatabaseContents() async {
+  final db = await getDatabase();
+  final List<Map<String, dynamic>> data = await db.query('ToDoData');
+  print(data);
+}
+
+Future<void> insertDbRows() async {
+  final db = await getDatabase();
+  final batch = db.batch();
+
+  batch.insert('ToDoData', DbRow(task: 'Fido', info: '35').toMap());
+  batch.insert('ToDoData', DbRow(task: 'Buddy', info: '42').toMap());
+  batch.insert('ToDoData', DbRow(task: 'Max', info: '29').toMap());
+
+  await batch.commit();
+}
+
+Future<List<DbRow>> AllDbRows() async {
+  final db = await getDatabase();
+  final List<Map<String, dynamic>> maps = await db.query('ToDoData');
+  return List.generate(maps.length, (i) {
+    return DbRow(
+      id: maps[i]['id'] as int,
+      task: maps[i]['task'] as String,
+      info: maps[i]['info'] as String,
+    );
+  });
+}
+
+class DbRow {
+  final int id;
+  final String task;
+  final String info;
+
+  DbRow({
+    this.id = 0,
+    required this.task,
+    required this.info,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'task': task,
+      'info': info,
+    };
   }
 }
