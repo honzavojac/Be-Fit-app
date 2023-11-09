@@ -16,7 +16,7 @@ Future<Database> getDatabase() async {
   } else {
     // Databáze neexistuje -- udělá se kopie z assetu
     try {
-      //vytvoření adresáře s cestou -- pokud existuje tak nemá efekt
+      //vytvoření adresáře s cestou -- pokud existuje tak nemá žádný efekt
       //recursive: true --vytvoření všech nadřazených adresářů
       await Directory(dirname(path)).create(recursive: true);
     } catch (_) {}
@@ -46,7 +46,7 @@ Future<void> insertDbRow(DbRow dbrow) async {
 
   // Insert the DbRow into the correct table. You might also specify the
   // `conflictAlgorithm` to use in case the same dbrow is inserted twice.
-  //
+
   // In this case, replace any previous data.
   await db.insert(
     'ToDoData', //tabulka databáze
@@ -56,8 +56,9 @@ Future<void> insertDbRow(DbRow dbrow) async {
   );
 }
 
+
 //metoda pro načtení všech záznamů/dat z tabulky 'ToDoData' z databáze
-Future<List<DbRow>> ToDoData() async {
+Future<List<DbRow>> AllToDoData() async {
   // získání reference na databázi
   final db = await database;
 
@@ -106,6 +107,19 @@ Future<void> deleteDbRow(int id) async {
     // zajišťuje bezpečnost vkládání SQL
     whereArgs: [id],
   );
+}
+
+//zobrazení celé databáze pro vývoj
+Future<void> printDatabaseContents() async {
+  final db = await getDatabase();
+  final List<Map<String, dynamic>> data = await db.query('ToDoData');
+  print(data);
+}
+
+Future<void> deleteAllData() async {
+  final db = await getDatabase(); // Získání instance databáze
+  await db.rawDelete(
+      'DELETE FROM ToDoData'); // SQL dotaz pro smazání všech záznamů v tabulce ToDoData
 }
 
 // reprezentace záznamů v DB a převod na formát mapy

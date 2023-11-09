@@ -4,6 +4,7 @@ import 'package:sqflite/sqflite.dart';
 
 void main() {
   runApp(MyApp());
+  getDatabase();
 }
 
 class MyApp extends StatelessWidget {
@@ -16,97 +17,60 @@ class MyApp extends StatelessWidget {
 }
 
 class HomeScreen extends StatelessWidget {
+  final TextEditingController taskController = TextEditingController();
+  final TextEditingController infoController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Database App'),
+        title: Text('Databáze úkolů'),
       ),
-      body: Column(
-        children: [
-          Row(
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  insertDbRows();
-                  printDatabaseContents();
-                  deleteDbRow(1);
-                },
-                child: Text('insert'),
-              ),
-            ],
-          ),
-          Expanded(
-            child: Container(
-              child: FutureBuilder<List<DbRow>>(
-                future: AllDbRows(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    final AllDbRowsList = snapshot.data;
-
-                    if (AllDbRowsList != null) {
-                      return ListView.builder(
-                        itemCount: AllDbRowsList.length,
-                        itemBuilder: (context, index) {
-                          final dog = AllDbRowsList[index];
-                          return ListTile(
-                            title: Text(dog.task),
-                            subtitle: Text(dog.info),
-                          );
-                        },
-                      );
-                    } else {
-                      return Center(
-                        child: Text('Databáze je prázdná.'),
-                      );
-                    }
-                  } else if (snapshot.hasError) {
-                    return Center(
-                      child:
-                          Text('Chyba při čtení databáze: ${snapshot.error}'),
-                    );
-                  } else {
-                    return Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  }
-                },
-              ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: <Widget>[
+            TextField(
+              controller: taskController,
+              decoration: InputDecoration(labelText: 'Úkol'),
             ),
-          ),
-        ],
+            TextField(
+              controller: infoController,
+              decoration: InputDecoration(labelText: 'Info'),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    // Vytvoření nového záznamu na základě zadaných hodnot
+                    final newDbRow = DbRow(
+                      task: taskController.text,
+                      info: infoController.text,
+                    );
+
+                    // Volání funkce pro vložení nového záznamu do databáze
+                    insertDbRow(newDbRow);
+
+                    // Vymazání textových polí po vložení
+                    //  taskController.clear();
+                    //  infoController.clear();
+                  },
+                  child: Text('Přidat úkol'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    printDatabaseContents();
+                  },
+                  child: Text('zobrazit databázi'),
+                ),
+              ],
+            )
+          ],
+        ),
       ),
     );
   }
-}
-
-Future<void> printDatabaseContents() async {
-  final db = await getDatabase();
-  final List<Map<String, dynamic>> data = await db.query('ToDoData');
-  print(data);
-}
-
-Future<void> insertDbRows() async {
-  final db = await getDatabase();
-  final batch = db.batch();
-
-  batch.insert('ToDoData', DbRow(task: 'Fido', info: '35').toMap());
-  batch.insert('ToDoData', DbRow(task: 'Buddy', info: '42').toMap());
-  batch.insert('ToDoData', DbRow(task: 'Max', info: '29').toMap());
-
-  await batch.commit();
-}
-
-Future<List<DbRow>> AllDbRows() async {
-  final db = await getDatabase();
-  final List<Map<String, dynamic>> maps = await db.query('ToDoData');
-  return List.generate(maps.length, (i) {
-    return DbRow(
-      id: maps[i]['id'] as int,
-      task: maps[i]['task'] as String,
-      info: maps[i]['info'] as String,
-    );
-  });
 }
 
 class DbRow {
@@ -119,11 +83,21 @@ class DbRow {
     required this.task,
     required this.info,
   });
-
   Map<String, dynamic> toMap() {
+    // pro uložení dat v DB -- data ve formě kterou databáze rozumí v podobě mapy s klíčema (názvy sloupců v 'ToDoData')
     return {
+      //'klíč':hodnota
+      'id': id,
       'task': task,
       'info': info,
     };
   }
+}
+
+Future<void> insertDbRow(DbRow dbRow) async {
+  final db = database;
+  await db.insert('ToDoData', dbRow.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace);
+  print(
+      'Vložení úkolu do databáze: ID: ${dbRow.id}, Task: ${dbRow.task}, Info: ${dbRow.info}');
 }
