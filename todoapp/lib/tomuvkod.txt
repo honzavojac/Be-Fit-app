@@ -1,0 +1,491 @@
+import 'package:drivingschool/models/cat.dart';
+import 'package:drivingschool/models/category_exam.dart';
+import 'package:drivingschool/models/question.dart';
+import 'package:drivingschool/utils/parse_questions.dart';
+import 'package:drivingschool/utils/settings_util.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
+import 'dart:io' as io;
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+
+class DbController extends GetxController {
+  late Database _database;
+
+  var courseT = CourseType.B; // default coursetype is B
+
+  Future<void> initDatabase() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    debugPrint("initilizing DB");
+
+    // create data database
+    io.Directory applicationDirectory = await getApplicationDocumentsDirectory();
+
+    String dataDbPath = path.join(applicationDirectory.path, "data.db");
+    debugPrint(dataDbPath);
+
+    Database dataDb = await openDatabase(
+      dataDbPath,
+      onCreate: (db, version) async {
+        debugPrint("creating dataDb tables...");
+        await db.execute('''
+          CREATE TABLE user_answers (
+            question_id TEXT PRIMARY KEY,
+            is_correct BOOLEAN,
+            flagged BOOLEAN NOT NULL default 0,
+            FOREIGN KEY (question_id) REFERENCES questions(id)
+          );
+          ''');
+      },
+      version: 1,
+    );
+    await dataDb.close();
+
+    // questions database
+    String questionsDbPath = path.join(applicationDirectory.path, "questions.db");
+    // Copy from asset
+    ByteData data = await rootBundle.load(path.join("assets/db", "questions.db"));
+    List<int> bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+    // Write and flush the bytes written
+    await io.File(questionsDbPath).writeAsBytes(bytes, flush: true);
+
+    _database = await openDatabase(questionsDbPath);
+
+    // attach dataDb
+    try {
+      await _database.rawQuery("ATTACH DATABASE '$dataDbPath' as 'dataDb'");
+    } catch (e) {
+      // database is already attached ignore
+      debugPrint("database already attached, not attaching again");
+    }
+  }
+
+  Future<List<Question>> getAllQuestions(CourseType ct, bool randomize) async {
+    final List<Map<String, Object?>> result = await _database.rawQuery('''
+      select questions.id as question_id, questions.text as question_text, categories.points as question_points, questions.image_url as question_image_url, questions.category_id as question_category_id,
+      answers.id as answer_id, answers.text as answer_text, answers.is_correct as answer_is_correct, answers.question_id as answer_question_id,
+      COALESCE(dataDb.user_answers.flagged, 0) AS flagged
+      from questions join answers
+      on (questions.id = answers.question_id)
+      left join dataDb.user_answers
+      on(questions.id = dataDb.user_answers.question_id)
+      join category_types on (questions.category_id = category_types.category_id)
+      join categories on (questions.category_id == categories.id)
+      where category_types.type_id = '${ct.type}'
+      ${randomize == true ? 'order by random()' : ''}
+      ;
+    ''');
+    return parseQuestions(result);
+  }
+
+  Future<int> getAllQuestionsAmount(CourseType ct) async {
+    final List<Map<String, Object?>> result = await _database.rawQuery('''
+      select count(*) as amount
+      from questions 
+      join category_types on (questions.category_id = category_types.category_id)
+      where category_types.type_id = '${ct.type}';
+    ''');
+    return result[0]['amount'] as int;
+  }
+
+  Future<List<Cat>> getCategories(CourseType ct) async {
+    // final List<Map<String, Object?>> result = await _database.rawQuery('''
+    //   select categories.id, categories.name, count(*) as count
+    //   from categories
+    //   join questions on categories.id = questions.category_id
+    //   join category_types on categories.id = category_types.category_id
+    //   where category_types.type_id = '${ct.type}'
+    //   group by categories.id;
+    // ''');
+
+    final List<Map<String, Object?>> result = await _database.rawQuery('''
+      WITH CategoryCounts AS (
+          SELECT
+              categories.id AS category_id,
+              COUNT(DISTINCT CASE WHEN ua.is_correct THEN questions.id END) AS correct_count,
+              COUNT(DISTINCT questions.id) AS count
+          FROM categories
+          JOIN questions ON categories.id = questions.category_id
+          LEFT JOIN dataDb.user_answers AS ua ON questions.id = ua.question_id AND ua.is_correct = 1
+          GROUP BY categories.id
+      )
+
+      SELECT
+          categories.id as id, categories.name as name,
+          cc.correct_count as correct_count,
+          cc.count AS count,
+          CAST(cc.correct_count AS REAL) / cc.count AS success_rate
+      FROM categories
+      JOIN CategoryCounts AS cc ON categories.id = cc.category_id
+      JOIN category_types ON categories.id = category_types.category_id
+      WHERE category_types.type_id = '${ct.type}';
+    ''');
+    return result.map((e) => Cat.fromMap(e)).toList();
+  }
+
+  Future<List<Question>> getQuestions(String categoryId) async {
+    final List<Map<String, Object?>> result = await _database.rawQuery('''
+      select questions.id as question_id, questions.text as question_text, categories.points as question_points, questions.image_url as question_image_url, questions.category_id as question_category_id,
+      answers.id as answer_id, answers.text as answer_text, answers.is_correct as answer_is_correct, answers.question_id as answer_question_id,
+      COALESCE(dataDb.user_answers.flagged, 0) AS flagged
+      from questions join answers
+      on (questions.id = answers.question_id)
+      left join dataDb.user_answers
+      on(questions.id = dataDb.user_answers.question_id)
+      join categories on (questions.category_id == categories.id)
+      where questions.category_id = '$categoryId'
+      order by random();
+    ''');
+    return parseQuestions(result);
+  }
+
+  void setCorrect(String questionId, bool isCorrect) async {
+    await _database.rawQuery('''
+      INSERT OR REPLACE INTO dataDb.user_answers (question_id, is_correct)
+      VALUES ('$questionId', $isCorrect)
+      ON CONFLICT (question_id) DO UPDATE SET
+      is_correct = $isCorrect;
+    ''');
+  }
+
+  void setFlagged(String questionId, bool isFlagged) async {
+    await _database.rawQuery('''
+      INSERT OR REPLACE INTO dataDb.user_answers (question_id, flagged)
+      VALUES ('$questionId', $isFlagged)
+      ON CONFLICT (question_id) DO UPDATE SET
+      flagged = $isFlagged;
+    ''');
+  }
+
+  Future<int> getFlaggedAmount(CourseType ct) async {
+    final List<Map<String, Object?>> result = await _database.rawQuery('''
+      select count(*) as amount
+      from user_answers
+      join questions on (user_answers.question_id = questions.id)
+      join category_types on (questions.category_id = category_types.category_id)
+      where flagged = 1 AND category_types.type_id = '${ct.type}';
+    ''');
+    return result[0]['amount'] as int;
+  }
+
+  Future<List<Question>> getFlagged(CourseType ct) async {
+    final List<Map<String, Object?>> result = await _database.rawQuery('''
+      select questions.id as question_id, questions.text as question_text, categories.points as question_points, questions.image_url as question_image_url, questions.category_id as question_category_id,
+      answers.id as answer_id, answers.text as answer_text, answers.is_correct as answer_is_correct, answers.question_id as answer_question_id,
+      COALESCE(dataDb.user_answers.flagged, 0) AS flagged
+      from questions join answers
+      on (questions.id = answers.question_id)
+      left join dataDb.user_answers
+      on(questions.id = dataDb.user_answers.question_id)
+      join category_types on (questions.category_id = category_types.category_id)
+      join categories on (questions.category_id == categories.id)
+      where dataDb.user_answers.flagged = 1 AND category_types.type_id = '${ct.type}'
+      order by random();
+    ''');
+    return parseQuestions(result);
+  }
+
+  Future<int> getWrongAmount(CourseType ct) async {
+    final List<Map<String, Object?>> result = await _database.rawQuery('''
+      select count(*) as amount
+      from user_answers
+      join questions on (user_answers.question_id = questions.id)
+      join category_types on (questions.category_id = category_types.category_id)
+      where is_correct = 0 AND category_types.type_id = '${ct.type}';
+    ''');
+    return result[0]['amount'] as int;
+  }
+
+  Future<List<Question>> getWrong(CourseType ct) async {
+    final List<Map<String, Object?>> result = await _database.rawQuery('''
+      select questions.id as question_id, questions.text as question_text, categories.points as question_points, questions.image_url as question_image_url, questions.category_id as question_category_id,
+      answers.id as answer_id, answers.text as answer_text, answers.is_correct as answer_is_correct, answers.question_id as answer_question_id,
+      COALESCE(dataDb.user_answers.flagged, 0) AS flagged
+      from questions join answers
+      on (questions.id = answers.question_id)
+      left join dataDb.user_answers
+      on(questions.id = dataDb.user_answers.question_id)
+      join category_types on (questions.category_id = category_types.category_id)
+      join categories on (questions.category_id == categories.id)
+      where dataDb.user_answers.is_correct = 0 AND category_types.type_id = '${ct.type}'
+      order by random();
+    ''');
+    return parseQuestions(result);
+  }
+
+  Future<int> getRightAmount(CourseType ct) async {
+    final List<Map<String, Object?>> result = await _database.rawQuery('''
+      select count(*) as amount
+      from user_answers
+      join questions on (user_answers.question_id = questions.id)
+      join category_types on (questions.category_id = category_types.category_id)
+      where is_correct = 1 AND category_types.type_id = '${ct.type}';
+    ''');
+    return result[0]['amount'] as int;
+  }
+
+  Future<List<Question>> getRight(CourseType ct) async {
+    final List<Map<String, Object?>> result = await _database.rawQuery('''
+      select questions.id as question_id, questions.text as question_text, categories.points as question_points, questions.image_url as question_image_url, questions.category_id as question_category_id,
+      answers.id as answer_id, answers.text as answer_text, answers.is_correct as answer_is_correct, answers.question_id as answer_question_id,
+      COALESCE(dataDb.user_answers.flagged, 0) AS flagged
+      from questions join answers
+      on (questions.id = answers.question_id)
+      left join dataDb.user_answers
+      on(questions.id = dataDb.user_answers.question_id)
+      join category_types on (questions.category_id = category_types.category_id)
+      join categories on (questions.category_id == categories.id)
+      where dataDb.user_answers.is_correct = 1 AND category_types.type_id = '${ct.type}'
+      order by random();
+    ''');
+    return parseQuestions(result);
+  }
+
+  Future<int> getUnshowedAmount(CourseType ct) async {
+    final List<Map<String, Object?>> result = await _database.rawQuery('''
+      select count(*) as amount
+      from questions
+      left join dataDb.user_answers on questions.id = dataDb.user_answers.question_id
+      join category_types on (questions.category_id = category_types.category_id)
+      where user_answers.question_id IS NULL AND category_types.type_id = '${ct.type}';
+    ''');
+    return result[0]['amount'] as int;
+  }
+
+  Future<List<Question>> getUnshowed(CourseType ct) async {
+    final List<Map<String, Object?>> result = await _database.rawQuery('''
+      select questions.id as question_id, questions.text as question_text, categories.points as question_points, questions.image_url as question_image_url, questions.category_id as question_category_id,
+      answers.id as answer_id, answers.text as answer_text, answers.is_correct as answer_is_correct, answers.question_id as answer_question_id,
+      COALESCE(dataDb.user_answers.flagged, 0) AS flagged
+      from questions join answers
+      on (questions.id = answers.question_id)
+      left join dataDb.user_answers
+      on(questions.id = dataDb.user_answers.question_id)
+      join category_types on (questions.category_id = category_types.category_id)
+      join categories on (questions.category_id == categories.id)
+      where user_answers.question_id is null AND category_types.type_id = '${ct.type}'
+      order by random();
+    ''');
+    return parseQuestions(result);
+  }
+
+  Future<double> getCompletionRate(CourseType ct) async {
+    final List<Map<String, Object?>> result = await _database.rawQuery('''
+     select CAST(
+      (
+        select count(*) from dataDb.user_answers
+        join questions on (user_answers.question_id = questions.id)
+        join category_types on (questions.category_id = category_types.category_id)
+        where is_correct is not null AND category_types.type_id = '${ct.type}'
+      ) as REAL)
+       / CAST(
+      (
+        select count(*) from questions
+        join category_types on (questions.category_id = category_types.category_id)
+        where category_types.type_id = '${ct.type}'
+      ) as REAL) 
+      as amount;
+    ''');
+    return result[0]['amount'] == null ? 0 : result[0]['amount'] as double;
+  }
+
+  Future<double> getSuccessRate(CourseType ct) async {
+    final List<Map<String, Object?>> result = await _database.rawQuery('''
+      select CAST(
+      (
+        select count(*) from dataDb.user_answers 
+        join questions on (user_answers.question_id = questions.id)
+        join category_types on (questions.category_id = category_types.category_id)
+        where is_correct = 1 AND category_types.type_id = '${ct.type}'
+      ) as REAL)
+      /
+      (
+        select count(*) from dataDb.user_answers 
+        join questions on (user_answers.question_id = questions.id)
+        join category_types on (questions.category_id = category_types.category_id)
+        where is_correct is not null AND category_types.type_id = '${ct.type}'
+      ) as amount;
+    ''');
+    return result[0]['amount'] == null ? 0 : result[0]['amount'] as double;
+  }
+
+  Future<List<CategoryExam>> getCategoryExamList(CourseType ct) async {
+    final List<Map<String, Object?>> result = await _database.rawQuery('''
+      select categories.id, categories.questions_to_exam
+      from categories
+      join category_types on categories.id = category_types.category_id
+      where category_types.type_id = '${ct.type}';
+    ''');
+    return result.map((e) => CategoryExam.fromMap(e)).toList();
+  }
+
+  Future<List<Question>> getQuestionsWithLimit(String categoryId, int limit) async {
+    final List<Map<String, Object?>> result = await _database.rawQuery('''
+      WITH LimitedQuestions AS (
+          SELECT
+              q.id AS question_id,
+              q.text AS question_text,
+              q.image_url AS question_image_url,
+              q.category_id AS question_category_id,
+              COALESCE(ua.flagged, 0) AS flagged
+          FROM questions q
+          LEFT JOIN user_answers ua ON q.id = ua.question_id
+          WHERE q.category_id = '$categoryId'
+          order by random()
+          LIMIT $limit
+      )
+      SELECT
+          lq.question_id,
+          lq.question_text,
+          categories.points as question_points,
+          lq.question_image_url,
+          lq.question_category_id,
+          a.id AS answer_id,
+          a.text AS answer_text,
+          a.is_correct AS answer_is_correct,
+          a.question_id AS answer_question_id,
+          lq.flagged
+      FROM LimitedQuestions lq
+      JOIN answers a ON lq.question_id = a.question_id
+      join categories on (lq.question_category_id == categories.id);
+    ''');
+    return parseQuestions(result);
+  }
+
+  // category questions wrong
+  Future<List<Question>> getCategoryWrong(String categoryId) async {
+    final List<Map<String, Object?>> result = await _database.rawQuery('''
+    select questions.id as question_id, questions.text as question_text, categories.points as question_points, questions.image_url as question_image_url, questions.category_id as question_category_id,
+    answers.id as answer_id, answers.text as answer_text, answers.is_correct as answer_is_correct, answers.question_id as answer_question_id,
+    COALESCE(dataDb.user_answers.flagged, 0) AS flagged
+    from questions join answers
+    on (questions.id = answers.question_id)
+    left join dataDb.user_answers
+    on(questions.id = dataDb.user_answers.question_id)
+    join categories on (questions.category_id == categories.id)
+    where questions.category_id = '$categoryId' and dataDb.user_answers.is_correct = 0
+    order by random();
+''');
+    return parseQuestions(result);
+  }
+
+// category questions wrong amount
+  Future<int> getCategoryWrongAmount(String categoryId) async {
+    final List<Map<String, Object?>> result = await _database.rawQuery('''
+    select count(*) as amount
+    from questions
+    left join dataDb.user_answers
+    on(questions.id = dataDb.user_answers.question_id)
+    where questions.category_id = '$categoryId' and dataDb.user_answers.is_correct = 0;
+''');
+    return result[0]['amount'] as int;
+  }
+
+  Future<List<Question>> getCategoryRight(String categoryId) async {
+    final List<Map<String, Object?>> result = await _database.rawQuery('''
+    select questions.id as question_id, questions.text as question_text, categories.points as question_points, questions.image_url as question_image_url, questions.category_id as question_category_id,
+    answers.id as answer_id, answers.text as answer_text, answers.is_correct as answer_is_correct, answers.question_id as answer_question_id,
+    COALESCE(dataDb.user_answers.flagged, 0) AS flagged
+    from questions join answers
+    on (questions.id = answers.question_id)
+    left join dataDb.user_answers
+    on(questions.id = dataDb.user_answers.question_id)
+    join categories on (questions.category_id == categories.id)
+    where questions.category_id = '$categoryId' and dataDb.user_answers.is_correct = 1
+    order by random();
+''');
+    return parseQuestions(result);
+  }
+
+  Future<int> getCategoryRightAmount(String categoryId) async {
+    final List<Map<String, Object?>> result = await _database.rawQuery('''
+    select count(*) as amount
+    from questions
+    left join dataDb.user_answers
+    on(questions.id = dataDb.user_answers.question_id)
+    where questions.category_id = '$categoryId' and dataDb.user_answers.is_correct = 1;
+''');
+    return result[0]['amount'] as int;
+  }
+
+// category questions unkown
+  Future<List<Question>> getCategoryUnshowed(String categoryId) async {
+    final List<Map<String, Object?>> result = await _database.rawQuery('''
+    select questions.id as question_id, questions.text as question_text, categories.points as question_points, questions.image_url as question_image_url, questions.category_id as question_category_id,
+    answers.id as answer_id, answers.text as answer_text, answers.is_correct as answer_is_correct, answers.question_id as answer_question_id,
+    COALESCE(dataDb.user_answers.flagged, 0) AS flagged
+    from questions join answers
+    on (questions.id = answers.question_id)
+    left join dataDb.user_answers
+    on(questions.id = dataDb.user_answers.question_id)
+    join categories on (questions.category_id == categories.id)
+    where user_answers.question_id is null AND questions.category_id = '$categoryId'
+    order by random();
+''');
+    return parseQuestions(result);
+  }
+
+// category questions unkown amount
+  Future<int> getCategoryUnshowedAmount(String categoryId) async {
+    final List<Map<String, Object?>> result = await _database.rawQuery('''
+    select count(*) as amount
+    from questions
+    left join dataDb.user_answers on questions.id = dataDb.user_answers.question_id
+    where user_answers.question_id IS NULL AND questions.category_id = '$categoryId';
+''');
+    return result[0]['amount'] as int;
+  }
+
+  Future<double> getTotalSuccessRate(CourseType ct) async {
+    final List<Map<String, Object?>> result = await _database.rawQuery('''
+      WITH CorrectAnswers AS (
+        SELECT COUNT(*) AS amount
+        FROM questions
+        JOIN category_types ON (questions.category_id = category_types.category_id)
+        JOIN dataDb.user_answers ON (dataDb.user_answers.question_id = questions.id)
+        WHERE category_types.type_id = '${ct.type}' AND dataDb.user_answers.is_correct = 1
+      ),
+      TotalQuestions AS (
+        SELECT COUNT(*) AS amount
+        FROM questions
+        JOIN category_types ON (questions.category_id = category_types.category_id)
+        WHERE category_types.type_id = '${ct.type}'
+      )
+      SELECT
+        CorrectAnswers.amount AS correct_count,
+        TotalQuestions.amount AS total_count,
+        (CorrectAnswers.amount * 1.0) / TotalQuestions.amount AS success_rate
+      FROM CorrectAnswers, TotalQuestions;
+''');
+    return result[0]['success_rate'] as double;
+  }
+  // void test() {
+  //   // _database.rawQuery("SELECT * from dataDb.progress");
+  //   _database.rawQuery(
+  //       "INSERT INTO dataDb.user_answers (question_id, answer_id, is_correct) VALUES ('0606038624', '3057824', 0);");
+  // }
+
+  // Future<int> insertUser(Map<String, dynamic> row) async {
+  //   return await _database.insert('users', row);
+  // }
+
+  // Future<int> updateUser(Map<String, dynamic> row) async {
+  //   return await _database.update(
+  //     'users',
+  //     row,
+  //     where: 'id = ?',
+  //     whereArgs: [row['id']],
+  //   );
+  // }
+
+  // Future<int> deleteUser(int id) async {
+  //   return await _database.delete(
+  //     'users',
+  //     where: 'id = ?',
+  //     whereArgs: [id],
+  //   );
+  // }
+}

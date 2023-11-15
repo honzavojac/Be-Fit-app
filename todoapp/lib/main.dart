@@ -28,16 +28,15 @@ class MainApp extends StatelessWidget {
     TextEditingController _controller_age = TextEditingController();
 
     return MaterialApp(
+      theme: ThemeData.dark(useMaterial3: true),
       home: Scaffold(
           appBar: AppBar(
-            title: Text('TO DO APP'),
-            backgroundColor: Colors.amber,
+            title: Text('TO DO APP', style: TextStyle(color: Colors.amber)),
           ),
           body: Column(
             children: [
               Expanded(
                 child: Container(
-                  color: Colors.blue,
                   child: Container(
                     margin: EdgeInsets.all(10),
                     color: const Color.fromARGB(72, 0, 0, 0),
@@ -69,9 +68,9 @@ class MainApp extends StatelessWidget {
                 ),
               ),
               Container(
-                height: 70,
-                color: Colors.white,
-                child: Row(
+                height: 200,
+                // color: Colors.white,
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     ElevatedButton(
@@ -82,17 +81,16 @@ class MainApp extends StatelessWidget {
                               "ID: ${dog.id}, name: ${dog.name}, age: ${dog.age}");
                         }
                       },
-                      child: Text('data'),
+                      child: Text('database view'),
                     ),
                     ElevatedButton(
-                      onPressed: () {
-                        print(_controller_age.text);
+                      onPressed: () async {
+                        debugPrint(_controller_age.text);
                       },
-                      child: Text('data'),
+                      child: Text('recount database id'),
                     ),
                     ElevatedButton(
                       onPressed: () {
-                        // insertDog();
                         databaseInstance.insertDog(
                           Dog(
                             name: _controller_name.text,
@@ -100,7 +98,7 @@ class MainApp extends StatelessWidget {
                           ),
                         );
                       },
-                      child: Text('data'),
+                      child: Text('insert'),
                     )
                   ],
                 ),

@@ -1,6 +1,5 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class changeServingSize extends StatefulWidget {
   const changeServingSize({super.key});
@@ -11,7 +10,7 @@ class changeServingSize extends StatefulWidget {
 
 final List<String> items = [
   'grams',
-  '100 g',
+  '100g',
 ];
 String selectedValue = items[0];
 

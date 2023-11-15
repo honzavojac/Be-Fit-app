@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
-import '../../globals_variables/nutri_data.dart';
-import '../../widgets_for_multiple_screens/change_servingSize.dart';
+import '../../../globals_variables/nutri_data.dart';
+import '../../../widgets_for_multiple_screens/change_servingSize.dart';
 
 class foodMainAddBoxes extends StatefulWidget {
   const foodMainAddBoxes({super.key});

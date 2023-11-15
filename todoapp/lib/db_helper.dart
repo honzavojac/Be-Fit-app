@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -28,7 +27,7 @@ class DbController {
           CREATE TABLE dog (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT,
-            age TEXT
+            age NUMBER
           );
           ''');
       },
@@ -91,14 +90,9 @@ class DbController {
 
   Future<void> deleteDog(int id) async {
     // Get a reference to the database.
-    // Remove the Dog from the database.
-    await _database.delete(
-      'dogs',
-      // Use a `where` clause to delete a specific dog.
-      where: 'id = ?',
-      // Pass the Dog's id as a whereArg to prevent SQL injection.
-      whereArgs: [id],
-    );
+    await _database.rawQuery('''
+      delete from dog where id = $id;
+    ''');
   }
 }
 

@@ -3,6 +3,7 @@
 //import 'dart:html';
 
 import 'package:flutter/material.dart';
+import 'package:kaloricke_tabulky_02/pages/fitnessRecord/statistics_page.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/chose_your_split.dart';
 import 'split_page.dart';
 
@@ -17,7 +18,12 @@ class FitnessRecordAppBar extends StatelessWidget {
       children: [
         Text('Exercise recording '),
         ElevatedButton.icon(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => StatisticsScreen()),
+            );
+          },
           icon: Icon(Icons.moving),
           label: Text(
             'Statistics',

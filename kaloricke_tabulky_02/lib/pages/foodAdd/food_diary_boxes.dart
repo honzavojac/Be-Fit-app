@@ -16,9 +16,8 @@ class _foodDiaryBoxesState extends State<foodDiaryBoxes> {
       margin: EdgeInsets.fromLTRB(10, 0, 10, 10),
       decoration: BoxDecoration(
         color: Colors.black26,
-        borderRadius: BorderRadius.circular(10), // Rounded corners
+        borderRadius: BorderRadius.circular(10),
         border: Border.all(style: BorderStyle.none),
-        // Default border style
       ),
       child: ListView.builder(
           physics: BouncingScrollPhysics(),

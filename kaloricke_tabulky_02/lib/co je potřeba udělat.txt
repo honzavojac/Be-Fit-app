@@ -1,0 +1,40 @@
+
+    Home page
+        settings
+            volba jazyku  (čj/en)
+            volba light/dark mod
+        date box
+            ať se zobrazí kalendář při kliknutí na datum a dá se vybrat určité datum
+            fukce šipek -den, + den
+        spodní lišta jídel daného dne (podle data)
+            nějak upravit -- ? možná jen někde tlačítko "detail"
+        
+            
+    Food add
+       ? * food diary posunout až dolů
+       ? * add (dole) přesunout nad food diary
+            ať zapisuje do  2. tabulky v secondFoodDatabase -- jmeno tabulky: personalFoodData 
+        * tak ať tam fungují obě databáze (mainFoodDatabase.db--assets database, secondFoodDatabase--databáze v zařízení)
+            searchbar
+            food diary
+
+    New food
+        * vyřešit zápis do databáze secondFoodDatabase
+
+    Exercise recording
+        statistics 
+        edit split
+            * opravit vytváření tabs
+            * udělat obrazovku pro každý tab
+                zvolit svalové partie
+                    každé svalové partii přiřadit/vytvořit cvik
+                        vytvořit cvik ??? nebo nějak jinak
+
+        * exercise box (cviky)
+            popřemýšlet jak to chci/potřebuju
+            asi předdefinované v edit split
+            add (dole) bude moct přidat další cvik mimo split
+
+        * Statistics 
+            navrhout celou obrazovku 
+            vymyslet funkčnosti
