@@ -7,7 +7,7 @@ import 'package:sqflite/sqflite.dart';
 import 'dart:io' as io;
 
 //data.db je databáze s tabulkami nově přidanými jídly a ukládání denních hodnot
-class DbController {
+class DbController extends ChangeNotifier {
   late Database _database;
 
   Future<void> initDatabase() async {
@@ -18,8 +18,8 @@ class DbController {
     io.Directory applicationDirectory =
         await getApplicationDocumentsDirectory();
 
-    String dataDbPath = path.join(applicationDirectory.path, "data.db");
-    debugPrint(dataDbPath);
+    String dataDbPath = path.join(applicationDirectory.path, "assets/db/");
+    debugPrint('cesta k databázi:${dataDbPath}');
 
     _database = await openDatabase(
       dataDbPath,
@@ -71,8 +71,7 @@ class DbController {
       },
       version: 1,
     );
-    //oddělat komentáře ctrl shift ú
-    await _database.close();
+    // oddělat komentáře ctrl shift ú
     debugPrint("databáze zavřena");
     //   mainFoodDatabase database
     String mainFoodDatabasePath =
@@ -90,27 +89,38 @@ class DbController {
     _database = await openDatabase(mainFoodDatabasePath);
 
     // attach dataDb
-    try {
-      debugPrint("spojování databáze");
-      await _database.rawQuery("ATTACH DATABASE '$dataDbPath' as 'dataDb'");
-    } catch (e) {
-      // database is already attached ignore
-      debugPrint("databáze už byla spojena");
-    }
+    // try {
+    debugPrint("spojování databáze");
+    debugPrint(dataDbPath);
+    await _database.rawQuery(
+        "ATTACH DATABASE '$dataDbPath' as 'dataDb'"); //ověřit že funguje
+    var hhh = await _database.rawQuery("select * from dataDb.newFoodData");
+    debugPrint("${hhh}");
+//NutriFoodDatabaze
+//newFoodData
+
+    // } catch (e) {
+    // database is already attached ignore
+    // debugPrint("databáze už byla spojena");
   }
 
 // Define a function that inserts dogs into the database
   Future<void> insertDog(Dog dog) async {
     // Get a reference to the database.
     await _database.rawQuery('''
-      insert into dog (name,age) values ('${dog.name}', '${dog.age}');
+      insert into newFoodData (czfoodname,energykcal) values ('${dog.czfoodname}', '${dog.energykcal}');
     ''');
   }
 
   Future<List<Dog>> getDogs() async {
+    debugPrint("getDogs");
     List<Map<String, Object?>> result = await _database.rawQuery('''
-      select id, name, age from dog;
+      
+      select id, czfoodname, energykcal from dataDb.NutriDatabaze;
     ''');
+    //NutriDatabaze
+    //newFoodData
+
     debugPrint(result.toString());
     return result.map((e) => Dog.fromMap(e)).toList();
   }
@@ -132,34 +142,34 @@ class DbController {
   Future<void> deleteDog(int id) async {
     // Get a reference to the database.
     await _database.rawQuery('''
-      delete from dog where id = $id;
+      delete from newFoodData where id = $id;
     ''');
   }
 }
 
 class Dog {
-  final int id;
-  final String name;
-  final String age;
+  final String id;
+  final String czfoodname;
+  final String energykcal;
 
   const Dog({
-    this.id = -1,
-    required this.name,
-    required this.age,
+    this.id = "-1",
+    required this.czfoodname,
+    required this.energykcal,
   });
 
   Dog.fromMap(Map<String, dynamic> item)
-      : id = item["id"],
-        name = item["name"],
-        age = item["age"];
+      : id = item["ID"].toString(),
+        czfoodname = item["CZFOODNAME"].toString(),
+        energykcal = item["ENERGYKCAL"].toString();
 
-  // Convert a Dog into a Map. The keys must correspond to the names of the
+  // Convert a Dog into a Map. The keys must correspond to the czfoodnames of the
   // columns in the database.
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'name': name,
-      'age': age,
+      'czfoodname': czfoodname,
+      'energykcal': energykcal,
     };
   }
 
@@ -167,6 +177,6 @@ class Dog {
   // each dog when using the print statement.
   @override
   String toString() {
-    return 'Dog{id: $id, name: $name, age: $age}';
+    return 'Dog{id: $id, czfoodname: $czfoodname, energykcal: $energykcal}';
   }
 }

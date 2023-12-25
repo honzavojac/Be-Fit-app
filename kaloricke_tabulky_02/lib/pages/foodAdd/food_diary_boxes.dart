@@ -20,7 +20,7 @@ class _foodDiaryBoxesState extends State<foodDiaryBoxes> {
         border: Border.all(style: BorderStyle.none),
       ),
       child: ListView.builder(
-          physics: BouncingScrollPhysics(),
+          // physics: BouncingScrollPhysics(),
           //reverse: true,
           itemCount: jidla.length,
           itemBuilder: (BuildContext context, int index) {

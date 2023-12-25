@@ -15,6 +15,8 @@ import 'pages/fitnessRecord/fitness_record_page.dart';
 
 import 'globals_variables/nutri_data.dart';
 
+
+
 late DbController databaseInstance;
 void main() async {
   if (Platform.isWindows || Platform.isLinux) {
@@ -22,10 +24,11 @@ void main() async {
   }
   databaseFactory = databaseFactoryFfi;
 
-  databaseInstance = DbController();
-  await databaseInstance.initDatabase();
+  // databaseInstance = DbController();
+  // await databaseInstance.initDatabase();
 
-  runApp(const MyApp());
+  runApp(ChangeNotifierProvider(
+      create: (context) => DbController(), child: MyApp()));
 }
 
 class MyApp extends StatefulWidget {
@@ -54,6 +57,13 @@ class _MyAppState extends State<MyApp> {
   final controller = PageController(initialPage: 1);
 
   @override
+  void initState() {
+    Provider.of<DbController>(context, listen: false).initDatabase();
+
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
@@ -63,6 +73,7 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider<fitnessGlobalVariables>(
           create: (_) => fitnessGlobalVariables(),
         ),
+      //  ChangeNotifierProvider<DbController>(create: (_) => DbController()),
       ],
       child: MaterialApp(
           debugShowCheckedModeBanner: false,
@@ -76,7 +87,6 @@ class _MyAppState extends State<MyApp> {
               controller: controller,
               onPageChanged: (index) {
                 _selectedIndex = index;
-                // controller.jumpToPage(index);nesmí tady být
                 setState(() {});
                 debugPrint('$_selectedIndex');
               },
@@ -121,14 +131,6 @@ class _MyAppState extends State<MyApp> {
                   icon: Icon(Icons.fastfood),
                   label: 'Add food',
                 ),
-                /*   NavigationDestination(
-                  selectedIcon: Icon(
-                    Icons.add_circle_rounded,
-                    color: Colors.black,
-                  ),
-                  icon: Icon(Icons.add_circle_outline_sharp),
-                  label: 'New food',
-                ), */
               ],
             ),
           )),
@@ -136,45 +138,5 @@ class _MyAppState extends State<MyApp> {
   }
 }
 
-        /*  drawer: Drawer(
-          child: ListView(
-            children: [
-              ListTile(
-                title: const Text('Domovská stránka'),
-                leading: const Icon(Icons.home),
-                onTap: () {
-                  _onItemTapped(0);
-                },
-              ),
-              ListTile(
-                title: const Text('Záznam jídla'),
-                leading: const Icon(Icons.fastfood),
-                onTap: () {
-                  _onItemTapped(1);
-                },
-              ),
-              ListTile(
-                title: const Text('Přidání potraviny'),
-                leading: const Icon(Icons.add_circle_outline_sharp),
-                onTap: () {
-                  _onItemTapped(2);
-                },
-              ),
-              ListTile(
-                title: const Text('Záznam tréninku'),
-                leading: const Icon(Icons.fitness_center),
-                onTap: () {
-                  _onItemTapped(3);
-                },
-              ),
-              ListTile(
-                title: const Text('Nastavení'),
-                leading: const Icon(Icons.settings),
-                onTap: () {
-                  _onItemTapped(4);
-                },
-              ),
-            ],
-          ),
-        ),*/
+       
  

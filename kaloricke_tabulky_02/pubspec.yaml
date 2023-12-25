@@ -41,4 +41,5 @@ flutter:
 
   assets:
     - assets/db/mainFoodDatabase.db
+    - assets/db/example.db
 
