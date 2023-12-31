@@ -1,0 +1,1 @@
+bude tady obrazovka kde se bude dát podívat na progres u cviků list containerů cviků, cviky se budou řadit podle poslední změny a budou mít 3 druhy ikon - routoucí(zelenou),klesající(červenou) a stoupající/rostoucí(bílá)

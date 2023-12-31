@@ -11,10 +11,13 @@ class dataBoxes extends StatefulWidget {
 }
 
 class _dataBoxesState extends State<dataBoxes> {
-  EdgeInsets globalPadding = const EdgeInsets.fromLTRB(25, 3, 25, 3);
-
+//  EdgeInsets globalPadding = const EdgeInsets.fromLTRB(25, 3, 25, 3);
+  //BorderRadius globalRadius = BorderRadius.circular(15);
   @override
   Widget build(BuildContext context) {
+    EdgeInsets globalPadding = const EdgeInsets.fromLTRB(25, 3, 25, 3);
+
+    BorderRadius globalRadius = BorderRadius.circular(20);
     final nutrition = Provider.of<NutritionIncremment>(context);
     return Column(
       children: [
@@ -26,7 +29,7 @@ class _dataBoxesState extends State<dataBoxes> {
               decoration: BoxDecoration(
                 //   border: borderBorder,
                 color: Colors.black26,
-                borderRadius: BorderRadius.circular(7), // Zaoblení rohů
+                borderRadius: globalRadius, // Zaoblení rohů
               ),
               padding: const EdgeInsets.fromLTRB(20, 5, 20, 2),
               child: Column(
@@ -56,7 +59,7 @@ class _dataBoxesState extends State<dataBoxes> {
               decoration: BoxDecoration(
                 //   border: borderBorder,
                 color: Colors.black26,
-                borderRadius: BorderRadius.circular(7), // Zaoblení rohů
+                borderRadius: globalRadius, // Zaoblení rohů
               ),
               padding: globalPadding,
               child: Column(
@@ -78,7 +81,7 @@ class _dataBoxesState extends State<dataBoxes> {
               decoration: BoxDecoration(
                 //   border: borderBorder,
                 color: Colors.black26,
-                borderRadius: BorderRadius.circular(7), // Zaoblení rohů
+                borderRadius: globalRadius, // Zaoblení rohů
               ),
               padding: globalPadding,
               child: Column(
@@ -108,7 +111,7 @@ class _dataBoxesState extends State<dataBoxes> {
               decoration: BoxDecoration(
                 //   border: borderBorder,
                 color: Colors.black26,
-                borderRadius: BorderRadius.circular(7), // Zaoblení rohů
+                borderRadius: globalRadius, // Zaoblení rohů
               ),
               padding: globalPadding,
               child: const Column(
@@ -130,7 +133,7 @@ class _dataBoxesState extends State<dataBoxes> {
               decoration: BoxDecoration(
                 //   border: borderBorder,
                 color: Colors.black26,
-                borderRadius: BorderRadius.circular(7), // Zaoblení rohů
+                borderRadius: globalRadius, // Zaoblení rohů
               ),
               padding: globalPadding,
               child: const Column(

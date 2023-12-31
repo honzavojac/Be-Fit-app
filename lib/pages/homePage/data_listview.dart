@@ -7,8 +7,6 @@ class dataListview extends StatefulWidget {
   State<dataListview> createState() => _dataListviewState();
 }
 
-
-
 //deklarace dvourozměrného pole jídel
 List<List<dynamic>> listOfFood = [
   [1, 100, 'kuřecí maso', 21, 0, 1, 0, 121],
@@ -31,7 +29,7 @@ class _dataListviewState extends State<dataListview> {
         // Default border style
       ),
       child: ListView.builder(
-          physics: BouncingScrollPhysics(),
+          // physics: BouncingScrollPhysics(),
           //reverse: true,
           itemCount: listOfFood.length,
           itemBuilder: (BuildContext context, int index) {

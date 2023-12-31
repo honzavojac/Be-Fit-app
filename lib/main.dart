@@ -1,19 +1,34 @@
 // ignore_for_file: library_private_types_in_public_api
 //
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/fitness_global_variables.dart';
 import 'package:provider/provider.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
-import 'pages/foodEntry/food_entry_page.dart';
+import 'database_structure/database.dart';
+import 'pages/foodAdd/food_entry_page.dart';
 import 'pages/homePage/home_page.dart';
 import 'pages/fitnessRecord/fitness_record_page.dart';
-import 'exercises_page.dart';
 
-import 'pages/foodAdd/food_add_page.dart';
 import 'globals_variables/nutri_data.dart';
 
-void main() {
-  runApp(const MyApp());
+
+
+late DbController databaseInstance;
+void main() async {
+  if (Platform.isWindows || Platform.isLinux) {
+    sqfliteFfiInit();
+  }
+  databaseFactory = databaseFactoryFfi;
+
+  // databaseInstance = DbController();
+  // await databaseInstance.initDatabase();
+
+  runApp(ChangeNotifierProvider(
+      create: (context) => DbController(), child: MyApp()));
 }
 
 class MyApp extends StatefulWidget {
@@ -24,26 +39,29 @@ class MyApp extends StatefulWidget {
 }
 
 final List<Widget> _pages = [
-  const ExerciseScreen(),
   const FitnessRecordScreen(),
   const HomeScreen(),
   const FoodRecordScreen(),
-  const FoodNewScreen(),
 ];
 
 final List<Widget> _appBars = [
-  const ExerciseAppBar(),
   const FitnessRecordAppBar(),
   const HomeAppBar(),
   const FoodRecordAppBar(),
-  const FoodNewAppbar(),
 ];
 
 class _MyAppState extends State<MyApp> {
-  int _selectedIndex = 2;
+  int _selectedIndex = 1;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  final controller = PageController(initialPage: 2);
+  final controller = PageController(initialPage: 1);
+
+  @override
+  void initState() {
+    Provider.of<DbController>(context, listen: false).initDatabase();
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,6 +73,7 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider<fitnessGlobalVariables>(
           create: (_) => fitnessGlobalVariables(),
         ),
+      //  ChangeNotifierProvider<DbController>(create: (_) => DbController()),
       ],
       child: MaterialApp(
           debugShowCheckedModeBanner: false,
@@ -68,7 +87,6 @@ class _MyAppState extends State<MyApp> {
               controller: controller,
               onPageChanged: (index) {
                 _selectedIndex = index;
-                controller.jumpToPage(index);
                 setState(() {});
                 debugPrint('$_selectedIndex');
               },
@@ -77,7 +95,7 @@ class _MyAppState extends State<MyApp> {
             key: scaffoldKey,
             //bottomnavigationbar------------------------
             bottomNavigationBar: NavigationBar(
-              height: 70,
+              height: 65,
               onDestinationSelected: (index) {
                 //controller;
                 _selectedIndex = index;
@@ -89,14 +107,6 @@ class _MyAppState extends State<MyApp> {
               selectedIndex: _selectedIndex,
               animationDuration: Duration(milliseconds: 1000),
               destinations: const [
-                NavigationDestination(
-                  selectedIcon: Icon(
-                    Icons.article,
-                    color: Colors.black,
-                  ),
-                  icon: Icon(Icons.article_outlined),
-                  label: 'Exercise',
-                ),
                 NavigationDestination(
                   selectedIcon: Icon(
                     Icons.fitness_center_rounded,
@@ -121,14 +131,6 @@ class _MyAppState extends State<MyApp> {
                   icon: Icon(Icons.fastfood),
                   label: 'Add food',
                 ),
-                NavigationDestination(
-                  selectedIcon: Icon(
-                    Icons.add_circle_rounded,
-                    color: Colors.black,
-                  ),
-                  icon: Icon(Icons.add_circle_outline_sharp),
-                  label: 'New food',
-                ),
               ],
             ),
           )),
@@ -136,45 +138,5 @@ class _MyAppState extends State<MyApp> {
   }
 }
 
-        /*  drawer: Drawer(
-          child: ListView(
-            children: [
-              ListTile(
-                title: const Text('Domovská stránka'),
-                leading: const Icon(Icons.home),
-                onTap: () {
-                  _onItemTapped(0);
-                },
-              ),
-              ListTile(
-                title: const Text('Záznam jídla'),
-                leading: const Icon(Icons.fastfood),
-                onTap: () {
-                  _onItemTapped(1);
-                },
-              ),
-              ListTile(
-                title: const Text('Přidání potraviny'),
-                leading: const Icon(Icons.add_circle_outline_sharp),
-                onTap: () {
-                  _onItemTapped(2);
-                },
-              ),
-              ListTile(
-                title: const Text('Záznam tréninku'),
-                leading: const Icon(Icons.fitness_center),
-                onTap: () {
-                  _onItemTapped(3);
-                },
-              ),
-              ListTile(
-                title: const Text('Nastavení'),
-                leading: const Icon(Icons.settings),
-                onTap: () {
-                  _onItemTapped(4);
-                },
-              ),
-            ],
-          ),
-        ),*/
+       
  

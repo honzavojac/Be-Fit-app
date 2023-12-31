@@ -1,10 +1,10 @@
 // ignore_for_file: prefer_const_constructors, avoid_print, avoid_unnecessary_containers
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:kaloricke_tabulky_02/pages/foodEntry/data_boxes.dart';
-import 'package:kaloricke_tabulky_02/pages/foodEntry/food_diary_boxes.dart';
-import 'package:kaloricke_tabulky_02/pages/foodEntry/my_search_bar.dart';
+import 'package:kaloricke_tabulky_02/pages/foodAdd/newFood/food_add_page.dart';
+import 'package:kaloricke_tabulky_02/pages/foodAdd/data_boxes.dart';
+import 'package:kaloricke_tabulky_02/pages/foodAdd/food_diary_boxes.dart';
+import 'package:kaloricke_tabulky_02/pages/foodAdd/my_search_bar.dart';
 
 DateTime now = DateTime.now();
 String formattedDate = "${now.day}.${now.month}.${now.year}";
@@ -15,7 +15,27 @@ class FoodRecordAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: const Text('Food entry'),
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text('Food Add'),
+          ElevatedButton.icon(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => FoodNewScreen()),
+              );
+            },
+            icon: Icon(Icons.add_circle_outline_sharp),
+            label: Text(
+              'New food',
+            ),
+            style: ButtonStyle(
+              foregroundColor: MaterialStateProperty.all(Colors.white),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

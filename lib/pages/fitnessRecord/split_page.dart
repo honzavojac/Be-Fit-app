@@ -60,7 +60,6 @@ class _SplitPageState extends State<SplitPage> {
           ],
           bottom: TabBar(
             tabs: tabs,
-
             indicatorColor: Colors.amber,
             indicatorSize: TabBarIndicatorSize.tab,
             dividerColor: Colors.transparent,
