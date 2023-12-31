@@ -13,6 +13,10 @@ dependencies:
   sqflite: ^2.3.0
   sqflite_common_ffi: ^2.3.0+4
   path_provider: ^2.0.11
+  animated_text_kit: ^4.2.2
+  marquee: ^2.2.3
+  provider: ^6.1.1
+  
 
 dev_dependencies:
   flutter_test:
@@ -23,3 +27,4 @@ flutter:
   uses-material-design: true
   assets:
   - assets/TestNote.db
+  - assets/foodDatabase.db
