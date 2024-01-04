@@ -1,90 +1,29 @@
-// ignore_for_file: unused_import
-
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-import 'dart:async';
-
-import 'package:path/path.dart';
-import 'package:sqflite/sqflite.dart';
+import '../../database/database_provider.dart';
 
 class mySearchBar extends StatefulWidget {
-  const mySearchBar({super.key});
+  const mySearchBar({Key? key}) : super(key: key);
 
   @override
   State<mySearchBar> createState() => _mySearchBarState();
 }
 
-
-
-final List<String> jidla = [
-  'Hovězí steak',
-  'Kuřecí maso na smetanové omáčce',
-  'Smažený rýže s kuřecím masem',
-  'Pizza Margherita',
-  'Těstoviny Carbonara',
-  'Losos na grilu',
-  'Sushi rolls',
-  'Caesarský salát',
-  'Hamburger',
-  'Tacos s hovězím masem',
-  'Rajčatová polévka',
-  'Smažené kuřecí křidélka',
-  'Masové kuličky se špagetami',
-  'Guacamole s nachos',
-  'Řízek s bramborovou kaší',
-  'Smažené krevety',
-  'Zeleninový curry',
-  'Smažený losos s teriyaki omáčkou',
-  'Club sendvič',
-  'Vegetariánská pizza',
-  'Rýžové noky s vepřovým masem',
-  'Chilli con carne',
-  'Quiche Lorraine',
-  'Palačinky s javorovým sirupem',
-  'Kuřecí plněné sýrem',
-  'Miso polévka',
-  'Pečená lilek',
-  'Těstoviny Alfredo',
-  'Smažený tvaroh s medem',
-  'Krabí salát',
-  'Tournedos Rossini',
-  'Houbová polévka',
-  'Kari s hovězím masem',
-  'Jambalaya',
-  'Coq au Vin',
-  'Španělská paella',
-  'Smažená rýže s vepřovým masem',
-  'Zeleninová lasagne',
-  'Smažený sýr',
-  'Zelný salát',
-  'Grilovaná kachna',
-  'Thajský zeleninový curry',
-  'Pečený losos s citronem',
-  'Smažený lososový steak',
-  'Zapečená brambora',
-  'Tacos s krevetami',
-  'Hovězí stroganoff',
-  'Sushi s lososem',
-  'Caprese salát',
-  'Tiramisu'
-];
-
 class _mySearchBarState extends State<mySearchBar> {
   @override
   Widget build(BuildContext context) {
-  
+    var dbHelper = Provider.of<DBHelper>(context);
     return Container(
       height: 90,
       padding: EdgeInsets.all(25),
       child: SearchAnchor(
-        //isFullScreen: false,
-
         builder: (BuildContext context, SearchController controller) {
           return SearchBar(
-            elevation: MaterialStatePropertyAll(1),
-            shadowColor: MaterialStatePropertyAll(Colors.transparent),
+            elevation: MaterialStateProperty.all(1),
+            shadowColor: MaterialStateProperty.all(Colors.transparent),
             controller: controller,
-            padding: const MaterialStatePropertyAll<EdgeInsets>(
+            padding: MaterialStateProperty.all<EdgeInsets>(
               EdgeInsets.symmetric(horizontal: 10.0),
             ),
             onTap: () {
@@ -94,23 +33,34 @@ class _mySearchBarState extends State<mySearchBar> {
               controller.openView();
             },
             leading: const Icon(Icons.search),
-            hintText: 'Search food...',
+            hintText: 'Vyhledat jídlo...',
           );
         },
         suggestionsBuilder:
-            (BuildContext context, SearchController controller) {
-          // Filtrujte seznam jídel na základě hledaného výrazu v `controller.text`
-          final filteredJidla = jidla.where((food) {
-            return food.toLowerCase().contains(controller.text.toLowerCase());
+            (BuildContext context, SearchController controller) async {
+          final List<String> czFoodNames = await dbHelper.getCzFoodNames();
+          final normalizedQuery =
+              _removeDiacritics(controller.text.toLowerCase());
+          
+          final filteredJidla = czFoodNames.where((food) {
+            final normalizedFood = _removeDiacritics(food.toLowerCase());
+            return normalizedFood.contains(normalizedQuery);
           }).toList();
 
           return filteredJidla.map((food) {
             return ListTile(
               title: Text(food),
-              onTap: () {
+              onTap: () async {
+                // Vložit vybranou položku jídla do databáze
+                 await dbHelper.insertItem(food,1);
+                 
+                //-----------toto funguje jako insert po kliknutí !!! později využít
+
+                // Zavřít pohled na vyhledávání a nastavit vybraný text
                 controller.text = food;
                 controller.closeView(food);
-                // Zde můžete provést akce po stisknutí položky jídla
+
+                // Přidejte akce po výběru položky jídla
               },
             );
           }).toList();
@@ -119,3 +69,42 @@ class _mySearchBarState extends State<mySearchBar> {
     );
   }
 }
+
+String _removeDiacritics(String input) {
+  return input.replaceAllMapped(
+    RegExp('[ÁáČčĎďÉéěÍíŇňÓóŘřŠšŤťÚúŮůÝýŽž]'),
+    (match) => _diacriticMap[match.group(0)] ?? match.group(0)!,
+  );
+}
+
+const Map<String, String> _diacriticMap = {
+  'Á': 'A',
+  'á': 'a',
+  'Č': 'C',
+  'č': 'c',
+  'Ď': 'D',
+  'ď': 'd',
+  'É': 'E',
+  'é': 'e',
+  'ě': 'e',
+  'Í': 'I',
+  'í': 'i',
+  'Ň': 'N',
+  'ň': 'n',
+  'Ó': 'O',
+  'ó': 'o',
+  'Ř': 'R',
+  'ř': 'r',
+  'Š': 'S',
+  'š': 's',
+  'Ť': 'T',
+  'ť': 't',
+  'Ú': 'U',
+  'ú': 'u',
+  'Ů': 'U',
+  'ů': 'u',
+  'Ý': 'Y',
+  'ý': 'y',
+  'Ž': 'Z',
+  'ž': 'z',
+};

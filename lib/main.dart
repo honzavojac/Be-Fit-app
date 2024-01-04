@@ -1,34 +1,42 @@
 // ignore_for_file: library_private_types_in_public_api
 //
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/fitness_global_variables.dart';
 import 'package:provider/provider.dart';
-import 'package:sqflite/sqflite.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
-import 'database_structure/database.dart';
+import 'database/database_provider.dart';
 import 'pages/foodAdd/food_entry_page.dart';
 import 'pages/homePage/home_page.dart';
 import 'pages/fitnessRecord/fitness_record_page.dart';
 
 import 'globals_variables/nutri_data.dart';
 
-
-
-late DbController databaseInstance;
+// late DbController databaseInstance;
 void main() async {
-  if (Platform.isWindows || Platform.isLinux) {
-    sqfliteFfiInit();
-  }
-  databaseFactory = databaseFactoryFfi;
+  print('object');
+  DBHelper dbHelper = DBHelper();
+  await dbHelper.initializeDB();
+  // await dbHelper.deleteFile('database.db');
 
-  // databaseInstance = DbController();
-  // await databaseInstance.initDatabase();
+  print(await dbHelper.getNotes());
+  // dbHelper.deleteFile("foodDatabase.db");
+  // await dbHelper.initializeDB();
+  // // await dbHelper.insertItem("text");
+  // // print(await dbHelper.assetsDB());
+  // await dbHelper.a();
 
-  runApp(ChangeNotifierProvider(
-      create: (context) => DbController(), child: MyApp()));
+  // if (Platform.isWindows || Platform.isLinux) {
+  //   sqfliteFfiInit();
+  // }
+  // databaseFactory = databaseFactoryFfi;
+
+  runApp(
+    ChangeNotifierProvider.value(
+      value: dbHelper,
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatefulWidget {
@@ -57,13 +65,6 @@ class _MyAppState extends State<MyApp> {
   final controller = PageController(initialPage: 1);
 
   @override
-  void initState() {
-    Provider.of<DbController>(context, listen: false).initDatabase();
-
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
@@ -73,7 +74,9 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider<fitnessGlobalVariables>(
           create: (_) => fitnessGlobalVariables(),
         ),
-      //  ChangeNotifierProvider<DbController>(create: (_) => DbController()),
+        // ChangeNotifierProvider<DBHelper>(
+        //   create: (_) => DBHelper(),
+        // ),
       ],
       child: MaterialApp(
           debugShowCheckedModeBanner: false,
@@ -137,6 +140,3 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
-
-       
- 

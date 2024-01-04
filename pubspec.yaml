@@ -20,6 +20,8 @@ dependencies:
   path_provider: ^2.1.1
   sqflite_common_ffi: ^2.3.0+3
   sqlite3_flutter_libs: ^0.5.18
+  marquee: ^2.2.3
+  intl: ^0.19.0
 
 dev_dependencies:
   flutter_test:
@@ -42,4 +44,5 @@ flutter:
   assets:
     - assets/db/mainFoodDatabase.db
     - assets/db/example.db
+    - assets/foodDatabase.db
 

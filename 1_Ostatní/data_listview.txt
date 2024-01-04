@@ -1,0 +1,24 @@
+import 'package:flutter/material.dart';
+
+class dataListview extends StatefulWidget {
+  const dataListview({super.key});
+
+  @override
+  State<dataListview> createState() => _dataListviewState();
+}
+
+
+class _dataListviewState extends State<dataListview> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.fromLTRB(10, 0, 10, 10),
+      decoration: BoxDecoration(
+        color: Colors.black26,
+        borderRadius: BorderRadius.circular(10), // Rounded corners
+        border: Border.all(style: BorderStyle.none),
+        // Default border style
+      ),
+    );
+  }
+}

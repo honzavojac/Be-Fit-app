@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/pages/homePage/date_row.dart';
 
 import 'data_boxes.dart';
-import 'data_listview.dart';
 import 'settings.dart';
 
 DateTime now = DateTime.now();
@@ -52,9 +51,6 @@ class HomeScreen extends StatelessWidget {
               dataBoxes(),
               const SizedBox(
                 height: 35,
-              ),
-              Expanded(
-                child: dataListview(),
               ),
             ],
           ),

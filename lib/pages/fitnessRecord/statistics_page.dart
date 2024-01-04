@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:kaloricke_tabulky_02/database/database_provider.dart';
+import 'package:marquee/marquee.dart';
 import 'package:provider/provider.dart';
-
-import '../../database_structure/database.dart';
 
 class StatisticsScreen extends StatefulWidget {
   const StatisticsScreen();
@@ -10,27 +10,9 @@ class StatisticsScreen extends StatefulWidget {
 }
 
 class _StatisticsScreenState extends State<StatisticsScreen> {
-  late Future<List<Dog>> dogsFuture;
-  // final DbController dbController = DbController();
-
-  @override
-  void initState() {
-    dogsFuture = _loadData();
-    super.initState();
-  }
-
-  Future<List<Dog>> _loadData() async {
-    debugPrint('načítání dat...');
-    // await dbController.initDatabase();
-    debugPrint(
-        'fetching data------------------------------------------------------------');
-    return Provider.of<DbController>(context, listen: false).getDogs();
-
-    // return dbController.getDogs();
-  }
-
   @override
   Widget build(BuildContext context) {
+    var dbHelper = Provider.of<DBHelper>(context);
     return Scaffold(
         appBar: AppBar(
           title: Text('Statistics'),
@@ -43,36 +25,108 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
             ),
             Container(
               height: 400,
-              color: const Color.fromARGB(255, 12, 41, 85),
-              child: FutureBuilder<List<Dog>>(
-                future: dogsFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(
-                      child: CircularProgressIndicator(color: Colors.amber),
-                    ); // Display a loading indicator while waiting for data.
-                  } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  } else {
-                    // Data loaded successfully, update the UI with the fetched data.
-                    List<Dog> dogs = snapshot.data!;
-                    return ListView.builder(
-                      itemCount: dogs.length,
-                      shrinkWrap: true,
-                      itemBuilder: (context, index) {
-                        final Dog dog = dogs[index];
-                        return ListTile(
-                          title: Text(dog.czfoodname),
-                          subtitle:
-                              Text('id:${dog.id} ${dog.energykcal} kcal '),
-                        );
-                      },
-                    );
-                  }
-                },
+              width: 300,
+              color: Color.fromARGB(255, 0, 87, 218),
+              child: Center(
+                child: FutureBuilder<List<Note>>(
+                  future: dbHelper.Notes(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('Chyba: ${snapshot.error}'));
+                    } else {
+                      List<Note> notes = snapshot.data!;
+                      return ListView.builder(
+                        itemCount: notes.length,
+                        itemBuilder: (context, index) {
+                          final note = notes[index];
+                          return Dismissible(
+                            key: Key(note.czfoodname),
+                            background: Container(
+                              color: Colors.green,
+                              child: Align(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 16),
+                                  child: Icon(Icons.edit),
+                                ),
+                                alignment: Alignment.centerLeft,
+                              ),
+                            ),
+                            secondaryBackground: Container(
+                              color: Colors.red,
+                              child: Align(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(right: 16),
+                                  child: Icon(Icons.delete),
+                                ),
+                                alignment: Alignment.centerRight,
+                              ),
+                            ),
+                            confirmDismiss: (direction) async {
+                              if (direction == DismissDirection.startToEnd) {
+                                return false;
+                              } else {
+                                bool delete = true;
+                                setState(
+                                  () {
+                                    dbHelper.deleteItem(notes[index].id);
+                                    notes.removeAt(index);
+                                  },
+                                );
+                                return delete;
+                              }
+                            },
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Container(
+                                  height: 50,
+                                  child: Text(" id: ${notes[index].id}"),
+                                  // Další informace, které chcete zobrazit
+                                ),
+                                Container(
+                                  height: 50, width: 200,
+                                  child: buildAnimatedText(
+                                      "${notes[index].czfoodname}"),
+                                  //  Text(
+                                  //     "description:${notes[index].czfoodname}")
+                                  // Další informace, které chcete zobrazit
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    }
+                  },
+                ),
               ),
             ),
           ],
         ));
+  }
+}
+
+Widget buildAnimatedText(String text) {
+  if (text.length <= 29) {
+    print("${text.indexOf(text)} ${text.length}");
+    return Text(text);
+  } else {
+    print("${text.length}text je větší než 15 znaků");
+    return Marquee(
+      text: text,
+      style: TextStyle(color: Colors.black),
+      scrollAxis: Axis.horizontal,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      blankSpace: 50.0,
+      // velocity: 100.0,
+      pauseAfterRound: Duration(seconds: 1),
+      startPadding: 0.0,
+      // accelerationDuration: Duration(seconds: 1),
+      // accelerationCurve: Curves.linear,
+      // decelerationDuration: Duration(milliseconds: 500),
+      // decelerationCurve: Curves.easeOut,
+    );
   }
 }

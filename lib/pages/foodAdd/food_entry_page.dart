@@ -3,8 +3,9 @@
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/pages/foodAdd/newFood/food_add_page.dart';
 import 'package:kaloricke_tabulky_02/pages/foodAdd/data_boxes.dart';
-import 'package:kaloricke_tabulky_02/pages/foodAdd/food_diary_boxes.dart';
 import 'package:kaloricke_tabulky_02/pages/foodAdd/my_search_bar.dart';
+
+import 'food_diary_boxes.dart';
 
 DateTime now = DateTime.now();
 String formattedDate = "${now.day}.${now.month}.${now.year}";
