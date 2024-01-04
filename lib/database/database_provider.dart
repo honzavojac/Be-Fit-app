@@ -97,8 +97,8 @@ class DBHelper extends ChangeNotifier {
 
   // A method that retrieves all the dogs from the dogs table.
   Future<List<Note>> Notes() async {
-    final List<Map<String, dynamic>> maps =
-        await _database.rawQuery('''SELECT ID,CZFOODNAME,ENERGYKCAL FROM Notes''');
+    final List<Map<String, dynamic>> maps = await _database
+        .rawQuery('''SELECT ID,CZFOODNAME,ENERGYKCAL FROM Notes''');
     return List.generate(maps.length, (i) {
       return Note(
         id: maps[i]['id'] as int,
@@ -133,8 +133,8 @@ class DBHelper extends ChangeNotifier {
   }
 
   Future<List<String>> getNotes() async {
-    final List<Map<String, dynamic>> maps =
-        await _database.rawQuery('''SELECT ID,CZFOODNAME,ENERGYKCAL FROM NutriDatabase''');
+    final List<Map<String, dynamic>> maps = await _database
+        .rawQuery('''SELECT ID,CZFOODNAME,ENERGYKCAL FROM NutriDatabase''');
 
     return List.generate(maps.length, (i) {
       return Note(
@@ -145,9 +145,23 @@ class DBHelper extends ChangeNotifier {
     });
   }
 
-  insertItem(String text,int kcal) async {
+  Future<int> getKcalForFood(String food) async {
+    final List<Map<String, dynamic>> result = await _database.rawQuery(
+        '''SELECT ENERGYKCAL FROM Notes WHERE CZFOODNAME = '$food' ''');
+
+    if (result.isNotEmpty) {
+      print(result[0]);
+      return result[0]['ENERGYKCAL'] ;
+    } else {
+      // Vracet defaultní hodnotu nebo vyvolat chybu, pokud není hodnota nalezena
+      return 0;
+    }
+  }
+
+  insertItem(String text, int kcal) async {
     databaseFactoryOrNull = null; //odstraní sql kecy
-    await _database.rawQuery('''INSERT INTO Notes  values(Null,'$text',$kcal)''');
+    await _database
+        .rawQuery('''INSERT INTO Notes  values(Null,'$text',$kcal)''');
     print(_database.rawQuery('''select * from Notes'''));
     notifyListeners();
   }
@@ -173,16 +187,16 @@ class Note {
   final int kcal;
   // final String description;
 
-  Note({this.id = 1, this.czfoodname = 'CZFOODNAME',  this.kcal=1});
+  Note({this.id = 1, this.czfoodname = 'CZFOODNAME', this.kcal = 1});
 
   Note.fromMap(Map<String, dynamic> item)
       : id = item["id"],
         czfoodname = item["CZFOODNAME"],
-        kcal = item["ENERGYKCAL"]
+            kcal = item["ENERGYKCAL"] ?? 0; 
   // description = item["description"];
-  ;
+  
   Map<String, Object> toMap() {
-    return {'id': id, 'CZFOODNAME': czfoodname,'ENERGYKCAL': kcal};
+    return {'id': id, 'CZFOODNAME': czfoodname, 'ENERGYKCAL': kcal};
   }
 
   @override

@@ -51,17 +51,19 @@ class _mySearchBarState extends State<mySearchBar> {
             return ListTile(
               title: Text(food),
               onTap: () async {
-                // Vložit vybranou položku jídla do databáze
-                 await dbHelper.insertItem(food,1);
-                 
-                //-----------toto funguje jako insert po kliknutí !!! později využít
+  // Získání hodnoty ENERGYKCAL ze stejného řádku jako food
+  int kcalValue = await dbHelper.getKcalForFood(food);
 
-                // Zavřít pohled na vyhledávání a nastavit vybraný text
-                controller.text = food;
-                controller.closeView(food);
+  // Vložit vybranou položku jídla do databáze s odpovídající hodnotou ENERGYKCAL
+  await dbHelper.insertItem(food, kcalValue);
 
-                // Přidejte akce po výběru položky jídla
-              },
+  // Zavřít pohled na vyhledávání a nastavit vybraný text
+  controller.text = food;
+  controller.closeView(food);
+
+  // Přidejte akce po výběru položky jídla
+},
+
             );
           }).toList();
         },
