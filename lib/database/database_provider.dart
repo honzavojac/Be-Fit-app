@@ -28,7 +28,7 @@ class DBHelper extends ChangeNotifier {
     _database = await openDatabase(appPath, version: 1,
         onCreate: (Database db, int version) {
       db.execute(
-        "CREATE TABLE Notes(ID INTEGER PRIMARY KEY AUTOINCREMENT, CZFOODNAME TEXT NOT NULL, ENERGYKCAL INTEGER)",
+        "CREATE TABLE Notes(ID INTEGER PRIMARY KEY AUTOINCREMENT, CZFOODNAME TEXT NOT NULL, ENERGYKCAL INTEGER,PROTEIN REAL,CARBS INTEGER,FAT INTEGER,FIBER INTEGER)",
       );
       print("Databáze byla vytvořena");
     });
@@ -92,19 +92,21 @@ class DBHelper extends ChangeNotifier {
       print("vytvoření assets databáze proběhlo úspěšně");
     }
 
-    return assetsPath; // Vracíme cestu k assets databázi (typu String)
+    return assetsPath;
   }
 
-  // A method that retrieves all the dogs from the dogs table.
   Future<List<Note>> Notes() async {
-    final List<Map<String, dynamic>> maps = await _database
-        .rawQuery('''SELECT ID,CZFOODNAME,ENERGYKCAL FROM Notes''');
+    final List<Map<String, dynamic>> maps = await _database.rawQuery(
+        '''SELECT ID,CZFOODNAME,ENERGYKCAL,PROTEIN,CARBS,FAT,FIBER FROM Notes''');
     return List.generate(maps.length, (i) {
       return Note(
-        id: maps[i]['id'] as int,
+        id: maps[i]['ID'] as int,
         czfoodname: maps[i]['CZFOODNAME'] as String,
         kcal: maps[i]['ENERGYKCAL'] as int,
-        // description: maps[i]['description'] as String,
+        protein: maps[i]['PROTEIN'] as double,
+        carbs: maps[i]['CARBS'] as int,
+        fat: maps[i]['FAT'] as int,
+        fiber: maps[i]['FIBER'] as int,
       );
     });
   }
@@ -113,13 +115,6 @@ class DBHelper extends ChangeNotifier {
     var joinResult =
         await _database.rawQuery('''SELECT CZFOODNAME FROM Notes''');
     print("vše------------$joinResult");
-
-    // List<int> cisla = joinResult.map((data) => data['id'] as int).toList();
-    // List<String> description =
-    //     joinResult.map((data) => data['CZFOODNAME'] as String).toList();
-    // // Opravené zakomentované řádky
-    // print(cisla);
-    // print(description);
     return joinResult;
   }
 
@@ -132,36 +127,84 @@ class DBHelper extends ChangeNotifier {
     });
   }
 
-  Future<List<String>> getNotes() async {
-    final List<Map<String, dynamic>> maps = await _database
-        .rawQuery('''SELECT ID,CZFOODNAME,ENERGYKCAL FROM NutriDatabase''');
-
-    return List.generate(maps.length, (i) {
-      return Note(
-        id: maps[i]['ID'] as int,
-        czfoodname: maps[i]['CZFOODNAME'] as String,
-        kcal: maps[i]['ENERGYKCAL'] as int,
-      ).toString();
-    });
-  }
-
   Future<int> getKcalForFood(String food) async {
     final List<Map<String, dynamic>> result = await _database.rawQuery(
-        '''SELECT ENERGYKCAL FROM Notes WHERE CZFOODNAME = '$food' ''');
+        '''SELECT ENERGYKCAL FROM NutriDatabase WHERE CZFOODNAME = '$food' ''');
 
     if (result.isNotEmpty) {
-      print(result[0]);
-      return result[0]['ENERGYKCAL'] ;
+      return result[0]['ENERGYKCAL'];
     } else {
       // Vracet defaultní hodnotu nebo vyvolat chybu, pokud není hodnota nalezena
       return 0;
     }
   }
 
-  insertItem(String text, int kcal) async {
+  Future<double> getProteinForFood(String food) async {
+    final List<Map<String, dynamic>> result = await _database.rawQuery(
+        '''SELECT PROTEIN FROM NutriDatabase WHERE CZFOODNAME = '$food' ''');
+
+    if (result.isNotEmpty) {
+      return result[0]['PROTEIN'];
+    } else {
+      return 0;
+    }
+  }
+
+  Future<int> getCarbsForFood(String food) async {
+    final List<Map<String, dynamic>> result = await _database.rawQuery(
+        '''SELECT CARBS FROM NutriDatabase WHERE CZFOODNAME = '$food' ''');
+
+    if (result.isNotEmpty) {
+      return result[0]['CARBS'];
+    } else {
+      return 0;
+    }
+  }
+
+  Future<int> getFatForFood(String food) async {
+    final List<Map<String, dynamic>> result = await _database.rawQuery(
+        '''SELECT FAT FROM NutriDatabase WHERE CZFOODNAME = '$food' ''');
+
+    if (result.isNotEmpty) {
+      return result[0]['FAT'];
+    } else {
+      return 0;
+    }
+  }
+
+  Future<int> getFiberForFood(String food) async {
+    final List<Map<String, dynamic>> result = await _database.rawQuery(
+        '''SELECT FIBER FROM NutriDatabase WHERE CZFOODNAME = '$food' ''');
+
+    if (result.isNotEmpty) {
+      return result[0]['FIBER'];
+    } else {
+      return 0;
+    }
+  }
+
+  Future<List<String>> getNotes() async {
+    final List<Map<String, dynamic>> maps = await _database.rawQuery(
+        '''SELECT ID,CZFOODNAME,ENERGYKCAL,PROTEIN,CARBS,FAT,FIBER FROM NutriDatabase''');
+
+    return List.generate(maps.length, (i) {
+      return Note(
+        id: maps[i]['ID'] as int,
+        czfoodname: maps[i]['CZFOODNAME'] as String,
+        kcal: maps[i]['ENERGYKCAL'] as int,
+        protein: maps[i]['PROTEIN'] as double,
+        carbs: maps[i]['CARBS'] as int,
+        fat: maps[i]['FAT'] as int,
+        fiber: maps[i]['FIBER'] as int,
+      ).toString();
+    });
+  }
+
+  insertItem(String text, int kcal, double protein, int carbs, int fat,
+      int fiber) async {
     databaseFactoryOrNull = null; //odstraní sql kecy
-    await _database
-        .rawQuery('''INSERT INTO Notes  values(Null,'$text',$kcal)''');
+    await _database.rawQuery(
+        '''INSERT INTO Notes  values(Null,'$text',$kcal,$protein,$carbs,$fat,$fiber)''');
     print(_database.rawQuery('''select * from Notes'''));
     notifyListeners();
   }
@@ -170,10 +213,7 @@ class DBHelper extends ChangeNotifier {
     databaseFactoryOrNull = null;
 
     await _database.delete('Notes', where: 'id = ?', whereArgs: [id]);
-    // Smazání záznamu s id 5
-    // await db.execute('DELETE FROM Notes WHERE id = 5');
 
-    // Získání aktualizovaných dat z databáze
     var updatedData = await _database.query('Notes');
     print(updatedData);
   }
@@ -185,22 +225,45 @@ class Note {
   final int id;
   final String czfoodname;
   final int kcal;
-  // final String description;
+  final double protein;
+  final int carbs;
+  final int fat;
+  final int fiber;
 
-  Note({this.id = 1, this.czfoodname = 'CZFOODNAME', this.kcal = 1});
+  Note({
+    this.id = 1,
+    this.czfoodname = 'CZFOODNAME',
+    this.kcal = 1,
+    this.protein = 1,
+    this.carbs = 1,
+    this.fat = 1,
+    this.fiber = 1,
+  });
 
   Note.fromMap(Map<String, dynamic> item)
-      : id = item["id"],
+      : id = item["ID"],
         czfoodname = item["CZFOODNAME"],
-            kcal = item["ENERGYKCAL"] ?? 0; 
+        kcal = item["ENERGYKCAL"],
+        protein = item["PROTEIN"],
+        carbs = item["CARBS"],
+        fat = item["FAT"],
+        fiber = item["FIBER"];
   // description = item["description"];
-  
+
   Map<String, Object> toMap() {
-    return {'id': id, 'CZFOODNAME': czfoodname, 'ENERGYKCAL': kcal};
+    return {
+      'ID': id,
+      'CZFOODNAME': czfoodname,
+      'ENERGYKCAL': kcal,
+      'PROTEIN': protein,
+      'CARBS': carbs,
+      'FAT': fat,
+      'FIBER': fiber,
+    };
   }
 
   @override
   String toString() {
-    return 'Dog{id: $id, CZFOODNAME: $czfoodname, ENERGYKCAL: $kcal}';
+    return 'Dog{id: $id, CZFOODNAME: $czfoodname, ENERGYKCAL: $kcal,PROTEIN: $protein,CARBS:$carbs,FAT:$fat,FIBER:$fiber}';
   }
 }

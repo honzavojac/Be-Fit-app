@@ -19,7 +19,7 @@ void main() async {
   await dbHelper.initializeDB();
   // await dbHelper.deleteFile('database.db');
 
-  print(await dbHelper.getNotes());
+  // print(await dbHelper.getNotes());
   // dbHelper.deleteFile("foodDatabase.db");
   // await dbHelper.initializeDB();
   // // await dbHelper.insertItem("text");

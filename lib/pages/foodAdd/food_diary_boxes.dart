@@ -72,26 +72,50 @@ class _foodDiaryBoxesState extends State<foodDiaryBoxes> {
                       return delete;
                     }
                   },
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
+                  child: Column(
                     children: [
-                      Container(
-                        height: 50,
-                        child: Text(" id: ${notes[index].id}"),
-                        // Další informace, které chcete zobrazit
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Container(
+                              height: 20,
+                              child: buildAnimatedText(
+                                  "${notes[index].czfoodname}"),
+                              //  Text(
+                              //     "description:${notes[index].czfoodname}")
+                              // Další informace, které chcete zobrazit
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Row(
+                        children: [
+                          Container(
+                            height: 30,
+                            child: Text(" id: ${notes[index].id}"),
+                            // Další informace, které chcete zobrazit
+                          ),
+                          Container(
+                            height: 30,
+                            child: Text(" Kcal: ${notes[index].kcal}"),
+                            // Další informace, které chcete zobrazit
+                          ),   Container(
+                            height: 30,
+                            child: Text(" Protein: ${notes[index].protein}"),
+                            // Další informace, které chcete zobrazit
+                          ),
+                        ],
                       ),
                       Container(
-                        width: 10,
-                      ),
-                      Expanded(
-                        child: Container(
-                          height: 50,
-                          child:
-                              buildAnimatedText("${notes[index].czfoodname}"),
-                          //  Text(
-                          //     "description:${notes[index].czfoodname}")
-                          // Další informace, které chcete zobrazit
-                        ),
+                        height: 1,
+                        color: Colors.amber,
                       ),
                     ],
                   ),

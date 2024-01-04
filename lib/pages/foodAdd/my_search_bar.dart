@@ -41,7 +41,7 @@ class _mySearchBarState extends State<mySearchBar> {
           final List<String> czFoodNames = await dbHelper.getCzFoodNames();
           final normalizedQuery =
               _removeDiacritics(controller.text.toLowerCase());
-          
+
           final filteredJidla = czFoodNames.where((food) {
             final normalizedFood = _removeDiacritics(food.toLowerCase());
             return normalizedFood.contains(normalizedQuery);
@@ -51,19 +51,22 @@ class _mySearchBarState extends State<mySearchBar> {
             return ListTile(
               title: Text(food),
               onTap: () async {
-  // Získání hodnoty ENERGYKCAL ze stejného řádku jako food
-  int kcalValue = await dbHelper.getKcalForFood(food);
+                // Získání hodnoty ENERGYKCAL ze stejného řádku jako food
+                int kcalValue = await dbHelper.getKcalForFood(food);
+                double proteinValue = await dbHelper.getProteinForFood(food);
+                int carbsValue = await dbHelper.getCarbsForFood(food);
+                int fatValue = await dbHelper.getFatForFood(food);
+                int fiberValue = await dbHelper.getFiberForFood(food);
+                // Vložit vybranou položku jídla do databáze s odpovídající hodnotou ENERGYKCAL
+                await dbHelper.insertItem(food, kcalValue, proteinValue,
+                    carbsValue, fatValue, fiberValue);
 
-  // Vložit vybranou položku jídla do databáze s odpovídající hodnotou ENERGYKCAL
-  await dbHelper.insertItem(food, kcalValue);
+                // Zavřít pohled na vyhledávání a nastavit vybraný text
+                controller.text = food;
+                controller.closeView(food);
 
-  // Zavřít pohled na vyhledávání a nastavit vybraný text
-  controller.text = food;
-  controller.closeView(food);
-
-  // Přidejte akce po výběru položky jídla
-},
-
+                // Přidejte akce po výběru položky jídla
+              },
             );
           }).toList();
         },
