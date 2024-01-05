@@ -62,7 +62,7 @@ class _MyAppState extends State<MyApp> {
   int _selectedIndex = 1;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  final controller = PageController(initialPage: 1);
+  final controller = PageController(initialPage:1);
 
   @override
   Widget build(BuildContext context) {

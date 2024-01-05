@@ -54,9 +54,9 @@ class _mySearchBarState extends State<mySearchBar> {
                 // Získání hodnoty ENERGYKCAL ze stejného řádku jako food
                 int kcalValue = await dbHelper.getKcalForFood(food);
                 double proteinValue = await dbHelper.getProteinForFood(food);
-                int carbsValue = await dbHelper.getCarbsForFood(food);
-                int fatValue = await dbHelper.getFatForFood(food);
-                int fiberValue = await dbHelper.getFiberForFood(food);
+                double carbsValue = await dbHelper.getCarbsForFood(food);
+                double fatValue = await dbHelper.getFatForFood(food);
+                double fiberValue = await dbHelper.getFiberForFood(food);
                 // Vložit vybranou položku jídla do databáze s odpovídající hodnotou ENERGYKCAL
                 await dbHelper.insertItem(food, kcalValue, proteinValue,
                     carbsValue, fatValue, fiberValue);

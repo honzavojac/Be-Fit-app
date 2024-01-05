@@ -28,7 +28,7 @@ class DBHelper extends ChangeNotifier {
     _database = await openDatabase(appPath, version: 1,
         onCreate: (Database db, int version) {
       db.execute(
-        "CREATE TABLE Notes(ID INTEGER PRIMARY KEY AUTOINCREMENT, CZFOODNAME TEXT NOT NULL, ENERGYKCAL INTEGER,PROTEIN REAL,CARBS INTEGER,FAT INTEGER,FIBER INTEGER)",
+        "CREATE TABLE Notes(ID INTEGER PRIMARY KEY AUTOINCREMENT, CZFOODNAME TEXT NOT NULL, ENERGYKCAL INTEGER,PROTEIN REAL,CARBS REAL,FAT REAL,FIBER REAL)",
       );
       print("Databáze byla vytvořena");
     });
@@ -77,7 +77,7 @@ class DBHelper extends ChangeNotifier {
     // print("Ověření existence databáze: $exists");
 
     if (exists) {
-      print("\nVytváření databáze");
+      print("\nVytváření assets databáze");
       try {
         await Directory(dirname(assetsPath)).create(recursive: true);
       } catch (_) {
@@ -104,9 +104,9 @@ class DBHelper extends ChangeNotifier {
         czfoodname: maps[i]['CZFOODNAME'] as String,
         kcal: maps[i]['ENERGYKCAL'] as int,
         protein: maps[i]['PROTEIN'] as double,
-        carbs: maps[i]['CARBS'] as int,
-        fat: maps[i]['FAT'] as int,
-        fiber: maps[i]['FIBER'] as int,
+        carbs: maps[i]['CARBS'] as double,
+        fat: maps[i]['FAT'] as double,
+        fiber: maps[i]['FIBER'] as double,
       );
     });
   }
@@ -120,7 +120,7 @@ class DBHelper extends ChangeNotifier {
 
   Future<List<String>> getCzFoodNames() async {
     final List<Map<String, dynamic>> maps =
-        await _database.rawQuery('''SELECT CZFOODNAME FROM NutriDatabase''');
+        await _database.rawQuery('''SELECT CZFOODNAME FROM NutriDatabaseData''');
 
     return List.generate(maps.length, (i) {
       return maps[i]['CZFOODNAME'].toString();
@@ -129,7 +129,7 @@ class DBHelper extends ChangeNotifier {
 
   Future<int> getKcalForFood(String food) async {
     final List<Map<String, dynamic>> result = await _database.rawQuery(
-        '''SELECT ENERGYKCAL FROM NutriDatabase WHERE CZFOODNAME = '$food' ''');
+        '''SELECT ENERGYKCAL FROM NutriDatabaseData WHERE CZFOODNAME = '$food' ''');
 
     if (result.isNotEmpty) {
       return result[0]['ENERGYKCAL'];
@@ -141,7 +141,7 @@ class DBHelper extends ChangeNotifier {
 
   Future<double> getProteinForFood(String food) async {
     final List<Map<String, dynamic>> result = await _database.rawQuery(
-        '''SELECT PROTEIN FROM NutriDatabase WHERE CZFOODNAME = '$food' ''');
+        '''SELECT PROTEIN FROM NutriDatabaseData WHERE CZFOODNAME = '$food' ''');
 
     if (result.isNotEmpty) {
       return result[0]['PROTEIN'];
@@ -150,9 +150,9 @@ class DBHelper extends ChangeNotifier {
     }
   }
 
-  Future<int> getCarbsForFood(String food) async {
+  Future<double> getCarbsForFood(String food) async {
     final List<Map<String, dynamic>> result = await _database.rawQuery(
-        '''SELECT CARBS FROM NutriDatabase WHERE CZFOODNAME = '$food' ''');
+        '''SELECT CARBS FROM NutriDatabaseData WHERE CZFOODNAME = '$food' ''');
 
     if (result.isNotEmpty) {
       return result[0]['CARBS'];
@@ -161,9 +161,9 @@ class DBHelper extends ChangeNotifier {
     }
   }
 
-  Future<int> getFatForFood(String food) async {
+  Future<double> getFatForFood(String food) async {
     final List<Map<String, dynamic>> result = await _database.rawQuery(
-        '''SELECT FAT FROM NutriDatabase WHERE CZFOODNAME = '$food' ''');
+        '''SELECT FAT FROM NutriDatabaseData WHERE CZFOODNAME = '$food' ''');
 
     if (result.isNotEmpty) {
       return result[0]['FAT'];
@@ -172,9 +172,9 @@ class DBHelper extends ChangeNotifier {
     }
   }
 
-  Future<int> getFiberForFood(String food) async {
+  Future<double> getFiberForFood(String food) async {
     final List<Map<String, dynamic>> result = await _database.rawQuery(
-        '''SELECT FIBER FROM NutriDatabase WHERE CZFOODNAME = '$food' ''');
+        '''SELECT FIBER FROM NutriDatabaseData WHERE CZFOODNAME = '$food' ''');
 
     if (result.isNotEmpty) {
       return result[0]['FIBER'];
@@ -185,23 +185,37 @@ class DBHelper extends ChangeNotifier {
 
   Future<List<String>> getNotes() async {
     final List<Map<String, dynamic>> maps = await _database.rawQuery(
-        '''SELECT ID,CZFOODNAME,ENERGYKCAL,PROTEIN,CARBS,FAT,FIBER FROM NutriDatabase''');
+        '''SELECT ID,CZFOODNAME,ENERGYKCAL,PROTEIN,CARBS,FAT,FIBER FROM NutriDatabaseDataData''');
+
+    print(maps);
+    for (var h in maps) {
+      print(h['FIBER'].runtimeType);
+    }
 
     return List.generate(maps.length, (i) {
+      double fiber;
+      if (maps[i]['FIBER'] == Null) {
+        fiber = 0;
+        print("NULLLLL");
+      } else {
+        // print(maps[i]['FIBER']);
+        fiber = double.parse(maps[i]['FIBER'].toString());
+      }
+
       return Note(
         id: maps[i]['ID'] as int,
         czfoodname: maps[i]['CZFOODNAME'] as String,
         kcal: maps[i]['ENERGYKCAL'] as int,
         protein: maps[i]['PROTEIN'] as double,
-        carbs: maps[i]['CARBS'] as int,
-        fat: maps[i]['FAT'] as int,
-        fiber: maps[i]['FIBER'] as int,
+        carbs: double.parse((maps[i]['CARBS']).toString()),
+        fat: double.parse(maps[i]['FAT'].toString()),
+        fiber: fiber,
       ).toString();
     });
   }
 
-  insertItem(String text, int kcal, double protein, int carbs, int fat,
-      int fiber) async {
+  insertItem(String text, int kcal, double protein, double carbs, double fat,
+      double fiber) async {
     databaseFactoryOrNull = null; //odstraní sql kecy
     await _database.rawQuery(
         '''INSERT INTO Notes  values(Null,'$text',$kcal,$protein,$carbs,$fat,$fiber)''');
@@ -226,9 +240,9 @@ class Note {
   final String czfoodname;
   final int kcal;
   final double protein;
-  final int carbs;
-  final int fat;
-  final int fiber;
+  final double carbs;
+  final double fat;
+  final double fiber;
 
   Note({
     this.id = 1,
@@ -248,7 +262,6 @@ class Note {
         carbs = item["CARBS"],
         fat = item["FAT"],
         fiber = item["FIBER"];
-  // description = item["description"];
 
   Map<String, Object> toMap() {
     return {

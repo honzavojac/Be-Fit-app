@@ -93,23 +93,105 @@ class _foodDiaryBoxesState extends State<foodDiaryBoxes> {
                         ],
                       ),
                       SizedBox(
-                        height: 10,
+                        height: 5,
                       ),
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          Container(
-                            height: 30,
-                            child: Text(" id: ${notes[index].id}"),
-                            // Další informace, které chcete zobrazit
+                          // Container(
+                          //   height: 30,
+                          //   child: Text(" id: ${notes[index].id}"),
+                          //   // Další informace, které chcete zobrazit
+                          // ),
+                          Column(
+                            children: [
+                              Container(
+                                height: 15,
+                                child: Text(" Kcal"),
+                                // Další informace, které chcete zobrazit
+                              ),
+                              Container(
+                                alignment: Alignment.center,
+                                height: 25,
+                                child: Text("${notes[index].kcal}"),
+                                // Další informace, které chcete zobrazit
+                              ),
+                              SizedBox(
+                                height: 5,
+                              ),
+                            ],
                           ),
-                          Container(
-                            height: 30,
-                            child: Text(" Kcal: ${notes[index].kcal}"),
-                            // Další informace, které chcete zobrazit
-                          ),   Container(
-                            height: 30,
-                            child: Text(" Protein: ${notes[index].protein}"),
-                            // Další informace, které chcete zobrazit
+                          Column(
+                            children: [
+                              Container(
+                                height: 15,
+                                child: Text(" Protein"),
+                                // Další informace, které chcete zobrazit
+                              ),
+                              Container(
+                                alignment: Alignment.center,
+                                height: 25,
+                                child: Text("${notes[index].protein}"),
+                                // Další informace, které chcete zobrazit
+                              ),
+                              SizedBox(
+                                height: 5,
+                              ),
+                            ],
+                          ),
+                          Column(
+                            children: [
+                              Container(
+                                height: 15,
+                                child: Text(" Carbs"),
+                                // Další informace, které chcete zobrazit
+                              ),
+                              Container(
+                                alignment: Alignment.center,
+                                height: 25,
+                                child: Text("${notes[index].carbs}"),
+                                // Další informace, které chcete zobrazit
+                              ),
+                              SizedBox(
+                                height: 5,
+                              ),
+                            ],
+                          ),
+                          Column(
+                            children: [
+                              Container(
+                                height: 15,
+                                child: Text(" Fat"),
+                                // Další informace, které chcete zobrazit
+                              ),
+                              Container(
+                                alignment: Alignment.center,
+                                height: 25,
+                                child: Text("${notes[index].fat}"),
+                                // Další informace, které chcete zobrazit
+                              ),
+                              SizedBox(
+                                height: 5,
+                              ),
+                            ],
+                          ),
+                          Column(
+                            children: [
+                              Container(
+                                height: 15,
+                                child: Text(" Fiber"),
+                                // Další informace, které chcete zobrazit
+                              ),
+                              Container(
+                                alignment: Alignment.center,
+                                height: 25,
+                                child: Text("${notes[index].fiber}"),
+                                // Další informace, které chcete zobrazit
+                              ),
+                              SizedBox(
+                                height: 5,
+                              ),
+                            ],
                           ),
                         ],
                       ),
