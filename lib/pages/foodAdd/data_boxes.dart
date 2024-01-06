@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:kaloricke_tabulky_02/database/database_provider.dart';
+import 'package:provider/provider.dart';
 
 import '../../widgets_for_multiple_screens/change_servingSize.dart';
 
@@ -13,6 +15,8 @@ class myDataboxes extends StatefulWidget {
 class _myDataboxesState extends State<myDataboxes> {
   @override
   Widget build(BuildContext context) {
+    var dbHelper = Provider.of<DBHelper>(context);
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -38,7 +42,10 @@ class _myDataboxesState extends State<myDataboxes> {
                     fontSize: 15) // zobrazí se pokud je textové pole prázdné
                 //  icon: Icon(Icons.text_fields), //
                 ),
-            onChanged: (input) {},
+            onChanged: (input) {
+              int value = int.parse(input);
+              dbHelper.Grams(value);
+            },
           ),
         ),
         changeServingSize(),

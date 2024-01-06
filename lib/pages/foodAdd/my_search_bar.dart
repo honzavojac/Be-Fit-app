@@ -58,7 +58,7 @@ class _mySearchBarState extends State<mySearchBar> {
                 double fatValue = await dbHelper.getFatForFood(food);
                 double fiberValue = await dbHelper.getFiberForFood(food);
                 // Vložit vybranou položku jídla do databáze s odpovídající hodnotou ENERGYKCAL
-                await dbHelper.insertItem(food, kcalValue, proteinValue,
+                await dbHelper.NutritionsData(food, kcalValue, proteinValue,
                     carbsValue, fatValue, fiberValue);
 
                 // Zavřít pohled na vyhledávání a nastavit vybraný text

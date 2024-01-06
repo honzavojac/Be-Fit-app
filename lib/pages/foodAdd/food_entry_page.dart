@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/pages/foodAdd/newFood/food_add_page.dart';
 import 'package:kaloricke_tabulky_02/pages/foodAdd/data_boxes.dart';
 import 'package:kaloricke_tabulky_02/pages/foodAdd/my_search_bar.dart';
+import 'package:provider/provider.dart';
 
+import '../../database/database_provider.dart';
 import 'food_diary_boxes.dart';
 
 DateTime now = DateTime.now();
@@ -53,6 +55,8 @@ class FoodRecordScreen extends StatefulWidget {
 class _FoodRecordScreenState extends State<FoodRecordScreen> {
   @override
   Widget build(BuildContext context) {
+    var dbHelper = Provider.of<DBHelper>(context);
+
     return Stack(
       children: [
         /*Positioned(
@@ -103,7 +107,10 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                     height: 40,
                     width: 150,
                     child: ElevatedButton.icon(
-                      onPressed: () {},
+                      onPressed: () {
+                        //-------------------------------
+                        dbHelper.insertAllData();
+                      },
                       icon: Icon(Icons.add, size: 30),
                       label: Text('Add',
                           style: TextStyle(fontWeight: FontWeight.bold)),

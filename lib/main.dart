@@ -2,6 +2,7 @@
 //
 
 import 'package:flutter/material.dart';
+import 'package:kaloricke_tabulky_02/count_provider.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/fitness_global_variables.dart';
 import 'package:provider/provider.dart';
 
@@ -17,6 +18,7 @@ void main() async {
   print('object');
   DBHelper dbHelper = DBHelper();
   await dbHelper.initializeDB();
+  CountProvider countProvider = CountProvider();
   // await dbHelper.deleteFile('database.db');
 
   // print(await dbHelper.getNotes());
@@ -32,8 +34,15 @@ void main() async {
   // databaseFactory = databaseFactoryFfi;
 
   runApp(
-    ChangeNotifierProvider.value(
-      value: dbHelper,
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(
+          value: dbHelper,
+        ),
+        ChangeNotifierProvider.value(
+          value: countProvider,
+        ),
+      ],
       child: MyApp(),
     ),
   );
@@ -62,7 +71,7 @@ class _MyAppState extends State<MyApp> {
   int _selectedIndex = 1;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  final controller = PageController(initialPage:1);
+  final controller = PageController(initialPage: 1);
 
   @override
   Widget build(BuildContext context) {
@@ -74,9 +83,9 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider<fitnessGlobalVariables>(
           create: (_) => fitnessGlobalVariables(),
         ),
-        // ChangeNotifierProvider<DBHelper>(
-        //   create: (_) => DBHelper(),
-        // ),
+        // ChangeNotifierProvider<CountProvider>(
+        //   create: (_) => CountProvider(),
+        // )
       ],
       child: MaterialApp(
           debugShowCheckedModeBanner: false,

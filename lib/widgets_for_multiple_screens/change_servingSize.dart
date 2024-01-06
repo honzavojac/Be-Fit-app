@@ -1,5 +1,7 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
+import 'package:kaloricke_tabulky_02/database/database_provider.dart';
+import 'package:provider/provider.dart';
 
 class changeServingSize extends StatefulWidget {
   const changeServingSize({super.key});
@@ -17,6 +19,8 @@ String selectedValue = items[0];
 class _changeServingSizeState extends State<changeServingSize> {
   @override
   Widget build(BuildContext context) {
+    var dbHelper = Provider.of<DBHelper>(context);
+    
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -55,6 +59,7 @@ class _changeServingSizeState extends State<changeServingSize> {
             onChanged: (value) {
               setState(() {
                 selectedValue = value!;
+                dbHelper.setSelectedValue(selectedValue);
               });
             },
             buttonStyleData: ButtonStyleData(

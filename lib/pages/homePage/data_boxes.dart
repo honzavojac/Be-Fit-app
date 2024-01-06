@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kaloricke_tabulky_02/database/database_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../../globals_variables/nutri_data.dart';
@@ -15,10 +16,10 @@ class _dataBoxesState extends State<dataBoxes> {
   //BorderRadius globalRadius = BorderRadius.circular(15);
   @override
   Widget build(BuildContext context) {
-    EdgeInsets globalPadding = const EdgeInsets.fromLTRB(25, 3, 25, 3);
-
-    BorderRadius globalRadius = BorderRadius.circular(20);
+    var dbHelper = Provider.of<DBHelper>(context);
     final nutrition = Provider.of<NutritionIncremment>(context);
+    EdgeInsets globalPadding = const EdgeInsets.fromLTRB(25, 3, 25, 3);
+    BorderRadius globalRadius = BorderRadius.circular(20);
     return Column(
       children: [
         Row(

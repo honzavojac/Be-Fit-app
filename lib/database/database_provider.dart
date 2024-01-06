@@ -13,6 +13,8 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 ///flutter run
 ///
 
+///toto je pro ovládání
+
 class DBHelper extends ChangeNotifier {
   late Database _database;
   late String _assetsDatabasePath;
@@ -28,7 +30,7 @@ class DBHelper extends ChangeNotifier {
     _database = await openDatabase(appPath, version: 1,
         onCreate: (Database db, int version) {
       db.execute(
-        "CREATE TABLE Notes(ID INTEGER PRIMARY KEY AUTOINCREMENT, CZFOODNAME TEXT NOT NULL, ENERGYKCAL INTEGER,PROTEIN REAL,CARBS REAL,FAT REAL,FIBER REAL)",
+        "CREATE TABLE Notes(ID INTEGER PRIMARY KEY AUTOINCREMENT, GRAMS INTEGER, CZFOODNAME TEXT NOT NULL, ENERGYKCAL INTEGER,PROTEIN REAL,CARBS REAL,FAT REAL,FIBER REAL)",
       );
       print("Databáze byla vytvořena");
     });
@@ -119,8 +121,8 @@ class DBHelper extends ChangeNotifier {
   }
 
   Future<List<String>> getCzFoodNames() async {
-    final List<Map<String, dynamic>> maps =
-        await _database.rawQuery('''SELECT CZFOODNAME FROM NutriDatabaseData''');
+    final List<Map<String, dynamic>> maps = await _database
+        .rawQuery('''SELECT CZFOODNAME FROM NutriDatabaseData''');
 
     return List.generate(maps.length, (i) {
       return maps[i]['CZFOODNAME'].toString();
@@ -214,13 +216,84 @@ class DBHelper extends ChangeNotifier {
     });
   }
 
-  insertItem(String text, int kcal, double protein, double carbs, double fat,
-      double fiber) async {
+  late int grams;
+  late String nameOfFood;
+  late int kcal;
+  late double protein;
+  late double carbs;
+  late double fat;
+  late double fiber;
+
+  NutritionsData(String text, int kcal, double protein, double carbs,
+      double fat, double fiber) async {
     databaseFactoryOrNull = null; //odstraní sql kecy
-    await _database.rawQuery(
-        '''INSERT INTO Notes  values(Null,'$text',$kcal,$protein,$carbs,$fat,$fiber)''');
-    print(_database.rawQuery('''select * from Notes'''));
-    notifyListeners();
+    this.nameOfFood = text;
+    this.kcal = kcal;
+    this.protein = protein;
+    this.carbs = carbs;
+    this.fat = fat;
+    this.fiber = fiber;
+  }
+
+  late double finalGrams;
+  late int finalKcal;
+  late double finalProtein;
+  late double finalCarbs;
+  late double finalFat;
+  late double finalFiber;
+
+  Grams(int grams) async {
+    databaseFactoryOrNull = null; //odstraní sql kecy
+    this.grams = grams;
+    print(this.grams);
+  }
+
+  late String finalSelectedValue = "grams";
+  setSelectedValue(String selectedValue) {
+    this.finalSelectedValue = selectedValue;
+  }
+
+  selectedMultiply() {
+    if (this.finalSelectedValue == "grams") {
+      print("grams");
+      this.finalGrams = double.parse((this.grams / 100).toString());
+    } else if (this.finalSelectedValue == "100g") {
+      print("100g");
+      this.finalGrams = double.parse((this.grams).toString());
+    }
+  }
+
+  countData() {
+    selectedMultiply();
+    this.finalKcal =
+        int.parse((this.kcal * this.finalGrams).round().toString());
+    this.finalProtein =
+        (((this.protein * this.finalGrams * 10).round() / 10)).toDouble();
+    this.finalCarbs =
+        (((this.carbs * this.finalGrams * 10).round() / 10)).toDouble();
+    this.finalFat =
+        (((this.fat * this.finalGrams * 10).round() / 10)).toDouble();
+    this.finalFiber =
+        (((this.fiber * this.finalGrams * 10).round() / 10)).toDouble();
+  }
+
+  insertAllData() async {
+    await countData();
+    databaseFactoryOrNull = null; //odstraní sql kecy
+    if (this.nameOfFood.isEmpty ||
+        this.grams == null ||
+        this.finalKcal == null ||
+        this.finalProtein == null ||
+        this.finalCarbs == null ||
+        this.finalFat == null ||
+        this.finalFiber == null) {
+      return false;
+    } else {
+      await _database.rawQuery(
+          '''INSERT INTO Notes  values(Null,${this.finalGrams},'${this.nameOfFood}',${this.finalKcal},${this.finalProtein},${this.finalCarbs},${this.finalFat},${this.finalFiber})''');
+      print(_database.rawQuery('''select * from Notes'''));
+      notifyListeners();
+    }
   }
 
   Future<void> deleteItem(int id) async {
@@ -235,8 +308,10 @@ class DBHelper extends ChangeNotifier {
   where(Function(dynamic food) param0) {}
 }
 
+
 class Note {
   final int id;
+  final int grams;
   final String czfoodname;
   final int kcal;
   final double protein;
@@ -246,6 +321,7 @@ class Note {
 
   Note({
     this.id = 1,
+    this.grams = 0,
     this.czfoodname = 'CZFOODNAME',
     this.kcal = 1,
     this.protein = 1,
@@ -256,6 +332,7 @@ class Note {
 
   Note.fromMap(Map<String, dynamic> item)
       : id = item["ID"],
+        grams = item["GRAMS"],
         czfoodname = item["CZFOODNAME"],
         kcal = item["ENERGYKCAL"],
         protein = item["PROTEIN"],
@@ -266,6 +343,7 @@ class Note {
   Map<String, Object> toMap() {
     return {
       'ID': id,
+      'GRAMS': grams,
       'CZFOODNAME': czfoodname,
       'ENERGYKCAL': kcal,
       'PROTEIN': protein,
@@ -277,6 +355,6 @@ class Note {
 
   @override
   String toString() {
-    return 'Dog{id: $id, CZFOODNAME: $czfoodname, ENERGYKCAL: $kcal,PROTEIN: $protein,CARBS:$carbs,FAT:$fat,FIBER:$fiber}';
+    return 'Dog{id: $id,GRAMS: $grams, CZFOODNAME: $czfoodname, ENERGYKCAL: $kcal,PROTEIN: $protein,CARBS:$carbs,FAT:$fat,FIBER:$fiber}';
   }
 }
