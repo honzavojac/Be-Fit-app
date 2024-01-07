@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/database/database_provider.dart';
 import 'package:provider/provider.dart';
 
-class changeServingSize extends StatefulWidget {
-  const changeServingSize({super.key});
+class changeNewFoodServingSize extends StatefulWidget {
+  const changeNewFoodServingSize({super.key});
 
   @override
-  State<changeServingSize> createState() => _changeServingSizeState();
+  State<changeNewFoodServingSize> createState() => _changeNewFoodServingSizeState();
 }
 
 final List<String> items = [
@@ -16,7 +16,7 @@ final List<String> items = [
 ];
 String selectedValue = items[0];
 
-class _changeServingSizeState extends State<changeServingSize> {
+class _changeNewFoodServingSizeState extends State<changeNewFoodServingSize> {
   @override
   Widget build(BuildContext context) {
     var dbHelper = Provider.of<DBHelper>(context);
@@ -59,7 +59,7 @@ class _changeServingSizeState extends State<changeServingSize> {
             onChanged: (value) {
               setState(() {
                 selectedValue = value!;
-                dbHelper.setSelectedValue(selectedValue);
+                dbHelper.setNewFoodSelectedValue(selectedValue);
               });
             },
             buttonStyleData: ButtonStyleData(

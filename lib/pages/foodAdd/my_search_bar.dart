@@ -58,6 +58,7 @@ class _mySearchBarState extends State<mySearchBar> {
                 double fatValue = await dbHelper.getFatForFood(food);
                 double fiberValue = await dbHelper.getFiberForFood(food);
                 // Vložit vybranou položku jídla do databáze s odpovídající hodnotou ENERGYKCAL
+                print("protein111:$proteinValue");
                 await dbHelper.NutritionsData(food, kcalValue, proteinValue,
                     carbsValue, fatValue, fiberValue);
 

@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:kaloricke_tabulky_02/database/database_provider.dart';
 import 'package:provider/provider.dart';
 
-import '../../widgets_for_multiple_screens/change_servingSize.dart';
+import 'change_data_box_servingSize.dart';
 
 class myDataboxes extends StatefulWidget {
   const myDataboxes({super.key});
@@ -48,7 +48,7 @@ class _myDataboxesState extends State<myDataboxes> {
             },
           ),
         ),
-        changeServingSize(),
+        changeDataBoxServingSize(),
       ],
     );
   }

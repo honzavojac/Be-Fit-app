@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/count_provider.dart';
+import 'package:kaloricke_tabulky_02/page_provider.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/fitness_global_variables.dart';
 import 'package:provider/provider.dart';
 
@@ -19,6 +20,7 @@ void main() async {
   DBHelper dbHelper = DBHelper();
   await dbHelper.initializeDB();
   CountProvider countProvider = CountProvider();
+  PageProvider pageProvider = PageProvider();
   // await dbHelper.deleteFile('database.db');
 
   // print(await dbHelper.getNotes());
@@ -42,6 +44,7 @@ void main() async {
         ChangeNotifierProvider.value(
           value: countProvider,
         ),
+        ChangeNotifierProvider.value(value: pageProvider),
       ],
       child: MyApp(),
     ),
@@ -68,13 +71,13 @@ final List<Widget> _appBars = [
 ];
 
 class _MyAppState extends State<MyApp> {
-  int _selectedIndex = 1;
-
   final scaffoldKey = GlobalKey<ScaffoldState>();
   final controller = PageController(initialPage: 1);
 
   @override
   Widget build(BuildContext context) {
+    var pageProvider = Provider.of<PageProvider>(context);
+
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<NutritionIncremment>(
@@ -83,8 +86,8 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider<fitnessGlobalVariables>(
           create: (_) => fitnessGlobalVariables(),
         ),
-        // ChangeNotifierProvider<CountProvider>(
-        //   create: (_) => CountProvider(),
+        // ChangeNotifierProvider<PageProvider>(
+        //   create: (_) => PageProvider(),
         // )
       ],
       child: MaterialApp(
@@ -93,14 +96,14 @@ class _MyAppState extends State<MyApp> {
           home: Scaffold(
             appBar: PreferredSize(
               preferredSize: const Size.fromHeight(50),
-              child: _appBars[_selectedIndex],
+              child: _appBars[pageProvider.page],
             ),
             body: PageView(
               controller: controller,
               onPageChanged: (index) {
-                _selectedIndex = index;
+                pageProvider.page = index;
                 setState(() {});
-                debugPrint('$_selectedIndex');
+                print('${pageProvider.page}');
               },
               children: _pages,
             ),
@@ -110,13 +113,14 @@ class _MyAppState extends State<MyApp> {
               height: 65,
               onDestinationSelected: (index) {
                 //controller;
-                _selectedIndex = index;
-                controller.jumpToPage(_selectedIndex);
+                pageProvider.page = index;
+                print(pageProvider.page);
+                controller.jumpToPage(pageProvider.page);
                 setState(() {});
-                //debugPrint('$_selectedIndex');
+                //debugPrint('$pageProvider.page');
               },
               indicatorColor: Colors.amber[800],
-              selectedIndex: _selectedIndex,
+              selectedIndex: pageProvider.page,
               animationDuration: Duration(milliseconds: 1000),
               destinations: const [
                 NavigationDestination(

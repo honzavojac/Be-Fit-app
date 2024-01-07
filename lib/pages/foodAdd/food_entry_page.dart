@@ -87,6 +87,12 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                 ),
               ],
             ),
+            //       GestureDetector(
+            // onHorizontalDragUpdate: (details) {
+            //   if (details.primaryDelta! > 0) {
+            //     print("object");
+            //     pageProvider.page = -1;
+            //   }
             Expanded(
               child: foodDiaryBoxes(),
             ),
@@ -109,7 +115,7 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                     child: ElevatedButton.icon(
                       onPressed: () {
                         //-------------------------------
-                        dbHelper.insertAllData();
+                        dbHelper.insertAllDataToNotes();
                       },
                       icon: Icon(Icons.add, size: 30),
                       label: Text('Add',

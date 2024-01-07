@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:kaloricke_tabulky_02/database/database_provider.dart';
+import 'package:kaloricke_tabulky_02/pages/foodAdd/newFood/change_new_food_box_servingSize.dart';
 import 'package:provider/provider.dart';
 
 import '../../../globals_variables/nutri_data.dart';
-import '../../../widgets_for_multiple_screens/change_servingSize.dart';
+import '../change_data_box_servingSize.dart';
 
 class foodMainAddBoxes extends StatefulWidget {
   const foodMainAddBoxes({super.key});
@@ -15,15 +17,7 @@ class foodMainAddBoxes extends StatefulWidget {
 class _foodMainAddBoxesState extends State<foodMainAddBoxes> {
   @override
   Widget build(BuildContext context) {
-    String textFood;
-    double numberProtein;
-    double numberCarbs;
-    double numberFats;
-    double numberFiber;
-    double numberKcal;
-
-    final nutritionChange = Provider.of<NutritionIncremment>(context);
-
+    var dbHelper = Provider.of<DBHelper>(context);
     return Column(children: [
       const SizedBox(
         height: 30,
@@ -35,7 +29,7 @@ class _foodMainAddBoxesState extends State<foodMainAddBoxes> {
             FilteringTextInputFormatter.allow(
                 RegExp(r'[A-Za-z0-9ěščřžýáíéóůú)(\-_\s]')),
 // povoluje zadat pouze string hodnotu => použiju pro vyhledávání v databázi
-            LengthLimitingTextInputFormatter(25)
+            LengthLimitingTextInputFormatter(50)
           ],
           keyboardType: TextInputType.text,
           decoration: const InputDecoration(
@@ -50,10 +44,14 @@ class _foodMainAddBoxesState extends State<foodMainAddBoxes> {
                   fontSize: 15) // zobrazí se pokud je textové pole prázdné
               //  icon: Icon(Icons.text_fields), //
               ),
+          controller: dbHelper.textEditingController1,
           onChanged: (input) {
-            textFood = input;
-            nutritionChange.updateKcal(input as double);
-            print('Text changed to: $textFood');
+            if (input == "") {
+              dbHelper.newFoodNameOfFood = "";
+            } else {
+              var value = input;
+              dbHelper.newFoodNameOfFood = value;
+            }
           },
         ),
       ),
@@ -69,7 +67,7 @@ class _foodMainAddBoxesState extends State<foodMainAddBoxes> {
               keyboardType: const TextInputType.numberWithOptions(
                   signed: true, decimal: true),
               inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
                 LengthLimitingTextInputFormatter(
                     4) // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
               ],
@@ -85,10 +83,18 @@ class _foodMainAddBoxesState extends State<foodMainAddBoxes> {
                       fontSize: 15) // zobrazí se pokud je textové pole prázdné
                   //  icon: Icon(Icons.text_fields), //
                   ),
-              onChanged: (input) {},
+              controller: dbHelper.textEditingController2,
+              onChanged: (input) {
+                if (input == "") {
+                  dbHelper.newFoodGrams = 0;
+                } else {
+                  var value = double.parse(input);
+                  dbHelper.newFoodGrams = value;
+                }
+              },
             ),
           ),
-          changeServingSize(),
+          changeNewFoodServingSize(),
         ],
       ),
       const SizedBox(
@@ -119,11 +125,14 @@ class _foodMainAddBoxesState extends State<foodMainAddBoxes> {
                       fontSize: 15) // zobrazí se pokud je textové pole prázdné
                   //  icon: Icon(Icons.text_fields), //
                   ),
+              controller: dbHelper.textEditingController3,
               onChanged: (input) {
-                numberKcal = double.parse(input);
-                nutritionChange.updateKcal(numberKcal);
-
-                print('Text changed to: $numberKcal');
+                if (input == "") {
+                  dbHelper.newFoodKcal = 0;
+                } else {
+                  var value = int.parse(input);
+                  dbHelper.newFoodKcal = value;
+                }
               },
             ),
           ),
@@ -141,9 +150,8 @@ class _foodMainAddBoxesState extends State<foodMainAddBoxes> {
               keyboardType: const TextInputType.numberWithOptions(
                   signed: true, decimal: true),
               inputFormatters: [
-                FilteringTextInputFormatter.allow(
-                  RegExp(r'[0-9]'),
-                ), // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
+                FilteringTextInputFormatter.allow(RegExp(
+                    r'[0-9.]')), // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
                 LengthLimitingTextInputFormatter(
                     4) //omezí kolik znaků je možno zadat
               ],
@@ -159,9 +167,14 @@ class _foodMainAddBoxesState extends State<foodMainAddBoxes> {
                       fontSize: 15) // zobrazí se pokud je textové pole prázdné
                   //  icon: Icon(Icons.text_fields), //
                   ),
+              controller: dbHelper.textEditingController4,
               onChanged: (input) {
-                numberProtein = double.parse(input);
-                print('Text changed to: $numberProtein');
+                if (input == "") {
+                  dbHelper.newFoodProtein = 0;
+                } else {
+                  var value = double.parse(input);
+                  dbHelper.newFoodProtein = value;
+                }
               },
             ),
           ),
@@ -172,7 +185,7 @@ class _foodMainAddBoxesState extends State<foodMainAddBoxes> {
                   signed: true, decimal: true),
               inputFormatters: [
                 FilteringTextInputFormatter.allow(RegExp(
-                    r'[0-9]')), // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
+                    r'[0-9.]')), // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
                 LengthLimitingTextInputFormatter(4)
               ],
               decoration: const InputDecoration(
@@ -187,9 +200,14 @@ class _foodMainAddBoxesState extends State<foodMainAddBoxes> {
                       fontSize: 15) // zobrazí se pokud je textové pole prázdné
                   //  icon: Icon(Icons.text_fields), //
                   ),
+              controller: dbHelper.textEditingController5,
               onChanged: (input) {
-                numberCarbs = double.parse(input);
-                print('Text changed to: $numberCarbs');
+                if (input == "") {
+                  dbHelper.newFoodCarbs = 0;
+                } else {
+                  var value = double.parse(input);
+                  dbHelper.newFoodCarbs = value;
+                }
               },
             ),
           ),
@@ -207,7 +225,7 @@ class _foodMainAddBoxesState extends State<foodMainAddBoxes> {
               keyboardType: const TextInputType.numberWithOptions(
                   signed: true, decimal: true),
               inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
                 LengthLimitingTextInputFormatter(
                     4) // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
               ],
@@ -223,9 +241,14 @@ class _foodMainAddBoxesState extends State<foodMainAddBoxes> {
                       fontSize: 15) // zobrazí se pokud je textové pole prázdné
                   //  icon: Icon(Icons.text_fields), //
                   ),
+              controller: dbHelper.textEditingController6,
               onChanged: (input) {
-                numberFats = double.parse(input);
-                print('Text changed to: $numberFats');
+                if (input == "") {
+                  dbHelper.newFoodFat = 0;
+                } else {
+                  var value = double.parse(input);
+                  dbHelper.newFoodFat = value;
+                }
               },
             ),
           ),
@@ -237,7 +260,7 @@ class _foodMainAddBoxesState extends State<foodMainAddBoxes> {
                 decimal: true,
               ),
               inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
                 LengthLimitingTextInputFormatter(4),
               ],
               decoration: const InputDecoration(
@@ -254,9 +277,14 @@ class _foodMainAddBoxesState extends State<foodMainAddBoxes> {
                 hintText: 'Enter value:',
                 hintStyle: TextStyle(fontSize: 15),
               ),
+              controller: dbHelper.textEditingController7,
               onChanged: (input) {
-                numberFiber = double.parse(input);
-                print('Text changed to: $numberFiber');
+                if (input == "") {
+                  dbHelper.newFoodFiber = 0;
+                } else {
+                  var value = double.parse(input);
+                  dbHelper.newFoodFiber = value;
+                }
               },
             ),
           )

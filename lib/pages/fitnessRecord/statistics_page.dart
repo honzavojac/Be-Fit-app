@@ -70,7 +70,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                                 bool delete = true;
                                 setState(
                                   () {
-                                    dbHelper.deleteItem(notes[index].id);
+                                    dbHelper.deleteItem(notes[index].id,notes[index].czfoodname);
                                     notes.removeAt(index);
                                   },
                                 );

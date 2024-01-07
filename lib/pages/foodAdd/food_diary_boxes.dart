@@ -1,9 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/database/database_provider.dart';
+import 'package:kaloricke_tabulky_02/page_provider.dart';
 import 'package:marquee/marquee.dart';
 import 'package:provider/provider.dart';
-
-import 'my_search_bar.dart';
 
 class foodDiaryBoxes extends StatefulWidget {
   const foodDiaryBoxes({super.key});
@@ -16,6 +17,8 @@ class _foodDiaryBoxesState extends State<foodDiaryBoxes> {
   @override
   Widget build(BuildContext context) {
     var dbHelper = Provider.of<DBHelper>(context);
+    var pageProvider = Provider.of<PageProvider>(context);
+    int deleteValue = 0;
     return Container(
       margin: EdgeInsets.fromLTRB(10, 0, 10, 10),
       decoration: BoxDecoration(
@@ -26,9 +29,7 @@ class _foodDiaryBoxesState extends State<foodDiaryBoxes> {
       child: FutureBuilder<List<Note>>(
         future: dbHelper.Notes(),
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
+          if (snapshot.hasError) {
             return Center(child: Text('Chyba: ${snapshot.error}'));
           } else {
             List<Note> notes = snapshot.data!;
@@ -37,18 +38,9 @@ class _foodDiaryBoxesState extends State<foodDiaryBoxes> {
               itemBuilder: (context, index) {
                 final note = notes[index];
                 return Dismissible(
+                  direction: DismissDirection.endToStart,
                   key: Key(note.czfoodname),
                   background: Container(
-                    color: Colors.green,
-                    child: Align(
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 16),
-                        child: Icon(Icons.edit),
-                      ),
-                      alignment: Alignment.centerLeft,
-                    ),
-                  ),
-                  secondaryBackground: Container(
                     color: Colors.red,
                     child: Align(
                       child: Padding(
@@ -59,145 +51,189 @@ class _foodDiaryBoxesState extends State<foodDiaryBoxes> {
                     ),
                   ),
                   confirmDismiss: (direction) async {
-                    if (direction == DismissDirection.startToEnd) {
-                      return false;
-                    } else {
-                      bool delete = true;
-                      setState(
-                        () {
-                          dbHelper.deleteItem(notes[index].id);
-                          notes.removeAt(index);
-                        },
-                      );
-                      return delete;
-                    }
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        duration: Duration(seconds: 5),
+                        backgroundColor: Colors.amber[800],
+                        content: Container(
+                          height: 30,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Do you want delete this record?',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 15),
+                              ),
+                              ElevatedButton(
+                                style: ButtonStyle(
+                                  backgroundColor:
+                                      MaterialStatePropertyAll(Colors.black),
+                                  foregroundColor: MaterialStatePropertyAll(
+                                    Colors.amber[800],
+                                  ),
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    dbHelper.deleteItem(notes[index].id,
+                                        notes[index].czfoodname);
+                                    notes.removeAt(index);
+                                  });
+                                  ScaffoldMessenger.of(context)
+                                      .hideCurrentSnackBar();
+                                },
+                                child: Text("yes"),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
                   },
                   child: Column(
                     children: [
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Container(
-                              height: 20,
-                              child: buildAnimatedText(
-                                  "${notes[index].czfoodname}"),
-                              //  Text(
-                              //     "description:${notes[index].czfoodname}")
-                              // Další informace, které chcete zobrazit
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 5,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          // Container(
-                          //   height: 30,
-                          //   child: Text(" id: ${notes[index].id}"),
-                          //   // Další informace, které chcete zobrazit
-                          // ),
-                          Column(
-                            children: [
-                              Container(
-                                height: 15,
-                                child: Text(" Kcal"),
-                                // Další informace, které chcete zobrazit
-                              ),
-                              Container(
-                                alignment: Alignment.center,
-                                height: 25,
-                                child: Text("${notes[index].kcal}"),
-                                // Další informace, které chcete zobrazit
-                              ),
-                              SizedBox(
-                                height: 5,
-                              ),
-                            ],
-                          ),
-                          Column(
-                            children: [
-                              Container(
-                                height: 15,
-                                child: Text(" Protein"),
-                                // Další informace, které chcete zobrazit
-                              ),
-                              Container(
-                                alignment: Alignment.center,
-                                height: 25,
-                                child: Text("${notes[index].protein}"),
-                                // Další informace, které chcete zobrazit
-                              ),
-                              SizedBox(
-                                height: 5,
-                              ),
-                            ],
-                          ),
-                          Column(
-                            children: [
-                              Container(
-                                height: 15,
-                                child: Text(" Carbs"),
-                                // Další informace, které chcete zobrazit
-                              ),
-                              Container(
-                                alignment: Alignment.center,
-                                height: 25,
-                                child: Text("${notes[index].carbs}"),
-                                // Další informace, které chcete zobrazit
-                              ),
-                              SizedBox(
-                                height: 5,
-                              ),
-                            ],
-                          ),
-                          Column(
-                            children: [
-                              Container(
-                                height: 15,
-                                child: Text(" Fat"),
-                                // Další informace, které chcete zobrazit
-                              ),
-                              Container(
-                                alignment: Alignment.center,
-                                height: 25,
-                                child: Text("${notes[index].fat}"),
-                                // Další informace, které chcete zobrazit
-                              ),
-                              SizedBox(
-                                height: 5,
-                              ),
-                            ],
-                          ),
-                          Column(
-                            children: [
-                              Container(
-                                height: 15,
-                                child: Text(" Fiber"),
-                                // Další informace, které chcete zobrazit
-                              ),
-                              Container(
-                                alignment: Alignment.center,
-                                height: 25,
-                                child: Text("${notes[index].fiber}"),
-                                // Další informace, které chcete zobrazit
-                              ),
-                              SizedBox(
-                                height: 5,
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
                       Container(
-                        height: 1,
-                        color: Colors.amber,
+                        decoration: BoxDecoration(
+                          color: Colors.amber[600],
+                          borderRadius: BorderRadius.circular(5),
+                          border: Border.all(style: BorderStyle.none),
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: LayoutBuilder(
+                                  builder: (context, constraints) {
+                                TextPainter textPainter = TextPainter(
+                                  text: TextSpan(
+                                      text: "${notes[index].czfoodname}",
+                                      style: TextStyle(fontSize: 16.0)),
+                                  textDirection: TextDirection.ltr,
+                                );
+
+                                textPainter.layout(
+                                    maxWidth: constraints.maxWidth);
+                                print(
+                                    "${textPainter.width} ${constraints.maxWidth}");
+                                return Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      child: Container(
+                                        height: 20,
+                                        child: buildAnimatedText(
+                                            "${notes[index].czfoodname}",
+                                            textPainter.width,
+                                            constraints.maxWidth),
+                                        //  Text(
+                                        //     "description:${notes[index].czfoodname}")
+                                        // Další informace, které chcete zobrazit
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              }),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(10, 1, 10, 5),
+                        child: Container(
+                          // color: Colors.black,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Column(
+                                children: [
+                                  Container(
+                                    child: Text("Serving"),
+                                    height: 18,
+                                  ),
+                                  Container(
+                                    alignment: Alignment.center,
+                                    child: Text("${notes[index].grams} g"),
+                                    height: 20,
+                                  ),
+                                ],
+                              ),
+                              Column(
+                                children: [
+                                  Container(
+                                    height: 18,
+                                    child: Text(" Kcal"),
+                                    // Další informace, které chcete zobrazit
+                                  ),
+                                  Container(
+                                    alignment: Alignment.center,
+                                    height: 20,
+                                    child: Text("${notes[index].kcal}"),
+                                    // Další informace, které chcete zobrazit
+                                  ),
+                                ],
+                              ),
+                              Column(
+                                children: [
+                                  Container(
+                                    height: 18,
+                                    child: Text(" Protein"),
+                                    // Další informace, které chcete zobrazit
+                                  ),
+                                  Container(
+                                    alignment: Alignment.center,
+                                    height: 20,
+                                    child: Text("${notes[index].protein}"),
+                                    // Další informace, které chcete zobrazit
+                                  ),
+                                ],
+                              ),
+                              Column(
+                                children: [
+                                  Container(
+                                    height: 18,
+                                    child: Text(" Carbs"),
+                                    // Další informace, které chcete zobrazit
+                                  ),
+                                  Container(
+                                    alignment: Alignment.center,
+                                    height: 20,
+                                    child: Text("${notes[index].carbs}"),
+                                    // Další informace, které chcete zobrazit
+                                  ),
+                                ],
+                              ),
+                              Column(
+                                children: [
+                                  Container(
+                                    height: 18,
+                                    child: Text(" Fat"),
+                                    // Další informace, které chcete zobrazit
+                                  ),
+                                  Container(
+                                    alignment: Alignment.center,
+                                    height: 20,
+                                    child: Text("${notes[index].fat}"),
+                                    // Další informace, které chcete zobrazit
+                                  ),
+                                ],
+                              ),
+                              Column(
+                                children: [
+                                  Container(
+                                    height: 18,
+                                    child: Text(" Fiber"),
+                                    // Další informace, které chcete zobrazit
+                                  ),
+                                  Container(
+                                    alignment: Alignment.center,
+                                    height: 20,
+                                    child: Text("${notes[index].fiber}"),
+                                    // Další informace, které chcete zobrazit
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -211,15 +247,19 @@ class _foodDiaryBoxesState extends State<foodDiaryBoxes> {
   }
 }
 
-Widget buildAnimatedText(String text) {
-  if (text.length <= 29) {
+Widget buildAnimatedText(
+    String text, double textPainter, double boxConstraints) {
+  if (textPainter < boxConstraints) {
     print("${text.indexOf(text)} ${text.length}");
-    return Text(text);
+    return Text(
+      text,
+      style: TextStyle(color: Colors.black),
+    );
   } else {
-    print("${text.length}text je větší než 15 znaků");
+    print("${text.length}text je větší než widget");
     return Marquee(
       text: text,
-      style: TextStyle(color: Colors.white),
+      style: TextStyle(color: Colors.black),
       scrollAxis: Axis.horizontal,
       crossAxisAlignment: CrossAxisAlignment.start,
       blankSpace: 50.0,

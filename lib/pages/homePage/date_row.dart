@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
-import '../../globals_variables/nutri_data.dart';
 import 'home_page.dart';
 
 class dateRow extends StatefulWidget {
@@ -14,7 +12,6 @@ class dateRow extends StatefulWidget {
 class _dateRowState extends State<dateRow> {
   @override
   Widget build(BuildContext context) {
-    final nutrition = Provider.of<NutritionIncremment>(context);
     return Container(
       padding: EdgeInsets.all(15),
       //color: Colors.amber,
@@ -25,7 +22,7 @@ class _dateRowState extends State<dateRow> {
             onPressed: () {},
             child: Icon(
               Icons.arrow_back_ios_new_rounded,
-              color: Colors.white,
+              color: Colors.amber,
             ),
             style: ElevatedButton.styleFrom(
               fixedSize: Size(80, 30),
@@ -40,15 +37,16 @@ class _dateRowState extends State<dateRow> {
                 style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w900,
-                    color: Colors.white),
+                    color: Colors.amber),
               ),
             ),
           ),
           ElevatedButton(
             onPressed: () {
-              nutrition.incrementKcal();
+              // nutrition.incrementKcal();
             },
-            child: Icon(Icons.arrow_forward_ios_rounded, color: Colors.white),
+            child:
+                Icon(Icons.arrow_forward_ios_rounded, color: Colors.amber),
             style: ElevatedButton.styleFrom(
               fixedSize: Size(80, 30),
             ),

@@ -14,6 +14,7 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 ///
 
 ///toto je pro ovládání
+///databáze vždy jsou na 100g
 
 class DBHelper extends ChangeNotifier {
   late Database _database;
@@ -30,7 +31,25 @@ class DBHelper extends ChangeNotifier {
     _database = await openDatabase(appPath, version: 1,
         onCreate: (Database db, int version) {
       db.execute(
-        "CREATE TABLE Notes(ID INTEGER PRIMARY KEY AUTOINCREMENT, GRAMS INTEGER, CZFOODNAME TEXT NOT NULL, ENERGYKCAL INTEGER,PROTEIN REAL,CARBS REAL,FAT REAL,FIBER REAL)",
+        '''CREATE TABLE Notes(
+          ID INTEGER PRIMARY KEY AUTOINCREMENT,
+          GRAMS INTEGER,
+          CZFOODNAME TEXT NOT NULL,
+          ENERGYKCAL INTEGER,
+          PROTEIN REAL,
+          CARBS REAL,
+          FAT REAL,
+          FIBER REAL
+          );
+        CREATE TABLE AppNutrients(
+          ID INTEGER PRIMARY KEY AUTOINCREMENT,
+          CZFOODNAME TEXT NOT NULL,
+          ENERGYKCAL INTEGER,
+          PROTEIN REAL,
+          CARBS REAL,
+          FAT REAL,
+          FIBER REAL 
+          )''',
       );
       print("Databáze byla vytvořena");
     });
@@ -99,7 +118,31 @@ class DBHelper extends ChangeNotifier {
 
   Future<List<Note>> Notes() async {
     final List<Map<String, dynamic>> maps = await _database.rawQuery(
-        '''SELECT ID,CZFOODNAME,ENERGYKCAL,PROTEIN,CARBS,FAT,FIBER FROM Notes''');
+        '''SELECT ID,GRAMS,CZFOODNAME,ENERGYKCAL,PROTEIN,CARBS,FAT,FIBER FROM Notes''');
+    return List.generate(maps.length, (i) {
+      return Note(
+        id: maps[i]['ID'] as int,
+        grams: maps[i]['GRAMS'] as int,
+        czfoodname: maps[i]['CZFOODNAME'] as String,
+        kcal: maps[i]['ENERGYKCAL'] as int,
+        protein: maps[i]['PROTEIN'] as double,
+        carbs: maps[i]['CARBS'] as double,
+        fat: maps[i]['FAT'] as double,
+        fiber: maps[i]['FIBER'] as double,
+      );
+    });
+  }
+
+  Future<List<Note>> countNotes() async {
+    final List<Map<String, dynamic>> maps =
+        await _database.rawQuery('''SELECT ID,
+        CZFOODNAME,
+        SUM(ENERGYKCAL)as ENERGYKCAL,
+        ROUND(SUM(PROTEIN),1)AS PROTEIN,
+        ROUND(SUM(CARBS),1)AS CARBS,
+        ROUND(SUM(FAT),1)AS FAT,
+        ROUND(SUM(FIBER),1)AS FIBER 
+        FROM Notes''');
     return List.generate(maps.length, (i) {
       return Note(
         id: maps[i]['ID'] as int,
@@ -121,8 +164,9 @@ class DBHelper extends ChangeNotifier {
   }
 
   Future<List<String>> getCzFoodNames() async {
-    final List<Map<String, dynamic>> maps = await _database
-        .rawQuery('''SELECT CZFOODNAME FROM NutriDatabaseData''');
+    final List<Map<String, dynamic>> maps = await _database.rawQuery('''
+        SELECT CZFOODNAME FROM AppNutrients  UNION ALL
+                SELECT CZFOODNAME FROM NutriDatabaseData''');
 
     return List.generate(maps.length, (i) {
       return maps[i]['CZFOODNAME'].toString();
@@ -131,19 +175,19 @@ class DBHelper extends ChangeNotifier {
 
   Future<int> getKcalForFood(String food) async {
     final List<Map<String, dynamic>> result = await _database.rawQuery(
-        '''SELECT ENERGYKCAL FROM NutriDatabaseData WHERE CZFOODNAME = '$food' ''');
+        '''SELECT ENERGYKCAL FROM AppNutrients WHERE CZFOODNAME = '$food' UNION ALL
+SELECT ENERGYKCAL FROM NutriDatabaseData WHERE CZFOODNAME = '$food' ''');
 
     if (result.isNotEmpty) {
       return result[0]['ENERGYKCAL'];
     } else {
-      // Vracet defaultní hodnotu nebo vyvolat chybu, pokud není hodnota nalezena
       return 0;
     }
   }
 
   Future<double> getProteinForFood(String food) async {
     final List<Map<String, dynamic>> result = await _database.rawQuery(
-        '''SELECT PROTEIN FROM NutriDatabaseData WHERE CZFOODNAME = '$food' ''');
+        '''SELECT PROTEIN FROM AppNutrients WHERE CZFOODNAME = '$food' UNION ALL SELECT PROTEIN FROM NutriDatabaseData WHERE CZFOODNAME = '$food' ''');
 
     if (result.isNotEmpty) {
       return result[0]['PROTEIN'];
@@ -154,7 +198,7 @@ class DBHelper extends ChangeNotifier {
 
   Future<double> getCarbsForFood(String food) async {
     final List<Map<String, dynamic>> result = await _database.rawQuery(
-        '''SELECT CARBS FROM NutriDatabaseData WHERE CZFOODNAME = '$food' ''');
+        '''SELECT CARBS FROM AppNutrients WHERE CZFOODNAME = '$food' UNION ALL SELECT CARBS FROM NutriDatabaseData WHERE CZFOODNAME = '$food' ''');
 
     if (result.isNotEmpty) {
       return result[0]['CARBS'];
@@ -165,7 +209,7 @@ class DBHelper extends ChangeNotifier {
 
   Future<double> getFatForFood(String food) async {
     final List<Map<String, dynamic>> result = await _database.rawQuery(
-        '''SELECT FAT FROM NutriDatabaseData WHERE CZFOODNAME = '$food' ''');
+        '''SELECT FAT FROM AppNutrients WHERE CZFOODNAME = '$food' UNION ALL SELECT FAT FROM NutriDatabaseData WHERE CZFOODNAME = '$food' ''');
 
     if (result.isNotEmpty) {
       return result[0]['FAT'];
@@ -176,7 +220,7 @@ class DBHelper extends ChangeNotifier {
 
   Future<double> getFiberForFood(String food) async {
     final List<Map<String, dynamic>> result = await _database.rawQuery(
-        '''SELECT FIBER FROM NutriDatabaseData WHERE CZFOODNAME = '$food' ''');
+        '''SELECT FIBER FROM AppNutrients WHERE CZFOODNAME = '$food' UNION ALL SELECT FIBER FROM NutriDatabaseData WHERE CZFOODNAME = '$food' ''');
 
     if (result.isNotEmpty) {
       return result[0]['FIBER'];
@@ -226,6 +270,7 @@ class DBHelper extends ChangeNotifier {
 
   NutritionsData(String text, int kcal, double protein, double carbs,
       double fat, double fiber) async {
+    print("protein:$protein");
     databaseFactoryOrNull = null; //odstraní sql kecy
     this.nameOfFood = text;
     this.kcal = kcal;
@@ -233,6 +278,7 @@ class DBHelper extends ChangeNotifier {
     this.carbs = carbs;
     this.fat = fat;
     this.fiber = fiber;
+    print("late protein:${this.protein}");
   }
 
   late double finalGrams;
@@ -245,12 +291,14 @@ class DBHelper extends ChangeNotifier {
   Grams(int grams) async {
     databaseFactoryOrNull = null; //odstraní sql kecy
     this.grams = grams;
-    print(this.grams);
+    print("grams${this.grams}");
+    print("proteingrams${this.protein}");
   }
 
   late String finalSelectedValue = "grams";
   setSelectedValue(String selectedValue) {
     this.finalSelectedValue = selectedValue;
+    print("proteinselectedvalue:${this.protein}");
   }
 
   selectedMultiply() {
@@ -261,12 +309,14 @@ class DBHelper extends ChangeNotifier {
       print("100g");
       this.finalGrams = double.parse((this.grams).toString());
     }
+    print("object1${finalGrams}");
   }
 
-  countData() {
-    selectedMultiply();
+  countData() async {
+    await selectedMultiply();
     this.finalKcal =
         int.parse((this.kcal * this.finalGrams).round().toString());
+    print("data:${this.kcal}");
     this.finalProtein =
         (((this.protein * this.finalGrams * 10).round() / 10)).toDouble();
     this.finalCarbs =
@@ -275,39 +325,136 @@ class DBHelper extends ChangeNotifier {
         (((this.fat * this.finalGrams * 10).round() / 10)).toDouble();
     this.finalFiber =
         (((this.fiber * this.finalGrams * 10).round() / 10)).toDouble();
-  }
-
-  insertAllData() async {
-    await countData();
-    databaseFactoryOrNull = null; //odstraní sql kecy
-    if (this.nameOfFood.isEmpty ||
-        this.grams == null ||
-        this.finalKcal == null ||
-        this.finalProtein == null ||
-        this.finalCarbs == null ||
-        this.finalFat == null ||
-        this.finalFiber == null) {
-      return false;
-    } else {
-      await _database.rawQuery(
-          '''INSERT INTO Notes  values(Null,${this.finalGrams},'${this.nameOfFood}',${this.finalKcal},${this.finalProtein},${this.finalCarbs},${this.finalFat},${this.finalFiber})''');
-      print(_database.rawQuery('''select * from Notes'''));
-      notifyListeners();
+    print("object2");
+    if (this.finalSelectedValue == "grams") {
+      print("grams");
+      this.finalGrams = double.parse((this.grams).toString());
+    } else if (this.finalSelectedValue == "100g") {
+      print("100g");
+      this.finalGrams = double.parse((this.grams * 100).toString());
     }
   }
 
-  Future<void> deleteItem(int id) async {
+  insertAllDataToNotes() async {
+    await countData();
+    databaseFactoryOrNull = null; //odstraní sql kecy
+    // if (this.nameOfFood.isEmpty ||
+    //     this.grams == null ||
+    //     this.finalKcal == null ||
+    //     this.finalProtein == null ||
+    //     this.finalCarbs == null ||
+    //     this.finalFat == null ||
+    //     this.finalFiber == null) {
+    //   return false;
+    // } else {
+    print("object3");
+    await _database.rawQuery(
+        '''INSERT INTO Notes values(Null,${this.finalGrams},'${this.nameOfFood}',${this.finalKcal},${this.finalProtein},${this.finalCarbs},${this.finalFat},${this.finalFiber})''');
+    print(_database.rawQuery('''select * from Notes'''));
+
+    // this.nameOfFood = "";
+    // this.finalKcal = 0;
+    // this.finalProtein = 0;
+    // this.finalCarbs = 0;
+    // this.finalFat = 0;
+    notifyListeners();
+    // }
+  }
+
+  late double newFoodGrams = 0;
+  late String newFoodNameOfFood = "";
+  late int newFoodKcal = 0;
+  late double newFoodProtein = 0;
+  late double newFoodCarbs = 0;
+  late double newFoodFat = 0;
+  late double newFoodFiber = 0;
+
+  TextEditingController textEditingController1 = TextEditingController();
+  TextEditingController textEditingController2 = TextEditingController();
+  TextEditingController textEditingController3 = TextEditingController();
+  TextEditingController textEditingController4 = TextEditingController();
+  TextEditingController textEditingController5 = TextEditingController();
+  TextEditingController textEditingController6 = TextEditingController();
+  TextEditingController textEditingController7 = TextEditingController();
+  resetBoxes() {
+    this.textEditingController1.clear();
+    this.textEditingController2.clear();
+    this.textEditingController3.clear();
+    this.textEditingController4.clear();
+    this.textEditingController5.clear();
+    this.textEditingController6.clear();
+    this.textEditingController7.clear();
+  }
+
+  late String finalNewFoodSelectedValue = "grams";
+  setNewFoodSelectedValue(String selectedValue) {
+    this.finalNewFoodSelectedValue = selectedValue;
+    selectedNewFoodMultiply();
+  }
+
+  selectedNewFoodMultiply() {
+    if (this.finalNewFoodSelectedValue == "grams") {
+      print("grams");
+      this.newFoodGrams = double.parse((this.newFoodGrams).toString());
+    } else if (this.finalNewFoodSelectedValue == "100g") {
+      print("100g");
+      this.newFoodGrams = double.parse((this.newFoodGrams * 100).toString());
+    }
+  }
+
+  countNewFoodData() {
+    selectedNewFoodMultiply();
+    this.newFoodKcal = int.parse(
+        (this.newFoodKcal / this.newFoodGrams * 100).round().toString());
+    this.newFoodProtein = this.newFoodProtein / this.newFoodGrams * 100;
+    this.newFoodCarbs = this.newFoodCarbs / this.newFoodGrams * 100;
+    this.newFoodFat = this.newFoodFat / this.newFoodGrams * 100;
+    this.newFoodFiber = this.newFoodFiber / this.newFoodGrams * 100;
+  }
+
+  insertNewFood() async {
+    await countNewFoodData();
+    databaseFactoryOrNull = null; //odstraní sql kecy
+    await _database.rawQuery(
+        '''INSERT INTO AppNutrients values(Null,'${this.newFoodNameOfFood}',${this.newFoodKcal},${this.newFoodProtein},${this.newFoodCarbs},${this.newFoodFat},${this.newFoodFiber})''');
+    print(_database.rawQuery('''select * from AppNutrients'''));
+    resetBoxes();
+    notifyListeners();
+
+    print("Name: ${this.newFoodNameOfFood}");
+    print("Grams: ${this.newFoodGrams}");
+    print("Kcal: ${this.newFoodKcal}");
+    print("Protein: ${this.newFoodProtein}");
+    print("Carbs: ${this.newFoodCarbs}");
+    print("Fat: ${this.newFoodFat}");
+    print("Fiber: ${this.newFoodFiber}");
+
+    deleteNewFoodValues();
+  }
+
+  deleteNewFoodValues() {
+    this.newFoodNameOfFood = "";
+    this.newFoodGrams = 0;
+    this.newFoodKcal = 0;
+    this.newFoodProtein = 0;
+    this.newFoodCarbs = 0;
+    this.newFoodFat = 0;
+    this.newFoodFiber = 0;
+  }
+
+  Future<void> deleteItem(int id, String text) async {
     databaseFactoryOrNull = null;
 
-    await _database.delete('Notes', where: 'id = ?', whereArgs: [id]);
+    await _database.delete('Notes',
+        where: 'ID = ? AND CZFOODNAME = ?', whereArgs: [id, text]);
 
     var updatedData = await _database.query('Notes');
     print(updatedData);
+    notifyListeners();
   }
 
   where(Function(dynamic food) param0) {}
 }
-
 
 class Note {
   final int id;

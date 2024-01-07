@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/database/database_provider.dart';
 import 'package:provider/provider.dart';
 
-import '../../globals_variables/nutri_data.dart';
-
 class dataBoxes extends StatefulWidget {
   const dataBoxes({super.key});
 
@@ -17,143 +15,173 @@ class _dataBoxesState extends State<dataBoxes> {
   @override
   Widget build(BuildContext context) {
     var dbHelper = Provider.of<DBHelper>(context);
-    final nutrition = Provider.of<NutritionIncremment>(context);
     EdgeInsets globalPadding = const EdgeInsets.fromLTRB(25, 3, 25, 3);
     BorderRadius globalRadius = BorderRadius.circular(20);
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Container(
-              width: 120,
-              decoration: BoxDecoration(
-                //   border: borderBorder,
-                color: Colors.black26,
-                borderRadius: globalRadius, // Zaoblení rohů
-              ),
-              padding: const EdgeInsets.fromLTRB(20, 5, 20, 2),
-              child: Column(
+    return FutureBuilder(
+      future: dbHelper.countNotes(),
+      builder: (context, snapshot) {
+        late int kcal = 0;
+        late double protein = 0;
+        late double carbs = 0;
+        late double fat = 0;
+        late double fiber = 0;
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else {
+          if (snapshot.hasData == false) {
+            kcal = 0;
+            protein = 0;
+            carbs = 0;
+            fat = 0;
+            fiber = 0;
+            print(
+                "žádné hodnoty nejsou v databázi  kcal ${kcal} protein ${protein} carbs ${carbs} fat ${fat} fiber ${fiber}");
+          } else {
+            List<Note> notes = snapshot.data!;
+            kcal = notes[0].kcal;
+            protein = notes[0].protein;
+            carbs = notes[0].carbs;
+            fat = notes[0].fat;
+            fiber = notes[0].fiber;
+            print("hodnoty jsou v databázi");
+          }
+          return Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Text(
-                    'Calories:',
-                    style: TextStyle(fontSize: 15),
-                  ),
-                  Text(
-                    '${nutrition.kcalData}',
-                    style: TextStyle(fontSize: 20, color: Colors.yellowAccent),
-                    strutStyle: StrutStyle(fontWeight: FontWeight.bold),
+                  Container(
+                    width: 120,
+                    decoration: BoxDecoration(
+                      //   border: borderBorder,
+                      color: Colors.black26,
+                      borderRadius: globalRadius, // Zaoblení rohů
+                    ),
+                    padding: const EdgeInsets.fromLTRB(20, 5, 20, 2),
+                    child: Column(
+                      children: [
+                        Text(
+                          'Calories:',
+                          style: TextStyle(fontSize: 15, color: Colors.amber),
+                        ),
+                        Text(
+                          '${kcal}',
+                          style: TextStyle(fontSize: 20, color: Colors.white),
+                          strutStyle: StrutStyle(fontWeight: FontWeight.bold),
+                        )
+                      ],
+                    ),
                   )
                 ],
               ),
-            )
-          ],
-        ),
-        const SizedBox(
-          height: 15,
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Container(
-              width: 120,
-              decoration: BoxDecoration(
-                //   border: borderBorder,
-                color: Colors.black26,
-                borderRadius: globalRadius, // Zaoblení rohů
+              const SizedBox(
+                height: 15,
               ),
-              padding: globalPadding,
-              child: Column(
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Text(
-                    'Protein',
-                    style: TextStyle(fontSize: 15),
+                  Container(
+                    width: 120,
+                    decoration: BoxDecoration(
+                      //   border: borderBorder,
+                      color: Colors.black26,
+                      borderRadius: globalRadius, // Zaoblení rohů
+                    ),
+                    padding: globalPadding,
+                    child: Column(
+                      children: [
+                        Text(
+                          'Protein',
+                          style: TextStyle(fontSize: 15, color: Colors.amber),
+                        ),
+                        Text(
+                          '${protein}',
+                          style: TextStyle(fontSize: 18, color: Colors.white),
+                          strutStyle: StrutStyle(fontWeight: FontWeight.bold),
+                        )
+                      ],
+                    ),
                   ),
-                  Text(
-                    '${nutrition.proteinData}',
-                    style: TextStyle(fontSize: 18, color: Colors.yellowAccent),
-                    strutStyle: StrutStyle(fontWeight: FontWeight.bold),
-                  )
+                  Container(
+                    width: 120,
+                    decoration: BoxDecoration(
+                      //   border: borderBorder,
+                      color: Colors.black26,
+                      borderRadius: globalRadius, // Zaoblení rohů
+                    ),
+                    padding: globalPadding,
+                    child: Column(
+                      children: [
+                        Text(
+                          'Carbs',
+                          style: TextStyle(fontSize: 15, color: Colors.amber),
+                        ),
+                        Text(
+                          '${carbs}',
+                          style: TextStyle(fontSize: 18, color: Colors.white),
+                          strutStyle: StrutStyle(fontWeight: FontWeight.bold),
+                        )
+                      ],
+                    ),
+                  ),
                 ],
               ),
-            ),
-            Container(
-              width: 120,
-              decoration: BoxDecoration(
-                //   border: borderBorder,
-                color: Colors.black26,
-                borderRadius: globalRadius, // Zaoblení rohů
+              const SizedBox(
+                height: 10,
               ),
-              padding: globalPadding,
-              child: Column(
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Text(
-                    'Carbs',
-                    style: TextStyle(fontSize: 15),
+                  Container(
+                    width: 120,
+                    decoration: BoxDecoration(
+                      //   border: borderBorder,
+                      color: Colors.black26,
+                      borderRadius: globalRadius, // Zaoblení rohů
+                    ),
+                    padding: globalPadding,
+                    child: Column(
+                      children: [
+                        Text(
+                          'Fat',
+                          style: TextStyle(fontSize: 15, color: Colors.amber),
+                        ),
+                        Text(
+                          '${fat}',
+                          style: TextStyle(fontSize: 18, color: Colors.white),
+                          strutStyle: StrutStyle(fontWeight: FontWeight.bold),
+                        )
+                      ],
+                    ),
                   ),
-                  Text(
-                    '${nutrition.carbsData}',
-                    style: TextStyle(fontSize: 18, color: Colors.yellowAccent),
-                    strutStyle: StrutStyle(fontWeight: FontWeight.bold),
-                  )
+                  Container(
+                    width: 120,
+                    decoration: BoxDecoration(
+                      //   border: borderBorder,
+                      color: Colors.black26,
+                      borderRadius: globalRadius, // Zaoblení rohů
+                    ),
+                    padding: globalPadding,
+                    child: Column(
+                      children: [
+                        Text(
+                          'Fiber',
+                          style: TextStyle(fontSize: 15, color: Colors.amber),
+                        ),
+                        Text(
+                          '${fiber}',
+                          style: TextStyle(fontSize: 18, color: Colors.white),
+                          strutStyle: StrutStyle(fontWeight: FontWeight.bold),
+                        )
+                      ],
+                    ),
+                  ),
                 ],
               ),
-            ),
-          ],
-        ),
-        const SizedBox(
-          height: 10,
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Container(
-              width: 120,
-              decoration: BoxDecoration(
-                //   border: borderBorder,
-                color: Colors.black26,
-                borderRadius: globalRadius, // Zaoblení rohů
-              ),
-              padding: globalPadding,
-              child: const Column(
-                children: [
-                  Text(
-                    'Fats',
-                    style: TextStyle(fontSize: 15),
-                  ),
-                  Text(
-                    'data',
-                    style: TextStyle(fontSize: 18, color: Colors.yellowAccent),
-                    strutStyle: StrutStyle(fontWeight: FontWeight.bold),
-                  )
-                ],
-              ),
-            ),
-            Container(
-              width: 120,
-              decoration: BoxDecoration(
-                //   border: borderBorder,
-                color: Colors.black26,
-                borderRadius: globalRadius, // Zaoblení rohů
-              ),
-              padding: globalPadding,
-              child: const Column(
-                children: [
-                  Text(
-                    'Fiber',
-                    style: TextStyle(fontSize: 15),
-                  ),
-                  Text(
-                    'data',
-                    style: TextStyle(fontSize: 18, color: Colors.yellowAccent),
-                    strutStyle: StrutStyle(fontWeight: FontWeight.bold),
-                  )
-                ],
-              ),
-            ),
-          ],
-        ),
-      ],
+            ],
+          );
+        }
+      },
     );
   }
 }
