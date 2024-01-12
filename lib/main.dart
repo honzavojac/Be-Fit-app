@@ -20,6 +20,7 @@ void main() async {
   await dbHelper.initializeDB();
   CountProvider countProvider = CountProvider();
   PageProvider pageProvider = PageProvider();
+  // await dbHelper.vlozitHodnoty();
   // await dbHelper.deleteFile('database.db');
 
   // print(await dbHelper.getNotes());

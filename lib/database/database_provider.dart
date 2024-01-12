@@ -68,7 +68,7 @@ class DBHelper extends ChangeNotifier {
         );
 
         CREATE TABLE Cvik (
-            ID_CVIKU INTEGER PRIMARY KEY,
+            ID_CVIKU INTEGER PRIMARY KEY AUTOINCREMENT,
             ID_SVALU INTEGER,
             NAZEV_CVIKU TEXT
         );
@@ -101,6 +101,13 @@ class DBHelper extends ChangeNotifier {
     print("inicializace proběhla úspěšně");
 
     return _database;
+  }
+
+  vlozitHodnoty() async {
+    await _database
+        .rawQuery('''INSERT INTO Cvik values(Null,1,'Biceps s činkou')''');
+    var a = await _database.rawQuery('''SELECT * FROM Cvik''');
+    print(a);
   }
 
   Future<void> deleteFile(String fileName) async {

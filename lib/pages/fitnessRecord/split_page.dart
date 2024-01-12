@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/database/database_provider.dart';
+import 'package:kaloricke_tabulky_02/pages/fitnessRecord/add_muscle_box.dart';
 import 'package:provider/provider.dart';
 
 class SplitPage extends StatefulWidget {
@@ -13,7 +14,7 @@ class _SplitPageState extends State<SplitPage> {
   @override
   Widget build(BuildContext context) {
     var dbHelper = Provider.of<DBHelper>(context);
-
+    bool isChecked = false;
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -95,18 +96,24 @@ class _SplitPageState extends State<SplitPage> {
                   ),
                 ),
                 SizedBox(
-                  width: 10,
+                  width: 5,
                 ),
                 IconButton(
-                  iconSize: 40,
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStatePropertyAll(
-                      Colors.amber[800],
-                    ),
-                  ),
-                  onPressed: () {},
                   color: Colors.black,
+                  style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStatePropertyAll(Colors.amber[800])),
                   icon: Icon(Icons.add),
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return Center(
+                          child: AddMuscleBox(),
+                        );
+                      },
+                    );
+                  },
                 ),
               ],
             ),
@@ -140,34 +147,30 @@ class _SplitPageState extends State<SplitPage> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Expanded(
-                                child: Padding(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(70, 0, 70, 0),
-                                  child: ListView.builder(
-                                    // physics: NeverScrollableScrollPhysics(),
-                                    itemBuilder: (context, index) {
-                                      return Column(
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Expanded(
-                                                child: Container(
-                                                  height: 30,
-                                                  color: Colors.green,
-                                                  width: 50,
-                                                  child: Text("data"),
-                                                ),
+                                child: ListView.builder(
+                                  // physics: NeverScrollableScrollPhysics(),
+                                  itemBuilder: (context, index) {
+                                    return Column(
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Container(
+                                                height: 30,
+                                                color: Colors.green,
+                                                width: 50,
+                                                child: Text("data"),
                                               ),
-                                            ],
-                                          ),
-                                          SizedBox(
-                                            height: 5,
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                    itemCount: 3,
-                                  ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          height: 5,
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                  itemCount: 3,
                                 ),
                               ),
                               Container(
