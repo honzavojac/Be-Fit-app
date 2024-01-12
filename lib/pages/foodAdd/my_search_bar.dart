@@ -32,8 +32,12 @@ class _mySearchBarState extends State<mySearchBar> {
             onChanged: (_) {
               controller.openView();
             },
-            leading: const Icon(Icons.search),
+            leading:
+                const Icon(Icons.search, color: Color.fromRGBO(255, 179, 0, 1)),
             hintText: 'Vyhledat jídlo...',
+            hintStyle: MaterialStatePropertyAll(TextStyle(
+              color: Colors.amber[600],
+            )),
           );
         },
         suggestionsBuilder:

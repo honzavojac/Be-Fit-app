@@ -32,6 +32,7 @@ class _myDataboxesState extends State<myDataboxes> {
             ],
             decoration: const InputDecoration(
                 labelText: 'Serving size',
+                labelStyle: TextStyle(color: Color.fromRGBO(255, 179, 0, 1)),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(12)),
                 ),
@@ -39,6 +40,7 @@ class _myDataboxesState extends State<myDataboxes> {
                     EdgeInsets.symmetric(vertical: 0, horizontal: 15),
                 hintText: 'Enter value:',
                 hintStyle: TextStyle(
+                    color: Color.fromRGBO(255, 179, 0, 1),
                     fontSize: 15) // zobrazí se pokud je textové pole prázdné
                 //  icon: Icon(Icons.text_fields), //
                 ),
