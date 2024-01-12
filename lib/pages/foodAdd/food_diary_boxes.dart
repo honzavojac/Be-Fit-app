@@ -17,8 +17,7 @@ class _foodDiaryBoxesState extends State<foodDiaryBoxes> {
   @override
   Widget build(BuildContext context) {
     var dbHelper = Provider.of<DBHelper>(context);
-    var pageProvider = Provider.of<PageProvider>(context);
-    int deleteValue = 0;
+  
     return Container(
       margin: EdgeInsets.fromLTRB(10, 0, 10, 10),
       decoration: BoxDecoration(
@@ -112,8 +111,8 @@ class _foodDiaryBoxesState extends State<foodDiaryBoxes> {
 
                                 textPainter.layout(
                                     maxWidth: constraints.maxWidth);
-                                print(
-                                    "${textPainter.width} ${constraints.maxWidth}");
+                                // print(
+                                //     "${textPainter.width} ${constraints.maxWidth}");
                                 return Row(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
@@ -250,13 +249,13 @@ class _foodDiaryBoxesState extends State<foodDiaryBoxes> {
 Widget buildAnimatedText(
     String text, double textPainter, double boxConstraints) {
   if (textPainter < boxConstraints) {
-    print("${text.indexOf(text)} ${text.length}");
+    // print("${text.indexOf(text)} ${text.length}");
     return Text(
       text,
       style: TextStyle(color: Colors.black),
     );
   } else {
-    print("${text.length}text je větší než widget");
+    // print("${text.length}text je větší než widget");
     return Marquee(
       text: text,
       style: TextStyle(color: Colors.black),

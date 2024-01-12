@@ -188,7 +188,7 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                       setState(() {
                         exerciseIndex
                             .add('Exercise ${exerciseIndex.length + 1}');
-                        print(exerciseIndex);
+                        // print(exerciseIndex);
                       });
                       // Po přidání položky posuňte pohled dolů
                       _scrollController.animateTo(

@@ -34,8 +34,7 @@ class _dataBoxesState extends State<dataBoxes> {
             carbs = 0;
             fat = 0;
             fiber = 0;
-            print(
-                "žádné hodnoty nejsou v databázi  kcal ${kcal} protein ${protein} carbs ${carbs} fat ${fat} fiber ${fiber}");
+          
           } else {
             List<Note> notes = snapshot.data!;
             kcal = notes[0].kcal;
@@ -43,7 +42,7 @@ class _dataBoxesState extends State<dataBoxes> {
             carbs = notes[0].carbs;
             fat = notes[0].fat;
             fiber = notes[0].fiber;
-            print("hodnoty jsou v databázi");
+          
           }
           return Column(
             children: [

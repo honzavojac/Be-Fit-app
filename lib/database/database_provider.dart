@@ -51,11 +51,10 @@ class DBHelper extends ChangeNotifier {
           FIBER REAL 
           )''',
       );
-      print("Databáze byla vytvořena");
+      print("Databáze byly vytvořena");
     });
 
     _assetsDatabasePath = await assetsDB();
-    print(_assetsDatabasePath);
 
     await _database
         .rawQuery('''ATTACH DATABASE '$_assetsDatabasePath' AS DB''');
@@ -63,7 +62,7 @@ class DBHelper extends ChangeNotifier {
     var result = await _database.query('Notes');
     print("Notes database:$result");
 
-    print("inicializace proběhla úspěšně\n\n\n\n\n\n\n");
+    print("inicializace proběhla úspěšně");
 
     return _database;
   }
@@ -92,10 +91,8 @@ class DBHelper extends ChangeNotifier {
   Future<String> assetsDB() async {
     String databasesPath = (await getApplicationDocumentsDirectory()).path;
     String assetsPath = join(databasesPath, "foodDatabase.db");
-    // print("Cesta k assets databázi: $assetsPath");
 
     var exists = await databaseExists(assetsPath);
-    // print("Ověření existence databáze: $exists");
 
     if (exists) {
       print("\nVytváření assets databáze");
@@ -154,13 +151,6 @@ class DBHelper extends ChangeNotifier {
         fiber: maps[i]['FIBER'] as double,
       );
     });
-  }
-
-  Future<List<Map<String, Object?>>> a() async {
-    var joinResult =
-        await _database.rawQuery('''SELECT CZFOODNAME FROM Notes''');
-    print("vše------------$joinResult");
-    return joinResult;
   }
 
   Future<List<String>> getCzFoodNames() async {
@@ -229,37 +219,6 @@ SELECT ENERGYKCAL FROM NutriDatabaseData WHERE CZFOODNAME = '$food' ''');
     }
   }
 
-  Future<List<String>> getNotes() async {
-    final List<Map<String, dynamic>> maps = await _database.rawQuery(
-        '''SELECT ID,CZFOODNAME,ENERGYKCAL,PROTEIN,CARBS,FAT,FIBER FROM NutriDatabaseDataData''');
-
-    print(maps);
-    for (var h in maps) {
-      print(h['FIBER'].runtimeType);
-    }
-
-    return List.generate(maps.length, (i) {
-      double fiber;
-      if (maps[i]['FIBER'] == Null) {
-        fiber = 0;
-        print("NULLLLL");
-      } else {
-        // print(maps[i]['FIBER']);
-        fiber = double.parse(maps[i]['FIBER'].toString());
-      }
-
-      return Note(
-        id: maps[i]['ID'] as int,
-        czfoodname: maps[i]['CZFOODNAME'] as String,
-        kcal: maps[i]['ENERGYKCAL'] as int,
-        protein: maps[i]['PROTEIN'] as double,
-        carbs: double.parse((maps[i]['CARBS']).toString()),
-        fat: double.parse(maps[i]['FAT'].toString()),
-        fiber: fiber,
-      ).toString();
-    });
-  }
-
   late int grams;
   late String nameOfFood;
   late int kcal;
@@ -270,7 +229,6 @@ SELECT ENERGYKCAL FROM NutriDatabaseData WHERE CZFOODNAME = '$food' ''');
 
   NutritionsData(String text, int kcal, double protein, double carbs,
       double fat, double fiber) async {
-    print("protein:$protein");
     databaseFactoryOrNull = null; //odstraní sql kecy
     this.nameOfFood = text;
     this.kcal = kcal;
@@ -278,7 +236,6 @@ SELECT ENERGYKCAL FROM NutriDatabaseData WHERE CZFOODNAME = '$food' ''');
     this.carbs = carbs;
     this.fat = fat;
     this.fiber = fiber;
-    print("late protein:${this.protein}");
   }
 
   late double finalGrams;
@@ -291,32 +248,26 @@ SELECT ENERGYKCAL FROM NutriDatabaseData WHERE CZFOODNAME = '$food' ''');
   Grams(int grams) async {
     databaseFactoryOrNull = null; //odstraní sql kecy
     this.grams = grams;
-    print("grams${this.grams}");
-    print("proteingrams${this.protein}");
   }
 
   late String finalSelectedValue = "grams";
   setSelectedValue(String selectedValue) {
     this.finalSelectedValue = selectedValue;
-    print("proteinselectedvalue:${this.protein}");
   }
 
   selectedMultiply() {
     if (this.finalSelectedValue == "grams") {
-      print("grams");
       this.finalGrams = double.parse((this.grams / 100).toString());
     } else if (this.finalSelectedValue == "100g") {
-      print("100g");
       this.finalGrams = double.parse((this.grams).toString());
     }
-    print("object1${finalGrams}");
   }
 
   countData() async {
     await selectedMultiply();
     this.finalKcal =
         int.parse((this.kcal * this.finalGrams).round().toString());
-    print("data:${this.kcal}");
+
     this.finalProtein =
         (((this.protein * this.finalGrams * 10).round() / 10)).toDouble();
     this.finalCarbs =
@@ -325,12 +276,10 @@ SELECT ENERGYKCAL FROM NutriDatabaseData WHERE CZFOODNAME = '$food' ''');
         (((this.fat * this.finalGrams * 10).round() / 10)).toDouble();
     this.finalFiber =
         (((this.fiber * this.finalGrams * 10).round() / 10)).toDouble();
-    print("object2");
+
     if (this.finalSelectedValue == "grams") {
-      print("grams");
       this.finalGrams = double.parse((this.grams).toString());
     } else if (this.finalSelectedValue == "100g") {
-      print("100g");
       this.finalGrams = double.parse((this.grams * 100).toString());
     }
   }
@@ -338,27 +287,11 @@ SELECT ENERGYKCAL FROM NutriDatabaseData WHERE CZFOODNAME = '$food' ''');
   insertAllDataToNotes() async {
     await countData();
     databaseFactoryOrNull = null; //odstraní sql kecy
-    // if (this.nameOfFood.isEmpty ||
-    //     this.grams == null ||
-    //     this.finalKcal == null ||
-    //     this.finalProtein == null ||
-    //     this.finalCarbs == null ||
-    //     this.finalFat == null ||
-    //     this.finalFiber == null) {
-    //   return false;
-    // } else {
-    print("object3");
+
     await _database.rawQuery(
         '''INSERT INTO Notes values(Null,${this.finalGrams},'${this.nameOfFood}',${this.finalKcal},${this.finalProtein},${this.finalCarbs},${this.finalFat},${this.finalFiber})''');
-    print(_database.rawQuery('''select * from Notes'''));
 
-    // this.nameOfFood = "";
-    // this.finalKcal = 0;
-    // this.finalProtein = 0;
-    // this.finalCarbs = 0;
-    // this.finalFat = 0;
     notifyListeners();
-    // }
   }
 
   late double newFoodGrams = 0;
@@ -394,10 +327,8 @@ SELECT ENERGYKCAL FROM NutriDatabaseData WHERE CZFOODNAME = '$food' ''');
 
   selectedNewFoodMultiply() {
     if (this.finalNewFoodSelectedValue == "grams") {
-      print("grams");
       this.newFoodGrams = double.parse((this.newFoodGrams).toString());
     } else if (this.finalNewFoodSelectedValue == "100g") {
-      print("100g");
       this.newFoodGrams = double.parse((this.newFoodGrams * 100).toString());
     }
   }
@@ -417,17 +348,9 @@ SELECT ENERGYKCAL FROM NutriDatabaseData WHERE CZFOODNAME = '$food' ''');
     databaseFactoryOrNull = null; //odstraní sql kecy
     await _database.rawQuery(
         '''INSERT INTO AppNutrients values(Null,'${this.newFoodNameOfFood}',${this.newFoodKcal},${this.newFoodProtein},${this.newFoodCarbs},${this.newFoodFat},${this.newFoodFiber})''');
-    print(_database.rawQuery('''select * from AppNutrients'''));
+
     resetBoxes();
     notifyListeners();
-
-    print("Name: ${this.newFoodNameOfFood}");
-    print("Grams: ${this.newFoodGrams}");
-    print("Kcal: ${this.newFoodKcal}");
-    print("Protein: ${this.newFoodProtein}");
-    print("Carbs: ${this.newFoodCarbs}");
-    print("Fat: ${this.newFoodFat}");
-    print("Fiber: ${this.newFoodFiber}");
 
     deleteNewFoodValues();
   }
