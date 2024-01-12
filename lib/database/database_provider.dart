@@ -31,45 +31,63 @@ class DBHelper extends ChangeNotifier {
     _database = await openDatabase(appPath, version: 1,
         onCreate: (Database db, int version) {
       db.execute(
-        '''CREATE TABLE Notes(
-          ID INTEGER PRIMARY KEY AUTOINCREMENT,
-          GRAMS INTEGER,
-          CZFOODNAME TEXT NOT NULL,
-          ENERGYKCAL INTEGER,
-          PROTEIN REAL,
-          CARBS REAL,
-          FAT REAL,
-          FIBER REAL
-          );
-        CREATE TABLE AppNutrients(
-          ID INTEGER PRIMARY KEY AUTOINCREMENT,
-          CZFOODNAME TEXT NOT NULL,
-          ENERGYKCAL INTEGER,
-          PROTEIN REAL,
-          CARBS REAL,
-          FAT REAL,
-          FIBER REAL 
-          );
-        CREATE TABLE Muscle(
-          ID INTEGER,
-          NAME TEXT
-          );
-        CREATE TABLE Split(
-          ID INTEGER PRIMARY KEY,
-          NAME TEXT
-          );
-        CREATE TABLE ExerciseMain(
-          ID INTEGER PRIMARY KEY AUTOINCREMENT,
-          EXERCISE TEXT NOT NULL,
-          DESCRIPTION TEXT
-          );
-        CREATE TABLE ExerciseData(
-          ID INTEGER PRIMARY KEY,
-          SET INTEGER,
-          REPS INTEGER
-        );''',
+        '''CREATE TABLE Notes (
+            ID INTEGER PRIMARY KEY AUTOINCREMENT,
+            GRAMS INTEGER,
+            CZFOODNAME TEXT NOT NULL,
+            ENERGYKCAL INTEGER,
+            PROTEIN REAL,
+            CARBS REAL,
+            FAT REAL,
+            FIBER REAL
+        );
+
+        CREATE TABLE AppNutrients (
+            ID INTEGER PRIMARY KEY,
+            CZFOODNAME TEXT NOT NULL,
+            ENERGYKCAL INTEGER,
+            PROTEIN REAL,
+            CARBS REAL,
+            FAT REAL,
+            FIBER REAL
+        );
+
+        CREATE TABLE Muscle (
+            ID INTEGER PRIMARY KEY,
+            NAME TEXT
+        );
+
+        CREATE TABLE Split (
+            ID_SPLITU INTEGER PRIMARY KEY,
+            ID_SVALU INTEGER
+        );
+
+        CREATE TABLE Sval (
+            ID_SVALU INTEGER PRIMARY KEY,
+            NAZEV_SVALU TEXT
+        );
+
+        CREATE TABLE Cvik (
+            ID_CVIKU INTEGER PRIMARY KEY,
+            ID_SVALU INTEGER,
+            NAZEV_CVIKU TEXT
+        );
+
+        CREATE TABLE DataCviku (
+            ID_DATA_CVIKU INTEGER PRIMARY KEY,
+            ID_CVIKU INTEGER,
+            SERIE INTEGER,
+            VAHA REAL,
+            OPAKOVANI INTEGER,
+            KOMENTAR TEXT,
+            DATUM DATE
+        );
+        CREATE TABLE PromenaSplitu (
+           INT_ID INTEGER PRIMARY KEY
+        );
+        ''',
       );
-      print("Databáze byly vytvořena");
+      print("Databáze byly vytvořeny");
     });
 
     _assetsDatabasePath = await assetsDB();

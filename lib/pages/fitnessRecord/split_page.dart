@@ -43,9 +43,18 @@ class _SplitPageState extends State<SplitPage> {
                   child: FutureBuilder<List<Note>>(
                     future: dbHelper.Notes(),
                     builder: (context, snapshot) {
-                      if (snapshot.hasError) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
                         return Center(
-                          child: Text('Chyba: ${snapshot.error}'),
+                          child: CircularProgressIndicator(),
+                        );
+                      } else if (snapshot.hasError) {
+                        return Center(
+                          child: Text('Error: ${snapshot.error}'),
+                        );
+                      } else if (snapshot.data == null ||
+                          snapshot.data!.isEmpty) {
+                        return Center(
+                          child: Text('No data available.'),
                         );
                       } else {
                         List<Note> splitData = snapshot.data!;
@@ -62,11 +71,11 @@ class _SplitPageState extends State<SplitPage> {
                                         style: TextStyle(fontSize: 15),
                                       ),
                                       Text(
-                                        "biceps",
+                                        "triceps",
                                         style: TextStyle(fontSize: 15),
                                       ),
                                       Text(
-                                        "biceps",
+                                        "shoulders",
                                         style: TextStyle(fontSize: 15),
                                       ),
                                     ],
@@ -74,7 +83,7 @@ class _SplitPageState extends State<SplitPage> {
                                 )
                                 .toList(),
                             indicatorColor: Colors.amber,
-                            indicatorSize: TabBarIndicatorSize.tab,
+                            // indicatorSize: TabBarIndicatorSize.tab,
                             dividerColor: Colors.transparent,
                             labelColor: Colors.amber,
                             isScrollable: true,
@@ -107,42 +116,80 @@ class _SplitPageState extends State<SplitPage> {
           ),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(15.0),
               child: Container(
                 color: Colors.blueGrey,
-                child: ListView(
-                  children: [
-                    Container(
-                      color: Colors.red,
-                      height: 40,
-                    ),
-                    Container(
-                      color: Colors.blue,
-                      height: 200,
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Container(
-                      color: Colors.red,
-                      height: 40,
-                    ),
-                    Container(
-                      color: Colors.blue,
-                      height: 200,
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Container(
-                      color: Colors.red,
-                      height: 40,
-                    ),
-                    Container(
-                      color: Colors.blue,
-                      height: 200,
-                    ),
-                  ],
+                child: ListView.builder(
+                  itemCount: 3,
+                  itemBuilder: (context, index) {
+                    return Column(
+                      children: [
+                        Container(
+                          color: Colors.red,
+                          height: 40,
+                          child: Center(
+                            child: Text("Biceps",
+                                style: TextStyle(
+                                    fontSize: 20, fontWeight: FontWeight.bold)),
+                          ),
+                        ),
+                        Container(
+                          color: Colors.blue,
+                          height: 200,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(70, 0, 70, 0),
+                                  child: ListView.builder(
+                                    // physics: NeverScrollableScrollPhysics(),
+                                    itemBuilder: (context, index) {
+                                      return Column(
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: Container(
+                                                  height: 30,
+                                                  color: Colors.green,
+                                                  width: 50,
+                                                  child: Text("data"),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(
+                                            height: 5,
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                    itemCount: 3,
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    ElevatedButton(
+                                      onPressed: () {},
+                                      child: Text(
+                                        "exercises",
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
               ),
             ),

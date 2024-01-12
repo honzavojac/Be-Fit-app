@@ -16,7 +16,6 @@ import 'globals_variables/nutri_data.dart';
 
 // late DbController databaseInstance;
 void main() async {
- 
   DBHelper dbHelper = DBHelper();
   await dbHelper.initializeDB();
   CountProvider countProvider = CountProvider();
@@ -103,7 +102,6 @@ class _MyAppState extends State<MyApp> {
               onPageChanged: (index) {
                 pageProvider.page = index;
                 setState(() {});
-             
               },
               children: _pages,
             ),
@@ -117,7 +115,6 @@ class _MyAppState extends State<MyApp> {
                 // print(pageProvider.page);
                 controller.jumpToPage(pageProvider.page);
                 setState(() {});
-               
               },
               indicatorColor: Colors.amber[800],
               selectedIndex: pageProvider.page,
