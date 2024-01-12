@@ -49,7 +49,25 @@ class DBHelper extends ChangeNotifier {
           CARBS REAL,
           FAT REAL,
           FIBER REAL 
-          )''',
+          );
+        CREATE TABLE Muscle(
+          ID INTEGER,
+          NAME TEXT
+          );
+        CREATE TABLE Split(
+          ID INTEGER PRIMARY KEY,
+          NAME TEXT
+          );
+        CREATE TABLE ExerciseMain(
+          ID INTEGER PRIMARY KEY AUTOINCREMENT,
+          EXERCISE TEXT NOT NULL,
+          DESCRIPTION TEXT
+          );
+        CREATE TABLE ExerciseData(
+          ID INTEGER PRIMARY KEY,
+          SET INTEGER,
+          REPS INTEGER
+        );''',
       );
       print("Databáze byla vytvořena");
     });
