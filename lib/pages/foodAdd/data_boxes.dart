@@ -33,8 +33,23 @@ class _myDataboxesState extends State<myDataboxes> {
             decoration: const InputDecoration(
                 labelText: 'Serving size',
                 labelStyle: TextStyle(color: Color.fromRGBO(255, 179, 0, 1)),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(12)),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(12),
+                  ),
+                  borderSide: BorderSide(
+                    color: Color.fromRGBO(255, 143, 0, 1),
+                    width: 0.5,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(12),
+                  ),
+                  borderSide: BorderSide(
+                    color: Color.fromRGBO(255, 143, 0, 1),
+                    width: 3.0,
+                  ),
                 ),
                 contentPadding:
                     EdgeInsets.symmetric(vertical: 0, horizontal: 15),

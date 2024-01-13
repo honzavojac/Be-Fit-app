@@ -1,8 +1,6 @@
-import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/database/database_provider.dart';
-import 'package:kaloricke_tabulky_02/page_provider.dart';
 import 'package:marquee/marquee.dart';
 import 'package:provider/provider.dart';
 
@@ -50,7 +48,7 @@ class _foodDiaryBoxesState extends State<foodDiaryBoxes> {
                     ),
                   ),
                   confirmDismiss: (direction) async {
-                    ScaffoldMessenger.of(context).showSnackBar(
+                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         duration: Duration(seconds: 5),
                         backgroundColor: Colors.amber[800],
@@ -88,6 +86,7 @@ class _foodDiaryBoxesState extends State<foodDiaryBoxes> {
                         ),
                       ),
                     );
+                     return null;
                   },
                   child: Column(
                     children: [

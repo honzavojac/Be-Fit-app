@@ -7,7 +7,8 @@ class changeDataBoxServingSize extends StatefulWidget {
   const changeDataBoxServingSize({super.key});
 
   @override
-  State<changeDataBoxServingSize> createState() => _changeDataBoxServingSizeState();
+  State<changeDataBoxServingSize> createState() =>
+      _changeDataBoxServingSizeState();
 }
 
 final List<String> items = [
@@ -20,7 +21,7 @@ class _changeDataBoxServingSizeState extends State<changeDataBoxServingSize> {
   @override
   Widget build(BuildContext context) {
     var dbHelper = Provider.of<DBHelper>(context);
-    
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -69,8 +70,8 @@ class _changeDataBoxServingSizeState extends State<changeDataBoxServingSize> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
-                  width: 1,
-                  color: Colors.white54,
+                  color: Color.fromRGBO(255, 143, 0, 1),
+                  width: 0.5,
                 ),
                 // color: Colors.redAccent,
               ),

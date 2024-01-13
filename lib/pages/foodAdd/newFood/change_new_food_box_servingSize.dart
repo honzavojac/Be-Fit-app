@@ -7,7 +7,8 @@ class changeNewFoodServingSize extends StatefulWidget {
   const changeNewFoodServingSize({super.key});
 
   @override
-  State<changeNewFoodServingSize> createState() => _changeNewFoodServingSizeState();
+  State<changeNewFoodServingSize> createState() =>
+      _changeNewFoodServingSizeState();
 }
 
 final List<String> items = [
@@ -20,28 +21,14 @@ class _changeNewFoodServingSizeState extends State<changeNewFoodServingSize> {
   @override
   Widget build(BuildContext context) {
     var dbHelper = Provider.of<DBHelper>(context);
-    
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         DropdownButtonHideUnderline(
           child: DropdownButton2<String>(
             isExpanded: true,
-            hint: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    '$selectedValue',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.yellow,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ),
+           
             items: items
                 .map((String item) => DropdownMenuItem<String>(
                       value: item,
@@ -69,8 +56,8 @@ class _changeNewFoodServingSizeState extends State<changeNewFoodServingSize> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
-                  width: 1,
-                  color: Colors.white54,
+                  color: Color.fromRGBO(255, 143, 0, 1),
+                  width: 0.5,
                 ),
                 // color: Colors.redAccent,
               ),

@@ -4,8 +4,7 @@ import 'package:kaloricke_tabulky_02/database/database_provider.dart';
 import 'package:kaloricke_tabulky_02/pages/foodAdd/newFood/change_new_food_box_servingSize.dart';
 import 'package:provider/provider.dart';
 
-import '../../../globals_variables/nutri_data.dart';
-import '../change_data_box_servingSize.dart';
+
 
 class foodMainAddBoxes extends StatefulWidget {
   const foodMainAddBoxes({super.key});
@@ -73,8 +72,26 @@ class _foodMainAddBoxesState extends State<foodMainAddBoxes> {
               ],
               decoration: const InputDecoration(
                   labelText: 'Serving size',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                  labelStyle: TextStyle(
+                    color: Color.fromRGBO(255, 179, 0, 1),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(12),
+                    ),
+                    borderSide: BorderSide(
+                      color: Color.fromRGBO(255, 143, 0, 1),
+                      width: 0.5,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(12),
+                    ),
+                    borderSide: BorderSide(
+                      color: Color.fromRGBO(255, 143, 0, 1),
+                      width: 3.0,
+                    ),
                   ),
                   contentPadding:
                       EdgeInsets.symmetric(vertical: 0, horizontal: 15),

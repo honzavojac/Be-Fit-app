@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/database/database_provider.dart';
+import 'package:kaloricke_tabulky_02/pages/fitnessRecord/new_exercise_box.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/add_muscle_box.dart';
 import 'package:provider/provider.dart';
+
+import 'add_exercise_box.dart';
 
 class SplitPage extends StatefulWidget {
   const SplitPage({Key? key}) : super(key: key);
@@ -14,7 +17,7 @@ class _SplitPageState extends State<SplitPage> {
   @override
   Widget build(BuildContext context) {
     var dbHelper = Provider.of<DBHelper>(context);
-    bool isChecked = false;
+
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -22,7 +25,16 @@ class _SplitPageState extends State<SplitPage> {
           children: [
             Text('Edit your split'),
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return Center(
+                      child: NewExerciseBox(),
+                    );
+                  },
+                );
+              },
               child: Text(
                 "Add exercise",
                 style: TextStyle(color: Colors.white),
@@ -178,7 +190,16 @@ class _SplitPageState extends State<SplitPage> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     ElevatedButton(
-                                      onPressed: () {},
+                                      onPressed: () {
+                                        showDialog(
+                                          context: context,
+                                          builder: (BuildContext context) {
+                                            return Center(
+                                              child: AddExerciseBox(),
+                                            );
+                                          },
+                                        );
+                                      },
                                       child: Text(
                                         "exercises",
                                         style: TextStyle(color: Colors.white),

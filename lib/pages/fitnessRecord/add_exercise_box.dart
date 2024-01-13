@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:kaloricke_tabulky_02/pages/fitnessRecord/new_muscle_box.dart';
 
-class AddMuscleBox extends StatefulWidget {
-  const AddMuscleBox({Key? key}) : super(key: key);
+import 'new_exercise_box.dart';
+
+class AddExerciseBox extends StatefulWidget {
+  const AddExerciseBox({Key? key}) : super(key: key);
 
   @override
-  _AddMuscleBoxState createState() => _AddMuscleBoxState();
+  _AddExerciseBoxState createState() => _AddExerciseBoxState();
 }
 
-class _AddMuscleBoxState extends State<AddMuscleBox> {
+class _AddExerciseBoxState extends State<AddExerciseBox> {
   bool isChecked = false;
 
   @override
@@ -98,12 +99,12 @@ class _AddMuscleBoxState extends State<AddMuscleBox> {
                           context: context,
                           builder: (BuildContext context) {
                             return Center(
-                              child: NewMuscleBox(),
+                              child: NewExerciseBox(),
                             );
                           },
                         );
                       },
-                      child: Text("New Muscle",
+                      child: Text("New Exercise",
                           style: TextStyle(color: Colors.black)),
                     ),
                   ),
