@@ -137,7 +137,7 @@ class _SplitPageState extends State<SplitPage> {
             child: Padding(
               padding: const EdgeInsets.all(15.0),
               child: Container(
-                color: Colors.blueGrey,
+                color: Colors.black12,
                 child: ListView.builder(
                   itemCount: 3,
                   itemBuilder: (context, index) {
@@ -153,7 +153,7 @@ class _SplitPageState extends State<SplitPage> {
                           ),
                         ),
                         Container(
-                          color: Colors.blue,
+                          // color: Colors.blue,
                           height: 200,
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
