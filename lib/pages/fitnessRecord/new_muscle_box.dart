@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+
+import '../../database/database_provider.dart';
 
 class NewMuscleBox extends StatefulWidget {
   const NewMuscleBox({Key? key}) : super(key: key);
@@ -11,6 +14,9 @@ class NewMuscleBox extends StatefulWidget {
 class _NewMuscleBoxState extends State<NewMuscleBox> {
   @override
   Widget build(BuildContext context) {
+    var dbHelper = Provider.of<DBHelper>(context);
+
+    var text;
     return AlertDialog(
       contentPadding: EdgeInsets.zero,
       content: Container(
@@ -89,7 +95,9 @@ class _NewMuscleBoxState extends State<NewMuscleBox> {
                           fontSize: 15,
                         ),
                       ),
-                      onChanged: (input) {},
+                      onChanged: (input) {
+                        text = input;
+                      },
                     ),
                   ),
                 ),
@@ -99,7 +107,11 @@ class _NewMuscleBoxState extends State<NewMuscleBox> {
                   width: double.infinity,
                   child: TextButton(
                     onPressed: () {
-                      Navigator.of(context).pop();
+                      setState(() async {
+                        Navigator.of(context).pop();
+                        dbHelper.isCheckedList.add(false);
+                        await dbHelper.InsertSval(text);
+                      });
                     },
                     style: TextButton.styleFrom(
                       backgroundColor: Colors.amber[800],

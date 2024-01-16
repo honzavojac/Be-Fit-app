@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 ///
@@ -17,6 +18,7 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 ///databáze vždy jsou na 100g
 
 class DBHelper extends ChangeNotifier {
+  List<bool> isCheckedList = [];
   late Database _database;
   late String _assetsDatabasePath;
   late String databasesPath;
@@ -52,18 +54,20 @@ class DBHelper extends ChangeNotifier {
             FIBER REAL
         );
 
-        CREATE TABLE Muscle (
-            ID INTEGER PRIMARY KEY,
-            NAME TEXT
+        CREATE TABLE Split (
+            ID_SPLITU INTEGER PRIMARY KEY AUTOINCREMENT,
+            NAZEV_SPLITU TEXT NOT NULL
         );
 
-        CREATE TABLE Split (
-            ID_SPLITU INTEGER PRIMARY KEY,
+        CREATE TABLE SplitSval (
+            ID INTEGER PRIMARY KEY AUTOINCREMENT,
+            ID_SPLITU INTEGER,
             ID_SVALU INTEGER
         );
 
+
         CREATE TABLE Sval (
-            ID_SVALU INTEGER PRIMARY KEY,
+            ID_SVALU INTEGER PRIMARY KEY AUTOINCREMENT,
             NAZEV_SVALU TEXT
         );
 
@@ -74,7 +78,7 @@ class DBHelper extends ChangeNotifier {
         );
 
         CREATE TABLE DataCviku (
-            ID_DATA_CVIKU INTEGER PRIMARY KEY,
+            ID_DATA_CVIKU INTEGER PRIMARY KEY AUTOINCREMENT,
             ID_CVIKU INTEGER,
             SERIE INTEGER,
             VAHA REAL,
@@ -101,13 +105,6 @@ class DBHelper extends ChangeNotifier {
     print("inicializace proběhla úspěšně");
 
     return _database;
-  }
-
-  vlozitHodnoty() async {
-    await _database
-        .rawQuery('''INSERT INTO Cvik values(Null,1,'Biceps s činkou')''');
-    var a = await _database.rawQuery('''SELECT * FROM Cvik''');
-    print(a);
   }
 
   Future<void> deleteFile(String fileName) async {
@@ -156,6 +153,116 @@ class DBHelper extends ChangeNotifier {
     return assetsPath;
   }
 
+  ///
+  ///
+  ///
+  ///  Future<List<Record>>
+  ///
+  ///
+  Future<List<Record>> Split() async {
+    final maps = await _database
+        .rawQuery('''SELECT ID_SPLITU,NAZEV_SPLITU FROM Split''');
+    // print(maps);
+    return List.generate(maps.length, (index) {
+      return Record(idSplitu: maps[index]['ID_SPLITU'] as int);
+    });
+  }
+
+  Future<int?> PosledniIdSplitu() async {
+    final maps = await _database.rawQuery('''
+    SELECT ID_SPLITU FROM Split ORDER BY ID_SPLITU DESC LIMIT 1
+  ''');
+
+    if (maps.isNotEmpty) {
+      return maps.first['ID_SPLITU'] as int?;
+    } else {
+      return 0;
+    }
+  }
+
+// Future<int> NumberOfDiferentRow() async {
+//   var result = await _database.rawQuery(
+//       '''SELECT COUNT(DISTINCT ID_SPLITU) AS count_distinct_id_splitu FROM Split''');
+
+//   int count = Sqflite.firstIntValue(result) ?? 0;
+//   print(count);
+//   return count;
+// }
+  Future<String?> SearchSval(int cislo) async {
+    List<Map<String, dynamic>> result = await _database
+        .rawQuery('''SELECT NAZEV_SVALU FROM Sval WHERE ID_SVALU is $cislo''');
+
+    if (result.isNotEmpty) {
+      // Získání hodnoty z prvního řádku výsledku
+      String nazevSvalu = result.first['NAZEV_SVALU'];
+      return nazevSvalu;
+    } else {
+      // Pokud nebyly žádné výsledky, můžete vrátit např. null nebo jinou výchozí hodnotu
+      return null;
+    }
+  }
+
+  InsertSplit(String text) async {
+    _database.rawQuery('''INSERT INTO Split VALUES(Null,'$text')''');
+    notifyListeners();
+  }
+
+  SplitSval() async {
+    final maps = await _database.rawQuery('''SELECT * FROM SplitSval''');
+    print("SplitSval tabulka: $maps");
+  }
+
+  InsertSplitSval(int cislo1, int cislo2) async {
+    var a = await _database
+        .rawQuery('''INSERT INTO SplitSval VALUES(Null,$cislo1,$cislo2)''');
+    print(a);
+  }
+
+  Future<List<Record>> Svaly() async {
+    final maps =
+        await _database.rawQuery('''SELECT ID_SVALU,NAZEV_SVALU FROM Sval''');
+    // print(maps);
+    return await List.generate(maps.length, (index) {
+      return Record(
+          idSvalu: maps[index]['ID_SVALU'] as int,
+          nazevSvalu: maps[index]['NAZEV_SVALU'] as String);
+    });
+  }
+
+  InsertSval(String text) async {
+    _database.rawQuery('''INSERT INTO Sval values(Null,'$text')''');
+    notifyListeners();
+  }
+
+  DeleteSval() async {
+    _database.rawQuery('''DELETE FROM Sval WHERE ID_SVALU =1''');
+  }
+
+  Future<List<Record>> Cviky() async {
+    final maps = await _database.rawQuery(
+        '''SELECT ID_CVIKU,ID_SVALU,NAZEV_CVIKU FROM Cvik order by ID_SVALU''');
+    print(maps);
+    return List.generate(maps.length, (index) {
+      return Record(
+          idCviku: maps[index]['ID_CVIKU'] as int,
+          idSvalu: maps[index]['ID_SVALU'] as int,
+          nazevCviku: maps[index]['NAZEV_CVIKU'] as String);
+    });
+  }
+
+  InsertCvik(int cislo, String text) async {
+    _database.rawQuery('''INSERT INTO Cvik VALUES(Null,$cislo,'$text')''');
+    notifyListeners();
+  }
+
+  InsertDataCviku() async {}
+
+  ///
+  ///
+  ///
+  ///
+  ///
+  ///
   Future<List<Note>> Notes() async {
     final List<Map<String, dynamic>> maps = await _database.rawQuery(
         '''SELECT ID,GRAMS,CZFOODNAME,ENERGYKCAL,PROTEIN,CARBS,FAT,FIBER FROM Notes''');
@@ -468,6 +575,73 @@ class Note {
 
   @override
   String toString() {
-    return 'Dog{id: $id,GRAMS: $grams, CZFOODNAME: $czfoodname, ENERGYKCAL: $kcal,PROTEIN: $protein,CARBS:$carbs,FAT:$fat,FIBER:$fiber}';
+    return 'Dog{ID: $id,GRAMS: $grams, CZFOODNAME: $czfoodname, ENERGYKCAL: $kcal,PROTEIN: $protein,CARBS:$carbs,FAT:$fat,FIBER:$fiber}';
+  }
+}
+
+class Record {
+  final int idSvalu;
+  final String nazevSvalu;
+  final int idSplitu;
+  final String nazevSplitu;
+  final int idCviku;
+  final String nazevCviku;
+  final int idDataCviku;
+  final int serie;
+  final double vaha;
+  final int opakovani;
+  final String komentar;
+  final DateTime datum;
+
+  Record({
+    this.idSvalu = 0,
+    this.nazevSvalu = "",
+    this.idSplitu = 0,
+    this.nazevSplitu = "",
+    this.idCviku = 0,
+    this.nazevCviku = "",
+    this.idDataCviku = 0,
+    this.serie = 0,
+    this.vaha = 0,
+    this.opakovani = 0,
+    this.komentar = "",
+    DateTime? datum, // Umožňuje datum být null
+  }) : datum = datum ??
+            DateTime.now(); // Pokud je datum null, použije aktuální čas
+
+  Record.fromMap(Map<String, dynamic> item)
+      : idSvalu = item["ID"] ?? 0,
+        nazevSvalu = item["NAZEV_SVALU"],
+        idSplitu = item["ID_SPLITU"],
+        nazevSplitu = item["NAZEV_SPLITU"],
+        idCviku = item["ID_CVIKU"],
+        nazevCviku = item["NAZEV_CVIKU"],
+        idDataCviku = item["ID_DATA_CVIKU"],
+        serie = item["SERIE"],
+        vaha = item["VAHA"],
+        opakovani = item["OPAKOVANI"],
+        komentar = item["KOMENTAR"],
+        datum = item["DATUM"];
+
+  Map<String, Object> toMap() {
+    return {
+      'ID': idSvalu,
+      'NAZEV_SVALU': nazevSvalu,
+      'ID_SPLITU': idSplitu,
+      'NAZEV_SPLITU': nazevSplitu,
+      'ID_CVIKU': idCviku,
+      'NAZEV_CVIKU': nazevCviku,
+      'ID_DATA_CVIKU': idDataCviku,
+      'SERIE': serie,
+      'VAHA': vaha,
+      'OPAKOVANI': opakovani,
+      'KOMENTAR': komentar,
+      'DATUM': datum,
+    };
+  }
+
+  @override
+  String toString() {
+    return 'Record{ID_SVALU: $idSvalu,NAZEV_SVALU:$nazevSvalu,ID_SPLITU:$idSplitu,NAZEV_SPLITU:$nazevSplitu, ID_CVIKU:$idCviku,NAZEV_CVIKU:$nazevCviku,ID_DATA_CVIKU:$idDataCviku,SERIE:$serie,VAHA:$vaha,OPAKOVANI:$opakovani,KOMENTAR:$komentar,DATUM:$datum}';
   }
 }

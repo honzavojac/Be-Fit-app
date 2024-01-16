@@ -2,7 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/pages/homePage/date_row.dart';
+import 'package:provider/provider.dart';
 
+import '../../database/database_provider.dart';
 import 'data_boxes.dart';
 import 'settings.dart';
 
@@ -14,13 +16,16 @@ class HomeAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var dbHelper = Provider.of<DBHelper>(context);
+
     return AppBar(
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           const Text('Home page'),
           IconButton(
-              onPressed: () {
+              onPressed: () async {
+              
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => Settings()),

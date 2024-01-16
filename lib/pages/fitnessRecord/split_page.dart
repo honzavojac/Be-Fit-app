@@ -53,8 +53,8 @@ class _SplitPageState extends State<SplitPage> {
             child: Row(
               children: [
                 Expanded(
-                  child: FutureBuilder<List<Note>>(
-                    future: dbHelper.Notes(),
+                  child: FutureBuilder<List<Record>>(
+                    future: dbHelper.Split(),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return Center(
@@ -67,28 +67,20 @@ class _SplitPageState extends State<SplitPage> {
                       } else if (snapshot.data == null ||
                           snapshot.data!.isEmpty) {
                         return Center(
-                          child: Text('No data available.'),
+                          child: Text('No data availableeeeeeeeeee.'),
                         );
                       } else {
-                        List<Note> splitData = snapshot.data!;
+                        List<Record> splitData = snapshot.data!;
                         return DefaultTabController(
                           length: splitData.length,
                           initialIndex: 0,
                           child: TabBar(
                             tabs: splitData
                                 .map(
-                                  (note) => Column(
+                                  (record) => Column(
                                     children: [
                                       Text(
-                                        "biceps",
-                                        style: TextStyle(fontSize: 15),
-                                      ),
-                                      Text(
-                                        "triceps",
-                                        style: TextStyle(fontSize: 15),
-                                      ),
-                                      Text(
-                                        "shoulders",
+                                        "${record.idSplitu}",
                                         style: TextStyle(fontSize: 15),
                                       ),
                                     ],
@@ -144,7 +136,7 @@ class _SplitPageState extends State<SplitPage> {
                     return Column(
                       children: [
                         Container(
-                          color: Colors.red,
+                          color: Colors.amber[800],
                           height: 40,
                           child: Center(
                             child: Text("Biceps",

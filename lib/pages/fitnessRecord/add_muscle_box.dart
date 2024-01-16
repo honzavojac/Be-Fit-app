@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:kaloricke_tabulky_02/database/database_provider.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/new_muscle_box.dart';
+import 'package:provider/provider.dart';
 
 class AddMuscleBox extends StatefulWidget {
   const AddMuscleBox({Key? key}) : super(key: key);
@@ -9,10 +11,11 @@ class AddMuscleBox extends StatefulWidget {
 }
 
 class _AddMuscleBoxState extends State<AddMuscleBox> {
-  bool isChecked = false;
+  // Seznam pro ukládání stavu checkboxů
 
   @override
   Widget build(BuildContext context) {
+    var dbHelper = Provider.of<DBHelper>(context);
     return AlertDialog(
       contentPadding: EdgeInsets.zero,
       content: Container(
@@ -32,24 +35,56 @@ class _AddMuscleBoxState extends State<AddMuscleBox> {
                       SizedBox(
                         height: 50,
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Container(
-                              child: Text("data"),
-                            ),
-                            Checkbox(
-                              value: isChecked,
-                              onChanged: (value) {
-                                setState(() {
-                                  isChecked = value!;
-                                });
-                              },
-                            ),
-                          ],
+                      Expanded(
+                        child: Container(
+                          // color: Colors.amber,
+                          child: FutureBuilder<List<Record>>(
+                            future: dbHelper.Svaly(),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasError) {
+                                return Center(
+                                    child: Text('Chyba: ${snapshot.error}'));
+                              } else {
+                                List<Record> records = snapshot.data!;
+                                // Inicializace seznamu isCheckedList na základě počtu záznamů
+
+                                if (dbHelper.isCheckedList.isEmpty) {
+                                  dbHelper.isCheckedList = List.generate(
+                                      records.length, (index) => false);
+                                }
+                                return ListView.builder(
+                                  itemCount: records.length,
+                                  itemBuilder: (context, index) {
+                                    return Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 20, right: 20),
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                              child: Text(
+                                                  records[index].nazevSvalu)),
+                                          Checkbox(
+                                            value:
+                                                dbHelper.isCheckedList[index],
+                                            onChanged: (value) {
+                                              dbHelper.isCheckedList[index] =
+                                                  value ?? false;
+                                              print(dbHelper.isCheckedList);
+                                              setState(() {});
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                );
+                              }
+                            },
+                          ),
                         ),
+                      ),
+                      SizedBox(
+                        height: 10,
                       ),
                     ],
                   ),
@@ -58,8 +93,26 @@ class _AddMuscleBoxState extends State<AddMuscleBox> {
                   height: 50,
                   width: double.infinity,
                   child: TextButton(
-                    onPressed: () {
+                    onPressed: () async {
+                      String finalName = "";
+                      int? posledniIdSplitu = await dbHelper.PosledniIdSplitu();
+                      print("posledni ID splitu: $posledniIdSplitu");
+                      for (var i = 0; i < dbHelper.isCheckedList.length; i++) {
+                        if (dbHelper.isCheckedList[i] == true) {
+                          String? a = await dbHelper.SearchSval(i + 1);
+                          finalName = finalName + a! + " ";
+                          print(finalName);
+                          await dbHelper.InsertSplitSval(
+                              posledniIdSplitu!, i + 1);
+                        }
+                      }
+                      if (dbHelper.isCheckedList.contains(true)) {
+                        await dbHelper.InsertSplit(finalName);
+                        dbHelper.isCheckedList = [];
+                      }
+
                       Navigator.of(context).pop();
+                      dbHelper.SplitSval();
                     },
                     style: TextButton.styleFrom(
                       backgroundColor: Colors.amber[800],
