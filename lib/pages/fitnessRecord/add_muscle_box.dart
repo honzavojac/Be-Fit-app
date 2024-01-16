@@ -97,13 +97,19 @@ class _AddMuscleBoxState extends State<AddMuscleBox> {
                       String finalName = "";
                       int? posledniIdSplitu = await dbHelper.PosledniIdSplitu();
                       print("posledni ID splitu: $posledniIdSplitu");
+                       if (posledniIdSplitu == null) {
+                            posledniIdSplitu = 1;
+                          } else {
+                            posledniIdSplitu = posledniIdSplitu! + 1;
+                          }
                       for (var i = 0; i < dbHelper.isCheckedList.length; i++) {
                         if (dbHelper.isCheckedList[i] == true) {
                           String? a = await dbHelper.SearchSval(i + 1);
                           finalName = finalName + a! + " ";
                           print(finalName);
+                         
                           await dbHelper.InsertSplitSval(
-                              posledniIdSplitu!, i + 1);
+                              posledniIdSplitu, i + 1);
                         }
                       }
                       if (dbHelper.isCheckedList.contains(true)) {

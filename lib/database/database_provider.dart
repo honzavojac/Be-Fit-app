@@ -162,7 +162,7 @@ class DBHelper extends ChangeNotifier {
   Future<List<Record>> Split() async {
     final maps = await _database
         .rawQuery('''SELECT ID_SPLITU,NAZEV_SPLITU FROM Split''');
-    // print(maps);
+    print(maps);
     return List.generate(maps.length, (index) {
       return Record(idSplitu: maps[index]['ID_SPLITU'] as int);
     });
@@ -176,7 +176,7 @@ class DBHelper extends ChangeNotifier {
     if (maps.isNotEmpty) {
       return maps.first['ID_SPLITU'] as int?;
     } else {
-      return 0;
+      return null;
     }
   }
 
