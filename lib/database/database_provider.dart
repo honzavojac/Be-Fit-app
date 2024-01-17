@@ -18,6 +18,19 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 ///databáze vždy jsou na 100g
 
 class DBHelper extends ChangeNotifier {
+  int initialIndex = 0;
+  late int tab = 1;
+  Tab(int cislo) {
+    this.tab = cislo;
+    // this.tab += 1;
+    // notifyListeners();
+  }
+
+  Record? selectedValue;
+  SetSelectedValue(Record? value) async {
+    this.selectedValue = value!;
+  }
+
   List<bool> isCheckedList = [];
   late Database _database;
   late String _assetsDatabasePath;
@@ -68,13 +81,13 @@ class DBHelper extends ChangeNotifier {
 
         CREATE TABLE Sval (
             ID_SVALU INTEGER PRIMARY KEY AUTOINCREMENT,
-            NAZEV_SVALU TEXT
+            NAZEV_SVALU TEXT NOT NULL
         );
 
         CREATE TABLE Cvik (
             ID_CVIKU INTEGER PRIMARY KEY AUTOINCREMENT,
-            ID_SVALU INTEGER,
-            NAZEV_CVIKU TEXT
+            ID_SVALU INTEGER NOT NULL,
+            NAZEV_CVIKU TEXT NOT NULL
         );
 
         CREATE TABLE DataCviku (
@@ -164,7 +177,9 @@ class DBHelper extends ChangeNotifier {
         .rawQuery('''SELECT ID_SPLITU,NAZEV_SPLITU FROM Split''');
     print(maps);
     return List.generate(maps.length, (index) {
-      return Record(idSplitu: maps[index]['ID_SPLITU'] as int);
+      return Record(
+          idSplitu: maps[index]['ID_SPLITU'] as int,
+          nazevSplitu: maps[index]['NAZEV_SPLITU'] as String);
     });
   }
 
@@ -208,7 +223,8 @@ class DBHelper extends ChangeNotifier {
   }
 
   SplitSval() async {
-    final maps = await _database.rawQuery('''SELECT * FROM SplitSval''');
+    final maps = await _database
+        .rawQuery('''SELECT ID_SPLITU,ID_SVALU FROM SplitSval''');
     print("SplitSval tabulka: $maps");
   }
 
@@ -216,6 +232,23 @@ class DBHelper extends ChangeNotifier {
     var a = await _database
         .rawQuery('''INSERT INTO SplitSval VALUES(Null,$cislo1,$cislo2)''');
     print(a);
+  }
+
+  Future<List<Record>> getSvalyForSplitId(int cislo) async {
+    final idSplitu = this.tab;
+    final maps = await _database.rawQuery('''
+    SELECT Sval.NAZEV_SVALU
+    FROM SplitSval
+    JOIN Sval ON SplitSval.ID_SVALU = Sval.ID_SVALU
+    WHERE SplitSval.ID_SPLITU = ${cislo}
+  ''');
+
+    return List.generate(maps.length, (index) {
+      return Record(
+        nazevSvalu: maps[index]['NAZEV_SVALU']
+            as String, // Opravena vlastnost na 'nazevSvalu'
+      );
+    });
   }
 
   Future<List<Record>> Svaly() async {
@@ -595,7 +628,7 @@ class Record {
 
   Record({
     this.idSvalu = 0,
-    this.nazevSvalu = "",
+    this.nazevSvalu = "a",
     this.idSplitu = 0,
     this.nazevSplitu = "",
     this.idCviku = 0,

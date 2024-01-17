@@ -1,6 +1,8 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:kaloricke_tabulky_02/database/database_provider.dart';
+import 'package:provider/provider.dart';
 
 class NewExerciseBox extends StatefulWidget {
   const NewExerciseBox({Key? key}) : super(key: key);
@@ -19,6 +21,7 @@ String selectedValue = items[0];
 class _NewExerciseBoxState extends State<NewExerciseBox> {
   @override
   Widget build(BuildContext context) {
+    var dbHelper = Provider.of<DBHelper>(context);
     return AlertDialog(
       contentPadding: EdgeInsets.zero,
       content: Container(
@@ -111,68 +114,72 @@ class _NewExerciseBoxState extends State<NewExerciseBox> {
                   ),
                 ),
                 DropdownButtonHideUnderline(
-                  child: DropdownButton2<String>(
-                    isExpanded: true,
-                    items: items
-                        .map(
-                          (String item) => DropdownMenuItem<String>(
-                            value: item,
-                            child: Text(
-                              item,
-                              style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.amber),
-                              overflow: TextOverflow.ellipsis,
+                  child: FutureBuilder(future: dbHelper.Svaly(),builder: (context, snapshot) {
+                    return DropdownButton2<String>(
+                      isExpanded: true,
+                      items: items
+                          .map(
+                            (String item) => DropdownMenuItem<String>(
+                              value: item,
+                              child: Text(
+                                item,
+                                style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.amber),
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
+                          )
+                          .toList(),
+                      value: selectedValue,
+                      onChanged: (value) {
+                        setState(() {
+                          selectedValue = value!;
+                        });
+                      },
+                      buttonStyleData: ButtonStyleData(
+                        height: 50,
+                        width: 150,
+                        padding: const EdgeInsets.only(left: 14, right: 14),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: Color.fromRGBO(255, 143, 0, 1),
+                            width: 0.5,
                           ),
-                        )
-                        .toList(),
-                    value: selectedValue,
-                    onChanged: (value) {
-                      setState(() {
-                        selectedValue = value!;
-                      });
-                    },
-                    buttonStyleData: ButtonStyleData(
-                      height: 50,
-                      width: 150,
-                      padding: const EdgeInsets.only(left: 14, right: 14),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(
-                          color: Color.fromRGBO(255, 143, 0, 1),
-                          width: 0.5,
+                          // color: Colors.redAccent,
                         ),
-                        // color: Colors.redAccent,
+                        //elevation: 2,
                       ),
-                      //elevation: 2,
-                    ),
-                    iconStyleData: const IconStyleData(
-                      icon: Icon(
-                        Icons.keyboard_arrow_down_outlined,
+                      iconStyleData: const IconStyleData(
+                        icon: Icon(
+                          Icons.keyboard_arrow_down_outlined,
+                        ),
+                        iconSize: 17,
+                        iconEnabledColor: Colors.amber,
                       ),
-                      iconSize: 17,
-                      iconEnabledColor: Colors.amber,
-                    ),
-                    dropdownStyleData: DropdownStyleData(
-                      maxHeight: 200,
-                      width: 150,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(14),
-                        // color: Colors.redAccent,
+                      dropdownStyleData: DropdownStyleData(
+                        maxHeight: 200,
+                        width: 150,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(14),
+                          // color: Colors.redAccent,
+                        ),
+                        offset: const Offset(0, -10),
+                        scrollbarTheme: ScrollbarThemeData(
+                          radius: const Radius.circular(40),
+                          thickness: MaterialStateProperty.all(6),
+                          thumbVisibility: MaterialStateProperty.all(true),
+                        ),
                       ),
-                      offset: const Offset(0, -10),
-                      scrollbarTheme: ScrollbarThemeData(
-                        radius: const Radius.circular(40),
-                        thickness: MaterialStateProperty.all(6),
-                        thumbVisibility: MaterialStateProperty.all(true),
+                      menuItemStyleData: const MenuItemStyleData(
+                        height: 40,
+                        padding: EdgeInsets.only(left: 14, right: 14),
                       ),
-                    ),
-                    menuItemStyleData: const MenuItemStyleData(
-                      height: 40,
-                      padding: EdgeInsets.only(left: 14, right: 14),
-                    ),
+                    );  
+                  },
+                  
                   ),
                 ),
                 SizedBox(
