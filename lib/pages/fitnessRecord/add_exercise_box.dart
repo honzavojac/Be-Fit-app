@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:kaloricke_tabulky_02/database/database_provider.dart';
+import 'package:provider/provider.dart';
 
 import 'new_exercise_box.dart';
 
@@ -14,6 +16,7 @@ class _AddExerciseBoxState extends State<AddExerciseBox> {
 
   @override
   Widget build(BuildContext context) {
+    var dbHelper = Provider.of<DBHelper>(context);
     return AlertDialog(
       contentPadding: EdgeInsets.zero,
       content: Container(
@@ -33,24 +36,57 @@ class _AddExerciseBoxState extends State<AddExerciseBox> {
                       SizedBox(
                         height: 50,
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Container(
-                              child: Text("data"),
-                            ),
-                            Checkbox(
-                              value: isChecked,
-                              onChanged: (value) {
-                                setState(() {
-                                  isChecked = value!;
-                                });
-                              },
-                            ),
-                          ],
+                      Expanded(
+                        child: Container(
+                          // color: Colors.amber,
+                          child: FutureBuilder<List<Record>>(
+                            future: dbHelper.Cviky(),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasError) {
+                                return Center(
+                                    child: Text('Chyba: ${snapshot.error}'));
+                              } else {
+                                List<Record> records = snapshot.data!;
+                                // Inicializace seznamu isCheckedList_2 na základě počtu záznamů
+
+                                if (dbHelper.isCheckedList_2.isEmpty) {
+                                  dbHelper.isCheckedList_2 = List.generate(
+                                      records.length, (index) => false);
+                                }
+                                return ListView.builder(
+                                  itemCount: records.length,
+                                  itemBuilder: (context, index) {
+                                    return Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 20, right: 20),
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                              child: Text(
+                                                  records[index].nazevCviku)),
+                                          Checkbox(
+                                            value:
+                                                dbHelper.isCheckedList_2[index],
+                                            onChanged: (value) {
+                                              dbHelper.isCheckedList_2[index] =
+                                                  value ?? false;
+                                              print(dbHelper.isCheckedList_2);
+
+                                              dbHelper.notList();
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                );
+                              }
+                            },
+                          ),
                         ),
+                      ),
+                      SizedBox(
+                        height: 10,
                       ),
                     ],
                   ),
@@ -61,6 +97,7 @@ class _AddExerciseBoxState extends State<AddExerciseBox> {
                   child: TextButton(
                     onPressed: () {
                       Navigator.of(context).pop();
+                      setState(() {});
                     },
                     style: TextButton.styleFrom(
                       backgroundColor: Colors.amber[800],

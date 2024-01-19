@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/database/database_provider.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/new_exercise_box.dart';
@@ -19,7 +17,6 @@ class _SplitPageState extends State<SplitPage> {
   @override
   Widget build(BuildContext context) {
     var dbHelper = Provider.of<DBHelper>(context);
-    late TabController tabController;
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -74,8 +71,6 @@ class _SplitPageState extends State<SplitPage> {
                           initialIndex: dbHelper.initialIndex,
                           child: TabBar(
                             tabs: splitData.map((record) {
-                              var i = record.idSplitu;
-                              // print(i);
                               return Text(
                                 "${record.nazevSplitu}",
                                 style: TextStyle(
@@ -90,6 +85,7 @@ class _SplitPageState extends State<SplitPage> {
                               print(
                                 "číslo tabu: ${dbHelper.tab}",
                               );
+                              // dbHelper.notList();
 
                               setState(() {});
                             },
@@ -137,68 +133,73 @@ class _SplitPageState extends State<SplitPage> {
               child: Container(
                 color: Colors.black12,
                 child: FutureBuilder<List<Record>>(
-                  future: dbHelper.getSvalyForSplitId(dbHelper.tab),
+                  future: dbHelper.getSvalyFromSplitId(dbHelper.tab),
                   builder: (context, snapshot) {
                     if (snapshot.hasError) {
                       return Center(child: Text('Chyba: ${snapshot.error}'));
                     } else {
                       List<Record> records = snapshot.data!;
-                      // Inicializace seznamu isCheckedList na základě počtu záznamů
 
                       return ListView.builder(
                         itemCount: records.length,
                         itemBuilder: (context, index) {
+                          dbHelper.hledaniSpravnehoCviku =
+                              records[index].idSvalu;
                           return Expanded(
-                            child: Container(
-                              color: Colors.blue,
-                              child: Column(
-                                children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                        color: Colors.amber[800],
-                                        borderRadius:
-                                            BorderRadius.circular(10)),
-                                    height: 35,
-                                    child: Center(
-                                      child: Text(
-                                        "${records[index].nazevSvalu}",
-                                        style: TextStyle(
-                                            fontSize: 20,
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.bold),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Container(
+                                color: Colors.blue,
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                          color: Colors.amber[800],
+                                          borderRadius:
+                                              BorderRadius.circular(10)),
+                                      height: 35,
+                                      child: Center(
+                                        child: Text(
+                                          "${records[index].nazevSvalu}",
+                                          style: TextStyle(
+                                              fontSize: 20,
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.bold),
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  Padding(
-                                    padding:
-                                        const EdgeInsets.fromLTRB(25, 0, 25, 5),
-                                    child: Container(
-                                      color: Colors.red,
-                                      height: 200,
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Expanded(
-                                            child: FutureBuilder<List<Record>>(
-                                              future: dbHelper.Cviky(),
-                                              builder: (context, snapshot) {
-                                                if (snapshot.hasError) {
-                                                  return Center(
-                                                      child: Text(
-                                                          'Chyba: ${snapshot.error}'));
-                                                } else {
-                                                  List<Record> records =
-                                                      snapshot.data!;
-                                                  // Inicializace seznamu isCheckedList na základě počtu záznamů
+                                    Padding(
+                                      padding: const EdgeInsets.fromLTRB(
+                                          25, 0, 25, 5),
+                                      child: Container(
+                                        color: Colors.red,
+                                        height: 300,
+                                        child: Column(
+                                          // mainAxisAlignment:
+                                          //     MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Container(
+                                              height: 200,
+                                              color: Colors.yellow,
+                                              child:
+                                                  FutureBuilder<List<Record>>(
+                                                future: dbHelper.Cviky(),
+                                                builder: (context, snapshot) {
+                                                  if (snapshot.hasError) {
+                                                    return Center(
+                                                        child: Text(
+                                                            'Chyba: ${snapshot.error}'));
+                                                  } else {
+                                                    List<Record> records =
+                                                        snapshot.data!;
 
-                                                  return ListView.builder(
-                                                    itemCount: records.length,
-                                                    // physics: NeverScrollableScrollPhysics(),
-                                                    itemBuilder:
-                                                        (context, index) {
-                                                      return Expanded(
-                                                        child: Container(
+                                                    return ListView.builder(
+                                                      itemCount: records.length,
+                                                      itemBuilder:
+                                                          (context, index) {
+                                                        return Container(
+                                                          height: 40,
+                                                          color: Colors.brown,
                                                           child: Column(
                                                             children: [
                                                               Row(
@@ -222,46 +223,57 @@ class _SplitPageState extends State<SplitPage> {
                                                               ),
                                                             ],
                                                           ),
-                                                        ),
-                                                      );
-                                                    },
-                                                  );
-                                                }
-                                              },
-                                            ),
-                                          ),
-                                          Container(
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                ElevatedButton(
-                                                  onPressed: () {
-                                                    showDialog(
-                                                      context: context,
-                                                      builder: (BuildContext
-                                                          context) {
-                                                        return Center(
-                                                          child:
-                                                              AddExerciseBox(),
                                                         );
                                                       },
                                                     );
-                                                  },
-                                                  child: Text(
-                                                    "exercises",
-                                                    style: TextStyle(
-                                                        color: Colors.white),
-                                                  ),
-                                                ),
-                                              ],
+                                                  }
+                                                },
+                                              ),
                                             ),
-                                          ),
-                                        ],
+                                            Container(
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  ElevatedButton(
+                                                    onPressed: () async {
+                                                      print(
+                                                          "id_svalu: ${records[index].nazevSvalu}");
+                                                      dbHelper.hledaniSpravnehoCviku =
+                                                          await dbHelper
+                                                              .getIdSvaluFromName(
+                                                                  records[index]
+                                                                      .nazevSvalu);
+                                                      dbHelper.selectedValue =
+                                                          records[index]
+                                                              .nazevSvalu;
+                                                      setState(() {});
+                                                      showDialog(
+                                                        context: context,
+                                                        builder: (BuildContext
+                                                            context) {
+                                                          return Center(
+                                                            child:
+                                                                AddExerciseBox(),
+                                                          );
+                                                        },
+                                                      );
+                                                    },
+                                                    child: Text(
+                                                      "exercises",
+                                                      style: TextStyle(
+                                                          color: Colors.white),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                           );

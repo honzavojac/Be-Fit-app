@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,12 +13,12 @@ class NewExerciseBox extends StatefulWidget {
   _NewExerciseBoxState createState() => _NewExerciseBoxState();
 }
 
-final List<String> items = [
-  'biceps',
-  'triceps',
-  'shoulders',
-];
-String selectedValue = items[0];
+// final List<String> items = [
+//   'biceps',
+//   'triceps',
+//   'shoulders',
+// ];
+//
 
 class _NewExerciseBoxState extends State<NewExerciseBox> {
   @override
@@ -49,6 +51,7 @@ class _NewExerciseBoxState extends State<NewExerciseBox> {
                   child: IconButton(
                     onPressed: () {
                       Navigator.of(context).pop();
+                      print(dbHelper.selectedValue + "1");
                     },
                     icon: Icon(
                       Icons.close,
@@ -61,7 +64,7 @@ class _NewExerciseBoxState extends State<NewExerciseBox> {
             ),
             Column(
               children: [
-                Expanded(child: Container()),
+                Expanded(child: SizedBox()),
                 Center(
                   child: Container(
                     width: 200,
@@ -99,7 +102,9 @@ class _NewExerciseBoxState extends State<NewExerciseBox> {
                           fontSize: 15,
                         ),
                       ),
-                      onChanged: (input) {},
+                      onChanged: (input) {
+                        dbHelper.nazev_cviku = input;
+                      },
                     ),
                   ),
                 ),
@@ -114,73 +119,96 @@ class _NewExerciseBoxState extends State<NewExerciseBox> {
                   ),
                 ),
                 DropdownButtonHideUnderline(
-                  child: FutureBuilder(future: dbHelper.Svaly(),builder: (context, snapshot) {
-                    return DropdownButton2<String>(
-                      isExpanded: true,
-                      items: items
-                          .map(
-                            (String item) => DropdownMenuItem<String>(
-                              value: item,
-                              child: Text(
-                                item,
-                                style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.amber),
-                                overflow: TextOverflow.ellipsis,
+                  child: FutureBuilder(
+                      future: dbHelper.getNazvySvalu(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasError) {
+                          return Center(
+                            child: Text('Error: ${snapshot.error}'),
+                          );
+                        } else if (snapshot.data == null ||
+                            snapshot.data!.isEmpty) {
+                          return Center(
+                            child: Text('No data available.'),
+                          );
+                        } else {
+                          List<String>? items = snapshot.data!;
+                          if (dbHelper.selectedValue.isEmpty) {
+                            print(dbHelper.selectedValue);
+                            dbHelper.selectedValue = items[0];
+                            dbHelper.hledaniSpravnehoCviku = 1;
+                          }
+                          return DropdownButton2<String>(
+                            isExpanded: true,
+                            items: items.map(
+                              (String item) {
+                                print("1) tady to dojde");
+                                return DropdownMenuItem<String>(
+                                  value: item,
+                                  child: Text(
+                                    item,
+                                    style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.amber),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                );
+                              },
+                            ).toList(),
+                            value: dbHelper.selectedValue,
+
+                            
+                            onChanged: (value) {
+                              print("aaa$dbHelper.selectedValue}");
+                              print(value);
+                              dbHelper.selectedValue = value!;
+                              setState(() {});
+                            },
+                            buttonStyleData: ButtonStyleData(
+                              height: 50,
+                              width: 150,
+                              padding:
+                                  const EdgeInsets.only(left: 14, right: 14),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
+                                  color: Color.fromRGBO(255, 143, 0, 1),
+                                  width: 0.5,
+                                ),
+                                // color: Colors.redAccent,
+                              ),
+                              //elevation: 2,
+                            ),
+                            iconStyleData: const IconStyleData(
+                              icon: Icon(
+                                Icons.keyboard_arrow_down_outlined,
+                              ),
+                              iconSize: 17,
+                              iconEnabledColor: Colors.amber,
+                            ),
+                            dropdownStyleData: DropdownStyleData(
+                              maxHeight: 200,
+                              width: 150,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(14),
+                                // color: Colors.redAccent,
+                              ),
+                              offset: const Offset(0, -10),
+                              scrollbarTheme: ScrollbarThemeData(
+                                radius: const Radius.circular(40),
+                                thickness: MaterialStateProperty.all(6),
+                                thumbVisibility:
+                                    MaterialStateProperty.all(true),
                               ),
                             ),
-                          )
-                          .toList(),
-                      value: selectedValue,
-                      onChanged: (value) {
-                        setState(() {
-                          selectedValue = value!;
-                        });
-                      },
-                      buttonStyleData: ButtonStyleData(
-                        height: 50,
-                        width: 150,
-                        padding: const EdgeInsets.only(left: 14, right: 14),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(
-                            color: Color.fromRGBO(255, 143, 0, 1),
-                            width: 0.5,
-                          ),
-                          // color: Colors.redAccent,
-                        ),
-                        //elevation: 2,
-                      ),
-                      iconStyleData: const IconStyleData(
-                        icon: Icon(
-                          Icons.keyboard_arrow_down_outlined,
-                        ),
-                        iconSize: 17,
-                        iconEnabledColor: Colors.amber,
-                      ),
-                      dropdownStyleData: DropdownStyleData(
-                        maxHeight: 200,
-                        width: 150,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(14),
-                          // color: Colors.redAccent,
-                        ),
-                        offset: const Offset(0, -10),
-                        scrollbarTheme: ScrollbarThemeData(
-                          radius: const Radius.circular(40),
-                          thickness: MaterialStateProperty.all(6),
-                          thumbVisibility: MaterialStateProperty.all(true),
-                        ),
-                      ),
-                      menuItemStyleData: const MenuItemStyleData(
-                        height: 40,
-                        padding: EdgeInsets.only(left: 14, right: 14),
-                      ),
-                    );  
-                  },
-                  
-                  ),
+                            menuItemStyleData: const MenuItemStyleData(
+                              height: 40,
+                              padding: EdgeInsets.only(left: 14, right: 14),
+                            ),
+                          );
+                        }
+                      }),
                 ),
                 SizedBox(
                   height: 15,
@@ -189,8 +217,21 @@ class _NewExerciseBoxState extends State<NewExerciseBox> {
                   height: 50,
                   width: double.infinity,
                   child: TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
+                    onPressed: () async {
+                      if (dbHelper.nazev_cviku.isNotEmpty ||
+                          dbHelper.selectedValue != null) {
+                        await dbHelper.InsertCvik();
+                        Navigator.of(context).pop();
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("message"),
+                            duration: Duration(
+                                seconds:
+                                    2), // Nastavte dobu zobrazení snackbaru
+                          ),
+                        );
+                      }
                     },
                     style: TextButton.styleFrom(
                       backgroundColor: Colors.amber[800],

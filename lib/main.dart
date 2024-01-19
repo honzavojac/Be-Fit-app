@@ -20,9 +20,10 @@ void main() async {
   await dbHelper.initializeDB();
   CountProvider countProvider = CountProvider();
   PageProvider pageProvider = PageProvider();
-  // await dbHelper.Split();
-  // await dbHelper.Svaly();
-  // await dbHelper.Cviky();
+  await dbHelper.Split();
+  await dbHelper.Svaly();
+  await dbHelper.SplitSval();
+  await dbHelper.Cviky();
   // await dbHelper.vlozitHodnoty();
   // await dbHelper.deleteFile('database.db');
 

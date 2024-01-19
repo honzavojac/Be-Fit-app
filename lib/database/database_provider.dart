@@ -26,12 +26,10 @@ class DBHelper extends ChangeNotifier {
     // notifyListeners();
   }
 
-  Record? selectedValue;
-  SetSelectedValue(Record? value) async {
-    this.selectedValue = value!;
-  }
+  //
 
   List<bool> isCheckedList = [];
+  List<bool> isCheckedList_2 = [];
   late Database _database;
   late String _assetsDatabasePath;
   late String databasesPath;
@@ -99,9 +97,13 @@ class DBHelper extends ChangeNotifier {
             KOMENTAR TEXT,
             DATUM DATE
         );
-        CREATE TABLE PromenaSplitu (
-           INT_ID INTEGER PRIMARY KEY
+        CREATE TABLE SvalCvik (
+           ID INTEGER PRIMARY KEY AUTOINCREMENT,
+           ID_SVALU INTEGER NOT NULL,
+           ID_CVIKU INTEGER NOT NULL,
+           BOOL_CVIKU INTEGER NOT NULL
         );
+
         ''',
       );
       print("Databáze byly vytvořeny");
@@ -175,7 +177,7 @@ class DBHelper extends ChangeNotifier {
   Future<List<Record>> Split() async {
     final maps = await _database
         .rawQuery('''SELECT ID_SPLITU,NAZEV_SPLITU FROM Split''');
-    print(maps);
+    print("Split tabulka: $maps");
     return List.generate(maps.length, (index) {
       return Record(
           idSplitu: maps[index]['ID_SPLITU'] as int,
@@ -234,10 +236,9 @@ class DBHelper extends ChangeNotifier {
     print(a);
   }
 
-  Future<List<Record>> getSvalyForSplitId(int cislo) async {
-    final idSplitu = this.tab;
+Future<List<Record>> getSvalyFromSplitId(int cislo) async {
     final maps = await _database.rawQuery('''
-    SELECT Sval.NAZEV_SVALU
+    SELECT Sval.ID_SVALU, Sval.NAZEV_SVALU
     FROM SplitSval
     JOIN Sval ON SplitSval.ID_SVALU = Sval.ID_SVALU
     WHERE SplitSval.ID_SPLITU = ${cislo}
@@ -245,16 +246,31 @@ class DBHelper extends ChangeNotifier {
 
     return List.generate(maps.length, (index) {
       return Record(
-        nazevSvalu: maps[index]['NAZEV_SVALU']
-            as String, // Opravena vlastnost na 'nazevSvalu'
+        idSvalu: maps[index]['ID_SVALU'] as int,
+        nazevSvalu: maps[index]['NAZEV_SVALU'] as String,
       );
     });
+  }
+
+
+  Future<int> getIdSvaluFromName(String hodnota) async {
+    final maps = await _database.rawQuery('''
+    SELECT ID_SVALU
+    FROM Sval
+    WHERE NAZEV_SVALU = ?
+  ''', [hodnota]);
+
+    if (maps.isNotEmpty) {
+      return maps.first['ID_SVALU'] as int;
+    } else {
+      return -1;
+    }
   }
 
   Future<List<Record>> Svaly() async {
     final maps =
         await _database.rawQuery('''SELECT ID_SVALU,NAZEV_SVALU FROM Sval''');
-    // print(maps);
+    print("svaly tabulka: $maps");
     return await List.generate(maps.length, (index) {
       return Record(
           idSvalu: maps[index]['ID_SVALU'] as int,
@@ -262,8 +278,16 @@ class DBHelper extends ChangeNotifier {
     });
   }
 
+  Future<List<String>> getNazvySvalu() async {
+    final maps = await _database.rawQuery('''SELECT NAZEV_SVALU FROM Sval''');
+    List<String> nazvySvalu = List.generate(maps.length, (index) {
+      return maps[index]['NAZEV_SVALU'] as String;
+    });
+    return nazvySvalu;
+  }
+
   InsertSval(String text) async {
-    _database.rawQuery('''INSERT INTO Sval values(Null,'$text')''');
+    await _database.rawQuery('''INSERT INTO Sval values(Null,'$text')''');
     notifyListeners();
   }
 
@@ -271,10 +295,12 @@ class DBHelper extends ChangeNotifier {
     _database.rawQuery('''DELETE FROM Sval WHERE ID_SVALU =1''');
   }
 
+  late int hledaniSpravnehoCviku = 0;
   Future<List<Record>> Cviky() async {
     final maps = await _database.rawQuery(
-        '''SELECT ID_CVIKU,ID_SVALU,NAZEV_CVIKU FROM Cvik order by ID_SVALU''');
-    print(maps);
+        '''SELECT ID_CVIKU,ID_SVALU,NAZEV_CVIKU FROM Cvik WHERE ID_SVALU IS $hledaniSpravnehoCviku order by ID_SVALU''');
+    print("cviky tabulka: $maps");
+
     return List.generate(maps.length, (index) {
       return Record(
           idCviku: maps[index]['ID_CVIKU'] as int,
@@ -282,11 +308,42 @@ class DBHelper extends ChangeNotifier {
           nazevCviku: maps[index]['NAZEV_CVIKU'] as String);
     });
   }
+  
 
-  InsertCvik(int cislo, String text) async {
-    _database.rawQuery('''INSERT INTO Cvik VALUES(Null,$cislo,'$text')''');
+  notList() {
     notifyListeners();
   }
+
+  late String nazev_cviku = "";
+  late String selectedValue = "";
+
+  Future<int> findMuscle(String text) async {
+    final result = await _database.rawQuery(
+        '''SELECT ID_SVALU FROM Sval WHERE NAZEV_SVALU IS ('$text')''');
+
+    if (result.isNotEmpty) {
+      final idSvalu = result.first['ID_SVALU'] as int;
+      return idSvalu;
+    } else {
+      return -1;
+    }
+  }
+
+
+  InsertCvik() async {
+    int id_svalu = await findMuscle(selectedValue);
+    _database
+        .rawQuery('''INSERT INTO Cvik VALUES(Null,$id_svalu,'$nazev_cviku')''');
+
+    notifyListeners();
+  }
+    // CREATE TABLE SvalCvik (
+    //        ID INTEGER PRIMARY KEY AUTOINCREMENT,
+    //        ID_SVALU INTEGER NOT NULL,
+    //        ID_CVIKU INTEGER NOT NULL,
+    //        BOOL_CVIKU INTEGER NOT NULL
+    //     );
+  
 
   InsertDataCviku() async {}
 
