@@ -139,16 +139,19 @@ class _SplitPageState extends State<SplitPage> {
                       return Center(child: Text('Chyba: ${snapshot.error}'));
                     } else {
                       List<Record> records = snapshot.data!;
-
+                      dbHelper.temphledaniSpravnehoSvalu =
+                          dbHelper.hledaniSpravnehoSvalu;
                       return ListView.builder(
                         itemCount: records.length,
                         itemBuilder: (context, index) {
-                          dbHelper.hledaniSpravnehoCviku =
+                          dbHelper.hledaniSpravnehoSvalu =
                               records[index].idSvalu;
+                          // print(dbHelper.temphledaniSpravnehoSvalu);
                           return Expanded(
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Container(
+                                height: 250,
                                 color: Colors.blue,
                                 child: Column(
                                   children: [
@@ -171,104 +174,125 @@ class _SplitPageState extends State<SplitPage> {
                                     Padding(
                                       padding: const EdgeInsets.fromLTRB(
                                           25, 0, 25, 5),
-                                      child: Container(
-                                        color: Colors.red,
-                                        height: 300,
-                                        child: Column(
-                                          // mainAxisAlignment:
-                                          //     MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Container(
-                                              height: 200,
-                                              color: Colors.yellow,
-                                              child:
-                                                  FutureBuilder<List<Record>>(
-                                                future: dbHelper.Cviky(),
-                                                builder: (context, snapshot) {
-                                                  if (snapshot.hasError) {
-                                                    return Center(
-                                                        child: Text(
-                                                            'Chyba: ${snapshot.error}'));
-                                                  } else {
-                                                    List<Record> records =
-                                                        snapshot.data!;
-
-                                                    return ListView.builder(
-                                                      itemCount: records.length,
-                                                      itemBuilder:
-                                                          (context, index) {
-                                                        return Container(
-                                                          height: 40,
-                                                          color: Colors.brown,
-                                                          child: Column(
-                                                            children: [
-                                                              Row(
-                                                                children: [
-                                                                  Expanded(
-                                                                    child:
-                                                                        Container(
+                                      child: Expanded(
+                                        child: Container(
+                                          color: Colors.red,
+                                          height: 200,
+                                          child: Column(
+                                            // mainAxisAlignment:
+                                            //     MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Expanded(
+                                                child:
+                                                    FutureBuilder<List<Record>>(
+                                                  future: dbHelper.SvalCvik(),
+                                                  builder: (context, snapshot) {
+                                                    if (snapshot.hasError) {
+                                                      return Center(
+                                                          child: Text(
+                                                              'Chyba: ${snapshot.error}'));
+                                                    } else {
+                                                      List<Record> records =
+                                                          snapshot.data!;
+                                                      dbHelper.hledaniSpravnehoSvalu =
+                                                          dbHelper
+                                                              .temphledaniSpravnehoSvalu;
+                                                      return ListView.builder(
+                                                        itemCount:
+                                                            records.length,
+                                                        itemBuilder:
+                                                            (context, index) {
+                                                          return Container(
+                                                            color: Colors.brown,
+                                                            child: Column(
+                                                              children: [
+                                                                Row(
+                                                                  children: [
+                                                                    Expanded(
+                                                                      child:
+                                                                          Container(
+                                                                        height:
+                                                                            30,
+                                                                        color: Colors
+                                                                            .green,
+                                                                        width:
+                                                                            50,
+                                                                        child: Text(
+                                                                            "${records[index].nazevCviku}"),
+                                                                      ),
+                                                                    ),
+                                                                    Container(
                                                                       height:
                                                                           30,
-                                                                      color: Colors
-                                                                          .green,
-                                                                      width: 50,
-                                                                      child: Text(
-                                                                          "${records[index].nazevCviku}"),
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                              SizedBox(
-                                                                height: 5,
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        );
-                                                      },
-                                                    );
-                                                  }
-                                                },
-                                              ),
-                                            ),
-                                            Container(
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  ElevatedButton(
-                                                    onPressed: () async {
-                                                      print(
-                                                          "id_svalu: ${records[index].nazevSvalu}");
-                                                      dbHelper.hledaniSpravnehoCviku =
-                                                          await dbHelper
-                                                              .getIdSvaluFromName(
-                                                                  records[index]
-                                                                      .nazevSvalu);
-                                                      dbHelper.selectedValue =
-                                                          records[index]
-                                                              .nazevSvalu;
-                                                      setState(() {});
-                                                      showDialog(
-                                                        context: context,
-                                                        builder: (BuildContext
-                                                            context) {
-                                                          return Center(
-                                                            child:
-                                                                AddExerciseBox(),
+                                                                      child:
+                                                                          IconButton(
+                                                                        onPressed:
+                                                                            () {},
+                                                                        icon: Icon(
+                                                                            Icons.delete),
+                                                                        iconSize:
+                                                                            20,
+                                                                      ),
+                                                                    )
+                                                                  ],
+                                                                ),
+                                                                SizedBox(
+                                                                  height: 5,
+                                                                ),
+                                                              ],
+                                                            ),
                                                           );
                                                         },
                                                       );
-                                                    },
-                                                    child: Text(
-                                                      "exercises",
-                                                      style: TextStyle(
-                                                          color: Colors.white),
-                                                    ),
-                                                  ),
-                                                ],
+                                                    }
+                                                  },
+                                                ),
                                               ),
-                                            ),
-                                          ],
+                                              Container(
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    ElevatedButton(
+                                                      onPressed: () async {
+                                                        print(
+                                                            "nazev_svalu: ${records[index].nazevSvalu}");
+
+                                                        dbHelper.hledaniSpravnehoSvalu =
+                                                            await dbHelper
+                                                                .getIdSvaluFromName(
+                                                                    records[index]
+                                                                        .nazevSvalu);
+                                                        dbHelper.selectedValue =
+                                                            records[index]
+                                                                .nazevSvalu;
+
+                                                   
+                                                        dbHelper.AutoInsert();
+                                                        setState(() {});
+                                                        showDialog(
+                                                          context: context,
+                                                          builder: (BuildContext
+                                                              context) {
+                                                            return Center(
+                                                              child:
+                                                                  AddExerciseBox(),
+                                                            );
+                                                          },
+                                                        );
+                                                      },
+                                                      child: Text(
+                                                        "exercises",
+                                                        style: TextStyle(
+                                                            color:
+                                                                Colors.white),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     ),

@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:ffi';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:kaloricke_tabulky_02/pages/foodAdd/newFood/change_new_food_box_servingSize.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -29,7 +31,6 @@ class DBHelper extends ChangeNotifier {
   //
 
   List<bool> isCheckedList = [];
-  List<bool> isCheckedList_2 = [];
   late Database _database;
   late String _assetsDatabasePath;
   late String databasesPath;
@@ -99,6 +100,7 @@ class DBHelper extends ChangeNotifier {
         );
         CREATE TABLE SvalCvik (
            ID INTEGER PRIMARY KEY AUTOINCREMENT,
+           ID_SPLITU INTEGER NOT NULL,
            ID_SVALU INTEGER NOT NULL,
            ID_CVIKU INTEGER NOT NULL,
            BOOL_CVIKU INTEGER NOT NULL
@@ -177,7 +179,7 @@ class DBHelper extends ChangeNotifier {
   Future<List<Record>> Split() async {
     final maps = await _database
         .rawQuery('''SELECT ID_SPLITU,NAZEV_SPLITU FROM Split''');
-    print("Split tabulka: $maps");
+    // print("Split tabulka: $maps");
     return List.generate(maps.length, (index) {
       return Record(
           idSplitu: maps[index]['ID_SPLITU'] as int,
@@ -236,7 +238,7 @@ class DBHelper extends ChangeNotifier {
     print(a);
   }
 
-Future<List<Record>> getSvalyFromSplitId(int cislo) async {
+  Future<List<Record>> getSvalyFromSplitId(int cislo) async {
     final maps = await _database.rawQuery('''
     SELECT Sval.ID_SVALU, Sval.NAZEV_SVALU
     FROM SplitSval
@@ -251,7 +253,6 @@ Future<List<Record>> getSvalyFromSplitId(int cislo) async {
       );
     });
   }
-
 
   Future<int> getIdSvaluFromName(String hodnota) async {
     final maps = await _database.rawQuery('''
@@ -292,14 +293,18 @@ Future<List<Record>> getSvalyFromSplitId(int cislo) async {
   }
 
   DeleteSval() async {
-    _database.rawQuery('''DELETE FROM Sval WHERE ID_SVALU =1''');
+    _database.rawQuery('''DELETE FROM Sval''');
   }
 
-  late int hledaniSpravnehoCviku = 0;
+  late int temphledaniSpravnehoSvalu = 0;
+  late int hledaniSpravnehoSvalu = 0;
   Future<List<Record>> Cviky() async {
     final maps = await _database.rawQuery(
-        '''SELECT ID_CVIKU,ID_SVALU,NAZEV_CVIKU FROM Cvik WHERE ID_SVALU IS $hledaniSpravnehoCviku order by ID_SVALU''');
-    print("cviky tabulka: $maps");
+        '''SELECT ID_CVIKU,ID_SVALU,NAZEV_CVIKU FROM Cvik WHERE ID_SVALU IS $hledaniSpravnehoSvalu order by ID_SVALU''');
+    // print("cviky tabulka: $maps");
+    for (var map in maps) {
+      print(map);
+    }
 
     return List.generate(maps.length, (index) {
       return Record(
@@ -308,7 +313,6 @@ Future<List<Record>> getSvalyFromSplitId(int cislo) async {
           nazevCviku: maps[index]['NAZEV_CVIKU'] as String);
     });
   }
-  
 
   notList() {
     notifyListeners();
@@ -329,7 +333,6 @@ Future<List<Record>> getSvalyFromSplitId(int cislo) async {
     }
   }
 
-
   InsertCvik() async {
     int id_svalu = await findMuscle(selectedValue);
     _database
@@ -337,15 +340,123 @@ Future<List<Record>> getSvalyFromSplitId(int cislo) async {
 
     notifyListeners();
   }
-    // CREATE TABLE SvalCvik (
-    //        ID INTEGER PRIMARY KEY AUTOINCREMENT,
-    //        ID_SVALU INTEGER NOT NULL,
-    //        ID_CVIKU INTEGER NOT NULL,
-    //        BOOL_CVIKU INTEGER NOT NULL
-    //     );
-  
+
+  Future<List<Record>> SvalCvik() async {
+    final maps =
+        await _database.rawQuery('''SELECT SvalCvik.*, Cvik.NAZEV_CVIKU 
+       FROM SvalCvik 
+       JOIN Cvik ON SvalCvik.ID_CVIKU = Cvik.ID_CVIKU 
+       WHERE SvalCvik.ID_SVALU IS $hledaniSpravnehoSvalu AND SvalCvik.BOOL_CVIKU IS true AND SvalCvik.ID_SPLITU IS $tab''');
+    //  AND SvalCvik.BOOL_CVIKU IS true
+    // print("SvalCvik tabulka:");
+    // for (var map in maps) {
+    //   print(map);
+    // }
+
+    return List.generate(maps.length, (index) {
+      return Record(
+        idSplitu: maps[index]['ID_SPLITU'] as int,
+        idSvalu: maps[index]['ID_SVALU'] as int,
+        idCviku: maps[index]['ID_CVIKU'] as int,
+        boolCviku: maps[index]['BOOL_CVIKU'] == 1,
+        nazevCviku: maps[index]['NAZEV_CVIKU'] as String,
+      );
+    });
+  }
+
+  ///potřebuju funkci která zkontroluje jestli jsou řádky id_splitu s číslem vložené a pokud ne tak je vloží z tabulky cvik
+
+  ///
+  Future<List<Record>> AutoInsert() async {
+    final cviky = await _database.rawQuery(
+        '''SELECT ID_CVIKU, ID_SVALU FROM Cvik WHERE ID_SVALU IS $hledaniSpravnehoSvalu ''');
+    print("Tabulka Cviky pro automatický insert");
+    for (var cvik in cviky) {
+      print(cvik);
+    }
+    final maps = await _database
+        .rawQuery('''SELECT * FROM SvalCvik WHERE ID_SPLITU IS $tab''');
+    print("Tabulka pro automatický insert");
+
+    for (var i = 0; i < cviky.length; i++) {
+      int idCvikuCviky = cviky[i]['ID_CVIKU'] as int;
+      bool vlozitHodnoty = true;
+
+      for (var j = 0; j < maps.length; j++) {
+        int idCvikuSvalCvik = maps[j]['ID_CVIKU'] as int;
+
+        if (idCvikuCviky == idCvikuSvalCvik) {
+          // ID_CVIKU z Cvik již existuje v SvalCvik
+          vlozitHodnoty = false;
+          print("neinsertuje se $idCvikuCviky");
+          break;
+        }
+      }
+
+      if (vlozitHodnoty) {
+        // Vložit hodnoty, protože ID_CVIKU z Cvik není nalezeno v SvalCvik
+        print("Vložit hodnoty pro ID_CVIKU $idCvikuCviky");
+        await _database.rawQuery(
+            '''INSERT INTO SvalCvik values(Null,$tab,$hledaniSpravnehoSvalu,$idCvikuCviky,0)''');
+        print("hodnoty byly vloženy");
+      }
+    }
+
+    return List.generate(maps.length, (index) {
+      return Record(
+        idSplitu: maps[index]['ID_SPLITU'] as int,
+        idSvalu: maps[index]['ID_SVALU'] as int,
+        idCviku: maps[index]['ID_CVIKU'] as int,
+        boolCviku: maps[index]['BOOL_CVIKU'] == 1,
+      );
+    });
+  }
+
+  Future<List<Record>> SvalCvikAddBox() async {
+    await AutoInsert();
+    final maps =
+        await _database.rawQuery('''SELECT SvalCvik.*, Cvik.NAZEV_CVIKU 
+       FROM SvalCvik 
+       JOIN Cvik ON SvalCvik.ID_CVIKU = Cvik.ID_CVIKU 
+       WHERE SvalCvik.ID_SVALU IS $hledaniSpravnehoSvalu AND SvalCvik.ID_SPLITU IS $tab''');
+    //  AND SvalCvik.BOOL_CVIKU IS true
+
+    print("SvalCvik tabulka:");
+    for (var map in maps) {
+      print(map);
+    }
+
+    return List.generate(maps.length, (index) {
+      return Record(
+        idSplitu: maps[index]['ID_SPLITU'] as int,
+        idSvalu: maps[index]['ID_SVALU'] as int,
+        idCviku: maps[index]['ID_CVIKU'] as int,
+        boolCviku: maps[index]['BOOL_CVIKU'] == 1,
+        nazevCviku: maps[index]['NAZEV_CVIKU'] as String,
+      );
+    });
+  }
+
+  UpdateSvalCvik(bool boolCviku, int idCviku, int idSplitu, int idSvalu) async {
+    print("aktualizace stavu");
+    await _database.rawQuery(
+        '''UPDATE SvalCvik SET BOOL_CVIKU = $boolCviku WHERE ID_CVIKU IS $idCviku AND ID_SPLITU IS $idSplitu AND ID_SVALU IS $idSvalu''');
+  }
 
   InsertDataCviku() async {}
+
+  InsertHodnoty() async {
+    await _database.rawQuery('''DELETE FROM Sval''');
+    await _database.rawQuery('''DELETE FROM Cvik''');
+    await _database.rawQuery('''INSERT INTO Sval VALUES(Null,'biceps')''');
+    await _database.rawQuery('''INSERT INTO Sval VALUES(Null,'triceps')''');
+    await _database.rawQuery('''INSERT INTO Sval VALUES(Null,'shoulders')''');
+    await _database.rawQuery('''INSERT INTO Cvik VALUES(Null,1,'činka 1')''');
+    await _database.rawQuery('''INSERT INTO Cvik VALUES(Null,1,'činka 2')''');
+    await _database.rawQuery('''INSERT INTO Cvik VALUES(Null,1,'činka 3')''');
+
+    print("hotovo");
+  }
 
   ///
   ///
@@ -682,6 +793,7 @@ class Record {
   final int opakovani;
   final String komentar;
   final DateTime datum;
+  final bool boolCviku;
 
   Record({
     this.idSvalu = 0,
@@ -695,7 +807,8 @@ class Record {
     this.vaha = 0,
     this.opakovani = 0,
     this.komentar = "",
-    DateTime? datum, // Umožňuje datum být null
+    DateTime? datum,
+    this.boolCviku = false, // Umožňuje datum být null
   }) : datum = datum ??
             DateTime.now(); // Pokud je datum null, použije aktuální čas
 
@@ -711,7 +824,8 @@ class Record {
         vaha = item["VAHA"],
         opakovani = item["OPAKOVANI"],
         komentar = item["KOMENTAR"],
-        datum = item["DATUM"];
+        datum = item["DATUM"],
+        boolCviku = item["BOOL_CVIKU"];
 
   Map<String, Object> toMap() {
     return {
@@ -727,11 +841,12 @@ class Record {
       'OPAKOVANI': opakovani,
       'KOMENTAR': komentar,
       'DATUM': datum,
+      'BOOL_CVIKU': boolCviku,
     };
   }
 
   @override
   String toString() {
-    return 'Record{ID_SVALU: $idSvalu,NAZEV_SVALU:$nazevSvalu,ID_SPLITU:$idSplitu,NAZEV_SPLITU:$nazevSplitu, ID_CVIKU:$idCviku,NAZEV_CVIKU:$nazevCviku,ID_DATA_CVIKU:$idDataCviku,SERIE:$serie,VAHA:$vaha,OPAKOVANI:$opakovani,KOMENTAR:$komentar,DATUM:$datum}';
+    return 'Record{ID_SVALU: $idSvalu,NAZEV_SVALU:$nazevSvalu,ID_SPLITU:$idSplitu,NAZEV_SPLITU:$nazevSplitu, ID_CVIKU:$idCviku,NAZEV_CVIKU:$nazevCviku,ID_DATA_CVIKU:$idDataCviku,SERIE:$serie,VAHA:$vaha,OPAKOVANI:$opakovani,KOMENTAR:$komentar,DATUM:$datum,BOOL_CVIKU:$boolCviku}';
   }
 }

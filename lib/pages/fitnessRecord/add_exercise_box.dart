@@ -12,7 +12,7 @@ class AddExerciseBox extends StatefulWidget {
 }
 
 class _AddExerciseBoxState extends State<AddExerciseBox> {
-  bool isChecked = false;
+
 
   @override
   Widget build(BuildContext context) {
@@ -40,19 +40,14 @@ class _AddExerciseBoxState extends State<AddExerciseBox> {
                         child: Container(
                           // color: Colors.amber,
                           child: FutureBuilder<List<Record>>(
-                            future: dbHelper.Cviky(),
+                            future: dbHelper.SvalCvikAddBox(),
                             builder: (context, snapshot) {
                               if (snapshot.hasError) {
                                 return Center(
                                     child: Text('Chyba: ${snapshot.error}'));
                               } else {
                                 List<Record> records = snapshot.data!;
-                                // Inicializace seznamu isCheckedList_2 na základě počtu záznamů
-
-                                if (dbHelper.isCheckedList_2.isEmpty) {
-                                  dbHelper.isCheckedList_2 = List.generate(
-                                      records.length, (index) => false);
-                                }
+                      
                                 return ListView.builder(
                                   itemCount: records.length,
                                   itemBuilder: (context, index) {
@@ -62,16 +57,18 @@ class _AddExerciseBoxState extends State<AddExerciseBox> {
                                       child: Row(
                                         children: [
                                           Expanded(
-                                              child: Text(
-                                                  records[index].nazevCviku)),
+                                            child:
+                                                Text(records[index].nazevCviku),
+                                          ),
                                           Checkbox(
-                                            value:
-                                                dbHelper.isCheckedList_2[index],
+                                            value: records[index].boolCviku,
                                             onChanged: (value) {
-                                              dbHelper.isCheckedList_2[index] =
-                                                  value ?? false;
-                                              print(dbHelper.isCheckedList_2);
-
+                                              dbHelper.UpdateSvalCvik(
+                                                  value!,
+                                                  records[index].idCviku,
+                                                  dbHelper.tab,
+                                                  records[index].idSvalu);
+                                            
                                               dbHelper.notList();
                                             },
                                           ),
@@ -95,7 +92,15 @@ class _AddExerciseBoxState extends State<AddExerciseBox> {
                   height: 50,
                   width: double.infinity,
                   child: TextButton(
-                    onPressed: () {
+                    onPressed: () async {
+                      // await dbHelper.InsertOrUpdateSvalCvik();
+                      await dbHelper.SvalCvikAddBox();
+                      // for (var i = 0; i < values.length; i++) {
+                      //   if (values[i].idCviku != 0) {
+                      //     print("object");
+                      //   }
+                      // }
+
                       Navigator.of(context).pop();
                       setState(() {});
                     },

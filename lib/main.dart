@@ -17,14 +17,20 @@ import 'globals_variables/nutri_data.dart';
 // late DbController databaseInstance;
 void main() async {
   DBHelper dbHelper = DBHelper();
+
   await dbHelper.initializeDB();
   CountProvider countProvider = CountProvider();
   PageProvider pageProvider = PageProvider();
-  await dbHelper.Split();
+
+  // await dbHelper.InsertHodnoty();
+
+  // await dbHelper.Split();
   await dbHelper.Svaly();
-  await dbHelper.SplitSval();
-  await dbHelper.Cviky();
+  // await dbHelper.SplitSval();
+  // await dbHelper.Cviky();
+
   // await dbHelper.vlozitHodnoty();
+
   // await dbHelper.deleteFile('database.db');
 
   // print(await dbHelper.getNotes());

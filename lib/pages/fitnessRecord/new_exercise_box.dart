@@ -136,13 +136,13 @@ class _NewExerciseBoxState extends State<NewExerciseBox> {
                           if (dbHelper.selectedValue.isEmpty) {
                             print(dbHelper.selectedValue);
                             dbHelper.selectedValue = items[0];
-                            dbHelper.hledaniSpravnehoCviku = 1;
+                            dbHelper.hledaniSpravnehoSvalu =
+                                dbHelper.findMuscle(items[0]) as int;
                           }
                           return DropdownButton2<String>(
                             isExpanded: true,
                             items: items.map(
                               (String item) {
-                                print("1) tady to dojde");
                                 return DropdownMenuItem<String>(
                                   value: item,
                                   child: Text(
@@ -157,8 +157,6 @@ class _NewExerciseBoxState extends State<NewExerciseBox> {
                               },
                             ).toList(),
                             value: dbHelper.selectedValue,
-
-                            
                             onChanged: (value) {
                               print("aaa$dbHelper.selectedValue}");
                               print(value);
@@ -218,10 +216,14 @@ class _NewExerciseBoxState extends State<NewExerciseBox> {
                   width: double.infinity,
                   child: TextButton(
                     onPressed: () async {
-                      if (dbHelper.nazev_cviku.isNotEmpty ||
-                          dbHelper.selectedValue != null) {
+                      if (dbHelper.nazev_cviku.isNotEmpty) {
                         await dbHelper.InsertCvik();
+
                         Navigator.of(context).pop();
+
+                        setState(() {});
+
+                        // await dbHelper.SvalCvikAddBox();
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
@@ -232,6 +234,8 @@ class _NewExerciseBoxState extends State<NewExerciseBox> {
                           ),
                         );
                       }
+                      ;
+                      await dbHelper.notList();
                     },
                     style: TextButton.styleFrom(
                       backgroundColor: Colors.amber[800],
