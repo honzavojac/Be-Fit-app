@@ -1,10 +1,8 @@
 import 'dart:async';
-import 'dart:ffi';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:kaloricke_tabulky_02/pages/foodAdd/newFood/change_new_food_box_servingSize.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -364,9 +362,14 @@ class DBHelper extends ChangeNotifier {
     });
   }
 
-  ///potřebuju funkci která zkontroluje jestli jsou řádky id_splitu s číslem vložené a pokud ne tak je vloží z tabulky cvik
+  printSvalCvik() async {
+    final maps = await _database.rawQuery('''SELECT * 
+       FROM SvalCvik ''');
+    for (var map in maps) {
+      print(map);
+    }
+  }
 
-  ///
   Future<List<Record>> AutoInsert() async {
     final cviky = await _database.rawQuery(
         '''SELECT ID_CVIKU, ID_SVALU FROM Cvik WHERE ID_SVALU IS $hledaniSpravnehoSvalu ''');
@@ -451,9 +454,6 @@ class DBHelper extends ChangeNotifier {
     await _database.rawQuery('''INSERT INTO Sval VALUES(Null,'biceps')''');
     await _database.rawQuery('''INSERT INTO Sval VALUES(Null,'triceps')''');
     await _database.rawQuery('''INSERT INTO Sval VALUES(Null,'shoulders')''');
-    await _database.rawQuery('''INSERT INTO Cvik VALUES(Null,1,'činka 1')''');
-    await _database.rawQuery('''INSERT INTO Cvik VALUES(Null,1,'činka 2')''');
-    await _database.rawQuery('''INSERT INTO Cvik VALUES(Null,1,'činka 3')''');
 
     print("hotovo");
   }

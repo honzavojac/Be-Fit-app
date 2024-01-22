@@ -202,6 +202,8 @@ class _SplitPageState extends State<SplitPage> {
                                                             records.length,
                                                         itemBuilder:
                                                             (context, index) {
+                                                          print(dbHelper
+                                                              .hledaniSpravnehoSvalu);
                                                           return Container(
                                                             color: Colors.brown,
                                                             child: Column(
@@ -267,8 +269,6 @@ class _SplitPageState extends State<SplitPage> {
                                                             records[index]
                                                                 .nazevSvalu;
 
-                                                   
-                                                        dbHelper.AutoInsert();
                                                         setState(() {});
                                                         showDialog(
                                                           context: context,

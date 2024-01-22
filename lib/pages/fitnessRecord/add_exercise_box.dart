@@ -12,8 +12,6 @@ class AddExerciseBox extends StatefulWidget {
 }
 
 class _AddExerciseBoxState extends State<AddExerciseBox> {
-
-
   @override
   Widget build(BuildContext context) {
     var dbHelper = Provider.of<DBHelper>(context);
@@ -47,7 +45,7 @@ class _AddExerciseBoxState extends State<AddExerciseBox> {
                                     child: Text('Chyba: ${snapshot.error}'));
                               } else {
                                 List<Record> records = snapshot.data!;
-                      
+
                                 return ListView.builder(
                                   itemCount: records.length,
                                   itemBuilder: (context, index) {
@@ -66,9 +64,9 @@ class _AddExerciseBoxState extends State<AddExerciseBox> {
                                               dbHelper.UpdateSvalCvik(
                                                   value!,
                                                   records[index].idCviku,
-                                                  dbHelper.tab,
+                                                  records[index].idSplitu,
                                                   records[index].idSvalu);
-                                            
+
                                               dbHelper.notList();
                                             },
                                           ),

@@ -26,6 +26,7 @@ void main() async {
 
   // await dbHelper.Split();
   await dbHelper.Svaly();
+  await dbHelper.printSvalCvik();
   // await dbHelper.SplitSval();
   // await dbHelper.Cviky();
 

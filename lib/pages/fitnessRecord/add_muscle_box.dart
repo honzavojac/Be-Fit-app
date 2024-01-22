@@ -100,7 +100,7 @@ class _AddMuscleBoxState extends State<AddMuscleBox> {
                        if (posledniIdSplitu == null) {
                             posledniIdSplitu = 1;
                           } else {
-                            posledniIdSplitu = posledniIdSplitu! + 1;
+                            posledniIdSplitu = posledniIdSplitu + 1;
                           }
                       for (var i = 0; i < dbHelper.isCheckedList.length; i++) {
                         if (dbHelper.isCheckedList[i] == true) {
