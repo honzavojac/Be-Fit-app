@@ -192,6 +192,26 @@ class DBHelper extends ChangeNotifier {
     });
   }
 
+  Future<List<String>> getNazvySplitu() async {
+    final maps = await _database.rawQuery('''SELECT NAZEV_SPLITU FROM Split''');
+    List<String> nazvySplitu = List.generate(maps.length, (index) {
+      return maps[index]['NAZEV_SPLITU'] as String;
+    });
+    return nazvySplitu;
+  }
+
+  Future<int> findSplit(String text) async {
+    final result = await _database.rawQuery(
+        '''SELECT ID_SPLITU FROM Split WHERE NAZEV_SPLITU IS ('$text')''');
+
+    if (result.isNotEmpty) {
+      final idSplitu = result.first['ID_SPLITU'] as int;
+      return idSplitu;
+    } else {
+      return -1;
+    }
+  }
+
   Future<int?> PosledniIdSplitu() async {
     final maps = await _database.rawQuery('''
     SELECT ID_SPLITU FROM Split ORDER BY ID_SPLITU DESC LIMIT 1

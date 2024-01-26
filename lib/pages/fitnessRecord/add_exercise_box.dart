@@ -43,6 +43,15 @@ class _AddExerciseBoxState extends State<AddExerciseBox> {
                               if (snapshot.hasError) {
                                 return Center(
                                     child: Text('Chyba: ${snapshot.error}'));
+                              } else if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return Container(
+                                  child: Center(
+                                    child: CircularProgressIndicator(
+                                      color: ColorsProvider.color_2,
+                                    ),
+                                  ),
+                                );
                               } else {
                                 List<Record> records = snapshot.data!;
 

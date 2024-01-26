@@ -131,6 +131,15 @@ class _NewExerciseBoxState extends State<NewExerciseBox> {
                           return Center(
                             child: Text('No data available.'),
                           );
+                        } else if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Container(
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                color: ColorsProvider.color_2,
+                              ),
+                            ),
+                          );
                         } else {
                           List<String>? items = snapshot.data!;
                           if (dbHelper.selectedValue.isEmpty) {

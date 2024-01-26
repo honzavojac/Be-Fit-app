@@ -1,6 +1,8 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/colors_provider.dart';
+import 'package:kaloricke_tabulky_02/database/database_provider.dart';
+import 'package:provider/provider.dart';
 
 class choseYourSplit extends StatefulWidget {
   const choseYourSplit({super.key});
@@ -9,93 +11,97 @@ class choseYourSplit extends StatefulWidget {
   State<choseYourSplit> createState() => _choseYourSplitState();
 }
 
-List<String> data = [
-  'Back, biceps, triceps',
-  'Pull',
-  'Legs',
-];
-String selectedValue = data[0];
-
 class _choseYourSplitState extends State<choseYourSplit> {
   @override
   Widget build(BuildContext context) {
-    //  final globalVariables = Provider.of<fitnessGlobalVariables>(context);
+    var dbHelper = Provider.of<DBHelper>(context);
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        DropdownButtonHideUnderline(
-          child: DropdownButton2<String>(
-            isExpanded: true,
-            hint: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    '$selectedValue',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: ColorsProvider.color_1,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ),
-            items: data
-                .map((String item) => DropdownMenuItem<String>(
-                      value: item,
-                      child: Text(
-                        item,
-                        style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: ColorsProvider.color_1),
-                        overflow: TextOverflow.ellipsis,
+        Container(
+          child: DropdownButtonHideUnderline(
+            child: FutureBuilder(
+              future: dbHelper.getNazvySplitu(),
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Text('Error: ${snapshot.error}'),
+                  );
+                } else if (snapshot.data == null || snapshot.data!.isEmpty) {
+                  return Center(
+                    child: Text('No data available.'),
+                  );
+                } else if (snapshot.connectionState ==
+                    ConnectionState.waiting) {
+                  return Container();
+                } else {
+                  List<String>? items = snapshot.data!;
+
+                  return DropdownButton2<String>(
+                    isExpanded: true,
+                    items: items.map(
+                      (String item) {
+                        return DropdownMenuItem<String>(
+                          value: item,
+                          child: Text(
+                            item,
+                            style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: ColorsProvider.color_1),
+                            overflow: TextOverflow.clip,
+                          ),
+                        );
+                      },
+                    ).toList(),
+                    value: dbHelper.selectedValue,
+                    onChanged: (value) {
+                      print("aaa$dbHelper.selectedValue}");
+                      print(value);
+                      dbHelper.selectedValue = value!;
+                      setState(() {});
+                    },
+                    buttonStyleData: ButtonStyleData(
+                      height: 50,
+                      width: 230,
+                      padding: const EdgeInsets.only(left: 14, right: 14),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: ColorsProvider.color_2,
+                          width: 0.5,
+                        ),
                       ),
-                    ))
-                .toList(),
-            value: selectedValue,
-            onChanged: (value) {
-              setState(() {
-                selectedValue = value!;
-              });
-            },
-            buttonStyleData: ButtonStyleData(
-              height: 50,
-              width: 200,
-              padding: const EdgeInsets.only(left: 14, right: 14),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(
-                  width: 1,
-                  color: ColorsProvider.color_2,
-                ),
-              ),
-              //elevation: 2,
-            ),
-            iconStyleData: const IconStyleData(
-              icon: Icon(
-                Icons.keyboard_arrow_down_outlined,
-              ),
-              iconSize: 17,
-              iconEnabledColor: ColorsProvider.color_1,
-            ),
-            dropdownStyleData: DropdownStyleData(
-              maxHeight: 200,
-              width: 200,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(14),
-              ),
-              offset: const Offset(0, -10),
-              scrollbarTheme: ScrollbarThemeData(
-                radius: const Radius.circular(40),
-                thickness: MaterialStateProperty.all(6),
-                thumbVisibility: MaterialStateProperty.all(true),
-              ),
-            ),
-            menuItemStyleData: const MenuItemStyleData(
-              height: 40,
-              padding: EdgeInsets.only(left: 14, right: 14),
+                      // elevation: 2,
+                    ),
+                    iconStyleData: const IconStyleData(
+                      icon: Icon(
+                        Icons.keyboard_arrow_down_outlined,
+                      ),
+                      iconSize: 17,
+                      iconEnabledColor: ColorsProvider.color_1,
+                    ),
+                    dropdownStyleData: DropdownStyleData(
+                      maxHeight: 200,
+                      width: 300,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      offset: const Offset(0, -10),
+                      scrollbarTheme: ScrollbarThemeData(
+                        radius: const Radius.circular(40),
+                        thickness: MaterialStateProperty.all(6),
+                        thumbVisibility: MaterialStateProperty.all(true),
+                      ),
+                    ),
+                    menuItemStyleData: const MenuItemStyleData(
+                      height: 40,
+                      padding: EdgeInsets.only(left: 14, right: 14),
+                    ),
+                  );
+                }
+              },
             ),
           ),
         ),

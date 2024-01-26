@@ -69,8 +69,10 @@ class _dataBoxesState extends State<dataBoxes> {
                         Text(
                           '${kcal}',
                           style: TextStyle(
-                              fontSize: 20, color: ColorsProvider.color_3),
-                          strutStyle: StrutStyle(fontWeight: FontWeight.bold),
+                            fontSize: 20,
+                            color: ColorsProvider.color_3,
+                            fontWeight: FontWeight.bold,
+                          ),
                         )
                       ],
                     ),
@@ -103,8 +105,10 @@ class _dataBoxesState extends State<dataBoxes> {
                         Text(
                           '${protein}',
                           style: TextStyle(
-                              fontSize: 18, color: ColorsProvider.color_3),
-                          strutStyle: StrutStyle(fontWeight: FontWeight.bold),
+                            fontSize: 20,
+                            color: ColorsProvider.color_3,
+                            fontWeight: FontWeight.bold,
+                          ),
                         )
                       ],
                     ),
@@ -129,8 +133,10 @@ class _dataBoxesState extends State<dataBoxes> {
                         Text(
                           '${carbs}',
                           style: TextStyle(
-                              fontSize: 18, color: ColorsProvider.color_3),
-                          strutStyle: StrutStyle(fontWeight: FontWeight.bold),
+                            fontSize: 20,
+                            color: ColorsProvider.color_3,
+                            fontWeight: FontWeight.bold,
+                          ),
                         )
                       ],
                     ),
@@ -163,8 +169,10 @@ class _dataBoxesState extends State<dataBoxes> {
                         Text(
                           '${fat}',
                           style: TextStyle(
-                              fontSize: 18, color: ColorsProvider.color_3),
-                          strutStyle: StrutStyle(fontWeight: FontWeight.bold),
+                            fontSize: 20,
+                            color: ColorsProvider.color_3,
+                            fontWeight: FontWeight.bold,
+                          ),
                         )
                       ],
                     ),
@@ -189,8 +197,10 @@ class _dataBoxesState extends State<dataBoxes> {
                         Text(
                           '${fiber}',
                           style: TextStyle(
-                              fontSize: 18, color: ColorsProvider.color_3),
-                          strutStyle: StrutStyle(fontWeight: FontWeight.bold),
+                            fontSize: 20,
+                            color: ColorsProvider.color_3,
+                            fontWeight: FontWeight.bold,
+                          ),
                         )
                       ],
                     ),

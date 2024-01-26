@@ -24,7 +24,9 @@ class FitnessRecordAppBar extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => StatisticsScreen()),
+                  MaterialPageRoute(
+                    builder: (context) => StatisticsScreen(),
+                  ),
                 );
               },
               icon: Icon(Icons.moving),
@@ -87,69 +89,77 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
       children: [
         Column(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                choseYourSplit(),
-                Container(
-                  height: 32,
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => SplitPage(),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Expanded(
+                    child: choseYourSplit(),
+                  ),
+                  Container(
+                    height: 32,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SplitPage(),
+                          ),
+                        );
+                      },
+                      icon: Icon(Icons.edit_outlined),
+                      label: Text(
+                        'Edit split',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
                         ),
-                      );
-                    },
-                    icon: Icon(Icons.edit_outlined),
-                    label: Text(
-                      'Edit split',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
+                      ),
+                      style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.all(ColorsProvider.color_2),
+                        foregroundColor:
+                            MaterialStateProperty.all(ColorsProvider.color_8),
                       ),
                     ),
-                    style: ButtonStyle(
-                      backgroundColor:
-                          MaterialStateProperty.all(ColorsProvider.color_2),
-                      foregroundColor:
-                          MaterialStateProperty.all(ColorsProvider.color_8),
-                    ),
                   ),
-                ),
-                // Padding(
-                //   padding: const EdgeInsets.only(left: 20.0),
-                //   child: TextButton(
-                //     style: ButtonStyle(
-                //         backgroundColor:
-                //             MaterialStatePropertyAll(ColorsProvider.color_2)),
-                //     onPressed: () {
-                //       Navigator.push(
-                //         context,
-                //         MaterialPageRoute(
-                //           builder: (context) => SplitPage(),
-                //         ),
-                //       );
-                //     },
-                //     child: SizedBox(
-                //       width: 85,
-                //       height: 20,
-                //       child: Row(
-                //         children: [
-                //           Icon(Icons.edit, color: ColorsProvider.color_8),
-                //           SizedBox(
-                //             width: 5,
-                //           ),
-                //           Text(
-                //             'Edit split',
-                //             style: TextStyle(color: ColorsProvider.color_8),
-                //           ),
-                //         ],
-                //       ),
-                //     ),
-                //   ),
-                // ),
-              ],
+                  SizedBox(
+                    width: 10,
+                  ),
+                  // Padding(
+                  //   padding: const EdgeInsets.only(left: 20.0),
+                  //   child: TextButton(
+                  //     style: ButtonStyle(
+                  //         backgroundColor:
+                  //             MaterialStatePropertyAll(ColorsProvider.color_2)),
+                  //     onPressed: () {
+                  //       Navigator.push(
+                  //         context,
+                  //         MaterialPageRoute(
+                  //           builder: (context) => SplitPage(),
+                  //         ),
+                  //       );
+                  //     },
+                  //     child: SizedBox(
+                  //       width: 85,
+                  //       height: 20,
+                  //       child: Row(
+                  //         children: [
+                  //           Icon(Icons.edit, color: ColorsProvider.color_8),
+                  //           SizedBox(
+                  //             width: 5,
+                  //           ),
+                  //           Text(
+                  //             'Edit split',
+                  //             style: TextStyle(color: ColorsProvider.color_8),
+                  //           ),
+                  //         ],
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
+                ],
+              ),
             ),
             SizedBox(
               height: 10,
