@@ -1,9 +1,11 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/database/database_provider.dart';
-import 'package:kaloricke_tabulky_02/pages/fitnessRecord/new_exercise_box.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/add_muscle_box.dart';
 import 'package:provider/provider.dart';
 
+import '../../colors_provider.dart';
 import 'add_exercise_box.dart';
 
 class SplitPage extends StatefulWidget {
@@ -22,297 +24,445 @@ class _SplitPageState extends State<SplitPage> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Edit your split'),
-            ElevatedButton(
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return Center(
-                      child: NewExerciseBox(),
-                    );
-                  },
-                );
-              },
-              child: Text(
-                "Add exercise",
-                style: TextStyle(color: Colors.white),
+            Text(
+              'Edit your split',
+              style: TextStyle(),
+            ),
+            Container(
+              child: IconButton(
+                icon: Icon(Icons.add_circle_outline_outlined,
+                    color: ColorsProvider.color_2, size: 35),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return Center(
+                        child: AddMuscleBox(),
+                      );
+                    },
+                  );
+                },
               ),
             ),
           ],
         ),
       ),
-      body: Column(
-        children: [
-          SizedBox(
-            height: 25,
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                Expanded(
+      body: Container(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: FutureBuilder<List<Record>>(
+                      future: dbHelper.Split(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasError) {
+                          return Center(
+                            child: Text('Error: ${snapshot.error}'),
+                          );
+                        } else if (snapshot.data == null ||
+                            snapshot.data!.isEmpty) {
+                          return Center(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'You have to add new muscles',
+                                  style:
+                                      TextStyle(color: ColorsProvider.color_1),
+                                ),
+                                SizedBox(
+                                  width: 5,
+                                ),
+                                Icon(
+                                  Icons.arrow_right_alt_sharp,
+                                  size: 35,
+                                ),
+
+                                // child: IconButton(
+                                //   icon: Icon(
+                                //       Icons.add_circle_outline_outlined,
+                                //       color: ColorsProvider.color_2,
+                                //       size: 35),
+                                //   onPressed: () {
+                                //     showDialog(
+                                //       context: context,
+                                //       builder: (BuildContext context) {
+                                //         return Center(
+                                //           child: AddMuscleBox(),
+                                //         );
+                                //       },
+                                //     );
+                                //   },
+                                // ),
+                                Container(
+                                  height: 32,
+                                  child: ElevatedButton.icon(
+                                    onPressed: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return Center(
+                                            child: AddMuscleBox(),
+                                          );
+                                        },
+                                      );
+                                    },
+                                    icon: Icon(Icons.add),
+                                    label: Text(
+                                      'Add split',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    style: ButtonStyle(
+                                      backgroundColor:
+                                          MaterialStateProperty.all(
+                                              ColorsProvider.color_2),
+                                      foregroundColor:
+                                          MaterialStateProperty.all(
+                                              ColorsProvider.color_8),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        } else {
+                          List<Record> splitData = snapshot.data!;
+                          return DefaultTabController(
+                            length: splitData.length,
+                            initialIndex: dbHelper.InitialIndex(),
+                            child: TabBar(
+                              // controller: dbHelper.InitialIndex(),
+                              tabs: splitData.map((record) {
+                                return Text(
+                                  "${record.nazevSplitu}",
+                                  style: TextStyle(
+                                    fontSize: 19,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                );
+                              }).toList(),
+                              onTap: (int index) {
+                                dbHelper.initialIndex = index;
+                                dbHelper.tab = index + 1;
+                                print(
+                                  "číslo tabu: ${dbHelper.tab} index: ${dbHelper.initialIndex}",
+                                );
+                                // dbHelper.notList();
+
+                                setState(() {});
+                              },
+                              // controller: dbHelper.notList(),
+                              indicatorColor: ColorsProvider.color_1,
+
+                              dividerColor: ColorsProvider.color_4,
+                              labelColor: ColorsProvider.color_1,
+                              isScrollable: true,
+                              tabAlignment: TabAlignment.start,
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(
+              height: 25,
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(15.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      color: ColorsProvider.color_7,
+                      borderRadius: BorderRadius.all(Radius.circular(20))),
                   child: FutureBuilder<List<Record>>(
-                    future: dbHelper.Split(),
+                    future: dbHelper.getSvalyFromSplitId(dbHelper.tab),
                     builder: (context, snapshot) {
                       if (snapshot.hasError) {
-                        return Center(
-                          child: Text('Error: ${snapshot.error}'),
-                        );
-                      } else if (snapshot.data == null ||
-                          snapshot.data!.isEmpty) {
-                        return Center(
-                          child: Text('No data availableeeeeeeeeee.'),
-                        );
+                        return Center(child: Text('Chyba: ${snapshot.error}'));
                       } else {
-                        List<Record> splitData = snapshot.data!;
-                        return DefaultTabController(
-                          length: splitData.length,
-                          initialIndex: dbHelper.initialIndex,
-                          child: TabBar(
-                            tabs: splitData.map((record) {
-                              return Text(
-                                "${record.nazevSplitu}",
-                                style: TextStyle(
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              );
-                            }).toList(),
-                            onTap: (int index) async {
-                              dbHelper.initialIndex = index;
-                              dbHelper.tab = index + 1;
-                              print(
-                                "číslo tabu: ${dbHelper.tab}",
-                              );
-                              // dbHelper.notList();
+                        print(
+                            "${dbHelper.hledaniSpravnehoSvalu}aaaaaaaaaaaaaaaa ${dbHelper.temphledaniSpravnehoSvalu} aaaaaaaaaaaaaaa");
+                        List<Record> records = snapshot.data!;
+                        dbHelper.temphledaniSpravnehoSvalu =
+                            dbHelper.hledaniSpravnehoSvalu;
+                        return ListView.builder(
+                          itemCount: records.length,
+                          itemBuilder: (context, index) {
+                            dbHelper.hledaniSpravnehoSvalu =
+                                records[index].idSvalu;
+                            // print(dbHelper.temphledaniSpravnehoSvalu);
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                        border: Border.all(
+                                            color: ColorsProvider.color_2,
+                                            width: 3),
+                                        color: ColorsProvider.color_7,
+                                        borderRadius:
+                                            BorderRadius.circular(10)),
+                                    height: 37,
+                                    child: Center(
+                                      child: Text(
+                                        "${records[index].nazevSvalu}",
+                                        style: TextStyle(
+                                            fontSize: 25,
+                                            color: ColorsProvider.color_1,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.fromLTRB(20, 0, 20, 5),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        border: Border(
+                                          top: BorderSide.none,
+                                          bottom: BorderSide(
+                                              color: ColorsProvider.color_2,
+                                              width: 5),
+                                          left: BorderSide(
+                                              color: ColorsProvider.color_2,
+                                              width: 5),
+                                          right: BorderSide(
+                                              color: ColorsProvider.color_2,
+                                              width: 5),
+                                        ),
+                                        color: ColorsProvider.color_4,
+                                        borderRadius: BorderRadius.only(
+                                            bottomLeft: Radius.circular(30),
+                                            bottomRight: Radius.circular(30)),
+                                      ),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        // mainAxisAlignment:
+                                        //     MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Container(
+                                            color: ColorsProvider.color_7,
+                                            height: 160,
+                                            child: FutureBuilder<List<Record>>(
+                                              future: dbHelper.SvalCvik(),
+                                              builder: (context, snapshot) {
+                                                if (snapshot.hasError) {
+                                                  return Center(
+                                                      child: Text(
+                                                          'Chyba: ${snapshot.error}'));
+                                                } else {
+                                                  List<Record> records =
+                                                      snapshot.data!;
+                                                  dbHelper.hledaniSpravnehoSvalu =
+                                                      dbHelper
+                                                          .temphledaniSpravnehoSvalu;
+                                                  return Container(
+                                                    child: ListView.builder(
+                                                      reverse: true,
+                                                      itemCount: records.length,
+                                                      itemBuilder:
+                                                          (context, index) {
+                                                        print(dbHelper
+                                                            .hledaniSpravnehoSvalu);
+                                                        return Container(
+                                                          child: Column(
+                                                            children: [
+                                                              Row(
+                                                                children: [
+                                                                  Expanded(
+                                                                    child:
+                                                                        Container(
+                                                                      height:
+                                                                          40,
+                                                                      decoration:
+                                                                          BoxDecoration(
+                                                                        color: ColorsProvider
+                                                                            .color_4,
+                                                                        border:
+                                                                            Border(
+                                                                          top: BorderSide(
+                                                                              width: 2,
+                                                                              color: ColorsProvider.color_2),
+                                                                        ),
+                                                                      ),
+                                                                      width: 50,
+                                                                      child:
+                                                                          Row(
+                                                                        mainAxisAlignment:
+                                                                            MainAxisAlignment.center,
+                                                                        children: [
+                                                                          Text(
+                                                                            "${records[index].nazevCviku}",
+                                                                            style:
+                                                                                TextStyle(fontSize: 17),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        );
+                                                      },
+                                                    ),
+                                                  );
+                                                }
+                                              },
+                                            ),
+                                          ),
+                                          Container(
+                                              height: 5,
+                                              width: double.infinity,
+                                              color: ColorsProvider.color_2),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Expanded(
+                                                child: ConstrainedBox(
+                                                  constraints:
+                                                      BoxConstraints.tightFor(
+                                                          height: 40,
+                                                          width:
+                                                              double.infinity),
+                                                  child: ElevatedButton(
+                                                    onPressed: () async {
+                                                      print(
+                                                          "nazev_svalu: ${records[index].nazevSvalu}");
 
-                              setState(() {});
-                            },
-                            indicatorColor: Colors.amber,
-                            // indicatorSize: TabBarIndicatorSize.tab,
-                            dividerColor: Colors.transparent,
-                            labelColor: Colors.amber,
-                            isScrollable: true,
-                            tabAlignment: TabAlignment.start,
-                          ),
+                                                      dbHelper.hledaniSpravnehoSvalu =
+                                                          await dbHelper
+                                                              .getIdSvaluFromName(
+                                                                  records[index]
+                                                                      .nazevSvalu);
+                                                      dbHelper.selectedValue =
+                                                          records[index]
+                                                              .nazevSvalu;
+
+                                                      setState(() {});
+                                                      showDialog(
+                                                        context: context,
+                                                        builder: (BuildContext
+                                                            context) {
+                                                          return Center(
+                                                            child:
+                                                                AddExerciseBox(),
+                                                          );
+                                                        },
+                                                      );
+                                                    },
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        side: BorderSide(
+                                                            width: 2,
+                                                            color: ColorsProvider
+                                                                .color_8), // nastavte šířku a barvu ohraničení
+
+                                                        borderRadius:
+                                                            BorderRadius.only(
+                                                          bottomLeft:
+                                                              Radius.circular(
+                                                                  25),
+                                                          bottomRight:
+                                                              Radius.circular(
+                                                                  25),
+                                                        ),
+                                                      ),
+                                                      backgroundColor:
+                                                          ColorsProvider
+                                                              .color_2,
+                                                    ),
+                                                    child: Text(
+                                                      "exercises",
+                                                      style: TextStyle(
+                                                        color: ColorsProvider
+                                                            .color_8,
+                                                        fontSize: 17,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
                         );
                       }
                     },
                   ),
                 ),
-                SizedBox(
-                  width: 5,
-                ),
-                IconButton(
-                  color: Colors.black,
-                  style: ButtonStyle(
-                      backgroundColor:
-                          MaterialStatePropertyAll(Colors.amber[800])),
-                  icon: Icon(Icons.add),
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return Center(
-                          child: AddMuscleBox(),
-                        );
-                      },
-                    );
-                  },
-                ),
-              ],
+              ),
             ),
-          ),
-          SizedBox(
-            height: 25,
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(15.0),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(10, 10, 10, 30),
               child: Container(
-                color: Colors.black12,
-                child: FutureBuilder<List<Record>>(
-                  future: dbHelper.getSvalyFromSplitId(dbHelper.tab),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                      return Center(child: Text('Chyba: ${snapshot.error}'));
-                    } else {
-                      List<Record> records = snapshot.data!;
-                      dbHelper.temphledaniSpravnehoSvalu =
-                          dbHelper.hledaniSpravnehoSvalu;
-                      return ListView.builder(
-                        itemCount: records.length,
-                        itemBuilder: (context, index) {
-                          dbHelper.hledaniSpravnehoSvalu =
-                              records[index].idSvalu;
-                          // print(dbHelper.temphledaniSpravnehoSvalu);
-                          return Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Container(
-                                height: 250,
-                                color: Colors.blue,
-                                child: Column(
-                                  children: [
-                                    Container(
-                                      decoration: BoxDecoration(
-                                          color: Colors.amber[800],
-                                          borderRadius:
-                                              BorderRadius.circular(10)),
-                                      height: 35,
-                                      child: Center(
-                                        child: Text(
-                                          "${records[index].nazevSvalu}",
-                                          style: TextStyle(
-                                              fontSize: 20,
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.fromLTRB(
-                                          25, 0, 25, 5),
-                                      child: Expanded(
-                                        child: Container(
-                                          color: Colors.red,
-                                          height: 200,
-                                          child: Column(
-                                            // mainAxisAlignment:
-                                            //     MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Expanded(
-                                                child:
-                                                    FutureBuilder<List<Record>>(
-                                                  future: dbHelper.SvalCvik(),
-                                                  builder: (context, snapshot) {
-                                                    if (snapshot.hasError) {
-                                                      return Center(
-                                                          child: Text(
-                                                              'Chyba: ${snapshot.error}'));
-                                                    } else {
-                                                      List<Record> records =
-                                                          snapshot.data!;
-                                                      dbHelper.hledaniSpravnehoSvalu =
-                                                          dbHelper
-                                                              .temphledaniSpravnehoSvalu;
-                                                      return ListView.builder(
-                                                        itemCount:
-                                                            records.length,
-                                                        itemBuilder:
-                                                            (context, index) {
-                                                          print(dbHelper
-                                                              .hledaniSpravnehoSvalu);
-                                                          return Container(
-                                                            color: Colors.brown,
-                                                            child: Column(
-                                                              children: [
-                                                                Row(
-                                                                  children: [
-                                                                    Expanded(
-                                                                      child:
-                                                                          Container(
-                                                                        height:
-                                                                            30,
-                                                                        color: Colors
-                                                                            .green,
-                                                                        width:
-                                                                            50,
-                                                                        child: Text(
-                                                                            "${records[index].nazevCviku}"),
-                                                                      ),
-                                                                    ),
-                                                                    Container(
-                                                                      height:
-                                                                          30,
-                                                                      child:
-                                                                          IconButton(
-                                                                        onPressed:
-                                                                            () {},
-                                                                        icon: Icon(
-                                                                            Icons.delete),
-                                                                        iconSize:
-                                                                            20,
-                                                                      ),
-                                                                    )
-                                                                  ],
-                                                                ),
-                                                                SizedBox(
-                                                                  height: 5,
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          );
-                                                        },
-                                                      );
-                                                    }
-                                                  },
-                                                ),
-                                              ),
-                                              Container(
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    ElevatedButton(
-                                                      onPressed: () async {
-                                                        print(
-                                                            "nazev_svalu: ${records[index].nazevSvalu}");
+                // width: 50,
+                height: 45,
 
-                                                        dbHelper.hledaniSpravnehoSvalu =
-                                                            await dbHelper
-                                                                .getIdSvaluFromName(
-                                                                    records[index]
-                                                                        .nazevSvalu);
-                                                        dbHelper.selectedValue =
-                                                            records[index]
-                                                                .nazevSvalu;
-
-                                                        setState(() {});
-                                                        showDialog(
-                                                          context: context,
-                                                          builder: (BuildContext
-                                                              context) {
-                                                            return Center(
-                                                              child:
-                                                                  AddExerciseBox(),
-                                                            );
-                                                          },
-                                                        );
-                                                      },
-                                                      child: Text(
-                                                        "exercises",
-                                                        style: TextStyle(
-                                                            color:
-                                                                Colors.white),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      );
+                child: TextButton(
+                  style: TextButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(17),
+                    ),
+                    foregroundColor: ColorsProvider.color_6,
+                    backgroundColor: ColorsProvider.color_5,
+                  ),
+                  onPressed: () async {
+                    print("delete split tab ${dbHelper.tab}");
+                    print("delete split initialIndex ${dbHelper.initialIndex}");
+                    if (dbHelper.initialIndex >= 0) {
+                      if (dbHelper.initialIndex <= 0 || dbHelper.tab <= 1) {
+                        dbHelper.initialIndex = 0;
+                        dbHelper.tab = 1;
+                      }
+                      await dbHelper.DeleteSplit();
+                      if (dbHelper.tab > 1) {
+                        dbHelper.initialIndex--;
+                        dbHelper.tab--;
+                      } else {
+                        dbHelper.initialIndex = 0;
+                        dbHelper.tab = 1;
+                      }
                     }
+                    dbHelper.hledaniSpravnehoSvalu = 0;
+
+                    setState(() {});
                   },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("Delete current split"),
+                      SizedBox(width: 20),
+                      Icon(Icons.delete),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-          Container(
-            height: 70,
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

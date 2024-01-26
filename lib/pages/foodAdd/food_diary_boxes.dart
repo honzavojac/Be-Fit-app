@@ -1,5 +1,5 @@
-
 import 'package:flutter/material.dart';
+import 'package:kaloricke_tabulky_02/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/database/database_provider.dart';
 import 'package:marquee/marquee.dart';
 import 'package:provider/provider.dart';
@@ -15,11 +15,11 @@ class _foodDiaryBoxesState extends State<foodDiaryBoxes> {
   @override
   Widget build(BuildContext context) {
     var dbHelper = Provider.of<DBHelper>(context);
-  
+
     return Container(
       margin: EdgeInsets.fromLTRB(10, 0, 10, 10),
       decoration: BoxDecoration(
-        color: Colors.black26,
+        color: ColorsProvider.color_7,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(style: BorderStyle.none),
       ),
@@ -38,7 +38,7 @@ class _foodDiaryBoxesState extends State<foodDiaryBoxes> {
                   direction: DismissDirection.endToStart,
                   key: Key(note.czfoodname),
                   background: Container(
-                    color: Colors.red,
+                    color: ColorsProvider.color_9,
                     child: Align(
                       child: Padding(
                         padding: const EdgeInsets.only(right: 16),
@@ -48,10 +48,10 @@ class _foodDiaryBoxesState extends State<foodDiaryBoxes> {
                     ),
                   ),
                   confirmDismiss: (direction) async {
-                     ScaffoldMessenger.of(context).showSnackBar(
+                    ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         duration: Duration(seconds: 5),
-                        backgroundColor: Colors.amber[800],
+                        backgroundColor: ColorsProvider.color_2,
                         content: Container(
                           height: 30,
                           child: Row(
@@ -67,7 +67,7 @@ class _foodDiaryBoxesState extends State<foodDiaryBoxes> {
                                   backgroundColor:
                                       MaterialStatePropertyAll(Colors.black),
                                   foregroundColor: MaterialStatePropertyAll(
-                                    Colors.amber[800],
+                                    ColorsProvider.color_1,
                                   ),
                                 ),
                                 onPressed: () {
@@ -86,13 +86,13 @@ class _foodDiaryBoxesState extends State<foodDiaryBoxes> {
                         ),
                       ),
                     );
-                     return null;
+                    return null;
                   },
                   child: Column(
                     children: [
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.amber[600],
+                          color: ColorsProvider.color_2,
                           borderRadius: BorderRadius.circular(5),
                           border: Border.all(style: BorderStyle.none),
                         ),
@@ -251,13 +251,19 @@ Widget buildAnimatedText(
     // print("${text.indexOf(text)} ${text.length}");
     return Text(
       text,
-      style: TextStyle(color: Colors.black),
+      style: TextStyle(
+          color: ColorsProvider.color_8,
+          fontWeight: FontWeight.bold,
+          fontSize: 15),
     );
   } else {
     // print("${text.length}text je větší než widget");
     return Marquee(
       text: text,
-      style: TextStyle(color: Colors.black),
+      style: TextStyle(
+          color: ColorsProvider.color_8,
+          fontWeight: FontWeight.bold,
+          fontSize: 15),
       scrollAxis: Axis.horizontal,
       crossAxisAlignment: CrossAxisAlignment.start,
       blankSpace: 50.0,

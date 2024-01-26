@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/database/database_provider.dart';
 import 'package:provider/provider.dart';
 
+import '../../colors_provider.dart';
+
 class dataBoxes extends StatefulWidget {
   const dataBoxes({super.key});
 
@@ -34,7 +36,6 @@ class _dataBoxesState extends State<dataBoxes> {
             carbs = 0;
             fat = 0;
             fiber = 0;
-          
           } else {
             List<Note> notes = snapshot.data!;
             kcal = notes[0].kcal;
@@ -42,7 +43,6 @@ class _dataBoxesState extends State<dataBoxes> {
             carbs = notes[0].carbs;
             fat = notes[0].fat;
             fiber = notes[0].fiber;
-          
           }
           return Column(
             children: [
@@ -53,19 +53,23 @@ class _dataBoxesState extends State<dataBoxes> {
                     width: 120,
                     decoration: BoxDecoration(
                       //   border: borderBorder,
-                      color: Colors.black26,
+                      color: ColorsProvider.color_10,
                       borderRadius: globalRadius, // Zaoblení rohů
                     ),
                     padding: const EdgeInsets.fromLTRB(20, 5, 20, 2),
                     child: Column(
                       children: [
                         Text(
-                          'Calories:',
-                          style: TextStyle(fontSize: 15, color: Colors.amber),
+                          'Calories',
+                          style: TextStyle(
+                              fontSize: 15,
+                              color: ColorsProvider.color_1,
+                              fontWeight: FontWeight.bold),
                         ),
                         Text(
                           '${kcal}',
-                          style: TextStyle(fontSize: 20, color: Colors.white),
+                          style: TextStyle(
+                              fontSize: 20, color: ColorsProvider.color_3),
                           strutStyle: StrutStyle(fontWeight: FontWeight.bold),
                         )
                       ],
@@ -83,7 +87,7 @@ class _dataBoxesState extends State<dataBoxes> {
                     width: 120,
                     decoration: BoxDecoration(
                       //   border: borderBorder,
-                      color: Colors.black26,
+                      color: ColorsProvider.color_10,
                       borderRadius: globalRadius, // Zaoblení rohů
                     ),
                     padding: globalPadding,
@@ -91,11 +95,15 @@ class _dataBoxesState extends State<dataBoxes> {
                       children: [
                         Text(
                           'Protein',
-                          style: TextStyle(fontSize: 15, color: Colors.amber),
+                          style: TextStyle(
+                              fontSize: 15,
+                              color: ColorsProvider.color_1,
+                              fontWeight: FontWeight.bold),
                         ),
                         Text(
                           '${protein}',
-                          style: TextStyle(fontSize: 18, color: Colors.white),
+                          style: TextStyle(
+                              fontSize: 18, color: ColorsProvider.color_3),
                           strutStyle: StrutStyle(fontWeight: FontWeight.bold),
                         )
                       ],
@@ -105,7 +113,7 @@ class _dataBoxesState extends State<dataBoxes> {
                     width: 120,
                     decoration: BoxDecoration(
                       //   border: borderBorder,
-                      color: Colors.black26,
+                      color: ColorsProvider.color_10,
                       borderRadius: globalRadius, // Zaoblení rohů
                     ),
                     padding: globalPadding,
@@ -113,11 +121,15 @@ class _dataBoxesState extends State<dataBoxes> {
                       children: [
                         Text(
                           'Carbs',
-                          style: TextStyle(fontSize: 15, color: Colors.amber),
+                          style: TextStyle(
+                              fontSize: 15,
+                              color: ColorsProvider.color_1,
+                              fontWeight: FontWeight.bold),
                         ),
                         Text(
                           '${carbs}',
-                          style: TextStyle(fontSize: 18, color: Colors.white),
+                          style: TextStyle(
+                              fontSize: 18, color: ColorsProvider.color_3),
                           strutStyle: StrutStyle(fontWeight: FontWeight.bold),
                         )
                       ],
@@ -135,7 +147,7 @@ class _dataBoxesState extends State<dataBoxes> {
                     width: 120,
                     decoration: BoxDecoration(
                       //   border: borderBorder,
-                      color: Colors.black26,
+                      color: ColorsProvider.color_10,
                       borderRadius: globalRadius, // Zaoblení rohů
                     ),
                     padding: globalPadding,
@@ -143,11 +155,15 @@ class _dataBoxesState extends State<dataBoxes> {
                       children: [
                         Text(
                           'Fat',
-                          style: TextStyle(fontSize: 15, color: Colors.amber),
+                          style: TextStyle(
+                              fontSize: 15,
+                              color: ColorsProvider.color_1,
+                              fontWeight: FontWeight.bold),
                         ),
                         Text(
                           '${fat}',
-                          style: TextStyle(fontSize: 18, color: Colors.white),
+                          style: TextStyle(
+                              fontSize: 18, color: ColorsProvider.color_3),
                           strutStyle: StrutStyle(fontWeight: FontWeight.bold),
                         )
                       ],
@@ -157,7 +173,7 @@ class _dataBoxesState extends State<dataBoxes> {
                     width: 120,
                     decoration: BoxDecoration(
                       //   border: borderBorder,
-                      color: Colors.black26,
+                      color: ColorsProvider.color_10,
                       borderRadius: globalRadius, // Zaoblení rohů
                     ),
                     padding: globalPadding,
@@ -165,11 +181,15 @@ class _dataBoxesState extends State<dataBoxes> {
                       children: [
                         Text(
                           'Fiber',
-                          style: TextStyle(fontSize: 15, color: Colors.amber),
+                          style: TextStyle(
+                              fontSize: 15,
+                              color: ColorsProvider.color_1,
+                              fontWeight: FontWeight.bold),
                         ),
                         Text(
                           '${fiber}',
-                          style: TextStyle(fontSize: 18, color: Colors.white),
+                          style: TextStyle(
+                              fontSize: 18, color: ColorsProvider.color_3),
                           strutStyle: StrutStyle(fontWeight: FontWeight.bold),
                         )
                       ],

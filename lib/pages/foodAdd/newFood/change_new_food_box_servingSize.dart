@@ -1,5 +1,6 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
+import 'package:kaloricke_tabulky_02/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/database/database_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -28,7 +29,6 @@ class _changeNewFoodServingSizeState extends State<changeNewFoodServingSize> {
         DropdownButtonHideUnderline(
           child: DropdownButton2<String>(
             isExpanded: true,
-           
             items: items
                 .map((String item) => DropdownMenuItem<String>(
                       value: item,
@@ -37,7 +37,7 @@ class _changeNewFoodServingSizeState extends State<changeNewFoodServingSize> {
                         style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
-                            color: Colors.amber),
+                            color: ColorsProvider.color_1),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ))
@@ -56,10 +56,9 @@ class _changeNewFoodServingSizeState extends State<changeNewFoodServingSize> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
-                  color: Color.fromRGBO(255, 143, 0, 1),
+                  color: ColorsProvider.color_2,
                   width: 0.5,
                 ),
-                // color: Colors.redAccent,
               ),
               //elevation: 2,
             ),
@@ -68,14 +67,13 @@ class _changeNewFoodServingSizeState extends State<changeNewFoodServingSize> {
                 Icons.keyboard_arrow_down_outlined,
               ),
               iconSize: 17,
-              iconEnabledColor: Colors.amber,
+              iconEnabledColor: ColorsProvider.color_1,
             ),
             dropdownStyleData: DropdownStyleData(
               maxHeight: 200,
               width: 120,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(14),
-                // color: Colors.redAccent,
               ),
               offset: const Offset(0, -10),
               scrollbarTheme: ScrollbarThemeData(

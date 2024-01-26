@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kaloricke_tabulky_02/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/database/database_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -20,7 +21,7 @@ class _AddExerciseBoxState extends State<AddExerciseBox> {
       content: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(25),
-          // color: Colors.blue[800],
+          color: ColorsProvider.color_7,
         ),
         height: 300,
         width: 200,
@@ -36,7 +37,6 @@ class _AddExerciseBoxState extends State<AddExerciseBox> {
                       ),
                       Expanded(
                         child: Container(
-                          // color: Colors.amber,
                           child: FutureBuilder<List<Record>>(
                             future: dbHelper.SvalCvikAddBox(),
                             builder: (context, snapshot) {
@@ -92,7 +92,7 @@ class _AddExerciseBoxState extends State<AddExerciseBox> {
                   child: TextButton(
                     onPressed: () async {
                       // await dbHelper.InsertOrUpdateSvalCvik();
-                      await dbHelper.SvalCvikAddBox();
+                      // await dbHelper.SvalCvikAddBox();
                       // for (var i = 0; i < values.length; i++) {
                       //   if (values[i].idCviku != 0) {
                       //     print("object");
@@ -103,7 +103,7 @@ class _AddExerciseBoxState extends State<AddExerciseBox> {
                       setState(() {});
                     },
                     style: TextButton.styleFrom(
-                      backgroundColor: Colors.amber[800],
+                      backgroundColor: ColorsProvider.color_2,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.vertical(
                           bottom: Radius.circular(25),
@@ -113,7 +113,7 @@ class _AddExerciseBoxState extends State<AddExerciseBox> {
                     child: Text(
                       'Save',
                       style: TextStyle(
-                        color: Colors.black,
+                        color: ColorsProvider.color_8,
                         fontWeight: FontWeight.bold,
                         fontSize: 20,
                       ),
@@ -132,8 +132,10 @@ class _AddExerciseBoxState extends State<AddExerciseBox> {
                     height: 35,
                     child: ElevatedButton(
                       style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStatePropertyAll(Colors.amber[800])),
+                        backgroundColor: MaterialStatePropertyAll(
+                          ColorsProvider.color_2,
+                        ),
+                      ),
                       onPressed: () {
                         showDialog(
                           context: context,
@@ -144,20 +146,23 @@ class _AddExerciseBoxState extends State<AddExerciseBox> {
                           },
                         );
                       },
-                      child: Text("New Exercise",
-                          style: TextStyle(color: Colors.black)),
+                      child: Text(
+                        "New Exercise",
+                        style: TextStyle(
+                          color: ColorsProvider.color_8,
+                        ),
+                      ),
                     ),
                   ),
                 ),
                 Container(
-                  // color: Colors.amber,
                   child: IconButton(
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
                     icon: Icon(
                       Icons.close,
-                      color: Colors.red,
+                      color: ColorsProvider.color_9,
                       size: 30,
                     ),
                   ),

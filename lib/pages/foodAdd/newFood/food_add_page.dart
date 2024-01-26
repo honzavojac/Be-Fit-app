@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:kaloricke_tabulky_02/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/database/database_provider.dart';
 
 import 'package:kaloricke_tabulky_02/pages/foodAdd/newFood/food_main_add_boxes.dart';
@@ -59,8 +60,10 @@ class _FoodNewScreenState extends State<FoodNewScreen> {
                   children: [
                     Text(
                       'Others values',
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: ColorsProvider.color_1),
                     )
                   ],
                 ),
@@ -71,7 +74,7 @@ class _FoodNewScreenState extends State<FoodNewScreen> {
                 SizedBox(
                   height: 15,
                 ),
-                VitaminsBox(),
+                // VitaminsBox(),
                 SizedBox(
                   height: 100,
                 ),
@@ -86,7 +89,6 @@ class _FoodNewScreenState extends State<FoodNewScreen> {
                 child: Column(
                   children: [
                     Container(
-                      //color: Colors.blue,
                       height: 40,
                       width: 150,
                       child: ElevatedButton.icon(
@@ -98,10 +100,10 @@ class _FoodNewScreenState extends State<FoodNewScreen> {
                         label: Text('Add',
                             style: TextStyle(fontWeight: FontWeight.bold)),
                         style: ButtonStyle(
-                            backgroundColor:
-                                MaterialStateProperty.all(Colors.amber[800]),
-                            foregroundColor:
-                                MaterialStateProperty.all(Colors.black)),
+                            backgroundColor: MaterialStateProperty.all(
+                                ColorsProvider.color_2),
+                            foregroundColor: MaterialStateProperty.all(
+                                ColorsProvider.color_8)),
                       ),
                     ),
                   ],

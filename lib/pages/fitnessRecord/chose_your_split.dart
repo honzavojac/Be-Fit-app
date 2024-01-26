@@ -1,5 +1,6 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
+import 'package:kaloricke_tabulky_02/colors_provider.dart';
 
 class choseYourSplit extends StatefulWidget {
   const choseYourSplit({super.key});
@@ -33,7 +34,7 @@ class _choseYourSplitState extends State<choseYourSplit> {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
-                      color: Colors.yellow,
+                      color: ColorsProvider.color_1,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -48,7 +49,7 @@ class _choseYourSplitState extends State<choseYourSplit> {
                         style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
-                            color: Colors.amber),
+                            color: ColorsProvider.color_1),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ))
@@ -67,9 +68,8 @@ class _choseYourSplitState extends State<choseYourSplit> {
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
                   width: 1,
-                  color: Colors.white54,
+                  color: ColorsProvider.color_2,
                 ),
-                // color: Colors.redAccent,
               ),
               //elevation: 2,
             ),
@@ -78,14 +78,13 @@ class _choseYourSplitState extends State<choseYourSplit> {
                 Icons.keyboard_arrow_down_outlined,
               ),
               iconSize: 17,
-              iconEnabledColor: Colors.amber,
+              iconEnabledColor: ColorsProvider.color_1,
             ),
             dropdownStyleData: DropdownStyleData(
               maxHeight: 200,
               width: 200,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(14),
-                // color: Colors.redAccent,
               ),
               offset: const Offset(0, -10),
               scrollbarTheme: ScrollbarThemeData(

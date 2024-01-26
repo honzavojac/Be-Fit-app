@@ -2,7 +2,7 @@
 //
 
 import 'package:flutter/material.dart';
-import 'package:kaloricke_tabulky_02/count_provider.dart';
+import 'package:kaloricke_tabulky_02/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/page_provider.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/fitness_global_variables.dart';
 import 'package:provider/provider.dart';
@@ -12,27 +12,31 @@ import 'pages/foodAdd/food_entry_page.dart';
 import 'pages/homePage/home_page.dart';
 import 'pages/fitnessRecord/fitness_record_page.dart';
 
-import 'globals_variables/nutri_data.dart';
-
 // late DbController databaseInstance;
 void main() async {
   DBHelper dbHelper = DBHelper();
 
   await dbHelper.initializeDB();
-  CountProvider countProvider = CountProvider();
+
   PageProvider pageProvider = PageProvider();
-
+  ColorsProvider colorsProvider = ColorsProvider();
+  print(dbHelper.initialIndex);
+  print(dbHelper.tab);
   // await dbHelper.InsertHodnoty();
+  // await dbHelper.DeleteSplit();
+  // await dbHelper.deleteFile('database.db');
 
+// await dbHelper.Autodelete();
+  // await dbHelper.Svaly();
+  // await dbHelper.Cviky();
   // await dbHelper.Split();
-  await dbHelper.Svaly();
-  await dbHelper.printSvalCvik();
+  // await dbHelper.SplitSval();
+  // await dbHelper.PrintSvalCvik();
+
   // await dbHelper.SplitSval();
   // await dbHelper.Cviky();
 
   // await dbHelper.vlozitHodnoty();
-
-  // await dbHelper.deleteFile('database.db');
 
   // print(await dbHelper.getNotes());
   // dbHelper.deleteFile("foodDatabase.db");
@@ -52,10 +56,10 @@ void main() async {
         ChangeNotifierProvider.value(
           value: dbHelper,
         ),
-        ChangeNotifierProvider.value(
-          value: countProvider,
-        ),
         ChangeNotifierProvider.value(value: pageProvider),
+        ChangeNotifierProvider.value(
+          value: colorsProvider,
+        ),
       ],
       child: MyApp(),
     ),
@@ -91,74 +95,69 @@ class _MyAppState extends State<MyApp> {
 
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider<NutritionIncremment>(
-          create: (_) => NutritionIncremment(),
-        ),
         ChangeNotifierProvider<fitnessGlobalVariables>(
           create: (_) => fitnessGlobalVariables(),
         ),
-        // ChangeNotifierProvider<PageProvider>(
-        //   create: (_) => PageProvider(),
-        // )
       ],
       child: MaterialApp(
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData.dark(useMaterial3: true),
-          home: Scaffold(
-            appBar: PreferredSize(
-              preferredSize: const Size.fromHeight(50),
-              child: _appBars[pageProvider.page],
-            ),
-            body: PageView(
-              controller: controller,
-              onPageChanged: (index) {
-                pageProvider.page = index;
-                setState(() {});
-              },
-              children: _pages,
-            ),
-            key: scaffoldKey,
-            //bottomnavigationbar------------------------
-            bottomNavigationBar: NavigationBar(
-              height: 65,
-              onDestinationSelected: (index) {
-                //controller;
-                pageProvider.page = index;
-                // print(pageProvider.page);
-                controller.jumpToPage(pageProvider.page);
-                setState(() {});
-              },
-              indicatorColor: Colors.amber[800],
-              selectedIndex: pageProvider.page,
-              animationDuration: Duration(milliseconds: 1000),
-              destinations: const [
-                NavigationDestination(
-                  selectedIcon: Icon(
-                    Icons.fitness_center_rounded,
-                    color: Colors.black,
-                  ),
-                  icon: Icon(Icons.fitness_center_rounded),
-                  label: 'Fitness',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData.dark(useMaterial3: true),
+        home: Scaffold(
+          appBar: PreferredSize(
+            preferredSize: const Size.fromHeight(50),
+            child: _appBars[pageProvider.page],
+          ),
+          body: PageView(
+            controller: controller,
+            onPageChanged: (index) {
+              pageProvider.page = index;
+              setState(() {});
+            },
+            children: _pages,
+          ),
+          key: scaffoldKey,
+          //bottomnavigationbar------------------------
+          bottomNavigationBar: NavigationBar(
+            height: 65,
+            onDestinationSelected: (index) {
+              //controller;
+              pageProvider.page = index;
+              // print(pageProvider.page);
+              controller.jumpToPage(pageProvider.page);
+              setState(() {});
+            },
+            indicatorColor: Colors.amber[800],
+            selectedIndex: pageProvider.page,
+            animationDuration: Duration(milliseconds: 1000),
+            destinations: const [
+              NavigationDestination(
+                selectedIcon: Icon(
+                  Icons.fitness_center_rounded,
+                  color: Colors.black,
                 ),
-                NavigationDestination(
-                  selectedIcon: Icon(
-                    Icons.home,
-                    color: Colors.black,
-                  ),
-                  icon: Icon(Icons.home_outlined),
-                  label: 'Home',
+                icon: Icon(Icons.fitness_center_rounded),
+                label: 'Fitness',
+              ),
+              NavigationDestination(
+                selectedIcon: Icon(
+                  Icons.home,
+                  color: Colors.black,
                 ),
-                NavigationDestination(
-                  selectedIcon: Icon(
-                    Icons.fastfood_rounded,
-                    color: Colors.black,
-                  ),
-                  icon: Icon(Icons.fastfood),
-                  label: 'Add food',
+                icon: Icon(Icons.home_outlined),
+                label: 'Home',
+              ),
+              NavigationDestination(
+                selectedIcon: Icon(
+                  Icons.fastfood_rounded,
+                  color: Colors.black,
                 ),
-              ],
-            ),
-          )),
+                icon: Icon(Icons.fastfood),
+                label: 'Add food',
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, avoid_print, avoid_unnecessary_containers
 
 import 'package:flutter/material.dart';
+import 'package:kaloricke_tabulky_02/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/pages/foodAdd/newFood/food_add_page.dart';
 import 'package:kaloricke_tabulky_02/pages/foodAdd/data_boxes.dart';
 import 'package:kaloricke_tabulky_02/pages/foodAdd/my_search_bar.dart';
@@ -22,19 +23,25 @@ class FoodRecordAppBar extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           const Text('Food Add'),
-          ElevatedButton.icon(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => FoodNewScreen()),
-              );
-            },
-            icon: Icon(Icons.add_circle_outline_sharp),
-            label: Text(
-              'New food',
-            ),
-            style: ButtonStyle(
-              foregroundColor: MaterialStateProperty.all(Colors.white),
+          Container(
+            height: 35,
+            child: ElevatedButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => FoodNewScreen()),
+                );
+              },
+              icon: Icon(Icons.add_circle_outline_sharp),
+              label: Text(
+                'New food',
+              ),
+              style: ButtonStyle(
+                backgroundColor:
+                    MaterialStateProperty.all(ColorsProvider.color_2),
+                foregroundColor:
+                    MaterialStateProperty.all(ColorsProvider.color_8),
+              ),
             ),
           ),
         ],
@@ -83,7 +90,13 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
               children: [
                 Padding(
                   padding: const EdgeInsets.only(left: 25),
-                  child: Text('Food diary', style: TextStyle(fontSize: 20)),
+                  child: Text(
+                    'Food diary',
+                    style: TextStyle(
+                        fontSize: 20,
+                        color: ColorsProvider.color_1,
+                        fontWeight: FontWeight.bold),
+                  ),
                 ),
               ],
             ),
@@ -109,7 +122,6 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
               child: Column(
                 children: [
                   Container(
-                    //color: Colors.blue,
                     height: 40,
                     width: 150,
                     child: ElevatedButton.icon(
@@ -121,10 +133,11 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                       label: Text('Add',
                           style: TextStyle(fontWeight: FontWeight.bold)),
                       style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all(Colors.amber[800]),
-                          foregroundColor:
-                              MaterialStateProperty.all(Colors.black)),
+                        backgroundColor:
+                            MaterialStateProperty.all(ColorsProvider.color_2),
+                        foregroundColor:
+                            MaterialStateProperty.all(ColorsProvider.color_8),
+                      ),
                     ),
                   ),
                 ],

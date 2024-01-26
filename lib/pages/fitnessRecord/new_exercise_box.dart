@@ -1,7 +1,7 @@
-
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:kaloricke_tabulky_02/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/database/database_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -27,6 +27,7 @@ class _NewExerciseBoxState extends State<NewExerciseBox> {
       contentPadding: EdgeInsets.zero,
       content: Container(
         decoration: BoxDecoration(
+          color: ColorsProvider.color_7,
           borderRadius: BorderRadius.circular(25),
         ),
         height: 250,
@@ -41,12 +42,12 @@ class _NewExerciseBoxState extends State<NewExerciseBox> {
                   child: Container(
                     child: Text(
                       "New Exercise",
-                      style: TextStyle(color: Colors.amber[600], fontSize: 20),
+                      style: TextStyle(
+                          color: ColorsProvider.color_1, fontSize: 20),
                     ),
                   ),
                 ),
                 Container(
-                  // color: Colors.amber,
                   child: IconButton(
                     onPressed: () {
                       Navigator.of(context).pop();
@@ -54,7 +55,7 @@ class _NewExerciseBoxState extends State<NewExerciseBox> {
                     },
                     icon: Icon(
                       Icons.close,
-                      color: Colors.red,
+                      color: ColorsProvider.color_9,
                       size: 30,
                     ),
                   ),
@@ -71,14 +72,14 @@ class _NewExerciseBoxState extends State<NewExerciseBox> {
                       decoration: const InputDecoration(
                         labelText: 'Name of Exercise:',
                         labelStyle: TextStyle(
-                          color: Color.fromRGBO(255, 179, 0, 1),
+                          color: ColorsProvider.color_1,
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.all(
                             Radius.circular(12),
                           ),
                           borderSide: BorderSide(
-                            color: Color.fromRGBO(255, 143, 0, 1),
+                            color: ColorsProvider.color_2,
                             width: 0.5,
                           ),
                         ),
@@ -87,7 +88,7 @@ class _NewExerciseBoxState extends State<NewExerciseBox> {
                             Radius.circular(12),
                           ),
                           borderSide: BorderSide(
-                            color: Color.fromRGBO(255, 143, 0, 1),
+                            color: ColorsProvider.color_2,
                             width: 3.0,
                           ),
                         ),
@@ -97,7 +98,7 @@ class _NewExerciseBoxState extends State<NewExerciseBox> {
                         ),
                         hintText: 'Enter value:',
                         hintStyle: TextStyle(
-                          color: Color.fromRGBO(255, 179, 0, 1),
+                          color: ColorsProvider.color_1,
                           fontSize: 15,
                         ),
                       ),
@@ -114,7 +115,7 @@ class _NewExerciseBoxState extends State<NewExerciseBox> {
                   height: 20,
                   child: Text(
                     "Assign a Muscle",
-                    style: TextStyle(color: Colors.amber[600]),
+                    style: TextStyle(color: ColorsProvider.color_1),
                   ),
                 ),
                 DropdownButtonHideUnderline(
@@ -149,7 +150,7 @@ class _NewExerciseBoxState extends State<NewExerciseBox> {
                                     style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.bold,
-                                        color: Colors.amber),
+                                        color: ColorsProvider.color_1),
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                 );
@@ -170,26 +171,24 @@ class _NewExerciseBoxState extends State<NewExerciseBox> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(14),
                                 border: Border.all(
-                                  color: Color.fromRGBO(255, 143, 0, 1),
+                                  color: ColorsProvider.color_2,
                                   width: 0.5,
                                 ),
-                                // color: Colors.redAccent,
                               ),
-                              //elevation: 2,
+                              // elevation: 2,
                             ),
                             iconStyleData: const IconStyleData(
                               icon: Icon(
                                 Icons.keyboard_arrow_down_outlined,
                               ),
                               iconSize: 17,
-                              iconEnabledColor: Colors.amber,
+                              iconEnabledColor: ColorsProvider.color_1,
                             ),
                             dropdownStyleData: DropdownStyleData(
                               maxHeight: 200,
                               width: 150,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(14),
-                                // color: Colors.redAccent,
                               ),
                               offset: const Offset(0, -10),
                               scrollbarTheme: ScrollbarThemeData(
@@ -220,7 +219,7 @@ class _NewExerciseBoxState extends State<NewExerciseBox> {
 
                         Navigator.of(context).pop();
 
-                        setState(() {});
+                        // setState(() {});
 
                         // await dbHelper.SvalCvikAddBox();
                       } else {
@@ -237,7 +236,7 @@ class _NewExerciseBoxState extends State<NewExerciseBox> {
                       await dbHelper.notList();
                     },
                     style: TextButton.styleFrom(
-                      backgroundColor: Colors.amber[800],
+                      backgroundColor: ColorsProvider.color_2,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.vertical(
                           bottom: Radius.circular(25),
@@ -247,7 +246,7 @@ class _NewExerciseBoxState extends State<NewExerciseBox> {
                     child: Text(
                       'Save',
                       style: TextStyle(
-                        color: Colors.black,
+                        color: ColorsProvider.color_8,
                         fontWeight: FontWeight.bold,
                         fontSize: 20,
                       ),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../colors_provider.dart';
+
 class foodSecondaryAddBoxes extends StatefulWidget {
   const foodSecondaryAddBoxes({super.key});
 
@@ -13,14 +15,39 @@ class _foodSecondaryAddBoxesState extends State<foodSecondaryAddBoxes> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: EdgeInsets.fromLTRB(20, 0, 20, 10),
-              child: Text('Fats', style: TextStyle(fontSize: 20)),
-            ),
-          ],
+        Padding(
+          padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                  child: Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(
+                              color: ColorsProvider.color_2, width: 1),
+                        ),
+                      ),
+                      padding: EdgeInsets.fromLTRB(20, 0, 20, 5),
+                      child: Center(
+                        child: Text(
+                          'Carbs',
+                          style: TextStyle(
+                              fontSize: 20, color: ColorsProvider.color_1),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(
+          height: 5,
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -36,19 +63,36 @@ class _foodSecondaryAddBoxesState extends State<foodSecondaryAddBoxes> {
                       4) // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
                 ],
                 decoration: const InputDecoration(
-                    labelText: 'Saturated Fatty Acids',
-                    labelStyle: TextStyle(fontSize: 10),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(12)),
+                  labelText: 'Saturated Fatty Acids',
+                  labelStyle: TextStyle(
+                    fontSize: 10,
+                    color: ColorsProvider.color_1,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(12),
                     ),
-                    contentPadding:
-                        EdgeInsets.symmetric(vertical: 0, horizontal: 15),
-                    hintText: 'Enter value:',
-                    hintStyle: TextStyle(
-                        fontSize:
-                            10) // zobrazí se pokud je textové pole prázdné
-                    //  icon: Icon(Icons.text_fields), //
+                    borderSide: BorderSide(
+                      color: ColorsProvider.color_2,
+                      width: 0.5,
                     ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(12),
+                    ),
+                    borderSide: BorderSide(
+                      color: ColorsProvider.color_2,
+                      width: 3.0,
+                    ),
+                  ),
+                  contentPadding:
+                      EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                  hintText: 'Enter value:',
+                  hintStyle: TextStyle(
+                      color: ColorsProvider.color_1,
+                      fontSize: 15), // zobrazí se pokud je textové pole prázdné
+                ),
                 onChanged: (input) {},
               ),
             ),
@@ -63,19 +107,36 @@ class _foodSecondaryAddBoxesState extends State<foodSecondaryAddBoxes> {
                       4) // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
                 ],
                 decoration: const InputDecoration(
-                    labelText: 'Trans Fatty Acids',
-                    labelStyle: TextStyle(fontSize: 10),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(12)),
+                  labelText: 'Trans Fatty Acids',
+                  labelStyle: TextStyle(
+                    fontSize: 10,
+                    color: ColorsProvider.color_1,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(12),
                     ),
-                    contentPadding:
-                        EdgeInsets.symmetric(vertical: 0, horizontal: 15),
-                    hintText: 'Enter value:',
-                    hintStyle: TextStyle(
-                        fontSize:
-                            10) // zobrazí se pokud je textové pole prázdné
-                    //  icon: Icon(Icons.text_fields), //
+                    borderSide: BorderSide(
+                      color: ColorsProvider.color_2,
+                      width: 0.5,
                     ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(12),
+                    ),
+                    borderSide: BorderSide(
+                      color: ColorsProvider.color_2,
+                      width: 3.0,
+                    ),
+                  ),
+                  contentPadding:
+                      EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                  hintText: 'Enter value:',
+                  hintStyle: TextStyle(
+                      color: ColorsProvider.color_1,
+                      fontSize: 15), // zobrazí se pokud je textové pole prázdné
+                ),
                 onChanged: (input) {},
               ),
             ),
@@ -98,19 +159,36 @@ class _foodSecondaryAddBoxesState extends State<foodSecondaryAddBoxes> {
                       4) // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
                 ],
                 decoration: const InputDecoration(
-                    labelText: 'Monounsaturated Fats',
-                    labelStyle: TextStyle(fontSize: 10),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(12)),
+                  labelText: 'Monounsaturated Fats',
+                  labelStyle: TextStyle(
+                    fontSize: 10,
+                    color: ColorsProvider.color_1,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(12),
                     ),
-                    contentPadding:
-                        EdgeInsets.symmetric(vertical: 0, horizontal: 15),
-                    hintText: 'Enter value:',
-                    hintStyle: TextStyle(
-                        fontSize:
-                            10) // zobrazí se pokud je textové pole prázdné
-                    //  icon: Icon(Icons.text_fields), //
+                    borderSide: BorderSide(
+                      color: ColorsProvider.color_2,
+                      width: 0.5,
                     ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(12),
+                    ),
+                    borderSide: BorderSide(
+                      color: ColorsProvider.color_2,
+                      width: 3.0,
+                    ),
+                  ),
+                  contentPadding:
+                      EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                  hintText: 'Enter value:',
+                  hintStyle: TextStyle(
+                      color: ColorsProvider.color_1,
+                      fontSize: 15), // zobrazí se pokud je textové pole prázdné
+                ),
                 onChanged: (input) {},
               ),
             ),
@@ -125,32 +203,71 @@ class _foodSecondaryAddBoxesState extends State<foodSecondaryAddBoxes> {
                       4) // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
                 ],
                 decoration: const InputDecoration(
-                    labelText: 'Polyunsaturated Fats',
-                    labelStyle: TextStyle(fontSize: 10),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(12)),
+                  labelText: 'Polyunsaturated Fats',
+                  labelStyle: TextStyle(
+                    fontSize: 10,
+                    color: ColorsProvider.color_1,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(12),
                     ),
-                    contentPadding:
-                        EdgeInsets.symmetric(vertical: 0, horizontal: 15),
-                    hintText: 'Enter value:',
-                    hintStyle: TextStyle(
-                        fontSize:
-                            10) // zobrazí se pokud je textové pole prázdné
-                    //  icon: Icon(Icons.text_fields), //
+                    borderSide: BorderSide(
+                      color: ColorsProvider.color_2,
+                      width: 0.5,
                     ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(12),
+                    ),
+                    borderSide: BorderSide(
+                      color: ColorsProvider.color_2,
+                      width: 3.0,
+                    ),
+                  ),
+                  contentPadding:
+                      EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                  hintText: 'Enter value:',
+                  hintStyle: TextStyle(
+                      color: ColorsProvider.color_1,
+                      fontSize: 15), // zobrazí se pokud je textové pole prázdné
+                ),
                 onChanged: (input) {},
               ),
             ),
           ],
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: EdgeInsets.fromLTRB(20, 20, 20, 10),
-              child: Text('Carbs', style: TextStyle(fontSize: 20)),
-            ),
-          ],
+        Padding(
+          padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                  child: Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(
+                              color: ColorsProvider.color_2, width: 1),
+                        ),
+                      ),
+                      padding: EdgeInsets.fromLTRB(20, 0, 20, 5),
+                      child: Center(
+                        child: Text(
+                          'Carbs',
+                          style: TextStyle(
+                              fontSize: 20, color: ColorsProvider.color_1),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -166,19 +283,36 @@ class _foodSecondaryAddBoxesState extends State<foodSecondaryAddBoxes> {
                       4) // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
                 ],
                 decoration: const InputDecoration(
-                    labelText: 'Sugars',
-                    labelStyle: TextStyle(fontSize: 10),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(12)),
+                  labelText: 'Sugars',
+                  labelStyle: TextStyle(
+                    fontSize: 10,
+                    color: ColorsProvider.color_1,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(12),
                     ),
-                    contentPadding:
-                        EdgeInsets.symmetric(vertical: 0, horizontal: 15),
-                    hintText: 'Enter value:',
-                    hintStyle: TextStyle(
-                        fontSize:
-                            10) // zobrazí se pokud je textové pole prázdné
-                    //  icon: Icon(Icons.text_fields), //
+                    borderSide: BorderSide(
+                      color: ColorsProvider.color_2,
+                      width: 0.5,
                     ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(12),
+                    ),
+                    borderSide: BorderSide(
+                      color: ColorsProvider.color_2,
+                      width: 3.0,
+                    ),
+                  ),
+                  contentPadding:
+                      EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                  hintText: 'Enter value:',
+                  hintStyle: TextStyle(
+                      color: ColorsProvider.color_1,
+                      fontSize: 15), // zobrazí se pokud je textové pole prázdné
+                ),
                 onChanged: (input) {},
               ),
             ),
@@ -186,14 +320,36 @@ class _foodSecondaryAddBoxesState extends State<foodSecondaryAddBoxes> {
         ),
         Column(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  padding: EdgeInsets.fromLTRB(20, 20, 20, 10),
-                  child: Text('Others', style: TextStyle(fontSize: 20)),
-                ),
-              ],
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                      child: Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(
+                                  color: ColorsProvider.color_2, width: 1),
+                            ),
+                          ),
+                          padding: EdgeInsets.fromLTRB(20, 0, 20, 5),
+                          child: Center(
+                            child: Text(
+                              'Carbs',
+                              style: TextStyle(
+                                  fontSize: 20, color: ColorsProvider.color_1),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -209,19 +365,37 @@ class _foodSecondaryAddBoxesState extends State<foodSecondaryAddBoxes> {
                           4) // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
                     ],
                     decoration: const InputDecoration(
-                        labelText: 'Salt',
-                        labelStyle: TextStyle(fontSize: 10),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(12)),
+                      labelText: 'Salt',
+                      labelStyle: TextStyle(
+                        fontSize: 10,
+                        color: ColorsProvider.color_1,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(12),
                         ),
-                        contentPadding:
-                            EdgeInsets.symmetric(vertical: 0, horizontal: 15),
-                        hintText: 'Enter value:',
-                        hintStyle: TextStyle(
-                            fontSize:
-                                10) // zobrazí se pokud je textové pole prázdné
-                        //  icon: Icon(Icons.text_fields), //
+                        borderSide: BorderSide(
+                          color: ColorsProvider.color_2,
+                          width: 0.5,
                         ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(12),
+                        ),
+                        borderSide: BorderSide(
+                          color: ColorsProvider.color_2,
+                          width: 3.0,
+                        ),
+                      ),
+                      contentPadding:
+                          EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                      hintText: 'Enter value:',
+                      hintStyle: TextStyle(
+                          color: ColorsProvider.color_1,
+                          fontSize:
+                              15), // zobrazí se pokud je textové pole prázdné
+                    ),
                     onChanged: (input) {},
                   ),
                 ),
@@ -236,19 +410,37 @@ class _foodSecondaryAddBoxesState extends State<foodSecondaryAddBoxes> {
                           4) // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
                     ],
                     decoration: const InputDecoration(
-                        labelText: 'Water',
-                        labelStyle: TextStyle(fontSize: 10),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(12)),
+                      labelText: 'Water',
+                      labelStyle: TextStyle(
+                        fontSize: 10,
+                        color: ColorsProvider.color_1,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(12),
                         ),
-                        contentPadding:
-                            EdgeInsets.symmetric(vertical: 0, horizontal: 15),
-                        hintText: 'Enter value:',
-                        hintStyle: TextStyle(
-                            fontSize:
-                                10) // zobrazí se pokud je textové pole prázdné
-                        //  icon: Icon(Icons.text_fields), //
+                        borderSide: BorderSide(
+                          color: ColorsProvider.color_2,
+                          width: 0.5,
                         ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(12),
+                        ),
+                        borderSide: BorderSide(
+                          color: ColorsProvider.color_2,
+                          width: 3.0,
+                        ),
+                      ),
+                      contentPadding:
+                          EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                      hintText: 'Enter value:',
+                      hintStyle: TextStyle(
+                          color: ColorsProvider.color_1,
+                          fontSize:
+                              15), // zobrazí se pokud je textové pole prázdné
+                    ),
                     onChanged: (input) {},
                   ),
                 ),
@@ -271,33 +463,51 @@ class _foodSecondaryAddBoxesState extends State<foodSecondaryAddBoxes> {
                           4) // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
                     ],
                     decoration: const InputDecoration(
-                        labelText: 'Cholesterol',
-                        labelStyle: TextStyle(fontSize: 10),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(12)),
+                      labelText: 'Cholesterol',
+                      labelStyle: TextStyle(
+                        fontSize: 10,
+                        color: ColorsProvider.color_1,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(12),
                         ),
-                        contentPadding:
-                            EdgeInsets.symmetric(vertical: 0, horizontal: 15),
-                        hintText: 'Enter value:',
-                        hintStyle: TextStyle(
-                            fontSize:
-                                10) // zobrazí se pokud je textové pole prázdné
-                        //  icon: Icon(Icons.text_fields), //
+                        borderSide: BorderSide(
+                          color: ColorsProvider.color_2,
+                          width: 0.5,
                         ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(12),
+                        ),
+                        borderSide: BorderSide(
+                          color: ColorsProvider.color_2,
+                          width: 3.0,
+                        ),
+                      ),
+                      contentPadding:
+                          EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                      hintText: 'Enter value:',
+                      hintStyle: TextStyle(
+                          color: ColorsProvider.color_1,
+                          fontSize:
+                              15), // zobrazí se pokud je textové pole prázdné
+                    ),
                     onChanged: (input) {},
                   ),
                 ),
               ],
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  padding: EdgeInsets.fromLTRB(20, 20, 20, 10),
-                  child: Text('Vitamins', style: TextStyle(fontSize: 20)),
-                ),
-              ],
-            ),
+            // Row(
+            //   mainAxisAlignment: MainAxisAlignment.center,
+            //   children: [
+            //     Container(
+            //       padding: EdgeInsets.fromLTRB(20, 20, 20, 10),
+            //       child: Text('Vitamins', style: TextStyle(fontSize: 20)),
+            //     ),
+            //   ],
+            // ),
           ],
         ),
       ],

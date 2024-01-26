@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kaloricke_tabulky_02/colors_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../../database/database_provider.dart';
@@ -21,7 +22,7 @@ class _mySearchBarState extends State<mySearchBar> {
         builder: (BuildContext context, SearchController controller) {
           return SearchBar(
             elevation: MaterialStateProperty.all(1),
-            shadowColor: MaterialStateProperty.all(Colors.transparent),
+            shadowColor: MaterialStateProperty.all(ColorsProvider.color_4),
             controller: controller,
             padding: MaterialStateProperty.all<EdgeInsets>(
               EdgeInsets.symmetric(horizontal: 10.0),
@@ -32,11 +33,10 @@ class _mySearchBarState extends State<mySearchBar> {
             onChanged: (_) {
               controller.openView();
             },
-            leading:
-                const Icon(Icons.search, color: Color.fromRGBO(255, 179, 0, 1)),
+            leading: const Icon(Icons.search, color: ColorsProvider.color_1),
             hintText: 'Vyhledat jídlo...',
             hintStyle: MaterialStatePropertyAll(TextStyle(
-              color: Colors.amber[600],
+              color: ColorsProvider.color_1,
             )),
           );
         },

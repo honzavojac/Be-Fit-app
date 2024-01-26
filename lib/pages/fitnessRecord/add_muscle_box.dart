@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kaloricke_tabulky_02/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/database/database_provider.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/new_muscle_box.dart';
 import 'package:provider/provider.dart';
@@ -20,9 +21,8 @@ class _AddMuscleBoxState extends State<AddMuscleBox> {
       contentPadding: EdgeInsets.zero,
       content: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(25),
-          // color: Colors.blue[800],
-        ),
+            borderRadius: BorderRadius.circular(25),
+            color: ColorsProvider.color_7),
         height: 300,
         width: 200,
         child: Stack(
@@ -37,7 +37,6 @@ class _AddMuscleBoxState extends State<AddMuscleBox> {
                       ),
                       Expanded(
                         child: Container(
-                          // color: Colors.amber,
                           child: FutureBuilder<List<Record>>(
                             future: dbHelper.Svaly(),
                             builder: (context, snapshot) {
@@ -97,17 +96,17 @@ class _AddMuscleBoxState extends State<AddMuscleBox> {
                       String finalName = "";
                       int? posledniIdSplitu = await dbHelper.PosledniIdSplitu();
                       print("posledni ID splitu: $posledniIdSplitu");
-                       if (posledniIdSplitu == null) {
-                            posledniIdSplitu = 1;
-                          } else {
-                            posledniIdSplitu = posledniIdSplitu + 1;
-                          }
+                      if (posledniIdSplitu == null) {
+                        posledniIdSplitu = 1;
+                      } else {
+                        posledniIdSplitu = posledniIdSplitu + 1;
+                      }
                       for (var i = 0; i < dbHelper.isCheckedList.length; i++) {
                         if (dbHelper.isCheckedList[i] == true) {
                           String? a = await dbHelper.SearchSval(i + 1);
                           finalName = finalName + a! + " ";
                           print(finalName);
-                         
+
                           await dbHelper.InsertSplitSval(
                               posledniIdSplitu, i + 1);
                         }
@@ -121,7 +120,7 @@ class _AddMuscleBoxState extends State<AddMuscleBox> {
                       dbHelper.SplitSval();
                     },
                     style: TextButton.styleFrom(
-                      backgroundColor: Colors.amber[800],
+                      backgroundColor: ColorsProvider.color_2,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.vertical(
                           bottom: Radius.circular(25),
@@ -131,7 +130,7 @@ class _AddMuscleBoxState extends State<AddMuscleBox> {
                     child: Text(
                       'Save',
                       style: TextStyle(
-                        color: Colors.black,
+                        color: ColorsProvider.color_8,
                         fontWeight: FontWeight.bold,
                         fontSize: 20,
                       ),
@@ -150,8 +149,10 @@ class _AddMuscleBoxState extends State<AddMuscleBox> {
                     height: 35,
                     child: ElevatedButton(
                       style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStatePropertyAll(Colors.amber[800])),
+                        backgroundColor: MaterialStatePropertyAll(
+                          ColorsProvider.color_2,
+                        ),
+                      ),
                       onPressed: () {
                         showDialog(
                           context: context,
@@ -162,20 +163,21 @@ class _AddMuscleBoxState extends State<AddMuscleBox> {
                           },
                         );
                       },
-                      child: Text("New Muscle",
-                          style: TextStyle(color: Colors.black)),
+                      child: Text(
+                        "New Muscle",
+                        style: TextStyle(color: ColorsProvider.color_8),
+                      ),
                     ),
                   ),
                 ),
                 Container(
-                  // color: Colors.amber,
                   child: IconButton(
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
                     icon: Icon(
                       Icons.close,
-                      color: Colors.red,
+                      color: ColorsProvider.color_9,
                       size: 30,
                     ),
                   ),

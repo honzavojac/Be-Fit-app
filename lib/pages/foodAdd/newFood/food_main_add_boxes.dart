@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:kaloricke_tabulky_02/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/database/database_provider.dart';
 import 'package:kaloricke_tabulky_02/pages/foodAdd/newFood/change_new_food_box_servingSize.dart';
 import 'package:provider/provider.dart';
-
-
 
 class foodMainAddBoxes extends StatefulWidget {
   const foodMainAddBoxes({super.key});
@@ -32,17 +31,34 @@ class _foodMainAddBoxesState extends State<foodMainAddBoxes> {
           ],
           keyboardType: TextInputType.text,
           decoration: const InputDecoration(
-              labelText: 'Food',
-              border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(12)),
-                  borderSide:
-                      BorderSide(strokeAlign: BorderSide.strokeAlignInside)),
-              contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 15),
-              hintText: 'Enter name of food:',
-              hintStyle: TextStyle(
-                  fontSize: 15) // zobrazí se pokud je textové pole prázdné
-              //  icon: Icon(Icons.text_fields), //
+            labelText: 'Food',
+            labelStyle: TextStyle(
+              color: ColorsProvider.color_1,
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.all(
+                Radius.circular(12),
               ),
+              borderSide: BorderSide(
+                color: ColorsProvider.color_2,
+                width: 0.5,
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.all(
+                Radius.circular(12),
+              ),
+              borderSide: BorderSide(
+                color: ColorsProvider.color_2,
+                width: 3.0,
+              ),
+            ),
+            contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+            hintText: 'Enter name of food:',
+            hintStyle: TextStyle(
+                color: ColorsProvider.color_1,
+                fontSize: 15), // zobrazí se pokud je textové pole prázdné
+          ),
           controller: dbHelper.textEditingController1,
           onChanged: (input) {
             if (input == "") {
@@ -71,35 +87,35 @@ class _foodMainAddBoxesState extends State<foodMainAddBoxes> {
                     4) // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
               ],
               decoration: const InputDecoration(
-                  labelText: 'Serving size',
-                  labelStyle: TextStyle(
-                    color: Color.fromRGBO(255, 179, 0, 1),
+                labelText: 'Serving size',
+                labelStyle: TextStyle(
+                  color: ColorsProvider.color_1,
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(12),
                   ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(12),
-                    ),
-                    borderSide: BorderSide(
-                      color: Color.fromRGBO(255, 143, 0, 1),
-                      width: 0.5,
-                    ),
+                  borderSide: BorderSide(
+                    color: ColorsProvider.color_2,
+                    width: 0.5,
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(12),
-                    ),
-                    borderSide: BorderSide(
-                      color: Color.fromRGBO(255, 143, 0, 1),
-                      width: 3.0,
-                    ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(12),
                   ),
-                  contentPadding:
-                      EdgeInsets.symmetric(vertical: 0, horizontal: 15),
-                  hintText: 'Enter value:',
-                  hintStyle: TextStyle(
-                      fontSize: 15) // zobrazí se pokud je textové pole prázdné
-                  //  icon: Icon(Icons.text_fields), //
+                  borderSide: BorderSide(
+                    color: ColorsProvider.color_2,
+                    width: 3.0,
                   ),
+                ),
+                contentPadding:
+                    EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                hintText: 'Enter value:',
+                hintStyle: TextStyle(
+                    color: ColorsProvider.color_1,
+                    fontSize: 15), // zobrazí se pokud je textové pole prázdné
+              ),
               controller: dbHelper.textEditingController2,
               onChanged: (input) {
                 if (input == "") {
@@ -131,17 +147,35 @@ class _foodMainAddBoxesState extends State<foodMainAddBoxes> {
                     4) // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
               ],
               decoration: const InputDecoration(
-                  labelText: 'Kcal',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                labelText: 'Kcal',
+                labelStyle: TextStyle(
+                  color: ColorsProvider.color_1,
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(12),
                   ),
-                  contentPadding:
-                      EdgeInsets.symmetric(vertical: 0, horizontal: 15),
-                  hintText: 'Enter value:',
-                  hintStyle: TextStyle(
-                      fontSize: 15) // zobrazí se pokud je textové pole prázdné
-                  //  icon: Icon(Icons.text_fields), //
+                  borderSide: BorderSide(
+                    color: ColorsProvider.color_2,
+                    width: 0.5,
                   ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(12),
+                  ),
+                  borderSide: BorderSide(
+                    color: ColorsProvider.color_2,
+                    width: 3.0,
+                  ),
+                ),
+                contentPadding:
+                    EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                hintText: 'Enter value:',
+                hintStyle: TextStyle(
+                    color: ColorsProvider.color_1,
+                    fontSize: 15), // zobrazí se pokud je textové pole prázdné
+              ),
               controller: dbHelper.textEditingController3,
               onChanged: (input) {
                 if (input == "") {
@@ -173,17 +207,35 @@ class _foodMainAddBoxesState extends State<foodMainAddBoxes> {
                     4) //omezí kolik znaků je možno zadat
               ],
               decoration: const InputDecoration(
-                  labelText: 'Protein',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                labelText: 'Protein',
+                labelStyle: TextStyle(
+                  color: ColorsProvider.color_1,
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(12),
                   ),
-                  contentPadding:
-                      EdgeInsets.symmetric(vertical: 0, horizontal: 15),
-                  hintText: 'Enter value:',
-                  hintStyle: TextStyle(
-                      fontSize: 15) // zobrazí se pokud je textové pole prázdné
-                  //  icon: Icon(Icons.text_fields), //
+                  borderSide: BorderSide(
+                    color: ColorsProvider.color_2,
+                    width: 0.5,
                   ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(12),
+                  ),
+                  borderSide: BorderSide(
+                    color: ColorsProvider.color_2,
+                    width: 3.0,
+                  ),
+                ),
+                contentPadding:
+                    EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                hintText: 'Enter value:',
+                hintStyle: TextStyle(
+                    color: ColorsProvider.color_1,
+                    fontSize: 15), // zobrazí se pokud je textové pole prázdné
+              ),
               controller: dbHelper.textEditingController4,
               onChanged: (input) {
                 if (input == "") {
@@ -206,17 +258,35 @@ class _foodMainAddBoxesState extends State<foodMainAddBoxes> {
                 LengthLimitingTextInputFormatter(4)
               ],
               decoration: const InputDecoration(
-                  labelText: 'Carbs',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                labelText: 'Carbs',
+                labelStyle: TextStyle(
+                  color: ColorsProvider.color_1,
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(12),
                   ),
-                  contentPadding:
-                      EdgeInsets.symmetric(vertical: 0, horizontal: 15),
-                  hintText: 'Enter value:',
-                  hintStyle: TextStyle(
-                      fontSize: 15) // zobrazí se pokud je textové pole prázdné
-                  //  icon: Icon(Icons.text_fields), //
+                  borderSide: BorderSide(
+                    color: ColorsProvider.color_2,
+                    width: 0.5,
                   ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(12),
+                  ),
+                  borderSide: BorderSide(
+                    color: ColorsProvider.color_2,
+                    width: 3.0,
+                  ),
+                ),
+                contentPadding:
+                    EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                hintText: 'Enter value:',
+                hintStyle: TextStyle(
+                    color: ColorsProvider.color_1,
+                    fontSize: 15), // zobrazí se pokud je textové pole prázdné
+              ),
               controller: dbHelper.textEditingController5,
               onChanged: (input) {
                 if (input == "") {
@@ -247,17 +317,35 @@ class _foodMainAddBoxesState extends State<foodMainAddBoxes> {
                     4) // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
               ],
               decoration: const InputDecoration(
-                  labelText: 'Fats',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                labelText: 'Fats',
+                labelStyle: TextStyle(
+                  color: ColorsProvider.color_1,
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(12),
                   ),
-                  contentPadding:
-                      EdgeInsets.symmetric(vertical: 0, horizontal: 15),
-                  hintText: 'Enter value:',
-                  hintStyle: TextStyle(
-                      fontSize: 15) // zobrazí se pokud je textové pole prázdné
-                  //  icon: Icon(Icons.text_fields), //
+                  borderSide: BorderSide(
+                    color: ColorsProvider.color_2,
+                    width: 0.5,
                   ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(12),
+                  ),
+                  borderSide: BorderSide(
+                    color: ColorsProvider.color_2,
+                    width: 3.0,
+                  ),
+                ),
+                contentPadding:
+                    EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                hintText: 'Enter value:',
+                hintStyle: TextStyle(
+                    color: ColorsProvider.color_1,
+                    fontSize: 15), // zobrazí se pokud je textové pole prázdné
+              ),
               controller: dbHelper.textEditingController6,
               onChanged: (input) {
                 if (input == "") {
@@ -282,17 +370,33 @@ class _foodMainAddBoxesState extends State<foodMainAddBoxes> {
               ],
               decoration: const InputDecoration(
                 labelText: 'Fiber',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(12)),
+                labelStyle: TextStyle(
+                  color: ColorsProvider.color_1,
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(12),
+                  ),
                   borderSide: BorderSide(
-                    color: Colors.blue, // Barva levé strany rámečku
-                    width: 2.0, // Šířka levé strany rámečku
+                    color: ColorsProvider.color_2,
+                    width: 0.5,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(12),
+                  ),
+                  borderSide: BorderSide(
+                    color: ColorsProvider.color_2,
+                    width: 3.0,
                   ),
                 ),
                 contentPadding:
                     EdgeInsets.symmetric(vertical: 0, horizontal: 15),
                 hintText: 'Enter value:',
-                hintStyle: TextStyle(fontSize: 15),
+                hintStyle: TextStyle(
+                    color: ColorsProvider.color_1,
+                    fontSize: 15), // zobrazí se pokud je textové pole prázdné
               ),
               controller: dbHelper.textEditingController7,
               onChanged: (input) {

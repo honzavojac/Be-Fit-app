@@ -22,8 +22,10 @@ class DBHelper extends ChangeNotifier {
   late int tab = 1;
   Tab(int cislo) {
     this.tab = cislo;
-    // this.tab += 1;
-    // notifyListeners();
+  }
+
+  InitialIndex() {
+    return this.initialIndex;
   }
 
   //
@@ -104,6 +106,7 @@ class DBHelper extends ChangeNotifier {
            BOOL_CVIKU INTEGER NOT NULL
         );
 
+    
         ''',
       );
       print("Databáze byly vytvořeny");
@@ -177,7 +180,11 @@ class DBHelper extends ChangeNotifier {
   Future<List<Record>> Split() async {
     final maps = await _database
         .rawQuery('''SELECT ID_SPLITU,NAZEV_SPLITU FROM Split''');
-    // print("Split tabulka: $maps");
+    print("Split tabulka: ");
+    for (var map in maps) {
+      print(map);
+    }
+
     return List.generate(maps.length, (index) {
       return Record(
           idSplitu: maps[index]['ID_SPLITU'] as int,
@@ -193,18 +200,237 @@ class DBHelper extends ChangeNotifier {
     if (maps.isNotEmpty) {
       return maps.first['ID_SPLITU'] as int?;
     } else {
+      return 0;
+    }
+  }
+
+  SwitchIndex() async {
+    final maps = await _database.rawQuery('''SELECT ID_SPLITU FROM Split''');
+    if (maps.isNotEmpty) {
+      return maps.last['ID_SPLITU'] as int;
+    } else {
       return null;
     }
   }
 
-// Future<int> NumberOfDiferentRow() async {
-//   var result = await _database.rawQuery(
-//       '''SELECT COUNT(DISTINCT ID_SPLITU) AS count_distinct_id_splitu FROM Split''');
+  DeleteSplit() async {
+    bool hotovo = true;
+    // tab = 3;
+    await _database.rawQuery('''DELETE FROM Split WHERE ID_SPLITU IS $tab''');
+    await _database
+        .rawQuery('''DELETE FROM SplitSval WHERE ID_SPLITU IS $tab''');
+    await _database
+        .rawQuery('''DELETE FROM SvalCvik WHERE ID_SPLITU IS $tab''');
+// potřebuju celé tři tabulky přepočítat od začátku tak aby začínaly od 1 a nebyla žádná mezera
+    try {
+      // Pokusit se odstranit existující tabulky
+      await _database.rawQuery('''DROP TABLE IF EXISTS NewSplit;''');
+      await _database.rawQuery('''DROP TABLE IF EXISTS NewSplitSval;''');
+      await _database.rawQuery('''DROP TABLE IF EXISTS NewSvalCvik;''');
+    } catch (e) {
+      //  hotovo = false;
+      print("Drop table se nezdařilo");
+    }
 
-//   int count = Sqflite.firstIntValue(result) ?? 0;
-//   print(count);
-//   return count;
-// }
+    try {
+      await _database.rawQuery('''
+      CREATE TABLE NewSplit (
+        ID_SPLITU INTEGER PRIMARY KEY AUTOINCREMENT,
+        NAZEV_SPLITU TEXT NOT NULL
+  );
+''');
+
+      await _database.rawQuery('''
+      CREATE TABLE NewSplitSval (
+        ID INTEGER PRIMARY KEY AUTOINCREMENT,
+        ID_SPLITU INTEGER,
+        ID_SVALU INTEGER
+  );
+''');
+
+      await _database.rawQuery('''
+      CREATE TABLE NewSvalCvik (
+        ID INTEGER PRIMARY KEY AUTOINCREMENT,
+        ID_SPLITU INTEGER NOT NULL,
+        ID_SVALU INTEGER NOT NULL,
+        ID_CVIKU INTEGER NOT NULL,
+        BOOL_CVIKU INTEGER NOT NULL
+      );
+''');
+    } catch (e) {
+      hotovo = false;
+      print("Vytvoření tabulek se nezdařilo");
+    }
+    try {
+      final mapSplit = await _database.rawQuery('''SELECT * FROM Split''');
+      print("Split:");
+      var temp = -1;
+      for (var i = 0; i < mapSplit.length; i++) {
+        var id_splitu = mapSplit[i]['ID_SPLITU'] as int;
+        var nazev_splitu = mapSplit[i]['NAZEV_SPLITU'] as String;
+        if (id_splitu != temp) {
+          temp = id_splitu;
+          await _database.rawQuery(
+              '''INSERT INTO NewSplit (NAZEV_SPLITU) VALUES('$nazev_splitu')''');
+        } else {}
+        print(mapSplit[i]);
+      }
+      //---------------------------------------------
+      temp = 1;
+      final mapSplitSval =
+          await _database.rawQuery('''SELECT * FROM SplitSval''');
+      print("SplitSval:");
+      for (var i = 0; i < mapSplitSval.length; i++) {
+        var id_splitu = mapSplitSval[i]['ID_SPLITU'] as int;
+        var id_svalu = mapSplitSval[i]['ID_SVALU'] as int;
+
+        if (id_splitu == temp) {
+          await _database.rawQuery('''
+            INSERT INTO NewSplitSval (ID_SPLITU, ID_SVALU)
+            VALUES (${temp}, $id_svalu);
+            
+          ''');
+          temp++;
+        } else if (id_splitu != temp) {
+          if (id_splitu > temp) {
+            if (id_splitu == temp + 1) {
+              await _database.rawQuery('''
+            INSERT INTO NewSplitSval (ID_SPLITU, ID_SVALU)
+            VALUES (${temp}, $id_svalu);
+          ''');
+            } else if (id_splitu == temp + 2) {
+              await _database.rawQuery('''
+            INSERT INTO NewSplitSval (ID_SPLITU, ID_SVALU)
+            VALUES (${temp + 1}, $id_svalu);
+          ''');
+              temp++;
+            }
+          } else {
+            if (id_splitu == temp - 1) {
+              await _database.rawQuery('''
+            INSERT INTO NewSplitSval (ID_SPLITU, ID_SVALU)
+            VALUES (${temp - 1}, $id_svalu);
+          ''');
+            } else if (id_splitu == temp - 2) {
+              print("b");
+            }
+          }
+        }
+        print(mapSplitSval[i]);
+      }
+
+      //-----------------------------------------
+      temp = 1;
+      final mapSvalCvik =
+          await _database.rawQuery('''SELECT * FROM SvalCvik''');
+      print("SvalCvik:");
+      for (var i = 0; i < mapSvalCvik.length; i++) {
+        var id_splitu = mapSvalCvik[i]['ID_SPLITU'] as int;
+        var id_svalu = mapSvalCvik[i]['ID_SVALU'] as int;
+        var id_cviku = mapSvalCvik[i]['ID_CVIKU'] as int;
+        var bool_cviku = mapSvalCvik[i]['BOOL_CVIKU'] as int;
+
+        if (id_splitu == temp) {
+          await _database.rawQuery('''
+      INSERT INTO NewSvalCvik (ID_SPLITU, ID_SVALU,ID_CVIKU,BOOL_CVIKU)
+      VALUES (${temp}, $id_svalu,$id_cviku,$bool_cviku);
+    ''');
+          temp++;
+        } else if (id_splitu != temp) {
+          if (id_splitu > temp) {
+            if (id_splitu == temp + 1) {
+              await _database.rawQuery('''
+          INSERT INTO NewSvalCvik (ID_SPLITU, ID_SVALU,ID_CVIKU,BOOL_CVIKU)
+          VALUES (${temp}, $id_svalu,$id_cviku,$bool_cviku);
+        ''');
+            } else if (id_splitu == temp + 2) {
+              await _database.rawQuery('''
+          INSERT INTO NewSvalCvik (ID_SPLITU, ID_SVALU,ID_CVIKU,BOOL_CVIKU)
+          VALUES (${temp + 1}, $id_svalu,$id_cviku,$bool_cviku);
+        ''');
+              temp++;
+            }
+          } else {
+            if (id_splitu == temp - 1) {
+              await _database.rawQuery('''
+          INSERT INTO NewSvalCvik (ID_SPLITU, ID_SVALU,ID_CVIKU,BOOL_CVIKU)
+          VALUES (${temp - 1}, $id_svalu,$id_cviku,$bool_cviku);
+        ''');
+            } else if (id_splitu == temp - 2) {
+              // Něco s tím můžete dělat
+            }
+          }
+        } else if (id_splitu == temp) {
+          await _database.rawQuery('''
+      INSERT INTO NewSvalCvik (ID_SPLITU, ID_SVALU,ID_CVIKU,BOOL_CVIKU)
+      VALUES (${temp}, $id_svalu,$id_cviku,$bool_cviku);
+    ''');
+        }
+        print(mapSvalCvik[i]);
+      }
+
+      print("přepočtání tabulek proběhlo ÚSPĚŠNĚ");
+      var new_splits = await _database.rawQuery('''SELECT * FROM NewSplit''');
+      print("NewSplit");
+      for (var new_split in new_splits) {
+        print(new_split);
+      }
+      var new_splitsvals =
+          await _database.rawQuery('''SELECT * FROM NewSplitSval''');
+      print("NewSplitSval");
+      for (var new_splitsval in new_splitsvals) {
+        print(new_splitsval);
+      }
+      var new_splitcviks =
+          await _database.rawQuery('''SELECT * FROM NewSvalCvik''');
+      print("NewSvalCvik");
+      for (var new_splitcvik in new_splitcviks) {
+        print(new_splitcvik);
+      }
+    } catch (e) {
+      hotovo = false;
+      print("přepočtání tabulek se nezdařilo");
+    }
+    try {
+      await _database.rawQuery('''DROP TABLE IF EXISTS Split;''');
+      await _database.rawQuery('''DROP TABLE IF EXISTS SplitSval;''');
+      await _database.rawQuery('''DROP TABLE IF EXISTS SvalCvik;''');
+      print("Výchozí tabulky BYLY odstraněny");
+    } catch (e) {
+      print("Výchozí tabulky NEBYLY odstraněny");
+    }
+    try {
+      await _database.rawQuery('''ALTER TABLE NewSplit RENAME TO Split''');
+      await _database
+          .rawQuery('''ALTER TABLE NewSplitSval RENAME TO SplitSval''');
+      await _database
+          .rawQuery('''ALTER TABLE NewSvalCvik RENAME TO SvalCvik''');
+      print("Nové tabulky BYLY přejmenovány");
+    } catch (e) {
+      print("Nové tabulky NEBYLY přejmenovány");
+    }
+    try {
+      await _database.rawQuery('''DROP TABLE IF EXISTS NewSplit;''');
+      await _database.rawQuery('''DROP TABLE IF EXISTS NewSplitSval;''');
+      await _database.rawQuery('''DROP TABLE IF EXISTS NewSvalCvik;''');
+    } catch (e) {
+      hotovo = false;
+      print("Drop table se nezdařilo");
+    }
+    // if (tab == PosledniIdSplitu()) {
+    //   tab = 1;
+    //   initialIndex = 0;
+    // } else if(tab <1) {
+    //   tab--;
+    //   initialIndex--;
+    // }
+    print(initialIndex);
+    print(tab);
+
+    print("Delete Split ${hotovo ? 'je hotový' : 'selhal'}");
+    notifyListeners();
+  }
+
   Future<String?> SearchSval(int cislo) async {
     List<Map<String, dynamic>> result = await _database
         .rawQuery('''SELECT NAZEV_SVALU FROM Sval WHERE ID_SVALU is $cislo''');
@@ -227,7 +453,10 @@ class DBHelper extends ChangeNotifier {
   SplitSval() async {
     final maps = await _database
         .rawQuery('''SELECT ID_SPLITU,ID_SVALU FROM SplitSval''');
-    print("SplitSval tabulka: $maps");
+    print("SplitSval tabulka: ");
+    for (var map in maps) {
+      print(map);
+    }
   }
 
   InsertSplitSval(int cislo1, int cislo2) async {
@@ -339,6 +568,14 @@ class DBHelper extends ChangeNotifier {
     notifyListeners();
   }
 
+  PrintSvalCvik() async {
+    final maps = await _database.rawQuery('''SELECT * FROM SvalCvik''');
+    print("SvalCvik tabulka");
+    for (var map in maps) {
+      print(map);
+    }
+  }
+
   Future<List<Record>> SvalCvik() async {
     final maps =
         await _database.rawQuery('''SELECT SvalCvik.*, Cvik.NAZEV_CVIKU 
@@ -360,14 +597,6 @@ class DBHelper extends ChangeNotifier {
         nazevCviku: maps[index]['NAZEV_CVIKU'] as String,
       );
     });
-  }
-
-  printSvalCvik() async {
-    final maps = await _database.rawQuery('''SELECT * 
-       FROM SvalCvik ''');
-    for (var map in maps) {
-      print(map);
-    }
   }
 
   Future<List<Record>> AutoInsert() async {
@@ -454,6 +683,14 @@ class DBHelper extends ChangeNotifier {
     await _database.rawQuery('''INSERT INTO Sval VALUES(Null,'biceps')''');
     await _database.rawQuery('''INSERT INTO Sval VALUES(Null,'triceps')''');
     await _database.rawQuery('''INSERT INTO Sval VALUES(Null,'shoulders')''');
+    await _database.rawQuery('''INSERT INTO Cvik VALUES(Null,1,'biceps1')''');
+    await _database.rawQuery('''INSERT INTO Cvik VALUES(Null,1,'biceps2')''');
+    await _database.rawQuery('''INSERT INTO Cvik VALUES(Null,2,'triceps1')''');
+    await _database.rawQuery('''INSERT INTO Cvik VALUES(Null,2,'triceps2')''');
+    await _database
+        .rawQuery('''INSERT INTO Cvik VALUES(Null,3,'shoulders1')''');
+    await _database
+        .rawQuery('''INSERT INTO Cvik VALUES(Null,3,'shoulders2')''');
 
     print("hotovo");
   }

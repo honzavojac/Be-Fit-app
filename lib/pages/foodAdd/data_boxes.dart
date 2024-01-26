@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:kaloricke_tabulky_02/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/database/database_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -32,13 +33,13 @@ class _myDataboxesState extends State<myDataboxes> {
             ],
             decoration: const InputDecoration(
                 labelText: 'Serving size',
-                labelStyle: TextStyle(color: Color.fromRGBO(255, 179, 0, 1)),
+                labelStyle: TextStyle(color: ColorsProvider.color_1),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.all(
                     Radius.circular(12),
                   ),
                   borderSide: BorderSide(
-                    color: Color.fromRGBO(255, 143, 0, 1),
+                    color: ColorsProvider.color_2,
                     width: 0.5,
                   ),
                 ),
@@ -47,7 +48,7 @@ class _myDataboxesState extends State<myDataboxes> {
                     Radius.circular(12),
                   ),
                   borderSide: BorderSide(
-                    color: Color.fromRGBO(255, 143, 0, 1),
+                    color: ColorsProvider.color_2,
                     width: 3.0,
                   ),
                 ),
@@ -55,7 +56,7 @@ class _myDataboxesState extends State<myDataboxes> {
                     EdgeInsets.symmetric(vertical: 0, horizontal: 15),
                 hintText: 'Enter value:',
                 hintStyle: TextStyle(
-                    color: Color.fromRGBO(255, 179, 0, 1),
+                    color: ColorsProvider.color_1,
                     fontSize: 15) // zobrazí se pokud je textové pole prázdné
                 //  icon: Icon(Icons.text_fields), //
                 ),

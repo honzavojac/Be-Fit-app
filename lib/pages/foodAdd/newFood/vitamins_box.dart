@@ -37,13 +37,17 @@ class _VitaminsBoxState extends State<VitaminsBox> {
                   scale: 1,
                   child: Checkbox(
                     shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(
-                            Radius.circular(5.0))), // Rounded Checkbox
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(5.0),
+                      ),
+                    ), // Rounded Checkbox
                     value: isChecked_A,
                     onChanged: (inputValue) {
-                      setState(() {
-                        isChecked_A = inputValue!;
-                      });
+                      setState(
+                        () {
+                          isChecked_A = inputValue!;
+                        },
+                      );
                     },
                   ),
                 ),

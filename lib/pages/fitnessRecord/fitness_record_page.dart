@@ -3,6 +3,7 @@
 //import 'dart:html';
 
 import 'package:flutter/material.dart';
+import 'package:kaloricke_tabulky_02/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/statistics_page.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/chose_your_split.dart';
 import 'split_page.dart';
@@ -13,27 +14,32 @@ class FitnessRecordAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-        title: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text('Exercise recording '),
-        ElevatedButton.icon(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => StatisticsScreen()),
-            );
-          },
-          icon: Icon(Icons.moving),
-          label: Text(
-            'Statistics',
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text('Exercise recording '),
+          Container(
+            height: 37,
+            child: ElevatedButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => StatisticsScreen()),
+                );
+              },
+              icon: Icon(Icons.moving),
+              label: Text(
+                'Statistics',
+              ),
+              style: ButtonStyle(
+                foregroundColor:
+                    MaterialStateProperty.all(ColorsProvider.color_1),
+              ),
+            ),
           ),
-          style: ButtonStyle(
-            foregroundColor: MaterialStateProperty.all(Colors.white),
-          ),
-        ),
-      ],
-    ));
+        ],
+      ),
+    );
   }
 }
 
@@ -46,7 +52,7 @@ List<NavigationDestination> generateNavigationDestinations(List<String> data) {
         selectedIcon: Text(
           item,
           style: TextStyle(
-            color: Colors.black,
+            color: ColorsProvider.color_8,
           ),
         ),
         icon: Text(
@@ -85,33 +91,64 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 choseYourSplit(),
-                Padding(
-                  padding: const EdgeInsets.only(left: 20.0),
-                  child: TextButton(
+                Container(
+                  height: 32,
+                  child: ElevatedButton.icon(
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => SplitPage()),
+                        MaterialPageRoute(
+                          builder: (context) => SplitPage(),
+                        ),
                       );
                     },
-                    child: SizedBox(
-                      width: 85,
-                      height: 20,
-                      child: Row(
-                        children: [
-                          Icon(Icons.edit, color: Colors.white),
-                          SizedBox(
-                            width: 5,
-                          ),
-                          Text(
-                            'Edit split',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ],
+                    icon: Icon(Icons.edit_outlined),
+                    label: Text(
+                      'Edit split',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
                       ),
+                    ),
+                    style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all(ColorsProvider.color_2),
+                      foregroundColor:
+                          MaterialStateProperty.all(ColorsProvider.color_8),
                     ),
                   ),
                 ),
+                // Padding(
+                //   padding: const EdgeInsets.only(left: 20.0),
+                //   child: TextButton(
+                //     style: ButtonStyle(
+                //         backgroundColor:
+                //             MaterialStatePropertyAll(ColorsProvider.color_2)),
+                //     onPressed: () {
+                //       Navigator.push(
+                //         context,
+                //         MaterialPageRoute(
+                //           builder: (context) => SplitPage(),
+                //         ),
+                //       );
+                //     },
+                //     child: SizedBox(
+                //       width: 85,
+                //       height: 20,
+                //       child: Row(
+                //         children: [
+                //           Icon(Icons.edit, color: ColorsProvider.color_8),
+                //           SizedBox(
+                //             width: 5,
+                //           ),
+                //           Text(
+                //             'Edit split',
+                //             style: TextStyle(color: ColorsProvider.color_8),
+                //           ),
+                //         ],
+                //       ),
+                //     ),
+                //   ),
+                // ),
               ],
             ),
             SizedBox(
@@ -119,13 +156,14 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
             ),
             Expanded(
               child: Container(
-                //color: Colors.blue,
-                // padding: EdgeInsets.all(20),
                 margin: EdgeInsets.only(left: 20, right: 20),
                 decoration: BoxDecoration(
-                    color: Colors.black12,
-                    //  border: Border.all(color: Colors.white),
-                    borderRadius: BorderRadius.all(Radius.circular(10))),
+                  color: ColorsProvider.color_7,
+                  // border: Border.all(color: Colors.white),
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(10),
+                  ),
+                ),
                 child: Column(
                   children: [
                     Expanded(
@@ -153,7 +191,7 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                                     ),
                                     child: Icon(
                                       Icons.add_circle_outline_sharp,
-                                      color: Colors.white,
+                                      color: ColorsProvider.color_3,
                                       size: 40, // Velikost ikony
                                     ),
                                   ),
@@ -161,9 +199,9 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                                 ),
                                 Container(
                                   width: double.infinity,
-                                  height: 0.15,
-                                  color: Colors.amber[800],
-                                )
+                                  height: 1,
+                                  color: ColorsProvider.color_2,
+                                ),
                               ],
                             );
                           }),
@@ -202,9 +240,9 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                         style: TextStyle(fontWeight: FontWeight.bold)),
                     style: ButtonStyle(
                         backgroundColor:
-                            MaterialStateProperty.all(Colors.amber[800]),
+                            MaterialStateProperty.all(ColorsProvider.color_2),
                         foregroundColor: MaterialStateProperty.all(
-                            Colors.black) // Nastavení barvy zde
+                            ColorsProvider.color_8) // Nastavení barvy zde
                         ),
                   ),
                 ),

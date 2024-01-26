@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:kaloricke_tabulky_02/colors_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../../database/database_provider.dart';
@@ -35,19 +36,19 @@ class _NewMuscleBoxState extends State<NewMuscleBox> {
                   child: Container(
                     child: Text(
                       "New Muscle",
-                      style: TextStyle(color: Colors.amber[600], fontSize: 20),
+                      style: TextStyle(
+                          color: ColorsProvider.color_1, fontSize: 20),
                     ),
                   ),
                 ),
                 Container(
-                  // color: Colors.amber,
                   child: IconButton(
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
                     icon: Icon(
                       Icons.close,
-                      color: Colors.red,
+                      color: ColorsProvider.color_9,
                       size: 30,
                     ),
                   ),
@@ -65,14 +66,14 @@ class _NewMuscleBoxState extends State<NewMuscleBox> {
                       decoration: const InputDecoration(
                         labelText: 'Name of Muscle:',
                         labelStyle: TextStyle(
-                          color: Color.fromRGBO(255, 179, 0, 1),
+                          color: ColorsProvider.color_1,
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.all(
                             Radius.circular(12),
                           ),
                           borderSide: BorderSide(
-                            color: Color.fromRGBO(255, 143, 0, 1),
+                            color: ColorsProvider.color_2,
                             width: 0.5,
                           ),
                         ),
@@ -81,7 +82,7 @@ class _NewMuscleBoxState extends State<NewMuscleBox> {
                             Radius.circular(12),
                           ),
                           borderSide: BorderSide(
-                            color: Color.fromRGBO(255, 143, 0, 1),
+                            color: ColorsProvider.color_2,
                             width: 3.0,
                           ),
                         ),
@@ -89,9 +90,9 @@ class _NewMuscleBoxState extends State<NewMuscleBox> {
                           vertical: 0,
                           horizontal: 15,
                         ),
-                        hintText: 'Enter value:',
+                        hintText: 'Enter name of muscle:',
                         hintStyle: TextStyle(
-                          color: Color.fromRGBO(255, 179, 0, 1),
+                          color: ColorsProvider.color_1,
                           fontSize: 15,
                         ),
                       ),
@@ -114,7 +115,7 @@ class _NewMuscleBoxState extends State<NewMuscleBox> {
                       });
                     },
                     style: TextButton.styleFrom(
-                      backgroundColor: Colors.amber[800],
+                      backgroundColor: ColorsProvider.color_2,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.vertical(
                           bottom: Radius.circular(25),
@@ -124,7 +125,7 @@ class _NewMuscleBoxState extends State<NewMuscleBox> {
                     child: Text(
                       'Save',
                       style: TextStyle(
-                        color: Colors.black,
+                        color: ColorsProvider.color_8,
                         fontWeight: FontWeight.bold,
                         fontSize: 20,
                       ),
