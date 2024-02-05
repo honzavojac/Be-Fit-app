@@ -55,22 +55,22 @@ class _FoodNewScreenState extends State<FoodNewScreen> {
                 SizedBox(
                   height: 30,
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Others values',
-                      style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: ColorsProvider.color_1),
-                    )
-                  ],
-                ),
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.center,
+                //   children: [
+                //     Text(
+                //       'Others values',
+                //       style: TextStyle(
+                //           fontSize: 20,
+                //           fontWeight: FontWeight.bold,
+                //           color: ColorsProvider.color_1),
+                //     )
+                //   ],
+                // ),
                 SizedBox(
                   height: 10,
                 ),
-                foodSecondaryAddBoxes(),
+                // foodSecondaryAddBoxes(),
                 SizedBox(
                   height: 15,
                 ),

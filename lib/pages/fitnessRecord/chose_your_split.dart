@@ -37,7 +37,9 @@ class _choseYourSplitState extends State<choseYourSplit> {
                   return Container();
                 } else {
                   List<String>? items = snapshot.data!;
-
+                  if (dbHelper.selectedValue.isEmpty) {
+                    dbHelper.selectedValue = items.first;
+                  }
                   return DropdownButton2<String>(
                     isExpanded: true,
                     items: items.map(

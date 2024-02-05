@@ -45,29 +45,6 @@ class FitnessRecordAppBar extends StatelessWidget {
   }
 }
 
-List<NavigationDestination> generateNavigationDestinations(List<String> data) {
-  List<NavigationDestination> destinations = [];
-
-  for (String item in data) {
-    destinations.add(
-      NavigationDestination(
-        selectedIcon: Text(
-          item,
-          style: TextStyle(
-            color: ColorsProvider.color_8,
-          ),
-        ),
-        icon: Text(
-          item,
-        ), // Také zde nastavte ikonu dle vašich požadavků
-        label: '', // Použijete položku ze seznamu jako popisek
-      ),
-    );
-  }
-
-  return destinations;
-}
-
 class FitnessRecordScreen extends StatefulWidget {
   const FitnessRecordScreen({super.key});
 
