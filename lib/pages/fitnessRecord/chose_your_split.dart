@@ -16,98 +16,102 @@ class _choseYourSplitState extends State<choseYourSplit> {
   Widget build(BuildContext context) {
     var dbHelper = Provider.of<DBHelper>(context);
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        Container(
-          child: DropdownButtonHideUnderline(
-            child: FutureBuilder(
-              future: dbHelper.getNazvySplitu(),
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return Center(
-                    child: Text('Error: ${snapshot.error}'),
-                  );
-                } else if (snapshot.data == null || snapshot.data!.isEmpty) {
-                  return Center(
-                    child: Text('No data available.'),
-                  );
-                } else if (snapshot.connectionState ==
-                    ConnectionState.waiting) {
-                  return Container();
-                } else {
-                  List<String>? items = snapshot.data!;
-                  if (dbHelper.selectedValue.isEmpty) {
-                    dbHelper.selectedValue = items.first;
-                  }
-                  return DropdownButton2<String>(
-                    isExpanded: true,
-                    items: items.map(
-                      (String item) {
-                        return DropdownMenuItem<String>(
-                          value: item,
-                          child: Text(
-                            item,
-                            style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: ColorsProvider.color_1),
-                            overflow: TextOverflow.clip,
-                          ),
-                        );
+    return Container(
+      height: 50,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Container(
+            height: 40,
+            child: DropdownButtonHideUnderline(
+              child: FutureBuilder(
+                future: dbHelper.getNazvySplitu(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return Center(
+                      child: Text('Error: ${snapshot.error}'),
+                    );
+                  } else if (snapshot.data == null || snapshot.data!.isEmpty) {
+                    return Center(
+                      child: Text('No data available.'),
+                    );
+                  } else if (snapshot.connectionState ==
+                      ConnectionState.waiting) {
+                    return Container();
+                  } else {
+                    List<String>? items = snapshot.data!;
+                    if (dbHelper.selectedValue.isEmpty) {
+                      dbHelper.selectedValue = items.first;
+                    }
+                    return DropdownButton2<String>(
+                      isExpanded: true,
+                      items: items.map(
+                        (String item) {
+                          return DropdownMenuItem<String>(
+                            value: item,
+                            child: Text(
+                              item,
+                              style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: ColorsProvider.color_1),
+                              overflow: TextOverflow.clip,
+                            ),
+                          );
+                        },
+                      ).toList(),
+                      value: dbHelper.selectedValue,
+                      onChanged: (value) {
+                        print("---${dbHelper.selectedValue}");
+                        print(value);
+                        dbHelper.selectedValue = value!;
+                        setState(() {});
                       },
-                    ).toList(),
-                    value: dbHelper.selectedValue,
-                    onChanged: (value) {
-                      print("aaa$dbHelper.selectedValue}");
-                      print(value);
-                      dbHelper.selectedValue = value!;
-                      setState(() {});
-                    },
-                    buttonStyleData: ButtonStyleData(
-                      height: 50,
-                      width: 230,
-                      padding: const EdgeInsets.only(left: 14, right: 14),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(
-                          color: ColorsProvider.color_2,
-                          width: 0.5,
+                      buttonStyleData: ButtonStyleData(
+                        height: 50,
+                        width: 230,
+                        padding: const EdgeInsets.only(left: 14, right: 14),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: ColorsProvider.color_2,
+                            width: 0.5,
+                          ),
+                        ),
+                        // elevation: 2,
+                      ),
+                      iconStyleData: const IconStyleData(
+                        icon: Icon(
+                          Icons.keyboard_arrow_down_outlined,
+                        ),
+                        iconSize: 17,
+                        iconEnabledColor: ColorsProvider.color_1,
+                      ),
+                      dropdownStyleData: DropdownStyleData(
+                        maxHeight: 200,
+                        width: 300,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        offset: const Offset(0, -10),
+                        scrollbarTheme: ScrollbarThemeData(
+                          radius: const Radius.circular(40),
+                          thickness: MaterialStateProperty.all(6),
+                          thumbVisibility: MaterialStateProperty.all(true),
                         ),
                       ),
-                      // elevation: 2,
-                    ),
-                    iconStyleData: const IconStyleData(
-                      icon: Icon(
-                        Icons.keyboard_arrow_down_outlined,
+                      menuItemStyleData: const MenuItemStyleData(
+                        height: 40,
+                        padding: EdgeInsets.only(left: 14, right: 14),
                       ),
-                      iconSize: 17,
-                      iconEnabledColor: ColorsProvider.color_1,
-                    ),
-                    dropdownStyleData: DropdownStyleData(
-                      maxHeight: 200,
-                      width: 300,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      offset: const Offset(0, -10),
-                      scrollbarTheme: ScrollbarThemeData(
-                        radius: const Radius.circular(40),
-                        thickness: MaterialStateProperty.all(6),
-                        thumbVisibility: MaterialStateProperty.all(true),
-                      ),
-                    ),
-                    menuItemStyleData: const MenuItemStyleData(
-                      height: 40,
-                      padding: EdgeInsets.only(left: 14, right: 14),
-                    ),
-                  );
-                }
-              },
+                    );
+                  }
+                },
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

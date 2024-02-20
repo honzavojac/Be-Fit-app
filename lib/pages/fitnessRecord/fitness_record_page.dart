@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/statistics_page.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/chose_your_split.dart';
+import 'package:provider/provider.dart';
+import '../../database/database_provider.dart';
 import 'split_page.dart';
 
 class FitnessRecordAppBar extends StatelessWidget {
@@ -61,6 +63,7 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
   @override
   Widget build(BuildContext context) {
     // List<NavigationDestination> destinations =
+    var dbHelper = Provider.of<DBHelper>(context);
 
     return Stack(
       children: [
@@ -103,38 +106,6 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                   SizedBox(
                     width: 10,
                   ),
-                  // Padding(
-                  //   padding: const EdgeInsets.only(left: 20.0),
-                  //   child: TextButton(
-                  //     style: ButtonStyle(
-                  //         backgroundColor:
-                  //             MaterialStatePropertyAll(ColorsProvider.color_2)),
-                  //     onPressed: () {
-                  //       Navigator.push(
-                  //         context,
-                  //         MaterialPageRoute(
-                  //           builder: (context) => SplitPage(),
-                  //         ),
-                  //       );
-                  //     },
-                  //     child: SizedBox(
-                  //       width: 85,
-                  //       height: 20,
-                  //       child: Row(
-                  //         children: [
-                  //           Icon(Icons.edit, color: ColorsProvider.color_8),
-                  //           SizedBox(
-                  //             width: 5,
-                  //           ),
-                  //           Text(
-                  //             'Edit split',
-                  //             style: TextStyle(color: ColorsProvider.color_8),
-                  //           ),
-                  //         ],
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
                 ],
               ),
             ),
@@ -154,45 +125,143 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                 child: Column(
                   children: [
                     Expanded(
-                      child: ListView.builder(
-                          controller: _scrollController,
-                          physics: BouncingScrollPhysics(),
-                          //reverse: true,
-                          itemCount: exerciseIndex.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return Column(
+                        child: ListView.builder(
+                      itemCount: 3,
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          padding: const EdgeInsets.fromLTRB(5, 0, 5, 20),
+                          child: Container(
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: ColorsProvider.color_2),
+                            height: 80,
+                            child: Row(
                               children: [
-                                ListTile(
-                                  leading: InkWell(
-                                    child: Icon(Icons.more_vert, size: 35),
-                                    onTap: () {},
-                                  ),
-                                  trailing: ElevatedButton(
-                                    onPressed: () {},
-                                    style: ButtonStyle(
-                                      shape: MaterialStateProperty.all(
-                                          CircleBorder()),
-
-                                      elevation: MaterialStateProperty.all(
-                                          0), // Zvýraznění tlačítka
+                                Expanded(
+                                  child: Container(
+                                    // color: Colors.white,
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              "Bicepsový zdvih s činkami",
+                                              style: TextStyle(
+                                                  fontSize: 18,
+                                                  color: ColorsProvider.color_8,
+                                                  fontWeight: FontWeight.bold),
+                                            )
+                                          ],
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.fromLTRB(
+                                              8, 0, 8, 0),
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              border: Border(
+                                                bottom: BorderSide(
+                                                    color:
+                                                        ColorsProvider.color_8,
+                                                    width: 2),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 10),
+                                          child: Container(
+                                            height: 45,
+                                            child: Row(
+                                              children: [
+                                                Column(
+                                                  children: [
+                                                    Text(
+                                                      "Set:",
+                                                      style: TextStyle(
+                                                        color: ColorsProvider
+                                                            .color_8,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      "Reps:",
+                                                      style: TextStyle(
+                                                        color: ColorsProvider
+                                                            .color_8,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                Expanded(
+                                                  child: ListView.builder(
+                                                    scrollDirection:
+                                                        Axis.horizontal,
+                                                    itemCount: 5,
+                                                    itemBuilder:
+                                                        (context, index) {
+                                                      return Container(
+                                                        width: 35,
+                                                        child: Column(
+                                                          children: [
+                                                            Text(
+                                                              "${index + 1}",
+                                                              style: TextStyle(
+                                                                color:
+                                                                    ColorsProvider
+                                                                        .color_8,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                            ),
+                                                            Text(
+                                                              "12",
+                                                              style: TextStyle(
+                                                                color:
+                                                                    ColorsProvider
+                                                                        .color_8,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      );
+                                                    },
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    child: Icon(
-                                      Icons.add_circle_outline_sharp,
-                                      color: ColorsProvider.color_3,
-                                      size: 40, // Velikost ikony
-                                    ),
                                   ),
-                                  title: Text('${exerciseIndex[index]}'),
                                 ),
                                 Container(
-                                  width: double.infinity,
-                                  height: 1,
-                                  color: ColorsProvider.color_2,
-                                ),
+                                  width: 50,
+                                  // color: Colors.red,
+                                  child: IconButton(
+                                    onPressed: () {},
+                                    icon: Icon(Icons.edit,
+                                        color: ColorsProvider.color_8),
+                                  ),
+                                )
                               ],
-                            );
-                          }),
-                    )
+                            ),
+                          ),
+                        );
+                      },
+                    ))
                   ],
                 ),
               ),
