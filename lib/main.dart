@@ -11,11 +11,18 @@ import 'database/database_provider.dart';
 import 'pages/foodAdd/food_entry_page.dart';
 import 'pages/homePage/home_page.dart';
 import 'pages/fitnessRecord/fitness_record_page.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+
+// ...
+
 
 // late DbController databaseInstance;
 void main() async {
   DBHelper dbHelper = DBHelper();
-
+await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   await dbHelper.initializeDB();
 
   PageProvider pageProvider = PageProvider();

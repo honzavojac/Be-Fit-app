@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "170074061215",
+    "project_id": "be-fit-cz",
+    "storage_bucket": "be-fit-cz.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:170074061215:android:f23f7de8e7f94024e025aa",
+        "android_client_info": {
+          "package_name": "com.example.kaloricke_tabulky_02"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDjoemr_Un2uXWX1CfE-gCqFR61dzesnbg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
