@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/colors_provider.dart';
+import 'package:kaloricke_tabulky_02/firestore/firestore.dart';
 import 'package:kaloricke_tabulky_02/pages/homePage/date_row.dart';
 
 import 'data_boxes.dart';
@@ -40,7 +41,10 @@ class HomeAppBar extends StatelessWidget {
 }
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  HomeScreen({super.key});
+
+  musclesFirestoreService dbMuscles = musclesFirestoreService();
+  final _nameOfMuscle = TextEditingController();
 
   @override
   Widget build(BuildContext context) {

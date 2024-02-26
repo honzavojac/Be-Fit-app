@@ -118,7 +118,7 @@ class DBHelper extends ChangeNotifier {
         .rawQuery('''ATTACH DATABASE '$_assetsDatabasePath' AS DB''');
 
     var result = await _database.query('Notes');
-    print("Notes database:$result");
+    // print("Notes database:$result");
 
     print("inicializace proběhla úspěšně");
 
