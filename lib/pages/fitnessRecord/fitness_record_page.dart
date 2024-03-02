@@ -6,8 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/statistics_page.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/chose_your_split.dart';
-import 'package:provider/provider.dart';
-import '../../database/database_provider.dart';
+
 import 'split_page.dart';
 
 class FitnessRecordAppBar extends StatelessWidget {
@@ -63,7 +62,6 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
   @override
   Widget build(BuildContext context) {
     // List<NavigationDestination> destinations =
-    var dbHelper = Provider.of<DBHelper>(context);
 
     return Stack(
       children: [

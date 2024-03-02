@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:kaloricke_tabulky_02/page_provider.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/fitness_global_variables.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/fitness_record_page.dart';
 import 'package:kaloricke_tabulky_02/pages/foodAdd/food_entry_page.dart';
@@ -14,25 +13,23 @@ class InitPage extends StatefulWidget {
 }
 
 final List<Widget> _appBars = [
-  const FitnessRecordAppBar(),
-  const HomeAppBar(),
-  const FoodRecordAppBar(),
+  FitnessRecordAppBar(),
+  HomeAppBar(),
+  FoodRecordAppBar(),
 ];
 
 final List<Widget> _pages = [
-  const FitnessRecordScreen(),
+  FitnessRecordScreen(),
   HomeScreen(),
-  const FoodRecordScreen(),
+  FoodRecordScreen(),
 ];
 
 class _InitPageState extends State<InitPage> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   final controller = PageController(initialPage: 1);
-
+  var pageProvider = 1;
   @override
   Widget build(BuildContext context) {
-    var pageProvider = Provider.of<PageProvider>(context);
-
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<fitnessGlobalVariables>(
@@ -45,12 +42,13 @@ class _InitPageState extends State<InitPage> {
         home: Scaffold(
           appBar: PreferredSize(
             preferredSize: const Size.fromHeight(50),
-            child: _appBars[pageProvider.page],
+            child: _appBars[pageProvider],
           ),
           body: PageView(
             controller: controller,
             onPageChanged: (index) {
-              pageProvider.page = index;
+              pageProvider = index;
+              setState(() {});
               // Removed setState since it's not needed here
             },
             children: _pages,
@@ -60,12 +58,12 @@ class _InitPageState extends State<InitPage> {
           bottomNavigationBar: NavigationBar(
             height: 65,
             onDestinationSelected: (index) {
-              pageProvider.page = index;
-              controller.jumpToPage(pageProvider.page);
+              pageProvider = index;
+              controller.jumpToPage(pageProvider);
               // Removed setState since it's not needed here
             },
             indicatorColor: Colors.amber[800],
-            selectedIndex: pageProvider.page,
+            selectedIndex: pageProvider,
             animationDuration: Duration(milliseconds: 1000),
             destinations: const [
               NavigationDestination(

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:kaloricke_tabulky_02/colors_provider.dart';
-import 'package:provider/provider.dart';
+import 'package:kaloricke_tabulky_02/firestore/firestore.dart';
 
-import '../../database/database_provider.dart';
 
 class NewMuscleBox extends StatefulWidget {
   const NewMuscleBox({Key? key}) : super(key: key);
@@ -13,11 +12,17 @@ class NewMuscleBox extends StatefulWidget {
 }
 
 class _NewMuscleBoxState extends State<NewMuscleBox> {
+  var dbFirebase = FirestoreService();
+  var textController = TextEditingController();
+  @override
+  void initState() {
+    textController.clear();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    var dbHelper = Provider.of<DBHelper>(context);
 
-    var text;
     return AlertDialog(
       contentPadding: EdgeInsets.zero,
       content: Container(
@@ -96,9 +101,7 @@ class _NewMuscleBoxState extends State<NewMuscleBox> {
                           fontSize: 15,
                         ),
                       ),
-                      onChanged: (input) {
-                        text = input;
-                      },
+                      controller: textController,
                     ),
                   ),
                 ),
@@ -110,8 +113,8 @@ class _NewMuscleBoxState extends State<NewMuscleBox> {
                     onPressed: () {
                       setState(() async {
                         Navigator.of(context).pop();
-                        dbHelper.isCheckedList.add(false);
-                        await dbHelper.InsertSval(text);
+                        dbFirebase.isCheckedList.add(false);
+                        await dbFirebase.addMuscle(textController.text.trim());
                       });
                     },
                     style: TextButton.styleFrom(

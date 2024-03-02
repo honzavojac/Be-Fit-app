@@ -1,9 +1,9 @@
-import 'dart:ffi';
+
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/colors_provider.dart';
-import 'package:provider/provider.dart';
+
 
 class ResetPasswordPage extends StatefulWidget {
   ResetPasswordPage({super.key});

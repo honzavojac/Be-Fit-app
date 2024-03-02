@@ -3,7 +3,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/colors_provider.dart';
-import 'package:kaloricke_tabulky_02/firestore/firestore.dart';
 import 'package:kaloricke_tabulky_02/login/check_page.dart';
 
 import 'package:kaloricke_tabulky_02/page_provider.dart';
@@ -22,14 +21,13 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  usersFirestoreService dbFirebase = usersFirestoreService();
-  musclesFirestoreService dbMusclesFirestore = musclesFirestoreService();
+  // FirestoreService dbFirebase = FirestoreService();
   // dbFirebase.addUser("David","david@gmail.com");
   // dbFirebase.getUsers();
   // dbFirebase.getUser();
   // dbFirebase.updateUser("Marek", "ondra@gmail.com");
 
-  dbMusclesFirestore.getMuscles();
+  
 
   await dbHelper.initializeDB();
   PageProvider pageProvider = PageProvider();

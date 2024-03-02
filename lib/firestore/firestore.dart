@@ -1,8 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 
-class usersFirestoreService {
+class FirestoreService {
   /* //get collection of notes
   final CollectionReference notes =
       FirebaseFirestore.instance.collection('notes');
@@ -38,7 +37,7 @@ class usersFirestoreService {
   final FirebaseFirestore db = FirebaseFirestore.instance;
   final user = FirebaseAuth.instance.currentUser;
 
-  getUser() async {
+  getUsername() async {
     var documentSnapshot = await db.collection("users").doc(user?.email).get();
 
     if (documentSnapshot.exists) {
@@ -46,6 +45,21 @@ class usersFirestoreService {
 
       // Získání konkrétní části dokumentu
       var desiredValue = userData?["name"];
+      print("Desired value: $desiredValue");
+      return desiredValue;
+    } else {
+      print("Dokument neexistuje");
+    }
+  }
+
+  getUserEmail() async {
+    var documentSnapshot = await db.collection("users").doc(user?.email).get();
+    print(documentSnapshot.toString());
+    if (documentSnapshot.exists) {
+      var userData = documentSnapshot.data();
+
+      // Získání konkrétní části dokumentu
+      var desiredValue = userData?["email"];
       print("Desired value: $desiredValue");
       return desiredValue;
     } else {
@@ -88,9 +102,89 @@ class usersFirestoreService {
     final data = {"name": name, "email": email};
     // await db.collection("users").doc().set(data, SetOptions(merge: true));
   }
+
+  addMuscle(String nameOfMucle) async {
+    // final user = <String, dynamic>{"name of muscle": nameOfMucle};
+    // await db.collection("muscles").add(user).then(
+    //       (DocumentReference doc) => print("Document ID -${doc.id}"),
+    //     );
+    await db
+        .collection("users")
+        .doc("honzavojac@gmail.com")
+        .collection("muscles")
+        .doc("$nameOfMucle")
+        .set({"name": "$nameOfMucle"});
+  }
+
+  List<bool> isCheckedList = [];
+  Future<List<Map<String, dynamic>>> getMuscles() async {
+    var musclesList = <Map<String, dynamic>>[];
+
+    await db
+        .collection("users")
+        .doc(user?.email)
+        .collection("muscles")
+        .get()
+        .then(
+      (querySnapshot) {
+        for (var doc in querySnapshot.docs) {
+          print("${doc.id} => ${doc.data()}");
+          musclesList.add(doc.data());
+        }
+      },
+    );
+
+    return musclesList;
+  }
+
+  Future<void> addSplit(String splitName) async {
+    try {
+      // Získání seznamu svalů a jejich stavů
+      var muscles = await getMuscles();
+
+      // Vytvoření mapy pro uložení svalů a jejich stavu
+      Map<String, bool> musclesMap = {};
+
+      // Naplnění mapy svalů ze seznamu svalů
+      for (var muscle in muscles) {
+        var muscleName = muscle["name"] as String;
+        musclesMap[muscleName] = false; // Nastavte výchozí hodnotu na false
+      }
+
+      // Uložení mapy svalů pod názvem splitu
+      await db
+          .collection("users")
+          .doc("honzavojac@gmail.com")
+          .collection("splits")
+          .doc(splitName)
+          .set({"name": splitName, "muscles": musclesMap});
+      print(musclesMap);
+    } catch (error) {
+      print("Chyba při přidávání splitu: $error");
+      // Zpracování chyby podle potřeby (např. zobrazení chybového hlášení).
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getSplits() async {
+    var splitsList = <Map<String, dynamic>>[];
+
+    await db
+        .collection("users")
+        .doc(user?.email)
+        .collection("split")
+        .get()
+        .then(
+      (querySnapshot) {
+        for (var doc in querySnapshot.docs) {
+          print("${doc.id} => ${doc.data()}");
+          splitsList.add(doc.data());
+        }
+      },
+    );
+    return splitsList;
+  }
 }
 
-class musclesFirestoreService {
   /* //get collection of notes
   final CollectionReference notes =
       FirebaseFirestore.instance.collection('notes');
@@ -122,28 +216,3 @@ class musclesFirestoreService {
     return notes.doc(docID).delete();
   }
   */
-  final FirebaseFirestore db = FirebaseFirestore.instance;
-  final user = FirebaseAuth.instance.currentUser;
-
-  addMuscle(String nameOfMucle) async {
-    final user = <String, dynamic>{"name of muscle": nameOfMucle};
-    await db.collection("muscles").add(user).then(
-          (DocumentReference doc) => print("Document ID -${doc.id}"),
-        );
-  }
-
-  Future<List<Map<String, dynamic>>> getMuscles() async {
-    var musclesList = <Map<String, dynamic>>[];
-
-    await db.collection("muscles").get().then(
-      (querySnapshot) {
-        for (var doc in querySnapshot.docs) {
-          print("${doc.id} => ${doc.data()}");
-          musclesList.add(doc.data());
-        }
-      },
-    );
-
-    return musclesList;
-  }
-}

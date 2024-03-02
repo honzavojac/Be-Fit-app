@@ -6,10 +6,8 @@ import 'package:kaloricke_tabulky_02/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/database/database_provider.dart';
 
 import 'package:kaloricke_tabulky_02/pages/foodAdd/newFood/food_main_add_boxes.dart';
-import 'package:kaloricke_tabulky_02/pages/foodAdd/newFood/food_secondary_add_boxes.dart';
 import 'package:provider/provider.dart';
 
-import 'vitamins_box.dart';
 
 class FoodNewScreen extends StatefulWidget {
   const FoodNewScreen({super.key});

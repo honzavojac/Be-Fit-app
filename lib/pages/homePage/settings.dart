@@ -11,15 +11,15 @@ class Settings extends StatefulWidget {
 
 class _SettingsState extends State<Settings> {
   final user = FirebaseAuth.instance.currentUser!;
-  usersFirestoreService db = usersFirestoreService();
+  FirestoreService db = FirestoreService();
   var idk;
   @override
   void dispose() {
-    idk = usersFirestoreService().getUser();
+    idk = FirestoreService().getUsername();
     super.dispose();
   }
 
-  musclesFirestoreService dbMuscles = musclesFirestoreService();
+  FirestoreService dbMuscles = FirestoreService();
 
   final _nameOfMuscle = TextEditingController();
 
@@ -43,7 +43,7 @@ class _SettingsState extends State<Settings> {
         child: Column(
           children: [
             FutureBuilder(
-              future: db.getUser(),
+              future: db.getUsername(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Expanded(
@@ -52,7 +52,7 @@ class _SettingsState extends State<Settings> {
                 }
 
                 final name = snapshot.data!;
-                return Text("sign in as ${name!} with email ${user.email}");
+                return Text("sign in as ${name} with email ${user.email}");
               },
             ),
             Expanded(
@@ -101,7 +101,7 @@ class _SettingsState extends State<Settings> {
                   ),
                   Expanded(
                     child: FutureBuilder(
-                      future: musclesFirestoreService().getMuscles(),
+                      future: FirestoreService().getMuscles(),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
@@ -116,7 +116,7 @@ class _SettingsState extends State<Settings> {
                               return Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Text("${items[index]['name of muscle']}"),
+                                  Text("${items[index]['name']}"),
                                 ],
                               );
                             },
