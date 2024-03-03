@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:kaloricke_tabulky_02/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/firestore/firestore.dart';
 
-
 class NewMuscleBox extends StatefulWidget {
   const NewMuscleBox({Key? key}) : super(key: key);
 
@@ -22,7 +21,6 @@ class _NewMuscleBoxState extends State<NewMuscleBox> {
 
   @override
   Widget build(BuildContext context) {
-
     return AlertDialog(
       contentPadding: EdgeInsets.zero,
       content: Container(
@@ -102,6 +100,7 @@ class _NewMuscleBoxState extends State<NewMuscleBox> {
                         ),
                       ),
                       controller: textController,
+                      style: TextStyle(color: ColorsProvider.color_1),
                     ),
                   ),
                 ),

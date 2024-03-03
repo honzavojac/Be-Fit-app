@@ -3,8 +3,6 @@ import 'package:kaloricke_tabulky_02/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/firestore/firestore.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/new_muscle_box.dart';
 
-
-
 class AddMuscleBox extends StatefulWidget {
   const AddMuscleBox({Key? key}) : super(key: key);
 
@@ -15,11 +13,20 @@ class AddMuscleBox extends StatefulWidget {
 class _AddMuscleBoxState extends State<AddMuscleBox> {
   // Seznam pro ukládání stavu checkboxů
   var dbFirebase = FirestoreService();
+  var textController = TextEditingController();
+  List<Map<String, dynamic>> listMuscles = [];
   List<bool> isCheckedList = [];
   @override
   void initState() {
-    isCheckedList = isCheckedList;
+    loadData();
     super.initState();
+  }
+
+  Future<void> loadData() async {
+    listMuscles = await dbFirebase.getMuscles();
+    isCheckedList = List.generate(listMuscles.length, (index) => false);
+    textController.clear();
+    setState(() {}); 
   }
 
   @override
@@ -42,57 +49,70 @@ class _AddMuscleBoxState extends State<AddMuscleBox> {
                       SizedBox(
                         height: 50,
                       ),
+                      Container(
+                        height: 50,
+                        // color: Colors.blue,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 15),
+                          child: TextField(
+                            decoration: InputDecoration(
+                              labelText: 'Name of Split:',
+                              labelStyle: TextStyle(
+                                color: ColorsProvider.color_1,
+                              ),
+                              enabledBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: ColorsProvider.color_2,
+                                  width: 0.5,
+                                ),
+                              ),
+                              focusedBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: ColorsProvider.color_2,
+                                  width: 3.0,
+                                ),
+                              ),
+                              contentPadding: EdgeInsets.symmetric(
+                                vertical: 0,
+                                horizontal: 15,
+                              ),
+                              hintText: 'Enter name of split:',
+                              hintStyle: TextStyle(
+                                color: ColorsProvider.color_1,
+                                fontSize: 15,
+                              ),
+                            ),
+                            controller: textController,
+                            style: TextStyle(color: ColorsProvider.color_1),
+                          ),
+                        ),
+                      ),
                       Expanded(
                         child: Container(
-                          child: FutureBuilder<List<Map<String, dynamic>>>(
-                            future: dbFirebase.getMuscles(),
-                            builder: (context, snapshot) {
-                              if (snapshot.hasError) {
-                                return Center(
-                                    child: Text('Chyba: ${snapshot.error}'));
-                              } else if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return Container(
-                                  child: Center(
-                                    child: CircularProgressIndicator(
-                                      color: ColorsProvider.color_2,
-                                    ),
-                                  ),
-                                );
-                              } else {
-                                List records = snapshot.data!;
-                                // Inicializace seznamu isCheckedList na základě počtu záznamů
-
-                                if (isCheckedList.isEmpty) {
-                                  isCheckedList = List.generate(
-                                      records.length, (index) => false);
-                                }
-                                return ListView.builder(
-                                  itemCount: records.length,
-                                  itemBuilder: (context, index) {
-                                    return Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 20, right: 20),
-                                      child: Row(
-                                        children: [
-                                          Expanded(
-                                              child:
-                                                  Text(records[index]["name"])),
-                                          Checkbox(
-                                            value: isCheckedList[index],
-                                            onChanged: (value) {
-                                              isCheckedList[index] =
-                                                  value ?? false;
-                                              print("\n\n${isCheckedList}");
-                                              setState(() {});
-                                            },
-                                          ),
-                                        ],
+                          child: ListView.builder(
+                            itemCount: listMuscles.length,
+                            itemBuilder: (context, index) {
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.only(left: 20, right: 20),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        listMuscles[index]["name"],
                                       ),
-                                    );
-                                  },
-                                );
-                              }
+                                    ),
+                                    Checkbox(
+                                      value: isCheckedList[index],
+                                      onChanged: (value) {
+                                        isCheckedList[index] = value ?? false;
+                                        print("\n\n${isCheckedList}");
+                                        setState(() {});
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              );
                             },
                           ),
                         ),
@@ -126,11 +146,11 @@ class _AddMuscleBoxState extends State<AddMuscleBox> {
                           //     posledniIdSplitu, i + 1);
                         }
                       }
-                      if (isCheckedList.contains(true)) {
-                        // await dbFirebase.InsertSplit(finalName);
-                        isCheckedList = [];
-                      }
-                      dbFirebase.addSplit("split_1");
+
+                      // print("ggg${isCheckedList.length}");
+                      dbFirebase.addSplit(
+                          "${textController.text.trim()}", isCheckedList);
+
                       Navigator.of(context).pop();
                       // dbFirebase.SplitSval();
                     },

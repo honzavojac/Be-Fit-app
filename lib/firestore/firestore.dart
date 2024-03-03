@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 
-class FirestoreService {
+class FirestoreService extends ChangeNotifier {
   /* //get collection of notes
   final CollectionReference notes =
       FirebaseFirestore.instance.collection('notes');
@@ -116,7 +117,6 @@ class FirestoreService {
         .set({"name": "$nameOfMucle"});
   }
 
-  List<bool> isCheckedList = [];
   Future<List<Map<String, dynamic>>> getMuscles() async {
     var musclesList = <Map<String, dynamic>>[];
 
@@ -128,7 +128,7 @@ class FirestoreService {
         .then(
       (querySnapshot) {
         for (var doc in querySnapshot.docs) {
-          print("${doc.id} => ${doc.data()}");
+          // print("${doc.id} => ${doc.data()}");
           musclesList.add(doc.data());
         }
       },
@@ -137,7 +137,8 @@ class FirestoreService {
     return musclesList;
   }
 
-  Future<void> addSplit(String splitName) async {
+  List<bool> isCheckedList = [];
+  Future<void> addSplit(String splitName, isCheckedList) async {
     try {
       // Získání seznamu svalů a jejich stavů
       var muscles = await getMuscles();
@@ -146,23 +147,47 @@ class FirestoreService {
       Map<String, bool> musclesMap = {};
 
       // Naplnění mapy svalů ze seznamu svalů
-      for (var muscle in muscles) {
-        var muscleName = muscle["name"] as String;
-        musclesMap[muscleName] = false; // Nastavte výchozí hodnotu na false
+      for (int i = 0; i < muscles.length; i++) {
+        var muscleName = muscles[i]["name"] as String;
+        if (isCheckedList.length > i) {
+          musclesMap[muscleName] = isCheckedList[i];
+        } else {
+          // print("aaaaa${isCheckedList.length}");
+          musclesMap[muscleName] = false;
+        }
       }
+
+      // for (var muscle in muscles) {
+      //   var muscleName = muscle["name"] as String;
+      //   musclesMap[muscleName] =
+      //       musclesMap[muscle]; // Nastavte výchozí hodnotu na false
+      // }
+      for (var element in isCheckedList) {
+        // print("$element");
+      }
+      QuerySnapshot splitSnapshot = await db
+          .collection("users")
+          .doc("honzavojac@gmail.com")
+          .collection("splits")
+          .get();
+
+      int splitNumber = splitSnapshot.size;
+      // print("Počet dokumentů v kolekci: $splitNumber");
 
       // Uložení mapy svalů pod názvem splitu
       await db
           .collection("users")
           .doc("honzavojac@gmail.com")
           .collection("splits")
-          .doc(splitName)
+          .doc("${splitName}")
           .set({"name": splitName, "muscles": musclesMap});
-      print(musclesMap);
+      // print(musclesMap);
+      notifyListeners();
     } catch (error) {
       print("Chyba při přidávání splitu: $error");
       // Zpracování chyby podle potřeby (např. zobrazení chybového hlášení).
     }
+    notifyListeners();
   }
 
   Future<List<Map<String, dynamic>>> getSplits() async {
@@ -171,19 +196,60 @@ class FirestoreService {
     await db
         .collection("users")
         .doc(user?.email)
-        .collection("split")
+        .collection("splits")
         .get()
         .then(
       (querySnapshot) {
         for (var doc in querySnapshot.docs) {
-          print("${doc.id} => ${doc.data()}");
+          // print("${doc.id} => ${doc.data()}");
           splitsList.add(doc.data());
         }
       },
     );
+    // notifyListeners();
+    return splitsList;
+  }
+
+  Future<List<Map<String, dynamic>>> getSplitMuscles(String splitName) async {
+    var splitsList = <Map<String, dynamic>>[];
+
+    DocumentSnapshot<Map<String, dynamic>> document = await db
+        .collection("users")
+        .doc(user?.email)
+        .collection("splits")
+        .doc(splitName)
+        .get();
+
+    if (document.exists) {
+      Map<String, dynamic> splitData = document.data() ?? {};
+
+      // Získání mapy s hodnotami true/false pro jednotlivé svaly
+      Map<String, dynamic> musclesMap = splitData['muscles'] ?? {};
+
+      // Získání názvů svalů s hodnotou true
+      List<String> selectedMuscles = musclesMap.entries
+          .where((entry) => entry.value == true)
+          .map((entry) => entry.key)
+          .toList();
+
+      // Vytvoření seznamu map s informacemi o svalích
+      splitsList = selectedMuscles.map((muscleName) {
+        return {
+          'name': muscleName,
+          // Zde můžete přidat další informace o svalu, pokud jsou dostupné v datovém modelu
+        };
+      }).toList();
+
+      // Výsledek
+      print('Vybrané svaly: $splitsList');
+    } else {
+      print('Dokument neexistuje.');
+    }
+
     return splitsList;
   }
 }
+
 
   /* //get collection of notes
   final CollectionReference notes =
