@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/database/database_provider.dart';
+import 'package:kaloricke_tabulky_02/firestore/firestore.dart';
 import 'package:provider/provider.dart';
 
 import 'new_exercise_box.dart';
@@ -13,9 +14,32 @@ class AddExerciseBox extends StatefulWidget {
 }
 
 class _AddExerciseBoxState extends State<AddExerciseBox> {
+  List<Map<String, dynamic>> listExercises = [];
+  List<bool> isCheckedList = [];
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    loadData();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // You can keep this method empty if you don't have any specific initialization.
+  }
+
+  Future<void> loadData() async {
+    var dbFirebase = Provider.of<FirestoreService>(context);
+    listExercises = await dbFirebase.getExercises();
+    print("id_Svalu: ${await dbFirebase.chosedMuscle}");
+
+    isCheckedList = List.generate(listExercises.length, (index) => false);
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
-    var dbHelper = Provider.of<DBHelper>(context);
     return AlertDialog(
       contentPadding: EdgeInsets.zero,
       content: Container(
@@ -37,54 +61,28 @@ class _AddExerciseBoxState extends State<AddExerciseBox> {
                       ),
                       Expanded(
                         child: Container(
-                          child: FutureBuilder<List<Record>>(
-                            future: dbHelper.SvalCvikAddBox(),
-                            builder: (context, snapshot) {
-                              if (snapshot.hasError) {
-                                return Center(
-                                    child: Text('Chyba: ${snapshot.error}'));
-                              } else if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return Container(
-                                  child: Center(
-                                    child: CircularProgressIndicator(
-                                      color: ColorsProvider.color_2,
+                          child: ListView.builder(
+                            itemCount: listExercises.length,
+                            itemBuilder: (context, index) {
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.only(left: 20, right: 20),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(listExercises[index]["name"]),
                                     ),
-                                  ),
-                                );
-                              } else {
-                                List<Record> records = snapshot.data!;
-
-                                return ListView.builder(
-                                  itemCount: records.length,
-                                  itemBuilder: (context, index) {
-                                    return Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 20, right: 20),
-                                      child: Row(
-                                        children: [
-                                          Expanded(
-                                            child:
-                                                Text(records[index].nazevCviku),
-                                          ),
-                                          Checkbox(
-                                            value: records[index].boolCviku,
-                                            onChanged: (value) {
-                                              dbHelper.UpdateSvalCvik(
-                                                  value!,
-                                                  records[index].idCviku,
-                                                  records[index].idSplitu,
-                                                  records[index].idSvalu);
-
-                                              dbHelper.notList();
-                                            },
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                );
-                              }
+                                    Checkbox(
+                                      value: isCheckedList[index],
+                                      onChanged: (value) {
+                                        isCheckedList[index] = value ?? false;
+                                        print("\n\n${isCheckedList}");
+                                        setState(() {});
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              );
                             },
                           ),
                         ),

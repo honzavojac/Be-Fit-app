@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/firestore/firestore.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/new_muscle_box.dart';
+import 'package:provider/provider.dart';
 
 class AddMuscleBox extends StatefulWidget {
   const AddMuscleBox({Key? key}) : super(key: key);
@@ -11,26 +12,33 @@ class AddMuscleBox extends StatefulWidget {
 }
 
 class _AddMuscleBoxState extends State<AddMuscleBox> {
-  // Seznam pro ukládání stavu checkboxů
-  var dbFirebase = FirestoreService();
   var textController = TextEditingController();
   List<Map<String, dynamic>> listMuscles = [];
   List<bool> isCheckedList = [];
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    loadData();
+  }
+
   @override
   void initState() {
-    loadData();
     super.initState();
   }
 
   Future<void> loadData() async {
+    var dbFirebase = Provider.of<FirestoreService>(context);
     listMuscles = await dbFirebase.getMuscles();
     isCheckedList = List.generate(listMuscles.length, (index) => false);
     textController.clear();
-    setState(() {}); 
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
+    var dbFirebase = Provider.of<FirestoreService>(context);
+
     return AlertDialog(
       contentPadding: EdgeInsets.zero,
       content: Container(
@@ -129,25 +137,13 @@ class _AddMuscleBoxState extends State<AddMuscleBox> {
                   child: TextButton(
                     onPressed: () async {
                       String finalName = "";
-                      // int? posledniIdSplitu = await dbFirebase.PosledniIdSplitu();
-                      // print("posledni ID splitu: $posledniIdSplitu");
-                      // if (posledniIdSplitu == null) {
-                      //   posledniIdSplitu = 1;
-                      // } else {
-                      //   posledniIdSplitu = posledniIdSplitu + 1;
-                      // }
+
                       for (var i = 0; i < isCheckedList.length; i++) {
                         if (isCheckedList[i] == true) {
-                          // String? a = await dbFirebase.SearchSval(i + 1);
-                          // finalName = finalName + a! + " ";
                           print(finalName);
-
-                          // await dbFirebase.InsertSplitSval(
-                          //     posledniIdSplitu, i + 1);
                         }
                       }
 
-                      // print("ggg${isCheckedList.length}");
                       dbFirebase.addSplit(
                           "${textController.text.trim()}", isCheckedList);
 

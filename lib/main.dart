@@ -22,7 +22,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  FirestoreService dbFirebase = FirestoreService();
+  
   // FirestoreService dbFirebase = FirestoreService();
   // dbFirebase.addUser("David","david@gmail.com");
   // dbFirebase.getUsers();
@@ -30,6 +30,7 @@ void main() async {
   // dbFirebase.updateUser("Marek", "ondra@gmail.com");
 
   await dbHelper.initializeDB();
+  FirestoreService dbFirebase = FirestoreService();
   PageProvider pageProvider = PageProvider();
   ColorsProvider colorsProvider = ColorsProvider();
   // print(dbHelper.initialIndex);
@@ -46,7 +47,9 @@ void main() async {
         ChangeNotifierProvider.value(
           value: dbHelper,
         ),
-        ChangeNotifierProvider<FirestoreService>.value(value: dbFirebase),
+        ChangeNotifierProvider.value(
+          value: dbFirebase,
+        ),
         ChangeNotifierProvider.value(
           value: colorsProvider,
         ),

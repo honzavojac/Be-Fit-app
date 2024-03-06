@@ -14,35 +14,49 @@ class SplitPage extends StatefulWidget {
   State<SplitPage> createState() => _SplitPageState();
 }
 
-class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
-  var dbFirebase = FirestoreService();
+class _SplitPageState extends State<SplitPage> {
+  late FirestoreService dbFirebase;
   List<Map<String, dynamic>> listSplits = [];
   List<Map<String, dynamic>> listMuscles = [];
-  late int clickedValue = 0;
+  List<Map<String, dynamic>> listExercises = [];
+  late int clickedTab = 0;
   // late TabController _tabController;
+
   @override
   void initState() {
     super.initState();
+    // dbFirebase = Provider.of<FirestoreService>(context);
+    // loadData();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     loadData();
   }
 
   @override
   void dispose() {
-    // _tabController.dispose();
     super.dispose();
   }
 
   Future<void> loadData() async {
+    var dbFirebase =
+        await Provider.of<FirestoreService>(context, listen: false);
+
     listSplits = await dbFirebase.getSplits();
     listMuscles =
-        await dbFirebase.getSplitMuscles(listSplits[clickedValue]["name"]);
-    print(listSplits);
+        await dbFirebase.getSplitMuscles(listSplits[clickedTab]["name"]);
+    listExercises = await dbFirebase.getSplitExercises(
+        listSplits[clickedTab]["name"], listMuscles);
+
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    // loadData(); // musí být tady pro aktualizaci listu splitů
+    var dbFirebase = Provider.of<FirestoreService>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -74,7 +88,15 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
       body: FutureBuilder(
         future: dbFirebase.getSplits(),
         builder: (context, snapshot) {
-          if (snapshot.data == null || snapshot.data!.isEmpty) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Container(
+              child: Center(
+                child: CircularProgressIndicator(
+                  color: ColorsProvider.color_2,
+                ),
+              ),
+            );
+          } else if (snapshot.data == null || snapshot.data!.isEmpty) {
             return Column(
               children: [
                 SizedBox(
@@ -161,8 +183,7 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                           );
                         }).toList(),
                         onTap: (value) {
-                          clickedValue = value;
-                          print(value);
+                          clickedTab = value;
                           setState(() {});
                           loadData();
                         },
@@ -177,6 +198,12 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                   child: ListView.builder(
                     itemCount: listMuscles.length,
                     itemBuilder: (context, index) {
+                      List<Map<String, dynamic>> filteredExercises = [];
+                      filteredExercises = listExercises
+                          .where((exercise) =>
+                              exercise['muscleName'] ==
+                              listMuscles[index]["name"])
+                          .toList();
                       return Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Column(
@@ -229,7 +256,7 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                                       child: Container(
                                         child: ListView.builder(
                                           reverse: true,
-                                          itemCount: listMuscles.length,
+                                          itemCount: filteredExercises.length,
                                           itemBuilder: (context, index) {
                                             return Container(
                                               child: Column(
@@ -258,7 +285,7 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                                                                     .center,
                                                             children: [
                                                               Text(
-                                                                "${listMuscles[index]["name"]}",
+                                                                "${filteredExercises[index]["exerciseName"]}",
                                                                 style: TextStyle(
                                                                     fontSize:
                                                                         17),
@@ -293,6 +320,8 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                                                     width: double.infinity),
                                             child: ElevatedButton(
                                               onPressed: () async {
+                                                dbFirebase.chosedMuscle =
+                                                    listMuscles[index]["name"];
                                                 setState(() {});
                                                 showDialog(
                                                   context: context,
@@ -309,8 +338,7 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                                                   side: BorderSide(
                                                       width: 2,
                                                       color: ColorsProvider
-                                                          .color_8), // nastavte šířku a barvu ohraničení
-
+                                                          .color_8),
                                                   borderRadius:
                                                       BorderRadius.only(
                                                     bottomLeft:
@@ -344,7 +372,80 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                       );
                     },
                   ),
-                )
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(25, 10, 25, 20),
+                  child: Container(
+                    // width: 50,
+                    height: 45,
+
+                    child: TextButton(
+                      style: TextButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(17),
+                        ),
+                        foregroundColor: ColorsProvider.color_6,
+                        backgroundColor: ColorsProvider.color_5,
+                      ),
+                      onPressed: () async {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            duration: Duration(seconds: 5),
+                            backgroundColor: ColorsProvider.color_2,
+                            content: Container(
+                              height: 50,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Column(
+                                    children: [
+                                      Text(
+                                        'Do you want delete this split?',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 17),
+                                      ),
+                                      Text(
+                                          'Data of exercises will stay save in app')
+                                    ],
+                                  ),
+                                  ElevatedButton(
+                                    style: ButtonStyle(
+                                      backgroundColor: MaterialStatePropertyAll(
+                                          Colors.black),
+                                      foregroundColor: MaterialStatePropertyAll(
+                                        ColorsProvider.color_1,
+                                      ),
+                                    ),
+                                    onPressed: () async {
+                                      dbFirebase.deleteSplit(
+                                          listSplits[clickedTab]["name"]);
+                                      loadData();
+                                      setState(() {});
+                                      ScaffoldMessenger.of(context)
+                                          .hideCurrentSnackBar();
+                                    },
+                                    child: Text("yes"),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                        return null;
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text("Delete current split"),
+                          SizedBox(width: 20),
+                          Icon(Icons.delete),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
               ],
             );
           }

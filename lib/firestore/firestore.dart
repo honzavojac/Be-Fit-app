@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:path/path.dart';
 
 class FirestoreService extends ChangeNotifier {
   /* //get collection of notes
@@ -111,7 +112,7 @@ class FirestoreService extends ChangeNotifier {
     //     );
     await db
         .collection("users")
-        .doc("honzavojac@gmail.com")
+        .doc(user?.email)
         .collection("muscles")
         .doc("$nameOfMucle")
         .set({"name": "$nameOfMucle"});
@@ -135,6 +136,42 @@ class FirestoreService extends ChangeNotifier {
     );
 
     return musclesList;
+  }
+
+  addExercise(String nameOfExercise, String muscle) async {
+    await db
+        .collection("users")
+        .doc(user?.email)
+        .collection("muscles")
+        .doc(chosedMuscle)
+        .collection("exercises")
+        .doc(nameOfExercise)
+        .set({"name": nameOfExercise});
+    notifyListeners();
+  }
+
+  String chosedMuscle = "";
+
+  Future<List<Map<String, dynamic>>> getExercises() async {
+    var exercisesList = <Map<String, dynamic>>[];
+
+    await db
+        .collection("users")
+        .doc(user?.email)
+        .collection("muscles")
+        .doc(chosedMuscle)
+        .collection("exercises")
+        .get()
+        .then(
+      (querySnapshot) {
+        for (var doc in querySnapshot.docs) {
+          print("${doc.id} => ${doc.data()}");
+          exercisesList.add(doc.data());
+        }
+      },
+    );
+
+    return exercisesList;
   }
 
   List<bool> isCheckedList = [];
@@ -171,13 +208,12 @@ class FirestoreService extends ChangeNotifier {
           .collection("splits")
           .get();
 
-      int splitNumber = splitSnapshot.size;
       // print("Počet dokumentů v kolekci: $splitNumber");
 
       // Uložení mapy svalů pod názvem splitu
       await db
           .collection("users")
-          .doc("honzavojac@gmail.com")
+          .doc(user?.email)
           .collection("splits")
           .doc("${splitName}")
           .set({"name": splitName, "muscles": musclesMap});
@@ -210,6 +246,34 @@ class FirestoreService extends ChangeNotifier {
     return splitsList;
   }
 
+  Future<void> deleteSplit(String docID) {
+    return db
+        .collection("users")
+        .doc(user?.email)
+        .collection("splits")
+        .doc(docID)
+        .delete();
+  }
+
+Future<void> addTrueSplitExercise(
+      String splitName, String muscleName, String exerciseName) async {
+    try {
+      await db
+          .collection("users")
+          .doc(user?.email)
+          .collection("splits")
+          .doc(splitName)
+          .collection("exercises")
+          .doc(muscleName)
+          .set({
+        'exercises': FieldValue.arrayUnion([exerciseName]),
+      }, SetOptions(merge: true));
+    } catch (e) {
+      print('Error adding exercise to split: $e');
+    }
+  }
+
+
   Future<List<Map<String, dynamic>>> getSplitMuscles(String splitName) async {
     var splitsList = <Map<String, dynamic>>[];
 
@@ -241,17 +305,57 @@ class FirestoreService extends ChangeNotifier {
       }).toList();
 
       // Výsledek
-      print('Vybrané svaly: $splitsList');
     } else {
       print('Dokument neexistuje.');
     }
 
     return splitsList;
   }
+
+  Future<List<Map<String, dynamic>>> getSplitExercises(
+      String splitName, List<Map<String, dynamic>> muscleNames) async {
+    var exercisesList = <Map<String, dynamic>>[];
+
+    for (int i = 0; i < muscleNames.length; i++) {
+      try {
+        DocumentSnapshot<Map<String, dynamic>> documentSnapshot = await db
+            .collection("users")
+            .doc(user?.email)
+            .collection("splits")
+            .doc(splitName)
+            .collection("exercises")
+            .doc(muscleNames[i]["name"])
+            .get();
+
+        if (documentSnapshot.exists) {
+          Map<String, dynamic> data = documentSnapshot.data() ?? {};
+          List<dynamic> exercises = data['exercises'] ?? [];
+
+          // Add each exercise to the list with the associated muscle name
+          exercisesList.addAll(exercises.map((exercise) {
+            return {
+              'muscleName': muscleNames[i]["name"],
+              'exerciseName': exercise.toString(),
+            };
+          }));
+        } else {
+          print(
+              'Document exercises does not exist for muscle: ${muscleNames[i]["name"]}');
+        }
+      } catch (e) {
+        print('Error fetching exercises: $e');
+      }
+    }
+    return exercisesList;
+  }
+
+  //
+  //
+  //
+  //
 }
 
-
-  /* //get collection of notes
+/* //get collection of notes
   final CollectionReference notes =
       FirebaseFirestore.instance.collection('notes');
   //CREATE

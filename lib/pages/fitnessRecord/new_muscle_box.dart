@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:kaloricke_tabulky_02/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/firestore/firestore.dart';
+import 'package:provider/provider.dart';
 
 class NewMuscleBox extends StatefulWidget {
   const NewMuscleBox({Key? key}) : super(key: key);
@@ -11,7 +12,6 @@ class NewMuscleBox extends StatefulWidget {
 }
 
 class _NewMuscleBoxState extends State<NewMuscleBox> {
-  var dbFirebase = FirestoreService();
   var textController = TextEditingController();
   @override
   void initState() {
@@ -21,6 +21,8 @@ class _NewMuscleBoxState extends State<NewMuscleBox> {
 
   @override
   Widget build(BuildContext context) {
+    var dbFirebase = Provider.of<FirestoreService>(context);
+
     return AlertDialog(
       contentPadding: EdgeInsets.zero,
       content: Container(
