@@ -6,7 +6,6 @@ import 'package:kaloricke_tabulky_02/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/firestore/firestore.dart';
 import 'package:kaloricke_tabulky_02/login/check_page.dart';
 
-import 'package:kaloricke_tabulky_02/page_provider.dart';
 import 'package:provider/provider.dart';
 
 import 'database/database_provider.dart';
@@ -22,7 +21,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  
+
   // FirestoreService dbFirebase = FirestoreService();
   // dbFirebase.addUser("David","david@gmail.com");
   // dbFirebase.getUsers();
@@ -31,7 +30,6 @@ void main() async {
 
   await dbHelper.initializeDB();
   FirestoreService dbFirebase = FirestoreService();
-  PageProvider pageProvider = PageProvider();
   ColorsProvider colorsProvider = ColorsProvider();
   // print(dbHelper.initialIndex);
   // print(dbHelper.tab);
@@ -40,6 +38,7 @@ void main() async {
   //   sqfliteFfiInit();
   // }
   // databaseFactory = databaseFactoryFfi;
+  print(dbFirebase.user?.email);
 
   runApp(
     MultiProvider(

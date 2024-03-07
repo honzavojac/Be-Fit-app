@@ -116,6 +116,7 @@ class FirestoreService extends ChangeNotifier {
         .collection("muscles")
         .doc("$nameOfMucle")
         .set({"name": "$nameOfMucle"});
+    notifyListeners();
   }
 
   Future<List<Map<String, dynamic>>> getMuscles() async {
@@ -150,7 +151,8 @@ class FirestoreService extends ChangeNotifier {
     notifyListeners();
   }
 
-  String chosedMuscle = "";
+  String? chosedMuscle = "";
+
 
   Future<List<Map<String, dynamic>>> getExercises() async {
     var exercisesList = <Map<String, dynamic>>[];
@@ -165,7 +167,6 @@ class FirestoreService extends ChangeNotifier {
         .then(
       (querySnapshot) {
         for (var doc in querySnapshot.docs) {
-          print("${doc.id} => ${doc.data()}");
           exercisesList.add(doc.data());
         }
       },
@@ -204,7 +205,7 @@ class FirestoreService extends ChangeNotifier {
       }
       QuerySnapshot splitSnapshot = await db
           .collection("users")
-          .doc("honzavojac@gmail.com")
+          .doc(user?.email)
           .collection("splits")
           .get();
 
@@ -218,7 +219,6 @@ class FirestoreService extends ChangeNotifier {
           .doc("${splitName}")
           .set({"name": splitName, "muscles": musclesMap});
       // print(musclesMap);
-      notifyListeners();
     } catch (error) {
       print("Chyba při přidávání splitu: $error");
       // Zpracování chyby podle potřeby (např. zobrazení chybového hlášení).
@@ -242,7 +242,6 @@ class FirestoreService extends ChangeNotifier {
         }
       },
     );
-    // notifyListeners();
     return splitsList;
   }
 
@@ -255,8 +254,8 @@ class FirestoreService extends ChangeNotifier {
         .delete();
   }
 
-Future<void> addTrueSplitExercise(
-      String splitName, String muscleName, String exerciseName) async {
+  late String splitName;
+  Future<void> addTrueSplitExercise(String exerciseName) async {
     try {
       await db
           .collection("users")
@@ -264,15 +263,58 @@ Future<void> addTrueSplitExercise(
           .collection("splits")
           .doc(splitName)
           .collection("exercises")
-          .doc(muscleName)
+          .doc(chosedMuscle)
           .set({
         'exercises': FieldValue.arrayUnion([exerciseName]),
       }, SetOptions(merge: true));
     } catch (e) {
       print('Error adding exercise to split: $e');
     }
+    notifyListeners();
   }
 
+  Future<void> DeleteTrueSplitExercise(String exerciseName) async {
+    try {
+      await db
+          .collection("users")
+          .doc(user?.email)
+          .collection("splits")
+          .doc(splitName)
+          .collection("exercises")
+          .doc(chosedMuscle)
+          .update({
+        'exercises': FieldValue.arrayRemove([exerciseName])
+      });
+    } catch (e) {
+      print('Error adding exercise to split: $e');
+    }
+    notifyListeners();
+  }
+
+  Future getTrueSplitExercise() async {
+    List<String> exercises = [];
+    try {
+      await db
+          .collection("users")
+          .doc(user?.email)
+          .collection("splits")
+          .doc(splitName)
+          .collection("exercises")
+          .doc(chosedMuscle)
+          .get()
+          .then((value) {
+        // Převedení dynamického seznamu na seznam řetězců
+        exercises = (value["exercises"] as List<dynamic>)
+            .map((e) => e.toString())
+            .toList();
+      });
+    } catch (e) {
+      print('Error adding exercise to split: $e');
+    }
+    // print(exercises);
+    // notifyListeners();
+    return exercises;
+  }
 
   Future<List<Map<String, dynamic>>> getSplitMuscles(String splitName) async {
     var splitsList = <Map<String, dynamic>>[];

@@ -111,12 +111,10 @@ class _NewMuscleBoxState extends State<NewMuscleBox> {
                   height: 50,
                   width: double.infinity,
                   child: TextButton(
-                    onPressed: () {
-                      setState(() async {
-                        Navigator.of(context).pop();
-                        dbFirebase.isCheckedList.add(false);
-                        await dbFirebase.addMuscle(textController.text.trim());
-                      });
+                    onPressed: () async {
+                      Navigator.of(context).pop();
+                      dbFirebase.isCheckedList.add(false);
+                      await dbFirebase.addMuscle(textController.text.trim());
                     },
                     style: TextButton.styleFrom(
                       backgroundColor: ColorsProvider.color_2,

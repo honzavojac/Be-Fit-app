@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+
 import 'package:kaloricke_tabulky_02/colors_provider.dart';
-import 'package:kaloricke_tabulky_02/database/database_provider.dart';
 import 'package:kaloricke_tabulky_02/firestore/firestore.dart';
 import 'package:provider/provider.dart';
 
@@ -15,6 +15,7 @@ class AddExerciseBox extends StatefulWidget {
 
 class _AddExerciseBoxState extends State<AddExerciseBox> {
   List<Map<String, dynamic>> listExercises = [];
+  List<String> listTrueExercises = [];
   List<bool> isCheckedList = [];
 
   @override
@@ -32,14 +33,27 @@ class _AddExerciseBoxState extends State<AddExerciseBox> {
   Future<void> loadData() async {
     var dbFirebase = Provider.of<FirestoreService>(context);
     listExercises = await dbFirebase.getExercises();
-    print("id_Svalu: ${await dbFirebase.chosedMuscle}");
+    listTrueExercises = await dbFirebase.getTrueSplitExercise();
+    print(listExercises);
+    print(listTrueExercises);
 
     isCheckedList = List.generate(listExercises.length, (index) => false);
+
+    for (var i = 0; i < listExercises.length; i++) {
+      print(isCheckedList);
+      for (var j = 0; j < listTrueExercises.length; j++) {
+        if (listExercises[i]["name"] == listTrueExercises[j]) {
+          isCheckedList[i] = true;
+        }
+      }
+    }
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
+    var dbFirebase = Provider.of<FirestoreService>(context);
+
     return AlertDialog(
       contentPadding: EdgeInsets.zero,
       content: Container(
@@ -76,7 +90,7 @@ class _AddExerciseBoxState extends State<AddExerciseBox> {
                                       value: isCheckedList[index],
                                       onChanged: (value) {
                                         isCheckedList[index] = value ?? false;
-                                        print("\n\n${isCheckedList}");
+                                        print(isCheckedList);
                                         setState(() {});
                                       },
                                     ),
@@ -98,16 +112,19 @@ class _AddExerciseBoxState extends State<AddExerciseBox> {
                   width: double.infinity,
                   child: TextButton(
                     onPressed: () async {
-                      // await dbHelper.InsertOrUpdateSvalCvik();
-                      // await dbHelper.SvalCvikAddBox();
-                      // for (var i = 0; i < values.length; i++) {
-                      //   if (values[i].idCviku != 0) {
-                      //     print("object");
-                      //   }
-                      // }
-
+                      for (var i = 0; i < listExercises.length; i++) {
+                        if (isCheckedList[i] == true) {
+                          print("add");
+                          dbFirebase
+                              .addTrueSplitExercise(listExercises[i]["name"]);
+                        } else if (isCheckedList[i] == false) {
+                          print("delete");
+                          dbFirebase.DeleteTrueSplitExercise(
+                              listExercises[i]["name"]);
+                        }
+                      }
                       Navigator.of(context).pop();
-                      setState(() {});
+                      // loadData();
                     },
                     style: TextButton.styleFrom(
                       backgroundColor: ColorsProvider.color_2,

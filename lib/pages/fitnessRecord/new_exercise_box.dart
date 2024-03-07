@@ -150,6 +150,7 @@ class _NewExerciseBoxState extends State<NewExerciseBox> {
                     isExpanded: true,
                     items: listMuscles.map<DropdownMenuItem<String>>(
                         (Map<String, dynamic> muscle) {
+                      print(dbFirebase.chosedMuscle);
                       return DropdownMenuItem<String>(
                         value: muscle["name"],
                         child: Text(
@@ -168,7 +169,7 @@ class _NewExerciseBoxState extends State<NewExerciseBox> {
                         selectedMuscle = value!; // Aktualizace vybraného svalu
                       });
                     },
-                    value: selectedMuscle,
+                    value: dbFirebase.chosedMuscle,
                     buttonStyleData: ButtonStyleData(
                       height: 50,
                       width: 150,

@@ -14,13 +14,13 @@ class SplitPage extends StatefulWidget {
   State<SplitPage> createState() => _SplitPageState();
 }
 
-class _SplitPageState extends State<SplitPage> {
+class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
   late FirestoreService dbFirebase;
   List<Map<String, dynamic>> listSplits = [];
   List<Map<String, dynamic>> listMuscles = [];
   List<Map<String, dynamic>> listExercises = [];
   late int clickedTab = 0;
-  // late TabController _tabController;
+  late TabController _tabController = TabController(length: 0, vsync: this);
 
   @override
   void initState() {
@@ -45,11 +45,12 @@ class _SplitPageState extends State<SplitPage> {
         await Provider.of<FirestoreService>(context, listen: false);
 
     listSplits = await dbFirebase.getSplits();
+    _tabController = await TabController(
+        length: listSplits.length, vsync: this, initialIndex: clickedTab);
     listMuscles =
         await dbFirebase.getSplitMuscles(listSplits[clickedTab]["name"]);
     listExercises = await dbFirebase.getSplitExercises(
         listSplits[clickedTab]["name"], listMuscles);
-
     setState(() {});
   }
 
@@ -156,10 +157,10 @@ class _SplitPageState extends State<SplitPage> {
                   // color: Colors.blue,
                   child: DefaultTabController(
                     length: listSplits.length,
-                    initialIndex: 0,
+                    initialIndex: clickedTab,
                     child: Container(
                       child: TabBar(
-                        // controller: _tabController,
+                        controller: _tabController,
                         indicatorColor: ColorsProvider.color_1,
                         dividerColor: ColorsProvider.color_4,
                         labelColor: ColorsProvider.color_1,
@@ -184,7 +185,7 @@ class _SplitPageState extends State<SplitPage> {
                         }).toList(),
                         onTap: (value) {
                           clickedTab = value;
-                          setState(() {});
+
                           loadData();
                         },
                       ),
@@ -252,9 +253,14 @@ class _SplitPageState extends State<SplitPage> {
                                   children: [
                                     Container(
                                       color: ColorsProvider.color_7,
-                                      height: 160,
+                                      // height: 160,
+                                      constraints:
+                                          BoxConstraints(minHeight: 80),
                                       child: Container(
                                         child: ListView.builder(
+                                          physics:
+                                              NeverScrollableScrollPhysics(),
+                                          shrinkWrap: true,
                                           reverse: true,
                                           itemCount: filteredExercises.length,
                                           itemBuilder: (context, index) {
@@ -322,7 +328,9 @@ class _SplitPageState extends State<SplitPage> {
                                               onPressed: () async {
                                                 dbFirebase.chosedMuscle =
                                                     listMuscles[index]["name"];
-                                                setState(() {});
+                                                dbFirebase.splitName =
+                                                    listSplits[clickedTab]
+                                                        ["name"];
                                                 showDialog(
                                                   context: context,
                                                   builder:
@@ -422,7 +430,7 @@ class _SplitPageState extends State<SplitPage> {
                                       dbFirebase.deleteSplit(
                                           listSplits[clickedTab]["name"]);
                                       loadData();
-                                      setState(() {});
+
                                       ScaffoldMessenger.of(context)
                                           .hideCurrentSnackBar();
                                     },

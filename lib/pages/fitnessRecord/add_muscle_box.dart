@@ -17,14 +17,14 @@ class _AddMuscleBoxState extends State<AddMuscleBox> {
   List<bool> isCheckedList = [];
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    loadData();
+  void initState() {
+    super.initState();
   }
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    loadData();
   }
 
   Future<void> loadData() async {
