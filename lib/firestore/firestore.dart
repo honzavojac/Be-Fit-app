@@ -39,6 +39,12 @@ class FirestoreService extends ChangeNotifier {
   final FirebaseAuth auth = FirebaseAuth.instance;
   final FirebaseFirestore db = FirebaseFirestore.instance;
   final user = FirebaseAuth.instance.currentUser;
+  addUsername(String name) async {
+    db
+        .collection("users")
+        .doc(auth.currentUser?.uid)
+        .set({"name": name, "email": auth.currentUser?.email});
+  }
 
   getUsername() async {
     var documentSnapshot =

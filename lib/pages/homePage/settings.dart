@@ -1,5 +1,3 @@
-
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/firestore/firestore.dart';
@@ -37,7 +35,8 @@ class _SettingsState extends State<Settings> {
 
   @override
   Widget build(BuildContext context) {
-      var dbFirebase = Provider.of<FirestoreService>(context);
+    var dbFirebase = Provider.of<FirestoreService>(context);
+    var nameController = TextEditingController();
 
     return Scaffold(
       appBar: AppBar(
@@ -60,7 +59,8 @@ class _SettingsState extends State<Settings> {
           ),
         ],
       ),
-      body: Center(
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
             FutureBuilder(
@@ -72,20 +72,39 @@ class _SettingsState extends State<Settings> {
                   );
                 }
 
-                final name = snapshot.data!;
-                return Text("sign in as ${name} with email ${user.email}");
+                final name = snapshot.data;
+
+                if (name != null) {
+                  return Text(
+                      "Signed in as ${name.toString().toUpperCase()} with email ${user.email}");
+                } else {
+                  return Text(
+                      "Signed in as ${"your name".toString().toUpperCase()} with email ${user.email}");
+                }
               },
             ),
-            Expanded(
+            Container(
+              height: 150,
+              color: const Color.fromARGB(255, 1, 41, 73),
               child: Column(
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [],
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Center(
+                      child: TextField(
+                        controller: nameController,
+                      ),
+                    ),
                   ),
+                  ElevatedButton(
+                      onPressed: () {
+                        dbFirebase.addUsername(nameController.text.trim());
+                        setState(() {});
+                      },
+                      child: Text("save your name"))
                 ],
               ),
-            )
+            ),
           ],
         ),
       ),
