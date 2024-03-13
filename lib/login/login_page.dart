@@ -1,10 +1,10 @@
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:kaloricke_tabulky_02/colors_provider.dart';
+import 'package:kaloricke_tabulky_02/services/auth_service.dart';
 
 import 'reset_password_page.dart';
-
 
 class LoginPage extends StatefulWidget {
   final VoidCallback showRegisterPage;
@@ -36,7 +36,9 @@ class _LoginPageState extends State<LoginPage> {
       password: _passwordController.text.trim(),
     );
 
-    Navigator.of(context).pop();
+    // Navigator.of(context, rootNavigator: true).pop();
+    Navigator.of(context).pop(dispose);
+    setState(() {});
   }
 
   @override
@@ -61,7 +63,7 @@ class _LoginPageState extends State<LoginPage> {
                   height: 250,
                 ),
                 SizedBox(
-                  height: 60,
+                  height: 40,
                 ),
                 Container(
                   // color: Colors.blue,
@@ -218,6 +220,52 @@ class _LoginPageState extends State<LoginPage> {
                     ],
                   ),
                 ),
+                SizedBox(
+                  height: 15,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 50),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("or sign in with"),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 15,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 50),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // SizedBox(
+                      //   width: 50,
+                      // ),
+                      GestureDetector(
+                        child: Container(
+                          // color: Colors.red,
+                          height: 70,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Colors.black, width: 2),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(2.0),
+                            child: Image(
+                                image: AssetImage("assets/google_icon.png")),
+                          ),
+                        ),
+                        onTap: () {
+                          print("google auth");
+                          AuthService().signInWithGoogle();
+                        },
+                      ),
+                    ],
+                  ),
+                )
               ],
             ),
           ),

@@ -2,7 +2,6 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/database/database_provider.dart';
-import 'package:kaloricke_tabulky_02/firestore/firestore.dart';
 import 'package:provider/provider.dart';
 
 class choseYourSplit extends StatefulWidget {
@@ -16,7 +15,6 @@ class _choseYourSplitState extends State<choseYourSplit> {
   @override
   Widget build(BuildContext context) {
     var dbHelper = Provider.of<DBHelper>(context);
-    var dbFirebase = FirestoreService();
 
     return Container(
       height: 50,

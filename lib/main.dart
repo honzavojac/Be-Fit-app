@@ -38,8 +38,6 @@ void main() async {
   //   sqfliteFfiInit();
   // }
   // databaseFactory = databaseFactoryFfi;
-  print(dbFirebase.user?.email);
-
   runApp(
     MultiProvider(
       providers: [

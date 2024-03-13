@@ -2,7 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/colors_provider.dart';
-
+import 'package:kaloricke_tabulky_02/firestore/firestore.dart';
+import 'package:provider/provider.dart';
 
 class RegisterPage extends StatefulWidget {
   final VoidCallback showLoginPage;
@@ -29,6 +30,7 @@ class _RegisterPageState extends State<RegisterPage> {
     _emailController.dispose();
     _passwordController.dispose();
     _confirmpasswordController.dispose();
+
     super.dispose();
   }
 
@@ -43,14 +45,20 @@ class _RegisterPageState extends State<RegisterPage> {
         },
       );
 
+      var dbFirebase = Provider.of<FirestoreService>(context, listen: false);
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: _emailController.text.trim(),
-          password: _passwordController.text.trim());
-      addUserDetails(_nameController.text.trim(), _emailController.text.trim());
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
 
-      
+      dbFirebase.addUser(
+        _nameController.text.trim(),
+        _emailController.text.trim(),
+      );
+      print("hotovo");
 
-      Navigator.of(context).pop();
+      Navigator.of(context).pop(dispose);
+      setState(() {});
     } else {
       showDialog(
         context: context,
@@ -61,15 +69,6 @@ class _RegisterPageState extends State<RegisterPage> {
         },
       );
     }
-  }
-
- 
-
-  Future addUserDetails(String name, String email) async {
-    await FirebaseFirestore.instance.collection('users').doc(email).set({
-      'name': name,
-      'email': email,
-    });
   }
 
   bool passwordConfirmed() {

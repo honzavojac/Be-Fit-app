@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
 
@@ -35,12 +36,13 @@ class FirestoreService extends ChangeNotifier {
     return notes.doc(docID).delete();
   }
   */
-
+  final FirebaseAuth auth = FirebaseAuth.instance;
   final FirebaseFirestore db = FirebaseFirestore.instance;
   final user = FirebaseAuth.instance.currentUser;
 
   getUsername() async {
-    var documentSnapshot = await db.collection("users").doc(user?.email).get();
+    var documentSnapshot =
+        await db.collection("users").doc(auth.currentUser?.uid).get();
 
     if (documentSnapshot.exists) {
       var userData = documentSnapshot.data();
@@ -55,7 +57,8 @@ class FirestoreService extends ChangeNotifier {
   }
 
   getUserEmail() async {
-    var documentSnapshot = await db.collection("users").doc(user?.email).get();
+    var documentSnapshot =
+        await db.collection("users").doc(auth.currentUser?.uid).get();
     print(documentSnapshot.toString());
     if (documentSnapshot.exists) {
       var userData = documentSnapshot.data();
@@ -69,50 +72,15 @@ class FirestoreService extends ChangeNotifier {
     }
   }
 
-  Future<void> addDocument() async {
-    CollectionReference collection =
-        FirebaseFirestore.instance.collection('users');
-
-    print('Added document with ID: ${collection.id}');
-  }
-
   addUser(String name, String email) async {
     final user = <String, dynamic>{"name": name, "email": email};
-    await db.collection("users").add(user).then(
-          (DocumentReference doc) => print("Document ID -${doc.id}"),
-        );
-  }
-
-  getUsers() async {
-    await db.collection("users").get().then((event) {
-      for (var doc in event.docs) {
-        print("${doc.id} => ${doc.data()}");
-      }
-    });
-  }
-
-  updateUser(String name, String email) async {
-    final docRef = db.collection("users").doc();
-    docRef.get().then(
-      (DocumentSnapshot doc) {
-        final data = doc.data();
-        // ...
-      },
-      onError: (e) => print("Error getting document: $e"),
-    );
-    // print(docRef);
-    final data = {"name": name, "email": email};
-    // await db.collection("users").doc().set(data, SetOptions(merge: true));
+    await db.collection("users").doc(auth.currentUser?.uid).set(user);
   }
 
   addMuscle(String nameOfMucle) async {
-    // final user = <String, dynamic>{"name of muscle": nameOfMucle};
-    // await db.collection("muscles").add(user).then(
-    //       (DocumentReference doc) => print("Document ID -${doc.id}"),
-    //     );
     await db
         .collection("users")
-        .doc(user?.email)
+        .doc(auth.currentUser!.uid)
         .collection("muscles")
         .doc("$nameOfMucle")
         .set({"name": "$nameOfMucle"});
@@ -124,7 +92,7 @@ class FirestoreService extends ChangeNotifier {
 
     await db
         .collection("users")
-        .doc(user?.email)
+        .doc(auth.currentUser!.uid)
         .collection("muscles")
         .get()
         .then(
@@ -142,7 +110,7 @@ class FirestoreService extends ChangeNotifier {
   addExercise(String nameOfExercise, String muscle) async {
     await db
         .collection("users")
-        .doc(user?.email)
+        .doc(auth.currentUser!.uid)
         .collection("muscles")
         .doc(chosedMuscle)
         .collection("exercises")
@@ -153,13 +121,12 @@ class FirestoreService extends ChangeNotifier {
 
   String? chosedMuscle = "";
 
-
   Future<List<Map<String, dynamic>>> getExercises() async {
     var exercisesList = <Map<String, dynamic>>[];
 
     await db
         .collection("users")
-        .doc(user?.email)
+        .doc(auth.currentUser!.uid)
         .collection("muscles")
         .doc(chosedMuscle)
         .collection("exercises")
@@ -205,7 +172,7 @@ class FirestoreService extends ChangeNotifier {
       }
       QuerySnapshot splitSnapshot = await db
           .collection("users")
-          .doc(user?.email)
+          .doc(auth.currentUser!.uid)
           .collection("splits")
           .get();
 
@@ -214,7 +181,7 @@ class FirestoreService extends ChangeNotifier {
       // Uložení mapy svalů pod názvem splitu
       await db
           .collection("users")
-          .doc(user?.email)
+          .doc(auth.currentUser!.uid)
           .collection("splits")
           .doc("${splitName}")
           .set({"name": splitName, "muscles": musclesMap});
@@ -231,7 +198,7 @@ class FirestoreService extends ChangeNotifier {
 
     await db
         .collection("users")
-        .doc(user?.email)
+        .doc(auth.currentUser!.uid)
         .collection("splits")
         .get()
         .then(
@@ -248,7 +215,7 @@ class FirestoreService extends ChangeNotifier {
   Future<void> deleteSplit(String docID) {
     return db
         .collection("users")
-        .doc(user?.email)
+        .doc(auth.currentUser!.uid)
         .collection("splits")
         .doc(docID)
         .delete();
@@ -259,7 +226,7 @@ class FirestoreService extends ChangeNotifier {
     try {
       await db
           .collection("users")
-          .doc(user?.email)
+          .doc(auth.currentUser!.uid)
           .collection("splits")
           .doc(splitName)
           .collection("exercises")
@@ -277,7 +244,7 @@ class FirestoreService extends ChangeNotifier {
     try {
       await db
           .collection("users")
-          .doc(user?.email)
+          .doc(auth.currentUser!.uid)
           .collection("splits")
           .doc(splitName)
           .collection("exercises")
@@ -296,7 +263,7 @@ class FirestoreService extends ChangeNotifier {
     try {
       await db
           .collection("users")
-          .doc(user?.email)
+          .doc(auth.currentUser!.uid)
           .collection("splits")
           .doc(splitName)
           .collection("exercises")
@@ -316,12 +283,41 @@ class FirestoreService extends ChangeNotifier {
     return exercises;
   }
 
+  Future<List<Map<String, String>>> getCurrentSplitExercises() async {
+    List<Map<String, String>> exercises = [];
+    try {
+      await db
+          .collection("users")
+          .doc(auth.currentUser!.uid)
+          .collection("splits")
+          .doc(splitName)
+          .collection("exercises")
+          .get()
+          .then((QuerySnapshot querySnapshot) {
+        querySnapshot.docs.forEach((doc) {
+          List<dynamic> exerciseNames =
+              doc["exercises"]; // Přečtěte pole názvů cvičení
+          String muscleName = doc.id; // Přečtěte název svalu
+          exerciseNames.forEach((name) {
+            exercises.add({
+              "muscle": muscleName,
+              "exercise": name.toString(),
+            }); // Přidejte každý název cvičení s odpovídajícím svalovým názvem do seznamu exercises
+          });
+        });
+      });
+    } catch (e) {
+      print('Error getting all exercises: $e');
+    }
+    return exercises;
+  }
+
   Future<List<Map<String, dynamic>>> getSplitMuscles(String splitName) async {
     var splitsList = <Map<String, dynamic>>[];
 
     DocumentSnapshot<Map<String, dynamic>> document = await db
         .collection("users")
-        .doc(user?.email)
+        .doc(auth.currentUser!.uid)
         .collection("splits")
         .doc(splitName)
         .get();
@@ -362,7 +358,7 @@ class FirestoreService extends ChangeNotifier {
       try {
         DocumentSnapshot<Map<String, dynamic>> documentSnapshot = await db
             .collection("users")
-            .doc(user?.email)
+            .doc(auth.currentUser!.uid)
             .collection("splits")
             .doc(splitName)
             .collection("exercises")

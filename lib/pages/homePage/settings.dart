@@ -1,6 +1,10 @@
+
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/firestore/firestore.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 
 class Settings extends StatefulWidget {
   const Settings({super.key});
@@ -11,7 +15,6 @@ class Settings extends StatefulWidget {
 
 class _SettingsState extends State<Settings> {
   final user = FirebaseAuth.instance.currentUser!;
-  FirestoreService db = FirestoreService();
   var idk;
   @override
   void dispose() {
@@ -19,31 +22,49 @@ class _SettingsState extends State<Settings> {
     super.dispose();
   }
 
-  FirestoreService dbMuscles = FirestoreService();
+  Future<void> _deleteCacheDir() async {
+    final cacheDir = await getTemporaryDirectory();
+    if (cacheDir.existsSync()) {
+      cacheDir.deleteSync(recursive: true);
+    }
+    final appDir = await getApplicationSupportDirectory();
+    if (appDir.existsSync()) {
+      appDir.deleteSync(recursive: true);
+    }
+  }
 
-  final _nameOfMuscle = TextEditingController();
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
+      var dbFirebase = Provider.of<FirestoreService>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Settings"),
         actions: [
           IconButton(
-              onPressed: () {
-                FirebaseAuth.instance.signOut();
-              },
-              icon: Icon(
-                Icons.logout,
-                color: Colors.red,
-              ))
+            onPressed: () async {
+              await _deleteCacheDir();
+
+              _firebaseAuth.signOut();
+            },
+            icon: Icon(
+              Icons.logout,
+              color: Colors.red,
+              size: 25,
+            ),
+          ),
+          SizedBox(
+            width: 15,
+          ),
         ],
       ),
       body: Center(
         child: Column(
           children: [
             FutureBuilder(
-              future: db.getUsername(),
+              future: dbFirebase.getUsername(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Expanded(
@@ -60,71 +81,8 @@ class _SettingsState extends State<Settings> {
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                          child: TextField(
-                        controller: _nameOfMuscle,
-                      )),
-                      ElevatedButton(
-                        style: ButtonStyle(
-                            backgroundColor:
-                                MaterialStatePropertyAll(Colors.blue)),
-                        onPressed: () {
-                          dbMuscles.addMuscle(_nameOfMuscle.text.trim());
-                          setState(() {});
-                        },
-                        child: Text(
-                          "add muscle",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ],
+                    children: [],
                   ),
-                  SizedBox(
-                    height: 30,
-                  ),
-                  ElevatedButton(
-                    style: ButtonStyle(
-                        backgroundColor:
-                            MaterialStatePropertyAll(Colors.green)),
-                    onPressed: () {
-                      dbMuscles.getMuscles();
-                      setState(() {});
-                    },
-                    child: Text(
-                      "get muscles",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Expanded(
-                    child: FutureBuilder(
-                      future: FirestoreService().getMuscles(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Center(child: Expanded(child: Container()));
-                        } else if (snapshot.hasError) {
-                          return Text('Error: ${snapshot.error}');
-                        } else {
-                          var items = snapshot.data!;
-                          return ListView.builder(
-                            itemCount: items.length,
-                            itemBuilder: (context, index) {
-                              return Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text("${items[index]['name']}"),
-                                ],
-                              );
-                            },
-                          );
-                        }
-                      },
-                    ),
-                  )
                 ],
               ),
             )

@@ -2,10 +2,13 @@
 
 //import 'dart:html';
 
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:kaloricke_tabulky_02/colors_provider.dart';
+import 'package:kaloricke_tabulky_02/firestore/firestore.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/statistics_page.dart';
-import 'package:kaloricke_tabulky_02/pages/fitnessRecord/chose_your_split.dart';
+import 'package:provider/provider.dart';
 
 import 'split_page.dart';
 
@@ -56,24 +59,147 @@ class FitnessRecordScreen extends StatefulWidget {
 ScrollController _scrollController = ScrollController();
 
 class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
-  List<String> exerciseIndex = [];
+  List<Map<String, dynamic>> listSplits = [];
+  List<Map<String, dynamic>> listFinalExercises = [];
+  List<Map<String, dynamic>> listSplitMuscles = [];
+  String? selectedSplit;
+  int initializedSplit = 0;
 
-  //final controller = PageController(initialPage: 0);
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    loadData();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  void loadData() async {
+    var dbFirebase = Provider.of<FirestoreService>(context, listen: false);
+
+    listSplits = await dbFirebase.getSplits();
+    // Nastavte výchozí hodnotu na první sval, pokud není seznam prázdný
+    if (listSplits.isNotEmpty && initializedSplit == 0) {
+      selectedSplit = listSplits[0]["name"];
+      dbFirebase.splitName = listSplits[0]["name"];
+      initializedSplit = 1;
+    } else if (listSplits.isNotEmpty) {
+    } else {
+      selectedSplit = " ";
+      dbFirebase.splitName = " ";
+    }
+    listSplitMuscles = await dbFirebase.getSplitMuscles(selectedSplit!);
+    print("list split muscles ${listSplitMuscles}");
+    listFinalExercises = await dbFirebase.getCurrentSplitExercises();
+    print("list final exercises ${listFinalExercises}");
+    setState(() {});
+  }
+
+  // void nacteni(int index) async {
+  //   var dbFirebase = Provider.of<FirestoreService>(context, listen: false);
+  //   listFinalExercises =
+  //       await dbFirebase.getFinalSplitExercise(listSplitMuscles[index]["name"]);
+  // }
+
   @override
   Widget build(BuildContext context) {
     // List<NavigationDestination> destinations =
+    var dbFirebase = Provider.of<FirestoreService>(context);
 
     return Stack(
       children: [
         Column(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+              padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Expanded(
-                    child: choseYourSplit(),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(25, 0, 25, 0),
+                      child: Container(
+                        // width: 150,
+                        height: 40,
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton2<String>(
+                            isExpanded: true,
+                            items: listSplits.map<DropdownMenuItem<String>>(
+                                (Map<String, dynamic> muscle) {
+                              // print(dbFirebase.chosedMuscle);
+                              return DropdownMenuItem<String>(
+                                value: muscle["name"],
+                                child: Center(
+                                  child: Text(
+                                    muscle["name"].toString().toUpperCase(),
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: ColorsProvider.color_1,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                            value: selectedSplit,
+                            onChanged: (value) {
+                              selectedSplit =
+                                  value!; // Aktualizace vybraného splitu
+                              dbFirebase.splitName = value;
+                              print(
+                                  "chosed split: ${dbFirebase.splitName.toString().toUpperCase()}");
+                              loadData();
+                              print(listSplitMuscles);
+                              // setState(() {});
+                            },
+                            buttonStyleData: ButtonStyleData(
+                              // height: 80,
+                              width: 180,
+                              padding:
+                                  const EdgeInsets.only(left: 14, right: 14),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
+                                  color: ColorsProvider.color_2,
+                                  width: 0.5,
+                                ),
+                              ),
+                              // elevation: 2,
+                            ),
+                            iconStyleData: const IconStyleData(
+                              icon: Icon(
+                                Icons.keyboard_arrow_down_outlined,
+                              ),
+                              iconSize: 17,
+                              iconEnabledColor: ColorsProvider.color_1,
+                            ),
+                            dropdownStyleData: DropdownStyleData(
+                              maxHeight: 200,
+                              // width: 200,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
+                                    width: 2, color: ColorsProvider.color_2),
+                              ),
+                              offset: const Offset(0, -0),
+                              scrollbarTheme: ScrollbarThemeData(
+                                radius: const Radius.circular(40),
+                                thickness: MaterialStateProperty.all(6),
+                                thumbVisibility:
+                                    MaterialStateProperty.all(true),
+                              ),
+                            ),
+                            menuItemStyleData: const MenuItemStyleData(
+                              height: 40,
+                              padding: EdgeInsets.only(left: 0, right: 18),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                   Container(
                     height: 32,
@@ -114,7 +240,7 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
               child: Container(
                 margin: EdgeInsets.only(left: 20, right: 20),
                 decoration: BoxDecoration(
-                  color: ColorsProvider.color_7,
+                  color: Color.fromARGB(146, 184, 1, 1),
                   // border: Border.all(color: Colors.white),
                   borderRadius: BorderRadius.all(
                     Radius.circular(10),
@@ -123,143 +249,187 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                 child: Column(
                   children: [
                     Expanded(
-                        child: ListView.builder(
-                      itemCount: 3,
-                      itemBuilder: (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.fromLTRB(5, 0, 5, 20),
-                          child: Container(
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: ColorsProvider.color_2),
-                            height: 80,
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Container(
-                                    // color: Colors.white,
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              "Bicepsový zdvih s činkami",
-                                              style: TextStyle(
-                                                  fontSize: 18,
-                                                  color: ColorsProvider.color_8,
-                                                  fontWeight: FontWeight.bold),
-                                            )
-                                          ],
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.fromLTRB(
-                                              8, 0, 8, 0),
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              border: Border(
-                                                bottom: BorderSide(
-                                                    color:
-                                                        ColorsProvider.color_8,
-                                                    width: 2),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 10),
-                                          child: Container(
-                                            height: 45,
-                                            child: Row(
-                                              children: [
-                                                Column(
-                                                  children: [
-                                                    Text(
-                                                      "Set:",
-                                                      style: TextStyle(
-                                                        color: ColorsProvider
-                                                            .color_8,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      "Reps:",
-                                                      style: TextStyle(
-                                                        color: ColorsProvider
-                                                            .color_8,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                Expanded(
-                                                  child: ListView.builder(
-                                                    scrollDirection:
-                                                        Axis.horizontal,
-                                                    itemCount: 5,
-                                                    itemBuilder:
-                                                        (context, index) {
-                                                      return Container(
-                                                        width: 35,
-                                                        child: Column(
-                                                          children: [
-                                                            Text(
-                                                              "${index + 1}",
-                                                              style: TextStyle(
-                                                                color:
-                                                                    ColorsProvider
-                                                                        .color_8,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                              ),
-                                                            ),
-                                                            Text(
-                                                              "12",
-                                                              style: TextStyle(
-                                                                color:
-                                                                    ColorsProvider
-                                                                        .color_8,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      );
-                                                    },
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ],
+                      child: ListView.builder(
+                        itemCount: listSplitMuscles.length,
+                        itemBuilder: (context, index) {
+                          // nacteni(index);
+                          List<String> finalList = [];
+                          for (var i = 0; i < listFinalExercises.length; i++) {
+                            if (listFinalExercises[i]["muscle"] ==
+                                listSplitMuscles[index]["name"]) {
+                              finalList.add(listFinalExercises[i]["exercise"]);
+                            }
+                          }
+                          return Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(5, 10, 5, 0),
+                                child: Container(
+                                  height: 50,
+                                  color: ColorsProvider.color_2,
+                                  child: Center(
+                                    child: Text(
+                                      "${listSplitMuscles[index]["name"].toString().toUpperCase()}",
+                                      style: TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20),
                                     ),
                                   ),
                                 ),
-                                Container(
-                                  width: 50,
-                                  // color: Colors.red,
-                                  child: IconButton(
-                                    onPressed: () {},
-                                    icon: Icon(Icons.edit,
-                                        color: ColorsProvider.color_8),
+                              ),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(left: 25, right: 25),
+                                child: Container(
+                                  // color: Colors.black,
+                                  child: ListView.builder(
+                                    shrinkWrap: true,
+                                    physics: NeverScrollableScrollPhysics(),
+                                    itemCount: finalList.length,
+                                    itemBuilder: (context, index) {
+                                      return Padding(
+                                        padding:
+                                            const EdgeInsets.only(bottom: 2),
+                                        child: Container(
+                                          height: 80,
+                                          color: ColorsProvider.color_1,
+                                          child: Column(
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Text(
+                                                    "${finalList[index]}",
+                                                    style: TextStyle(
+                                                        color: Colors.black,
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ),
+                                                ],
+                                              ),
+                                              Expanded(
+                                                child: Container(
+                                                  color: Colors.teal,
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Row(
+                                                        children: [
+                                                          Container(
+                                                            // width: 60,
+                                                            child: Column(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .end,
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                Container(
+                                                                  // height: 20,
+                                                                  width: 50,
+                                                                  color: Colors
+                                                                      .red,
+                                                                  child: Text(
+                                                                      "Weight:"),
+                                                                ),
+                                                                Container(
+                                                                  // height: 20,
+                                                                  width: 50,
+                                                                  color: Colors
+                                                                      .red,
+                                                                  child: Text(
+                                                                      "Reps:"),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                          Container(
+                                                            // height: 50,
+                                                            // width: 100,
+                                                            child: ListView
+                                                                .builder(
+                                                              shrinkWrap: true,
+                                                              itemCount: 5,
+                                                              scrollDirection:
+                                                                  Axis.horizontal,
+                                                              itemBuilder:
+                                                                  (context,
+                                                                      index) {
+                                                                return Container(
+                                                                  // height: 40,
+                                                                  width: 40,
+                                                                  color: Colors
+                                                                      .black26,
+                                                                  margin: EdgeInsets
+                                                                      .symmetric(
+                                                                          horizontal:
+                                                                              2),
+                                                                  child: Column(
+                                                                    children: [
+                                                                      Text(
+                                                                          "set ${index + 1}"),
+                                                                      Text(
+                                                                          "15"),
+                                                                      Text(
+                                                                          "15"),
+                                                                    ],
+                                                                  ),
+                                                                );
+                                                              },
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      IconButton(
+                                                        onPressed: () {},
+                                                        icon: Icon(Icons.edit),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              )
+                                              /* Column(
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      Container(
+                                                          width: 50,
+                                                          color: Colors.red,
+                                                          child:
+                                                              Text("Weight:")),
+                                                    ],
+                                                  ),
+                                                  SizedBox(
+                                                    height: 2,
+                                                  ),
+                                                  Row(
+                                                    children: [
+                                                      Container(
+                                                          width: 50,
+                                                          color: Colors.red,
+                                                          child: Text("Reps:")),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ) */
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    },
                                   ),
-                                )
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    ))
+                                ),
+                              )
+                            ],
+                          );
+                        },
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -277,12 +447,6 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                   width: 150,
                   child: ElevatedButton.icon(
                     onPressed: () {
-                      setState(() {
-                        exerciseIndex
-                            .add('Exercise ${exerciseIndex.length + 1}');
-                        // print(exerciseIndex);
-                      });
-                      // Po přidání položky posuňte pohled dolů
                       _scrollController.animateTo(
                         _scrollController.position.maxScrollExtent,
                         duration: Duration(milliseconds: 300),

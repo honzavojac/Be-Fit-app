@@ -2,7 +2,6 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:kaloricke_tabulky_02/colors_provider.dart';
-import 'package:kaloricke_tabulky_02/database/database_provider.dart';
 import 'package:kaloricke_tabulky_02/firestore/firestore.dart';
 import 'package:provider/provider.dart';
 

@@ -68,6 +68,12 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
               style: TextStyle(),
             ),
             Container(
+              child: ElevatedButton(
+                onPressed: () {},
+                child: Text("data"),
+              ),
+            ),
+            Container(
               child: IconButton(
                 icon: Icon(Icons.add_circle_outline_outlined,
                     color: ColorsProvider.color_2, size: 35),
@@ -185,7 +191,7 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                         }).toList(),
                         onTap: (value) {
                           clickedTab = value;
-
+                          
                           loadData();
                         },
                       ),
@@ -331,6 +337,8 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                                                 dbFirebase.splitName =
                                                     listSplits[clickedTab]
                                                         ["name"];
+                                                // print(dbFirebase.chosedMuscle);
+                                                setState(() {});
                                                 showDialog(
                                                   context: context,
                                                   builder:
@@ -430,7 +438,7 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                                       dbFirebase.deleteSplit(
                                           listSplits[clickedTab]["name"]);
                                       loadData();
-
+                                      setState(() {});
                                       ScaffoldMessenger.of(context)
                                           .hideCurrentSnackBar();
                                     },
