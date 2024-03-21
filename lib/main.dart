@@ -22,22 +22,12 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // FirestoreService dbFirebase = FirestoreService();
-  // dbFirebase.addUser("David","david@gmail.com");
-  // dbFirebase.getUsers();
-  // dbFirebase.getUser();
-  // dbFirebase.updateUser("Marek", "ondra@gmail.com");
-
   await dbHelper.initializeDB();
   FirestoreService dbFirebase = FirestoreService();
   ColorsProvider colorsProvider = ColorsProvider();
-  // print(dbHelper.initialIndex);
-  // print(dbHelper.tab);
 
-  // if (Platform.isWindows || Platform.isLinux) {
-  //   sqfliteFfiInit();
-  // }
-  // databaseFactory = databaseFactoryFfi;
+  // dbFirebase.enableSync();
+
   runApp(
     MultiProvider(
       providers: [

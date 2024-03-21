@@ -9,7 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  two_dimensional_scrollables: ^0.0.1
+  two_dimensional_scrollables: ^0.1.2
   provider: ^6.0.5
   dropdown_button2: ^2.3.8
  
@@ -27,6 +27,10 @@ dependencies:
   firebase_auth: ^4.17.4
   firebase_database: ^10.4.6
   google_sign_in: ^6.2.1
+  expandable_widgets: ^1.0.3+1
+  expand_widget: ^3.1.1
+  connectivity: ^3.0.6
+  toggle_list: ^0.3.1
   
 
 dev_dependencies:
