@@ -1,10 +1,7 @@
-import 'package:expand_widget/expand_widget.dart';
-import 'package:expandable_widgets/expandable_widgets.dart';
+
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/firestore/firestore.dart';
-import 'package:kaloricke_tabulky_02/pages/fitnessRecord/new_muscle_box.dart';
-import 'package:toggle_list/toggle_list.dart';
 import 'package:provider/provider.dart';
 
 class SpecialBox extends StatefulWidget {

@@ -60,7 +60,6 @@ class FitnessRecordScreen extends StatefulWidget {
 ScrollController _scrollController = ScrollController();
 
 class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
-  List<Map<String, dynamic>> listSplits = [];
   List<Map<String, dynamic>> listFinalExercises = [];
   List<Map<String, dynamic>> listSplitMuscles = [];
   String? selectedSplit;
@@ -80,31 +79,31 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
   void loadData() async {
     var dbFirebase = Provider.of<FirestoreService>(context, listen: false);
 
-    listSplits = await dbFirebase.getSplits();
+    await dbFirebase.getSplits();
 
-    // Nastavte výchozí hodnotu na první sval, pokud není seznam prázdný
-    if (listSplits.isNotEmpty && initializedSplit == 0) {
-      selectedSplit = listSplits[0]["name"];
-      dbFirebase.splitName = listSplits[0]["name"];
+    // Nastavte výchozí hodnotu na první split, pokud není seznam prázdný
+    if (dbFirebase.listSplits.isNotEmpty && initializedSplit == 0) {
+      selectedSplit = dbFirebase.listSplits[0]["name"];
+      dbFirebase.splitName = dbFirebase.listSplits[0]["name"];
       initializedSplit = 1;
-    } else if (listSplits.isNotEmpty) {
+    } else if (dbFirebase.listSplits.isNotEmpty) {
     } else {
       selectedSplit = " ";
       dbFirebase.splitName = " ";
     }
+
     listSplitMuscles = await dbFirebase.getSplitMuscles(selectedSplit!);
-    print("list split muscles ${listSplitMuscles}");
+    // print("list split muscles ${listSplitMuscles}");
     listFinalExercises = await dbFirebase.getCurrentSplitExercises();
-    print("list final exercises ${listFinalExercises}");
+    // print("list final exercises ${listFinalExercises}");
 
     //vložení hodnot do provideru
-    dbFirebase.listSplits = listSplits;
     dbFirebase.listFinalExercises = listFinalExercises;
     dbFirebase.listSplitMuscles = listSplitMuscles;
     setState(() {});
+    // print(listSplitMuscles); -------- musím udělat mapu kde bude key bude sval a value bude list cviků
+    // print(listFinalExercises);
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -128,13 +127,13 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                         child: DropdownButtonHideUnderline(
                           child: DropdownButton2<String>(
                             isExpanded: true,
-                            items: listSplits.map<DropdownMenuItem<String>>((Map<String, dynamic> muscle) {
-                              // print(dbFirebase.chosedMuscle);
+                            value: selectedSplit,
+                            items: dbFirebase.listSplits.map<DropdownMenuItem<String>>((split) {
                               return DropdownMenuItem<String>(
-                                value: muscle["name"],
+                                value: split["name"],
                                 child: Center(
                                   child: Text(
-                                    muscle["name"].toString().toUpperCase(),
+                                    split["name"].toString().toUpperCase(),
                                     style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
@@ -145,19 +144,17 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                                 ),
                               );
                             }).toList(),
-                            value: selectedSplit,
                             onChanged: (value) {
-                              selectedSplit = value!; // Aktualizace vybraného splitu
-                              dbFirebase.splitName = value;
-                              print("chosed split: ${dbFirebase.splitName.toString().toUpperCase()}");
-                              loadData();
-                              print(listSplitMuscles);
-                              // setState(() {});
+                              setState(() {
+                                selectedSplit = value!; // Aktualizace vybraného splitu
+                                dbFirebase.splitName = value;
+                                // print("chosed split: ${dbFirebase.splitName.toString().toUpperCase()}");
+                                loadData();
+                              });
                             },
                             buttonStyleData: ButtonStyleData(
-                              // height: 80,
                               width: 180,
-                              padding: const EdgeInsets.only(left: 14, right: 14),
+                              padding: const EdgeInsets.symmetric(horizontal: 14),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(14),
                                 border: Border.all(
@@ -165,18 +162,14 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                                   width: 0.5,
                                 ),
                               ),
-                              // elevation: 2,
                             ),
                             iconStyleData: const IconStyleData(
-                              icon: Icon(
-                                Icons.keyboard_arrow_down_outlined,
-                              ),
+                              icon: Icon(Icons.keyboard_arrow_down_outlined),
                               iconSize: 17,
                               iconEnabledColor: ColorsProvider.color_1,
                             ),
                             dropdownStyleData: DropdownStyleData(
                               maxHeight: 200,
-                              // width: 200,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(14),
                                 border: Border.all(width: 2, color: ColorsProvider.color_2),
@@ -366,8 +359,8 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
 
                                           dbFirebase.chosedExercise = finalList[exerciseIndex];
                                           dbFirebase.selectedMuscle = listSplitMuscles[muscleIndex]["name"];
-                                          print(dbFirebase.selectedMuscle);
-                                          print(finalList[exerciseIndex]);
+                                          // print(dbFirebase.selectedMuscle);
+                                          // print(finalList[exerciseIndex]);
 
                                           Navigator.push(
                                             context,

@@ -3,52 +3,79 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
-import 'package:path/path.dart';
 
 class FirestoreService extends ChangeNotifier {
-  //proměnná pro kontrolu dat cviků (serie, opakování, váha, náročnost a intenzifikační technika)
-  Map<String, dynamic> exerciseData = {};
+  //Proměnné ******************************************************************************************************************************************
+  //***************************************************************************************************************************************************
+
+  //proměnné pro firebase
+  final FirebaseAuth auth = FirebaseAuth.instance;
+  final FirebaseFirestore db = FirebaseFirestore.instance;
+  final user = FirebaseAuth.instance.currentUser;
+
+  // Určení dnešního datumu
   DateTime now = DateTime.now();
-  //
-  //
-  Timer? _syncTimer;
-  bool _syncEnabled = true;
 
-  void startSyncTimer() {
-    _syncTimer = Timer.periodic(Duration(minutes: 30), (timer) {
-      _syncData();
-    });
-  }
+  //proměnná pro uložení všech uživatelem zadaných hodnot do cviků
+  Map<String, dynamic> exerciseData = {};
 
-  void _syncData() async {
-    if (_syncEnabled) {
-      await db.enableNetwork();
-      // synchronizace dat s Firestore
-    }
-  }
+  //bullshit, načítá se do něho hodnoty, které se převádí do mapy v fitness record page (mělo by to spíše být tak, že to budou mapy a ne listy map)
+  List<Map<String, dynamic>> listSplits = [];
+  List<Map<String, dynamic>> listFinalExercises = [];
+  List<Map<String, dynamic>> listSplitMuscles = [];
 
+  //proměnné (mapy) pro místo převodu
+  Map<String, dynamic> mapSplits = {};
+  Map<String, dynamic> mapFinalExercises = {};
+  Map<String, dynamic> mapSplitMuscles = {};
+
+  //vybraný cvik v fitness record page -- po kliknutí na cvik
+  String? chosedExercise;
+
+  //vybraný sval v fitness record page -- po kliknutí na cvik
+  String? selectedMuscle;
+
+  //proměnná do které se ukládá comentář cviku
+  String? commentExercise;
+
+  //proměnná pro výběr svalu v exercise page -- po kliknutí na exercises
+  String? chosedMuscle = "";
+
+  //proměnná sloužící pro vyběř aktivních cviků
+  //při novém cviku se nastaví na false
+  List<bool> isCheckedList = [];
+
+  //proměnná pro uložení výběru splitu
+  late String splitName;
+
+  //mapa pro složení celé mapy
+  //FORMÁT:   currunt split -> muscles - > exercises -> exercise data
+  //"pull":{"back":{"kladiva":{data}}};
+  Map<String, dynamic> mapExercisesSplits = {};
+
+  //funkce pro zakázání synchronizace / obnovení s firebase *******************************************************************************************
+  //***************************************************************************************************************************************************
+
+  //zakáže se synchronizovat s firebase
   void disableSync() async {
-    _syncEnabled = false;
     await db.disableNetwork();
     print("synchronizace s firebase odpojena");
   }
 
+  //povolí se synchronizovat s firebase
   void enableSync() async {
-    _syncEnabled = true;
     await db.enableNetwork();
     print("synchronizace s firebase zpřístupněna");
   }
 
-  //
-  //
-  final FirebaseAuth auth = FirebaseAuth.instance;
-  final FirebaseFirestore db = FirebaseFirestore.instance;
-  final user = FirebaseAuth.instance.currentUser;
+//uživatelské funkce (vyytváření a úprava) ************************************************************************************************************
+
+  //přídání jména a emailu při sign up
   addUsername(String name) async {
     db.collection("users").doc(auth.currentUser?.uid).set({"name": name, "email": auth.currentUser?.email});
   }
 
+  //získání jména přihlášeného uživatele
   getUsername() async {
     var documentSnapshot = await db.collection("users").doc(auth.currentUser?.uid).get();
 
@@ -64,13 +91,12 @@ class FirestoreService extends ChangeNotifier {
     }
   }
 
+  //získání emailu přihláčeného uživatele
   getUserEmail() async {
     var documentSnapshot = await db.collection("users").doc(auth.currentUser?.uid).get();
     print(documentSnapshot.toString());
     if (documentSnapshot.exists) {
       var userData = documentSnapshot.data();
-
-      // Získání konkrétní části dokumentu
       var desiredValue = userData?["email"];
       print("Desired value: $desiredValue");
       return desiredValue;
@@ -79,16 +105,21 @@ class FirestoreService extends ChangeNotifier {
     }
   }
 
+  //vytvoření jména a emailu nového uživatele
   addUser(String name, String email) async {
     final user = <String, dynamic>{"name": name, "email": email};
     await db.collection("users").doc(auth.currentUser?.uid).set(user);
   }
 
+  //vytvoření a uložení nového svalu do firebase
   addMuscle(String nameOfMucle) async {
     await db.collection("users").doc(auth.currentUser!.uid).collection("muscles").doc("$nameOfMucle").set({"name": "$nameOfMucle"});
     notifyListeners();
   }
+  //funkce pro pracování s splity, svaly a cviky ******************************************************************************************************
+  //***************************************************************************************************************************************************
 
+  //získání svalů z firebase
   Future<List<Map<String, dynamic>>> getMuscles() async {
     var musclesList = <Map<String, dynamic>>[];
 
@@ -100,17 +131,16 @@ class FirestoreService extends ChangeNotifier {
         }
       },
     );
-
     return musclesList;
   }
 
+  //vytvoření a uložení nového cviku do firebase
   addExercise(String nameOfExercise, String muscle) async {
     await db.collection("users").doc(auth.currentUser!.uid).collection("muscles").doc(chosedMuscle).collection("exercises").doc(nameOfExercise).set({"name": nameOfExercise});
     notifyListeners();
   }
 
-  String? chosedMuscle = "";
-
+  //získání cviků z firebase
   Future<List<Map<String, dynamic>>> getExercises() async {
     var exercisesList = <Map<String, dynamic>>[];
 
@@ -121,11 +151,10 @@ class FirestoreService extends ChangeNotifier {
         }
       },
     );
-
     return exercisesList;
   }
 
-  List<bool> isCheckedList = [];
+  //vytvoření a uložení nového splitu s uložením "true" cviků do firebase
   Future<void> addSplit(String splitName, isCheckedList) async {
     try {
       // Získání seznamu svalů a jejich stavů
@@ -144,25 +173,15 @@ class FirestoreService extends ChangeNotifier {
           musclesMap[muscleName] = false;
         }
       }
-
-      // for (var muscle in muscles) {
-      //   var muscleName = muscle["name"] as String;
-      //   musclesMap[muscleName] =
-      //       musclesMap[muscle]; // Nastavte výchozí hodnotu na false
-      // }
-
-      // print("Počet dokumentů v kolekci: $splitNumber");
-
       // Uložení mapy svalů pod názvem splitu
       await db.collection("users").doc(auth.currentUser!.uid).collection("splits").doc("${splitName}").set({"name": splitName, "muscles": musclesMap});
-      // print(musclesMap);
     } catch (error) {
       print("Chyba při přidávání splitu: $error");
-      // Zpracování chyby podle potřeby (např. zobrazení chybového hlášení).
     }
     notifyListeners();
   }
 
+  //získání splitů z firebase
   Future<List<Map<String, dynamic>>> getSplits() async {
     var splitsList = <Map<String, dynamic>>[];
 
@@ -174,14 +193,16 @@ class FirestoreService extends ChangeNotifier {
         }
       },
     );
+    listSplits = splitsList;
     return splitsList;
   }
 
+  //odstranění splitu z firebase
   Future<void> deleteSplit(String docID) {
     return db.collection("users").doc(auth.currentUser!.uid).collection("splits").doc(docID).delete();
   }
 
-  late String splitName;
+  //přidání "true" cviku do splitu (checkbox)
   Future<void> addTrueSplitExercise(String exerciseName) async {
     try {
       await db.collection("users").doc(auth.currentUser!.uid).collection("splits").doc(splitName).collection("exercises").doc(chosedMuscle).set({
@@ -193,6 +214,7 @@ class FirestoreService extends ChangeNotifier {
     notifyListeners();
   }
 
+  //odstranění "true" cviku ze splitu (checkbox)
   Future<void> DeleteTrueSplitExercise(String exerciseName) async {
     try {
       await db.collection("users").doc(auth.currentUser!.uid).collection("splits").doc(splitName).collection("exercises").doc(chosedMuscle).update({
@@ -204,6 +226,7 @@ class FirestoreService extends ChangeNotifier {
     notifyListeners();
   }
 
+  //získání "true" cviků ze splitu
   Future getTrueSplitExercise() async {
     List<String> exercises = [];
     try {
@@ -214,11 +237,12 @@ class FirestoreService extends ChangeNotifier {
     } catch (e) {
       print('Error adding exercise to split: $e');
     }
-    // print(exercises);
+    print(exercises);
     // notifyListeners();
     return exercises;
   }
 
+  //získání cviků z právě zvoleného splitu
   Future<List<Map<String, String>>> getCurrentSplitExercises() async {
     List<Map<String, String>> exercises = [];
     try {
@@ -240,6 +264,7 @@ class FirestoreService extends ChangeNotifier {
     return exercises;
   }
 
+  //získání svalů splitu
   Future<List<Map<String, dynamic>>> getSplitMuscles(String splitName) async {
     var splitsList = <Map<String, dynamic>>[];
 
@@ -266,10 +291,11 @@ class FirestoreService extends ChangeNotifier {
     } else {
       print('Dokument neexistuje.');
     }
-
+    print(splitsList);
     return splitsList;
   }
 
+  //získání cviků ze splitu
   Future<List<Map<String, dynamic>>> getSplitExercises(String splitName, List<Map<String, dynamic>> muscleNames) async {
     var exercisesList = <Map<String, dynamic>>[];
 
@@ -282,12 +308,16 @@ class FirestoreService extends ChangeNotifier {
           List<dynamic> exercises = data['exercises'] ?? [];
 
           // Add each exercise to the list with the associated muscle name
-          exercisesList.addAll(exercises.map((exercise) {
-            return {
-              'muscleName': muscleNames[i]["name"],
-              'exerciseName': exercise.toString(),
-            };
-          }));
+          exercisesList.addAll(
+            exercises.map(
+              (exercise) {
+                return {
+                  'muscleName': muscleNames[i]["name"],
+                  'exerciseName': exercise.toString(),
+                };
+              },
+            ),
+          );
         } else {
           print('Document exercises does not exist for muscle: ${muscleNames[i]["name"]}');
         }
@@ -302,9 +332,8 @@ class FirestoreService extends ChangeNotifier {
   /// Ukládání dat cviků
   ///
 
+  //ukládání dat cviku do firebase
   Future<void> SaveExerciseData() async {
-    // enableSync(); // pro testování ukládání
-
     //aktuální čas
     String time = "${now.day}.${now.month}.${now.year}";
     for (var a = 0; a < exerciseData.length; a++) {
@@ -345,26 +374,8 @@ class FirestoreService extends ChangeNotifier {
     // }
   }
 
-  //bullshit, načítá se do něho hodnoty, které se převádí do mapy
-  List<Map<String, dynamic>> listSplits = [];
-  List<Map<String, dynamic>> listFinalExercises = [];
-  List<Map<String, dynamic>> listSplitMuscles = [];
-
-  //proměnné (mapy) pro místo převodu
-  Map<String, dynamic> mapSplits = {};
-  Map<String, dynamic> mapFinalExercises = {};
-  Map<String, dynamic> mapSplitMuscles = {};
-//
-  String? chosedExercise;
-  String? selectedMuscle;
-  String? commentExercise;
-
-  //FORMÁT:   currunt split -> muscles - > exercises -> exercise data
-  //"pull":{"back":{"kladiva":{data}}};
-  Map<String, dynamic> mapExercisesSplits = {};
-
+  //získání dat z konkrétního cviku (pro zobrazení hodnot, když uživatel zavře aplikaci a z proměnné exerciseData se vymažou hodnoty, tak se znovu do té proměnné načtou)
   Future<void> LoadExerciseData() async {
-    int g = 0;
     print("list splits: $listSplits");
     print("list final exercises: $listFinalExercises");
     print("list split muscles: $listSplitMuscles");
@@ -388,6 +399,10 @@ class FirestoreService extends ChangeNotifier {
 //     print(mapFinalExercises);
   }
 
+  //ostatní *******************************************************************************************************************************************
+  //***************************************************************************************************************************************************
+
+  //porovnání dvou map jestli jsou stejné
   bool areEqual(Map map1, Map map2) {
     if (map1.length != map2.length) return false;
     for (var key in map1.keys) {
@@ -398,35 +413,3 @@ class FirestoreService extends ChangeNotifier {
     return true;
   }
 }
-
-/* //get collection of notes
-  final CollectionReference notes =
-      FirebaseFirestore.instance.collection('notes');
-  //CREATE
-  Future<void> addNote(String note) {
-    return notes.add({
-      'note': note,
-      'timestamp': Timestamp.now(),
-    });
-  }
-
-  //READ
-  Stream<QuerySnapshot> getNotesStream() {
-    final notesStream =
-        notes.orderBy('timestamp', descending: true).snapshots();
-    return notesStream;
-  }
-
-  //UPDATE
-  Future<void> updateNote(String docID, String newNote) {
-    return notes.doc(docID).update({
-      'note': newNote,
-      'timestamp': Timestamp.now(),
-    });
-  }
-
-  //DELETE
-  Future<void> deleteNote(String docID) {
-    return notes.doc(docID).delete();
-  }
-  */

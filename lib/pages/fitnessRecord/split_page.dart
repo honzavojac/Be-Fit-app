@@ -41,12 +41,16 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
   }
 
   Future<void> loadData() async {
-    var dbFirebase = await Provider.of<FirestoreService>(context, listen: false);
+    var dbFirebase =
+        await Provider.of<FirestoreService>(context, listen: false);
 
     listSplits = await dbFirebase.getSplits();
-    _tabController = await TabController(length: listSplits.length, vsync: this, initialIndex: clickedTab);
-    listMuscles = await dbFirebase.getSplitMuscles(listSplits[clickedTab]["name"]);
-    listExercises = await dbFirebase.getSplitExercises(listSplits[clickedTab]["name"], listMuscles);
+    _tabController = await TabController(
+        length: listSplits.length, vsync: this, initialIndex: clickedTab);
+    listMuscles =
+        await dbFirebase.getSplitMuscles(listSplits[clickedTab]["name"]);
+    listExercises = await dbFirebase.getSplitExercises(
+        listSplits[clickedTab]["name"], listMuscles);
     setState(() {});
   }
 
@@ -64,8 +68,15 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
               style: TextStyle(),
             ),
             Container(
+              child: ElevatedButton(
+                onPressed: () {},
+                child: Text("data"),
+              ),
+            ),
+            Container(
               child: IconButton(
-                icon: Icon(Icons.add_circle_outline_outlined, color: ColorsProvider.color_2, size: 35),
+                icon: Icon(Icons.add_circle_outline_outlined,
+                    color: ColorsProvider.color_2, size: 35),
                 onPressed: () {
                   showDialog(
                     context: context,
@@ -105,7 +116,8 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                       children: [
                         Text(
                           'You have to click this',
-                          style: TextStyle(fontSize: 20, color: ColorsProvider.color_1),
+                          style: TextStyle(
+                              fontSize: 20, color: ColorsProvider.color_1),
                         ),
                         SizedBox(
                           width: 5,
@@ -116,7 +128,8 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                         ),
                         Container(
                           child: IconButton(
-                            icon: Icon(Icons.add_circle_outline_outlined, color: ColorsProvider.color_2, size: 50),
+                            icon: Icon(Icons.add_circle_outline_outlined,
+                                color: ColorsProvider.color_2, size: 50),
                             onPressed: () {
                               showDialog(
                                 context: context,
@@ -193,18 +206,29 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                     itemCount: listMuscles.length,
                     itemBuilder: (context, index) {
                       List<Map<String, dynamic>> filteredExercises = [];
-                      filteredExercises = listExercises.where((exercise) => exercise['muscleName'] == listMuscles[index]["name"]).toList();
+                      filteredExercises = listExercises
+                          .where((exercise) =>
+                              exercise['muscleName'] ==
+                              listMuscles[index]["name"])
+                          .toList();
                       return Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Column(
                           children: [
                             Container(
-                              decoration: BoxDecoration(border: Border.all(color: ColorsProvider.color_2, width: 3), color: ColorsProvider.color_7, borderRadius: BorderRadius.circular(10)),
+                              decoration: BoxDecoration(
+                                  border: Border.all(
+                                      color: ColorsProvider.color_2, width: 3),
+                                  color: ColorsProvider.color_7,
+                                  borderRadius: BorderRadius.circular(10)),
                               height: 37,
                               child: Center(
                                 child: Text(
                                   listMuscles[index]["name"],
-                                  style: TextStyle(fontSize: 25, color: ColorsProvider.color_1, fontWeight: FontWeight.bold),
+                                  style: TextStyle(
+                                      fontSize: 25,
+                                      color: ColorsProvider.color_1,
+                                      fontWeight: FontWeight.bold),
                                 ),
                               ),
                             ),
@@ -214,9 +238,15 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                                 decoration: BoxDecoration(
                                   border: Border(
                                     top: BorderSide.none,
-                                    bottom: BorderSide(color: ColorsProvider.color_2, width: 5),
-                                    left: BorderSide(color: ColorsProvider.color_2, width: 5),
-                                    right: BorderSide(color: ColorsProvider.color_2, width: 5),
+                                    bottom: BorderSide(
+                                        color: ColorsProvider.color_2,
+                                        width: 5),
+                                    left: BorderSide(
+                                        color: ColorsProvider.color_2,
+                                        width: 5),
+                                    right: BorderSide(
+                                        color: ColorsProvider.color_2,
+                                        width: 5),
                                   ),
                                   color: ColorsProvider.color_4,
                                   borderRadius: BorderRadius.only(
@@ -230,10 +260,12 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                                     Container(
                                       color: ColorsProvider.color_7,
                                       // height: 160,
-                                      constraints: BoxConstraints(minHeight: 80),
+                                      constraints:
+                                          BoxConstraints(minHeight: 80),
                                       child: Container(
                                         child: ListView.builder(
-                                          physics: NeverScrollableScrollPhysics(),
+                                          physics:
+                                              NeverScrollableScrollPhysics(),
                                           shrinkWrap: true,
                                           reverse: true,
                                           itemCount: filteredExercises.length,
@@ -246,19 +278,29 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                                                       Expanded(
                                                         child: Container(
                                                           height: 40,
-                                                          decoration: BoxDecoration(
-                                                            color: ColorsProvider.color_4,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color:
+                                                                ColorsProvider
+                                                                    .color_4,
                                                             border: Border(
-                                                              top: BorderSide(width: 2, color: ColorsProvider.color_2),
+                                                              top: BorderSide(
+                                                                  width: 2,
+                                                                  color: ColorsProvider
+                                                                      .color_2),
                                                             ),
                                                           ),
                                                           width: 50,
                                                           child: Row(
-                                                            mainAxisAlignment: MainAxisAlignment.center,
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
                                                             children: [
                                                               Text(
                                                                 "${filteredExercises[index]["exerciseName"]}",
-                                                                style: TextStyle(fontSize: 17),
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        17),
                                                               ),
                                                             ],
                                                           ),
@@ -279,20 +321,28 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                                       color: ColorsProvider.color_2,
                                     ),
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         Expanded(
                                           child: ConstrainedBox(
-                                            constraints: BoxConstraints.tightFor(height: 40, width: double.infinity),
+                                            constraints:
+                                                BoxConstraints.tightFor(
+                                                    height: 40,
+                                                    width: double.infinity),
                                             child: ElevatedButton(
                                               onPressed: () async {
-                                                dbFirebase.chosedMuscle = listMuscles[index]["name"];
-                                                dbFirebase.splitName = listSplits[clickedTab]["name"];
+                                                dbFirebase.chosedMuscle =
+                                                    listMuscles[index]["name"];
+                                                dbFirebase.splitName =
+                                                    listSplits[clickedTab]
+                                                        ["name"];
                                                 // print(dbFirebase.chosedMuscle);
                                                 setState(() {});
                                                 showDialog(
                                                   context: context,
-                                                  builder: (BuildContext context) {
+                                                  builder:
+                                                      (BuildContext context) {
                                                     return Center(
                                                       child: AddExerciseBox(),
                                                     );
@@ -301,13 +351,20 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                                               },
                                               style: ElevatedButton.styleFrom(
                                                 shape: RoundedRectangleBorder(
-                                                  side: BorderSide(width: 2, color: ColorsProvider.color_8),
-                                                  borderRadius: BorderRadius.only(
-                                                    bottomLeft: Radius.circular(25),
-                                                    bottomRight: Radius.circular(25),
+                                                  side: BorderSide(
+                                                      width: 2,
+                                                      color: ColorsProvider
+                                                          .color_8),
+                                                  borderRadius:
+                                                      BorderRadius.only(
+                                                    bottomLeft:
+                                                        Radius.circular(25),
+                                                    bottomRight:
+                                                        Radius.circular(25),
                                                   ),
                                                 ),
-                                                backgroundColor: ColorsProvider.color_2,
+                                                backgroundColor:
+                                                    ColorsProvider.color_2,
                                               ),
                                               child: Text(
                                                 "exercises",
@@ -354,29 +411,36 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                             content: Container(
                               height: 50,
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Column(
                                     children: [
                                       Text(
                                         'Do you want delete this split?',
-                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 17),
                                       ),
-                                      Text('Data of exercises will stay save in app')
+                                      Text(
+                                          'Data of exercises will stay save in app')
                                     ],
                                   ),
                                   ElevatedButton(
                                     style: ButtonStyle(
-                                      backgroundColor: MaterialStatePropertyAll(Colors.black),
+                                      backgroundColor: MaterialStatePropertyAll(
+                                          Colors.black),
                                       foregroundColor: MaterialStatePropertyAll(
                                         ColorsProvider.color_1,
                                       ),
                                     ),
                                     onPressed: () async {
-                                      dbFirebase.deleteSplit(listSplits[clickedTab]["name"]);
+                                      dbFirebase.deleteSplit(
+                                          listSplits[clickedTab]["name"]);
                                       loadData();
                                       setState(() {});
-                                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                                      ScaffoldMessenger.of(context)
+                                          .hideCurrentSnackBar();
                                     },
                                     child: Text("yes"),
                                   ),

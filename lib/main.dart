@@ -27,7 +27,7 @@ void main() async {
   ColorsProvider colorsProvider = ColorsProvider();
 
   // dbFirebase.enableSync();
-
+  // dbFirebase.getSplitsMap();
   runApp(
     MultiProvider(
       providers: [
