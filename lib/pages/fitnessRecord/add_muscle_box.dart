@@ -13,7 +13,7 @@ class AddMuscleBox extends StatefulWidget {
 
 class _AddMuscleBoxState extends State<AddMuscleBox> {
   var textController = TextEditingController();
-  List<Map<String, dynamic>> listMuscles = [];
+  List<String> listMuscles = [];
   List<bool> isCheckedList = [];
 
   @override
@@ -42,9 +42,7 @@ class _AddMuscleBoxState extends State<AddMuscleBox> {
     return AlertDialog(
       contentPadding: EdgeInsets.zero,
       content: Container(
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(25),
-            color: ColorsProvider.color_7),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(25), color: ColorsProvider.color_7),
         height: 300,
         width: 200,
         child: Stack(
@@ -101,20 +99,18 @@ class _AddMuscleBoxState extends State<AddMuscleBox> {
                             itemCount: listMuscles.length,
                             itemBuilder: (context, index) {
                               return Padding(
-                                padding:
-                                    const EdgeInsets.only(left: 20, right: 20),
+                                padding: const EdgeInsets.only(left: 20, right: 20),
                                 child: Row(
                                   children: [
                                     Expanded(
                                       child: Text(
-                                        listMuscles[index]["name"],
+                                        listMuscles[index],
                                       ),
                                     ),
                                     Checkbox(
                                       value: isCheckedList[index],
                                       onChanged: (value) {
                                         isCheckedList[index] = value ?? false;
-                                        print("\n\n${isCheckedList}");
                                         setState(() {});
                                       },
                                     ),
@@ -144,11 +140,9 @@ class _AddMuscleBoxState extends State<AddMuscleBox> {
                         }
                       }
 
-                      dbFirebase.addSplit(
-                          "${textController.text.trim()}", isCheckedList);
-
+                      await dbFirebase.addSplit("${textController.text.trim()}", isCheckedList);
+                      setState(() {});
                       Navigator.of(context).pop();
-                      // dbFirebase.SplitSval();
                     },
                     style: TextButton.styleFrom(
                       backgroundColor: ColorsProvider.color_2,

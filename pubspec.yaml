@@ -31,6 +31,7 @@ dependencies:
   expand_widget: ^3.1.1
   connectivity: ^3.0.6
   toggle_list: ^0.3.1
+  conditional_builder_null_safety: ^0.0.6
   
 
 dev_dependencies:

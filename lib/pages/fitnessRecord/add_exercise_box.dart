@@ -14,8 +14,6 @@ class AddExerciseBox extends StatefulWidget {
 }
 
 class _AddExerciseBoxState extends State<AddExerciseBox> {
-  List<Map<String, dynamic>> listExercises = [];
-  List<String> listTrueExercises = [];
   List<bool> isCheckedList = [];
 
   @override
@@ -32,17 +30,13 @@ class _AddExerciseBoxState extends State<AddExerciseBox> {
 
   Future<void> loadData() async {
     var dbFirebase = Provider.of<FirestoreService>(context);
-    listExercises = await dbFirebase.getExercises();
-    listTrueExercises = await dbFirebase.getTrueSplitExercise();
-    print(listExercises);
-    print(listTrueExercises);
-
-    isCheckedList = List.generate(listExercises.length, (index) => false);
-
-    for (var i = 0; i < listExercises.length; i++) {
-      print(isCheckedList);
-      for (var j = 0; j < listTrueExercises.length; j++) {
-        if (listExercises[i]["name"] == listTrueExercises[j]) {
+    await dbFirebase.getExercises();
+    await dbFirebase.getTrueSplitExercise(dbFirebase.splitName);
+    isCheckedList = List.generate(dbFirebase.allExercises.length, (index) => false);
+    print(dbFirebase.mapFinalExercises[dbFirebase.splitName][dbFirebase.chosedMuscle]);
+    for (var i = 0; i < dbFirebase.allExercises.length; i++) {
+      for (var j = 0; j < dbFirebase.mapFinalExercises[dbFirebase.splitName][dbFirebase.chosedMuscle].length; j++) {
+        if (dbFirebase.allExercises[i] == dbFirebase.mapFinalExercises[dbFirebase.splitName][dbFirebase.chosedMuscle][j]) {
           isCheckedList[i] = true;
         }
       }
@@ -76,21 +70,19 @@ class _AddExerciseBoxState extends State<AddExerciseBox> {
                       Expanded(
                         child: Container(
                           child: ListView.builder(
-                            itemCount: listExercises.length,
+                            itemCount: dbFirebase.allExercises.length,
                             itemBuilder: (context, index) {
                               return Padding(
-                                padding:
-                                    const EdgeInsets.only(left: 20, right: 20),
+                                padding: const EdgeInsets.only(left: 20, right: 20),
                                 child: Row(
                                   children: [
                                     Expanded(
-                                      child: Text(listExercises[index]["name"]),
+                                      child: Text(dbFirebase.allExercises[index]),
                                     ),
                                     Checkbox(
                                       value: isCheckedList[index],
                                       onChanged: (value) {
                                         isCheckedList[index] = value ?? false;
-                                        print(isCheckedList);
                                         setState(() {});
                                       },
                                     ),
@@ -112,19 +104,16 @@ class _AddExerciseBoxState extends State<AddExerciseBox> {
                   width: double.infinity,
                   child: TextButton(
                     onPressed: () async {
-                      for (var i = 0; i < listExercises.length; i++) {
+                      for (var i = 0; i < dbFirebase.allExercises.length; i++) {
                         if (isCheckedList[i] == true) {
                           print("add");
-                          dbFirebase
-                              .addTrueSplitExercise(listExercises[i]["name"]);
+                          dbFirebase.addTrueSplitExercise(dbFirebase.allExercises[i]);
                         } else if (isCheckedList[i] == false) {
                           print("delete");
-                          dbFirebase.DeleteTrueSplitExercise(
-                              listExercises[i]["name"]);
+                          dbFirebase.DeleteTrueSplitExercise(dbFirebase.allExercises[i]);
                         }
                       }
                       Navigator.of(context).pop();
-                      // loadData();
                     },
                     style: TextButton.styleFrom(
                       backgroundColor: ColorsProvider.color_2,

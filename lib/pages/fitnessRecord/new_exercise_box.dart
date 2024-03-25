@@ -12,15 +12,7 @@ class NewExerciseBox extends StatefulWidget {
   _NewExerciseBoxState createState() => _NewExerciseBoxState();
 }
 
-// final List<String> items = [
-//   'biceps',
-//   'triceps',
-//   'shoulders',
-// ];
-//
-
 class _NewExerciseBoxState extends State<NewExerciseBox> {
-  List<Map<String, dynamic>> listMuscles = [];
   String? selectedMuscle;
   var textController = TextEditingController();
 
@@ -38,10 +30,11 @@ class _NewExerciseBoxState extends State<NewExerciseBox> {
   void loadData() async {
     var dbFirebase = Provider.of<FirestoreService>(context);
 
-    listMuscles = await dbFirebase.getMuscles();
+    await dbFirebase.getMuscles();
     // Nastavte výchozí hodnotu na první sval, pokud není seznam prázdný
-    if (listMuscles.isNotEmpty) {
-      selectedMuscle = listMuscles[0]["name"];
+    if (dbFirebase.allMuscles.isNotEmpty) {
+      print("nastavení defaultní hodnoty");
+      selectedMuscle = dbFirebase.chosedMuscle;
     } else {
       selectedMuscle = " ";
     }
@@ -71,8 +64,7 @@ class _NewExerciseBoxState extends State<NewExerciseBox> {
                   child: Container(
                     child: Text(
                       "New Exercise",
-                      style: TextStyle(
-                          color: ColorsProvider.color_1, fontSize: 20),
+                      style: TextStyle(color: ColorsProvider.color_1, fontSize: 20),
                     ),
                   ),
                 ),
@@ -147,13 +139,12 @@ class _NewExerciseBoxState extends State<NewExerciseBox> {
                 DropdownButtonHideUnderline(
                   child: DropdownButton2<String>(
                     isExpanded: true,
-                    items: listMuscles.map<DropdownMenuItem<String>>(
-                        (Map<String, dynamic> muscle) {
+                    items: dbFirebase.allMuscles.map<DropdownMenuItem<String>>((String muscle) {
                       print(dbFirebase.chosedMuscle);
                       return DropdownMenuItem<String>(
-                        value: muscle["name"],
+                        value: muscle,
                         child: Text(
-                          muscle["name"],
+                          muscle,
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
@@ -168,7 +159,7 @@ class _NewExerciseBoxState extends State<NewExerciseBox> {
                         selectedMuscle = value!; // Aktualizace vybraného svalu
                       });
                     },
-                    value: dbFirebase.chosedMuscle,
+                    value: selectedMuscle,
                     buttonStyleData: ButtonStyleData(
                       height: 50,
                       width: 150,
@@ -215,8 +206,7 @@ class _NewExerciseBoxState extends State<NewExerciseBox> {
                   width: double.infinity,
                   child: TextButton(
                     onPressed: () {
-                      dbFirebase.addExercise(
-                          textController.text.trim(), selectedMuscle!);
+                      dbFirebase.addExercise(textController.text.trim(), selectedMuscle!);
                       Navigator.of(context).pop();
                     },
                     style: TextButton.styleFrom(

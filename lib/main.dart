@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/firestore/firestore.dart';
 import 'package:kaloricke_tabulky_02/login/check_page.dart';
+import 'package:kaloricke_tabulky_02/variables_provider.dart';
 
 import 'package:provider/provider.dart';
 
@@ -25,9 +26,8 @@ void main() async {
   await dbHelper.initializeDB();
   FirestoreService dbFirebase = FirestoreService();
   ColorsProvider colorsProvider = ColorsProvider();
+  VariablesProvider variablesProvider = VariablesProvider();
 
-  // dbFirebase.enableSync();
-  // dbFirebase.getSplitsMap();
   runApp(
     MultiProvider(
       providers: [
@@ -40,8 +40,10 @@ void main() async {
         ChangeNotifierProvider.value(
           value: colorsProvider,
         ),
+        ChangeNotifierProvider.value(value: variablesProvider),
       ],
       child: MyApp(),
+      // child: Container(),
     ),
   );
 }

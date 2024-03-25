@@ -22,27 +22,54 @@ class _ExercisePageState extends State<ExercisePage> {
   TextEditingController commentExercise = TextEditingController();
   String? selectedMuscle;
   String? chosedExercise;
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    loadData();
-  }
+
+  //jednodušší proměnné z provideru
+
+  String today = "";
 
   @override
   void initState() {
     super.initState();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    loadData();
+  }
+
   Future<void> loadData() async {
     var dbFirebase = Provider.of<FirestoreService>(context);
+    today = "${dbFirebase.now.day}.${dbFirebase.now.month}.${dbFirebase.now.year}";
     dbFirebase.commentExercise = "";
 
     selectedMuscle = await dbFirebase.selectedMuscle;
     chosedExercise = await dbFirebase.chosedExercise;
-    print(selectedMuscle);
-    if (dbFirebase.exerciseData[chosedExercise] == null) {
-      print("vytváření prvního řádku ");
-      dbFirebase.exerciseData.addAll({
+
+    // Načtení dat z Firebase do providerů pro zobrazení hodnot po zavření aplikace
+    try {
+      weightControllers = {};
+      repsControllers = {};
+      var exerciseDate = dbFirebase.fullMapExercises[dbFirebase.splitName][selectedMuscle][chosedExercise]?["date"]?[today];
+      dbFirebase.exerciseData = {
+        "${dbFirebase.selectedMuscle}": {dbFirebase.chosedExercise: {}}
+      };
+      for (var i = 0; i < exerciseDate["series"].length; i++) {
+        var splitNumber = exerciseDate["series"].keys.toList()[i]; //set key (set 1)
+        var splitvalues = exerciseDate["series"].values.toList()[i]; // values of set ({special: normal, difficulty: 1, reps: null, weight: null})
+        print(splitNumber);
+        print(i);
+        print(splitvalues);
+        dbFirebase.exerciseData[dbFirebase.selectedMuscle][dbFirebase.chosedExercise].addAll({splitNumber: splitvalues});
+      }
+      print("exercisedate: ${exerciseDate}");
+      //přičtení
+    } catch (e) {
+      print("chyba: $e");
+
+      print("Vytváření prvního řádku ");
+
+      dbFirebase.exerciseData = {
         "$selectedMuscle": {
           "$chosedExercise": {
             "set 1": {
@@ -53,32 +80,51 @@ class _ExercisePageState extends State<ExercisePage> {
             }
           }
         }
-      });
-
-      print(dbFirebase.exerciseData[selectedMuscle][chosedExercise]);
-
+      };
+      print("${dbFirebase.exerciseData}");
       weightControllers["set 1"] = TextEditingController();
       repsControllers["set 1"] = TextEditingController();
-      setState(() {});
     }
-    for (var i = 0; i < dbFirebase.exerciseData[selectedMuscle][chosedExercise].length; i++) {
-      print(i);
-      weightControllers["set ${i + 1}"] = TextEditingController();
-      repsControllers["set ${i + 1}"] = TextEditingController();
-      if (dbFirebase.exerciseData[selectedMuscle][chosedExercise]["set ${i + 1}"]["weight"] != null) {
-        weightControllers["set ${i + 1}"]!.text = dbFirebase.exerciseData[selectedMuscle][chosedExercise]["set ${i + 1}"]["weight"];
-      }
-      if (dbFirebase.exerciseData[selectedMuscle][chosedExercise]["set ${i + 1}"]["reps"] != null) {
-        repsControllers["set ${i + 1}"]!.text = dbFirebase.exerciseData[selectedMuscle][chosedExercise]["set ${i + 1}"]["reps"];
-      }
-    }
+
+    // print(dbFirebase.exerciseData);
+    // if (dbFirebase.exerciseData[dbFirebase.selectedMuscle][dbFirebase.chosedExercise]) {
+    //   print("Vytváření prvního řádku ");
+    //   dbFirebase.exerciseData["$selectedMuscle"]?["$chosedExercise"].addAll(
+    //     {
+    //       "set 1": {
+    //         "weight": null,
+    //         "reps": null,
+    //         "difficulty": 1,
+    //         "special": "normal",
+    //       }
+    //     },
+    //   );
+    // }
+
+    // print(exerciseDate);
+    // print(" ");
+
+    // print(dbFirebase.fullMapExercises);
+    // print(" ");
+    print(dbFirebase.exerciseData);
+
+    // Nastavení controllerů
+    dbFirebase.exerciseData[selectedMuscle]?.forEach((key, value) {
+      value?.forEach((splitNumber, data) {
+        weightControllers["$splitNumber"] = TextEditingController(text: data["weight"]?.toString());
+        repsControllers["$splitNumber"] = TextEditingController(text: data["reps"]?.toString());
+      });
+    });
+
+    setState(() {});
   }
 
   recount() {
     var dbFirebase = Provider.of<FirestoreService>(context, listen: false);
 
+    print(dbFirebase.exerciseData[selectedMuscle][chosedExercise]);
     // Získání seznamu klíčů
-    List<String> exexrciseKeys = dbFirebase.exerciseData[selectedMuscle][chosedExercise].keys.toList();
+    List<dynamic> exexrciseKeys = dbFirebase.exerciseData[selectedMuscle][chosedExercise].keys.toList();
 
     // Seřazení klíčů podle jejich číselné hodnoty
     exexrciseKeys.sort((a, b) => int.parse(a.substring(4)).compareTo(int.parse(b.substring(4))));
@@ -135,9 +181,10 @@ class _ExercisePageState extends State<ExercisePage> {
       repsControllers[newKey] = controller;
     }
   }
-
-  saveData() {}
-
+loadExerciseData(String splitName, String muscleName, String exerciseName)async{
+  //načte postupně všechny data z daného dne
+   
+}
   @override
   Widget build(BuildContext context) {
     var dbFirebase = Provider.of<FirestoreService>(context);
@@ -149,123 +196,41 @@ class _ExercisePageState extends State<ExercisePage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              '${chosedExercise}',
+              '${dbFirebase.chosedExercise}',
               style: TextStyle(fontWeight: FontWeight.bold, color: ColorsProvider.color_1),
             ),
-            GestureDetector(
-              child: Container(
-                  decoration: BoxDecoration(
-                    color: ColorsProvider.color_2,
-                    border: Border.all(color: Colors.black),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(3, 4, 3, 4),
-                    child: Text(
-                      "Specials",
-                      style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 15),
-                    ),
-                  )),
-              onTap: () {
-                print("new special");
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return Center(
-                      child: SpecialBox(),
-                    );
-                  },
-                );
-              },
-            )
+            // GestureDetector(
+            //   child: Container(
+            //       decoration: BoxDecoration(
+            //         color: ColorsProvider.color_2,
+            //         border: Border.all(color: Colors.black),
+            //         borderRadius: BorderRadius.circular(12),
+            //       ),
+            //       child: Padding(
+            //         padding: const EdgeInsets.fromLTRB(3, 4, 3, 4),
+            //         child: Text(
+            //           "Specials",
+            //           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 15),
+            //         ),
+            //       )),
+            //   onTap: () {
+            //     showDialog(
+            //       context: context,
+            //       builder: (BuildContext context) {
+            //         return Center(
+            //           child: SpecialBox(),
+            //         );
+            //       },
+            //     );
+            //   },
+            // )
           ],
         ),
         leading: IconButton(
           icon: Icon(Icons.arrow_back), // Ikona zpětné šipky
           onPressed: () {
             dbFirebase.enableSync();
-            // showDialog(
-            //   context: context,
-            //   builder: (BuildContext context) {
-            //     return AlertDialog(
-            //       title: Text(
-            //         'Do you want save your values?',
-            //         style: TextStyle(
-            //           fontWeight: FontWeight.bold,
-            //           fontSize: 20,
-            //         ),
-            //       ),
-            //       actions: <Widget>[
-            //         Row(
-            //           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            //           children: [
-            //             Expanded(
-            //               child: GestureDetector(
-            //                 child: Container(
-            //                   decoration: BoxDecoration(
-            //                     border: Border.all(
-            //                       color: Colors.black,
-            //                       width: 2,
-            //                     ),
-            //                     borderRadius: BorderRadius.circular(17),
-            //                   ),
-            //                   child: Padding(
-            //                     padding: const EdgeInsets.all(5.0),
-            //                     child: Row(
-            //                       mainAxisAlignment: MainAxisAlignment.center,
-            //                       children: [
-            //                         Text("Delete"),
-            //                         Icon(
-            //                           Icons.delete,
-            //                           color: ColorsProvider.color_5,
-            //                         )
-            //                       ],
-            //                     ),
-            //                   ),
-            //                 ),
-            //                 onTap: () {
-            //                   Navigator.of(context).pop();
-            //                 },
-            //               ),
-            //             ),
-            //             SizedBox(
-            //               width: 30,
-            //             ),
-            //             Expanded(
-            //               child: GestureDetector(
-            //                 child: Container(
-            //                   decoration: BoxDecoration(
-            //                     border: Border.all(
-            //                       color: Colors.black,
-            //                       width: 2,
-            //                     ),
-            //                     borderRadius: BorderRadius.circular(17),
-            //                   ),
-            //                   child: Padding(
-            //                     padding: const EdgeInsets.all(5.0),
-            //                     child: Row(
-            //                       mainAxisAlignment: MainAxisAlignment.center,
-            //                       children: [
-            //                         Text("Save"),
-            //                         Icon(
-            //                           Icons.save_rounded,
-            //                           color: Colors.green,
-            //                         )
-            //                       ],
-            //                     ),
-            //                   ),
-            //                 ),
-            //                 onTap: () {
-            //                   Navigator.of(context).pop();
-            //                 },
-            //               ),
-            //             ),
-            //           ],
-            //         ),
-            //       ],
-            //     );
-            //   },
-            // );
+
             Navigator.of(context).pop();
           },
         ),
@@ -334,9 +299,9 @@ class _ExercisePageState extends State<ExercisePage> {
                                 ),
                                 Expanded(
                                   child: ListView.builder(
-                                    // shrinkWrap: true,
+                                    shrinkWrap: false,
                                     // physics: NeverScrollableScrollPhysics(),
-                                    itemCount: dbFirebase.exerciseData[selectedMuscle][chosedExercise].length,
+                                    itemCount: dbFirebase.exerciseData[dbFirebase.selectedMuscle]?[dbFirebase.chosedExercise]?.length,
                                     itemBuilder: (context, index) {
                                       return Column(
                                         children: [
@@ -360,8 +325,13 @@ class _ExercisePageState extends State<ExercisePage> {
                                                     height: 35,
                                                     child: Center(
                                                       child: TextField(
-                                                        onChanged: (value) {
-                                                          dbFirebase.exerciseData[selectedMuscle][chosedExercise]["set ${index + 1}"]["weight"] = value;
+                                                        onChanged: (value) async {
+                                                          dbFirebase.exerciseData[dbFirebase.selectedMuscle]?[dbFirebase.chosedExercise]?["set ${index + 1}"]["weight"] = value;
+                                                          print(value);
+                                                          if (weightControllers["set ${index + 1}"]!.text.isNotEmpty) {
+                                                            // await dbFirebase.SaveExerciseData();
+                                                            print("object");
+                                                          }
 
                                                           //uložení dat do offline firebase
                                                         },
@@ -411,7 +381,7 @@ class _ExercisePageState extends State<ExercisePage> {
                                                     child: Center(
                                                       child: TextField(
                                                         onChanged: (value) {
-                                                          dbFirebase.exerciseData[selectedMuscle][chosedExercise]["set ${index + 1}"]["reps"] = value;
+                                                          dbFirebase.exerciseData[selectedMuscle]?[chosedExercise]?["set ${index + 1}"]["reps"] = value;
                                                           //uložení dat do offline firebase
                                                         },
                                                         controller: repsControllers["set ${index + 1}"],
@@ -458,9 +428,10 @@ class _ExercisePageState extends State<ExercisePage> {
                                                   child: DropdownButtonHideUnderline(
                                                     child: DropdownButton2<int>(
                                                       isExpanded: true,
-                                                      value: dbFirebase.exerciseData[selectedMuscle][chosedExercise]["set ${index + 1}"]["difficulty"],
-                                                      onChanged: (int? value) {
+                                                      value: dbFirebase.exerciseData[selectedMuscle]?[chosedExercise]?["set ${index + 1}"]["difficulty"],
+                                                      onChanged: (int? value) async {
                                                         dbFirebase.exerciseData[selectedMuscle][chosedExercise]["set ${index + 1}"]["difficulty"] = value!;
+                                                        // await dbFirebase.SaveExerciseData();
                                                         setState(() {});
                                                       },
                                                       items: List.generate(
@@ -507,9 +478,10 @@ class _ExercisePageState extends State<ExercisePage> {
                                                   onTap: () async {
                                                     //vymazat hodnotu
                                                     print("odstranění hodnoty: ${index + 1}");
-                                                    dbFirebase.exerciseData[selectedMuscle][chosedExercise].remove("set ${index + 1}");
+                                                    dbFirebase.exerciseData[selectedMuscle]?[chosedExercise]?.remove("set ${index + 1}");
                                                     weightControllers.remove("set ${index + 1}");
                                                     repsControllers.remove("set ${index + 1}");
+                                                    // dbFirebase.
                                                     await recount();
                                                     setState(() {});
                                                   },
@@ -547,109 +519,48 @@ class _ExercisePageState extends State<ExercisePage> {
                       ],
                     ),
                   ),
-                  Container(
-                    height: 100,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        GestureDetector(
-                          child: Container(
-                            child: Text("data"),
-                          ),
-                          onTap: () {},
+                  GestureDetector(
+                    child: Container(
+                      height: 40,
+                      width: 100,
+                      decoration: BoxDecoration(
+                        color: ColorsProvider.color_2,
+                        borderRadius: BorderRadius.circular(9),
+                        border: Border.all(color: Colors.black, width: 2),
+                      ),
+                      child: Center(
+                        child: Text(
+                          "Add set",
+                          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
                         ),
-                        GestureDetector(
-                          child: Container(
-                            height: 40,
-                            width: 100,
-                            decoration: BoxDecoration(
-                              color: ColorsProvider.color_2,
-                              borderRadius: BorderRadius.circular(9),
-                              border: Border.all(color: Colors.black, width: 2),
-                            ),
-                            child: Center(
-                              child: Text(
-                                "Add set",
-                                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
-                              ),
-                            ),
-                          ),
-                          onTap: () {
-                            int length = dbFirebase.exerciseData[selectedMuscle][chosedExercise].length;
-                            if (length == 0) {
-                              print("vytvoření prvního řádku");
-                              dbFirebase.exerciseData = {
-                                "${chosedExercise}": {"set 1": {}}
-                              };
-                              print(dbFirebase.exerciseData[selectedMuscle][chosedExercise]);
-
-                              weightControllers["set 1"] = TextEditingController();
-                              repsControllers["set 1"] = TextEditingController();
-                              setState(() {});
-                            } else {
-                              //přidání další položky v listview.builder
-
-                              dbFirebase.exerciseData[selectedMuscle][chosedExercise]["set ${length + 1}"] = {
-                                "weight": null,
-                                "reps": null,
-                                "difficulty": 1,
-                                "special": "normal",
-                              };
-
-                              weightControllers["set ${length + 1}"] = TextEditingController();
-                              repsControllers["set ${length + 1}"] = TextEditingController();
-                              setState(() {});
-                            }
-                            // else if (weightControllers["set $length"]!
-                            //             .text
-                            //             .isEmpty ==
-                            //         true ||
-                            //     repsControllers["set $length"]!.text.isEmpty ==
-                            //         true) {
-                            //   print("textfield je null");
-                            //   showDialog(
-                            //     context: context,
-                            //     builder: (BuildContext context) {
-                            //       return AlertDialog(
-                            //         title: Text('Warning !!!'),
-                            //         content: Container(
-                            //           height: 100,
-                            //           child: Column(
-                            //             mainAxisAlignment:
-                            //                 MainAxisAlignment.spaceBetween,
-                            //             children: [
-                            //               Text(
-                            //                 'Text field is empty',
-                            //                 style: TextStyle(
-                            //                   fontWeight: FontWeight.bold,
-                            //                   fontSize: 20,
-                            //                 ),
-                            //               ),
-                            //               Text(
-                            //                 'Please enter a value or, if it is a value of your body, enter 0.',
-                            //               ),
-                            //             ],
-                            //           ),
-                            //         ),
-                            //         actions: <Widget>[
-                            //           Container(
-                            //             height: 40,
-                            //             child: TextButton(
-                            //               onPressed: () {
-                            //                 Navigator.of(context).pop();
-                            //               },
-                            //               child: Text("OK"),
-                            //             ),
-                            //           ),
-                            //         ],
-                            //       );
-                            //     },
-                            //   );
-                            // }
-                          },
-                        ),
-                      ],
+                      ),
                     ),
+                    onTap: () {
+                      int length = dbFirebase.exerciseData[selectedMuscle][chosedExercise].length;
+                      if (length == 0) {
+                        print("vytvoření prvního řádku");
+                        dbFirebase.exerciseData = {
+                          "${chosedExercise}": {"set 1": {}}
+                        };
+
+                        weightControllers["set 1"] = TextEditingController();
+                        repsControllers["set 1"] = TextEditingController();
+                        setState(() {});
+                      } else {
+                        //přidání další položky v listview.builder
+
+                        dbFirebase.exerciseData[selectedMuscle][chosedExercise]["set ${length + 1}"] = {
+                          "weight": null,
+                          "reps": null,
+                          "difficulty": 1,
+                          "special": "normal",
+                        };
+
+                        weightControllers["set ${length + 1}"] = TextEditingController();
+                        repsControllers["set ${length + 1}"] = TextEditingController();
+                      }
+                      setState(() {});
+                    },
                   ),
                   ExpandChild(
                     indicatorIconColor: ColorsProvider.color_2,
@@ -891,7 +802,7 @@ class _ExercisePageState extends State<ExercisePage> {
                         ),
                       ),
                     ),
-                    onTap: () {
+                    onTap: () async {
                       // // výpis exercise dat
                       // print("dbFirebase.exerciseData:");
                       // dbFirebase.exerciseData[selectedMuscle][chosedExercise].forEach((key, value) {
@@ -903,8 +814,11 @@ class _ExercisePageState extends State<ExercisePage> {
                       // print("repsControllers:   |${repsControllers.entries.map((entry) => "${entry.key}: ${entry.value.text}").join("| ")}|");
 
                       // print(dbFirebase.exerciseData);
+                      // print("weight controllers: ${weightControllers.keys}");
+                      // print("reps controllers: ${repsControllers.keys}");
 
-                      dbFirebase.LoadExerciseData();
+                      await dbFirebase.SaveExerciseData();
+                      print("uloženo ");
                       setState(() {});
                     },
                   )
