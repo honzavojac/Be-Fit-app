@@ -555,7 +555,7 @@ class _ExercisePageState extends State<ExercisePage> {
                         repsControllers["set ${length + 1}"] = TextEditingController();
                       }
                       print("2:   ${dbFirebase.exerciseData}");
-                      await dbFirebase.SaveExerciseData();
+                      // await dbFirebase.SaveExerciseData();
                       setState(() {});
                     },
                   ),
