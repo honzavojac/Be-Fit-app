@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 class FirestoreService extends ChangeNotifier {
   //Proměnné ******************************************************************************************************************************************
@@ -16,6 +17,7 @@ class FirestoreService extends ChangeNotifier {
 
   // Určení dnešního datumu
   DateTime now = DateTime.now();
+  String? time;
 
   //proměnná pro uložení všech uživatelem zadaných hodnot do cviků
   Map<String, dynamic> exerciseData = {};
@@ -270,17 +272,19 @@ class FirestoreService extends ChangeNotifier {
           // Uložení seznamu cviků do mapy pro daný sval
           exercisesMap[splitName] ??= {};
           exercisesMap[splitName]![docSnapshot.id] = exercises;
+          print(exercisesMap);
         }
       }
     } catch (e) {
       print('Chyba při získávání cviků ze splitu: $e');
     }
 
-    // Přidejte mapu cviků do mapy mapFinalExercises
+    // // Přidejte mapu cviků do mapy mapFinalExercises
     mapFinalExercises.addAll(exercisesMap);
 
-    // Vypsání výsledků pro ověření
-    print(mapFinalExercises);
+    // // Vypsání výsledků pro ověření
+    // print(mapFinalExercises);
+    // splitData.add(SplitData(splitName: splitName,muscleName: exercisesMap[splitName] ));
 
     return exercisesMap;
   }
@@ -412,7 +416,7 @@ class FirestoreService extends ChangeNotifier {
   //   }
   Future<void> SaveExerciseData() async {
     //aktuální čas
-    String time = "${now.day}.${now.month}.${now.year}";
+    time = "${now.day}.${now.month}.${now.year}";
     for (var a = 0; a < exerciseData.length; a++) {
       //svaly
       var muscleKey = exerciseData.keys.toList()[a];
@@ -430,15 +434,20 @@ class FirestoreService extends ChangeNotifier {
             "$time": {"comment": "$commentExercise", "series": data}
           }
         };
-        print(finalData);
         // Získání reference na dokument
 
-        await db.collection("users").doc(auth.currentUser?.uid).collection("muscles").doc(muscleKey).collection("exercises").doc(exerciseKey).collection("years").doc("${now.year}").set(finalData, SetOptions(merge: true));
-        print("uloženo");
+        //
+        try {
+          db.collection("users").doc(auth.currentUser?.uid).collection("muscles").doc(muscleKey).collection("exercises").doc(exerciseKey).collection("years").doc("${now.year}").set(finalData, SetOptions(merge: true));
+        } catch (e) {
+          print(e);
+        }
+        print(finalData);
         // uložit do databáze
-
+        notifyListeners();
         // Funkce pro kontrolu shody dvou map
       }
+      print("uloženo");
     }
 
     // try {
@@ -451,43 +460,20 @@ class FirestoreService extends ChangeNotifier {
     // }
   }
 
-  //získání dat z konkrétního cviku (pro zobrazení hodnot, když uživatel zavře aplikaci a z proměnné exerciseData se vymažou hodnoty, tak se znovu do té proměnné načtou)
-  Future<void> LoadExerciseData(String splitName, String muscleName, String exerciseName) async {
-    // print("list splits: $listSplits");
-    // print("map final exercises: ${mapFinalExercises}");
-    // print("map split muscles: $mapSplitMuscles");
+  Future<void> DeleteExerciseData(String splitName, String muscleName, String exerciseName, String set) async {
     try {
       //aktuální čas
-      String time = "${now.day}.${now.month}.${now.year}";
-
-      var document = await db.collection("users").doc(auth.currentUser?.uid).collection("muscles").doc(muscleName).collection("exercises").doc(exerciseName).collection("years").doc("${now.year}").get();
-
-      // print(document["exercise_data"]["${time}"]);
-
-      //FORMÁT:   currunt split -> muscles - > exercises -> exercise data
-
-      fullMapExercises.addAll({
-        "$splitName": {
-          "$muscleName": {
-            "$exerciseName": {"date": document["exercise_data"]},
-          },
-        },
-      });
+      time = "${now.day}.${now.month}.${now.year}";
+      // Odstranění určitého klíče z dokumentu
+      fullMapExercises[splitName][muscleName][exerciseName]["date"][time]["series"]["$set"].remove();
+      print(fullMapExercises);
+      await db.collection("users").doc(auth.currentUser?.uid).collection("muscles").doc(muscleName).collection("exercises").doc(exerciseName).collection("years").doc("${now.year}").update({"exercise_data.$time.series.": FieldValue.delete()});
     } catch (e) {}
-    // print(fullMapExercises[splitName][selectedMuscle][chosedExercise]["date"]);
-    // for (var i = 0; i < fullMapExercises[splitName][muscleName][exerciseName]["date"].length; i++) {
-    //   print(fullMapExercises[splitName][muscleName][exerciseName]["date"].keys.toList()[i]);
-    // }
-    disableSync();
+    // notifyListeners();
+    print("hotovoooo");
+    LoadExerciseData(splitName, muscleName, exerciseName);
   }
-
-  Future<void> DeleteExerciseData(String splitName, String muscleName, String exerciseName) async {
-    try {
-      //aktuální čas
-    } catch (e) {}
-
-    disableSync();
-  }
+  //  {test pull: {back: {vodorovné přítahy na kladce: {date: {26.3.2024: {series: {set 2: {difficulty: 4, special: normal, reps: 222, weight: 22},
 
   //ostatní *******************************************************************************************************************************************
   //***************************************************************************************************************************************************
@@ -502,4 +488,125 @@ class FirestoreService extends ChangeNotifier {
     }
     return true;
   }
+
+  List<ExerciseData> dataCviku = [];
+  //získání dat z konkrétního cviku (pro zobrazení hodnot, když uživatel zavře aplikaci a z proměnné exerciseData se vymažou hodnoty, tak se znovu do té proměnné načtou)
+  Future<void> LoadExerciseData(String splitName, String muscleName, String exerciseName) async {
+    try {
+      //aktuální čas
+      time = "${now.day}.${now.month}.${now.year}";
+
+      var document = await db.collection("users").doc(auth.currentUser?.uid).collection("muscles").doc(muscleName).collection("exercises").doc(exerciseName).collection("years").doc("${now.year}").get();
+
+      //FORMÁT:   currunt split -> muscles - > exercises -> exercise data
+
+      fullMapExercises.addAll({
+        "$splitName": {
+          "$muscleName": {
+            "$exerciseName": {"date": document["exercise_data"]},
+          },
+        },
+      });
+      // dataCviku = [];
+
+      // for (var i = 0; i < document["exercise_data"].length; i++) {
+      //   //datum
+      //   var date = document["exercise_data"].keys.toList()[i];
+      //   // print(date);
+      //   for (var j = 0; j < document["exercise_data"][date]["series"].length; j++) {
+      //     //set
+      //     var set = document["exercise_data"][date]["series"].keys.toList()[j];
+      //     var setData = document["exercise_data"][date]["series"][set];
+      //     print(j);
+      //     print(setData);
+      //     // setData = {"difficulty": 5, "special": "normal", "reps": 12, "weight": 50};
+      //     // if (dataCviku.any((data) => data.splitName == splitName && data.muscleName == muscleName && data.exerciseName == exerciseName && data.time == date)) {
+      //     //   // uprava hodnot
+      //     //   print("uprava hodnot");
+      //     //   // Aktualizace hodnot položek weight, reps a difficulty
+      //     //   dataCviku.forEach((element) {
+      //     //     element.weight = setData["weight"];
+      //     //     element.reps = setData["reps"];
+      //     //     element.difficulty = setData["difficulty"];
+      //     //   });
+      //     // } else {
+      //     print("vytváření nového objektu");
+      //     dataCviku.add(ExerciseData(
+      //       splitName: splitName,
+      //       muscleName: muscleName,
+      //       exerciseName: exerciseName,
+      //       splitNumberName: set,
+      //       time: date,
+      //       weight: setData["weight"],
+      //       reps: setData["reps"],
+      //       difficulty: setData["difficulty"],
+      //     ));
+      //     // }
+      //   }
+      // }
+    } catch (e) {
+      print(e);
+    }
+    // for (var data in dataCviku) {
+    //   print('------------------');
+    //   print('SplitName: ${data.splitName}');
+    //   print('MuscleName: ${data.muscleName}');
+    //   print('ExerciseName: ${data.exerciseName}');
+    //   print('Date: ${data.splitNumberName}');
+    //   print('Time: ${data.time}');
+    //   print('Weight: ${data.weight}');
+    //   print('Reps: ${data.reps}');
+    //   print('Difficulty: ${data.difficulty}');
+    //   print('Comment: ${data.comment ?? "No comment"}'); // Zde použijeme ?? pro kontrolu, zda je comment null
+    //   print('------------------');
+    // }
+  }
+
+  List<SplitData> splitData = [];
+  insertSplitData(String splitName, String muscleName, String exerciseName) {
+    splitData.add(SplitData(splitName: splitName, muscleName: muscleName, exerciseName: exerciseName));
+  }
+}
+
+class SplitData {
+  //data kde bude splitName, muscleName a exerciseName
+
+  String splitName;
+  late String? muscleName;
+  late String? exerciseName;
+
+  SplitData({
+    required this.splitName,
+    this.muscleName,
+    this.exerciseName,
+  });
+  printData() {
+    print("split name: $splitName \tmuscle name: $muscleName \texercise name: $exerciseName");
+  }
+}
+
+class ExerciseData {
+  //date kde jsou data o cviku (split, muscle, exercise, date, split, weight, resp, difficulty a comment)
+
+  String splitName;
+  String muscleName;
+  String exerciseName;
+  String time;
+  String splitNumberName;
+  String weight;
+  String reps;
+  int difficulty;
+  String? comment;
+
+  ExerciseData({
+    required this.splitName,
+    required this.muscleName,
+    required this.exerciseName,
+    required this.time,
+    required this.splitNumberName,
+    required this.weight,
+    required this.reps,
+    required this.difficulty,
+    this.comment,
+  });
 }

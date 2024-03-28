@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:kaloricke_tabulky_02/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/firestore/firestore.dart';
-import 'package:kaloricke_tabulky_02/pages/fitnessRecord/special_box.dart';
 import 'package:provider/provider.dart';
 
 class ExercisePage extends StatefulWidget {
@@ -57,12 +56,9 @@ class _ExercisePageState extends State<ExercisePage> {
       for (var i = 0; i < exerciseDate["series"].length; i++) {
         var splitNumber = exerciseDate["series"].keys.toList()[i]; //set key (set 1)
         var splitvalues = exerciseDate["series"].values.toList()[i]; // values of set ({special: normal, difficulty: 1, reps: null, weight: null})
-        print(splitNumber);
-        print(i);
-        print(splitvalues);
+
         dbFirebase.exerciseData[dbFirebase.selectedMuscle][dbFirebase.chosedExercise].addAll({splitNumber: splitvalues});
       }
-      print("exercisedate: ${exerciseDate}");
       //přičtení
     } catch (e) {
       print("chyba: $e");
@@ -81,32 +77,9 @@ class _ExercisePageState extends State<ExercisePage> {
           }
         }
       };
-      print("${dbFirebase.exerciseData}");
       weightControllers["set 1"] = TextEditingController();
       repsControllers["set 1"] = TextEditingController();
     }
-
-    // print(dbFirebase.exerciseData);
-    // if (dbFirebase.exerciseData[dbFirebase.selectedMuscle][dbFirebase.chosedExercise]) {
-    //   print("Vytváření prvního řádku ");
-    //   dbFirebase.exerciseData["$selectedMuscle"]?["$chosedExercise"].addAll(
-    //     {
-    //       "set 1": {
-    //         "weight": null,
-    //         "reps": null,
-    //         "difficulty": 1,
-    //         "special": "normal",
-    //       }
-    //     },
-    //   );
-    // }
-
-    // print(exerciseDate);
-    // print(" ");
-
-    // print(dbFirebase.fullMapExercises);
-    // print(" ");
-    print(dbFirebase.exerciseData);
 
     // Nastavení controllerů
     dbFirebase.exerciseData[selectedMuscle]?.forEach((key, value) {
@@ -122,7 +95,6 @@ class _ExercisePageState extends State<ExercisePage> {
   recount() {
     var dbFirebase = Provider.of<FirestoreService>(context, listen: false);
 
-    print(dbFirebase.exerciseData[selectedMuscle][chosedExercise]);
     // Získání seznamu klíčů
     List<dynamic> exexrciseKeys = dbFirebase.exerciseData[selectedMuscle][chosedExercise].keys.toList();
 
@@ -144,7 +116,7 @@ class _ExercisePageState extends State<ExercisePage> {
     // Seřadit klíče podle jejich číselného řádu
     weightKeys.sort((a, b) => int.parse(a.substring(4)).compareTo(int.parse(b.substring(4))));
 
-    // Vytvořit nové klíče ve formátu "set {index + 1}" a odstranit staré klíče
+    // Vytvořit nové klíče ve formátu "set {setNumber}" a odstranit staré klíče
     for (var i = 0; i < weightKeys.length; i++) {
       String oldKey = weightKeys[i];
       String newKey = "set ${i + 1}";
@@ -166,7 +138,7 @@ class _ExercisePageState extends State<ExercisePage> {
     // Seřadit klíče podle jejich číselného řádu
     repsKeys.sort((a, b) => int.parse(a.substring(4)).compareTo(int.parse(b.substring(4))));
 
-    // Vytvořit nové klíče ve formátu "set {index + 1}" a odstranit staré klíče
+    // Vytvořit nové klíče ve formátu "set {setNumber}" a odstranit staré klíče
     for (var i = 0; i < repsKeys.length; i++) {
       String oldKey = repsKeys[i];
       String newKey = "set ${i + 1}";
@@ -180,11 +152,19 @@ class _ExercisePageState extends State<ExercisePage> {
       // Přidat nový klíč s odpovídající hodnotou
       repsControllers[newKey] = controller;
     }
+    // setState(() {});
   }
-loadExerciseData(String splitName, String muscleName, String exerciseName)async{
-  //načte postupně všechny data z daného dne
-   
-}
+
+  saveData() {
+    // uloží data do fullmapexercises odkud se bude brát vše pro zobrazování hodnot
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+  }
   @override
   Widget build(BuildContext context) {
     var dbFirebase = Provider.of<FirestoreService>(context);
@@ -229,9 +209,12 @@ loadExerciseData(String splitName, String muscleName, String exerciseName)async{
         leading: IconButton(
           icon: Icon(Icons.arrow_back), // Ikona zpětné šipky
           onPressed: () {
-            dbFirebase.enableSync();
+            dbFirebase.SaveExerciseData();
 
-            Navigator.of(context).pop();
+            Navigator.of(context).pop(true);
+            setState(() {});
+            dbFirebase.enableSync();
+            setState(() {});
           },
         ),
       ),
@@ -303,6 +286,7 @@ loadExerciseData(String splitName, String muscleName, String exerciseName)async{
                                     // physics: NeverScrollableScrollPhysics(),
                                     itemCount: dbFirebase.exerciseData[dbFirebase.selectedMuscle]?[dbFirebase.chosedExercise]?.length,
                                     itemBuilder: (context, index) {
+                                      int setNumber = index + 1;
                                       return Column(
                                         children: [
                                           Container(
@@ -315,7 +299,7 @@ loadExerciseData(String splitName, String muscleName, String exerciseName)async{
                                                   child: Row(
                                                     mainAxisAlignment: MainAxisAlignment.center,
                                                     children: [
-                                                      Text("${index + 1}"),
+                                                      Text("${setNumber}"),
                                                     ],
                                                   ),
                                                 ),
@@ -326,16 +310,16 @@ loadExerciseData(String splitName, String muscleName, String exerciseName)async{
                                                     child: Center(
                                                       child: TextField(
                                                         onChanged: (value) async {
-                                                          dbFirebase.exerciseData[dbFirebase.selectedMuscle]?[dbFirebase.chosedExercise]?["set ${index + 1}"]["weight"] = value;
+                                                          dbFirebase.exerciseData[dbFirebase.selectedMuscle]?[dbFirebase.chosedExercise]?["set ${setNumber}"]["weight"] = value;
                                                           print(value);
-                                                          if (weightControllers["set ${index + 1}"]!.text.isNotEmpty) {
-                                                            // await dbFirebase.SaveExerciseData();
+                                                          if (weightControllers["set ${setNumber}"]!.text.isNotEmpty) {
+                                                            await dbFirebase.SaveExerciseData();
                                                             print("object");
                                                           }
 
                                                           //uložení dat do offline firebase
                                                         },
-                                                        controller: weightControllers["set ${index + 1}"],
+                                                        controller: weightControllers["set ${setNumber}"],
                                                         keyboardType: TextInputType.numberWithOptions(),
                                                         inputFormatters: [
                                                           LengthLimitingTextInputFormatter(3),
@@ -380,11 +364,15 @@ loadExerciseData(String splitName, String muscleName, String exerciseName)async{
                                                     height: 35,
                                                     child: Center(
                                                       child: TextField(
-                                                        onChanged: (value) {
-                                                          dbFirebase.exerciseData[selectedMuscle]?[chosedExercise]?["set ${index + 1}"]["reps"] = value;
-                                                          //uložení dat do offline firebase
+                                                        onChanged: (value) async {
+                                                          dbFirebase.exerciseData[selectedMuscle]?[chosedExercise]?["set ${setNumber}"]["reps"] = value;
+                                                          print(value);
+                                                          if (repsControllers["set ${setNumber}"]!.text.isNotEmpty) {
+                                                            await dbFirebase.SaveExerciseData();
+                                                            print("object");
+                                                          }
                                                         },
-                                                        controller: repsControllers["set ${index + 1}"],
+                                                        controller: repsControllers["set ${setNumber}"],
                                                         keyboardType: TextInputType.numberWithOptions(),
                                                         inputFormatters: [
                                                           LengthLimitingTextInputFormatter(3),
@@ -428,29 +416,29 @@ loadExerciseData(String splitName, String muscleName, String exerciseName)async{
                                                   child: DropdownButtonHideUnderline(
                                                     child: DropdownButton2<int>(
                                                       isExpanded: true,
-                                                      value: dbFirebase.exerciseData[selectedMuscle]?[chosedExercise]?["set ${index + 1}"]["difficulty"],
+                                                      value: dbFirebase.exerciseData[selectedMuscle]?[chosedExercise]?["set ${setNumber}"]["difficulty"],
                                                       onChanged: (int? value) async {
-                                                        dbFirebase.exerciseData[selectedMuscle][chosedExercise]["set ${index + 1}"]["difficulty"] = value!;
-                                                        // await dbFirebase.SaveExerciseData();
+                                                        dbFirebase.exerciseData[selectedMuscle][chosedExercise]["set ${setNumber}"]["difficulty"] = value!;
                                                         setState(() {});
+                                                        await dbFirebase.SaveExerciseData();
                                                       },
                                                       items: List.generate(
                                                         5,
                                                         (index) {
-                                                          int difficulty = index + 1;
+                                                          int hardness = index + 1;
                                                           return DropdownMenuItem(
                                                             value: index + 1,
                                                             child: Text(
                                                               style: TextStyle(
                                                                 fontSize: 16,
                                                                 fontWeight: FontWeight.bold,
-                                                                color: difficulty == 1
+                                                                color: hardness == 1
                                                                     ? Colors.green
-                                                                    : difficulty == 2
+                                                                    : hardness == 2
                                                                         ? Colors.lightGreen
-                                                                        : difficulty == 3
+                                                                        : hardness == 3
                                                                             ? Colors.yellow
-                                                                            : difficulty == 4
+                                                                            : hardness == 4
                                                                                 ? Colors.orange
                                                                                 : Colors.red,
                                                               ),
@@ -477,13 +465,19 @@ loadExerciseData(String splitName, String muscleName, String exerciseName)async{
                                                   ),
                                                   onTap: () async {
                                                     //vymazat hodnotu
-                                                    print("odstranění hodnoty: ${index + 1}");
-                                                    dbFirebase.exerciseData[selectedMuscle]?[chosedExercise]?.remove("set ${index + 1}");
-                                                    weightControllers.remove("set ${index + 1}");
-                                                    repsControllers.remove("set ${index + 1}");
-                                                    // dbFirebase.
+                                                    print("odstranění hodnoty: ${setNumber}");
+                                                    dbFirebase.exerciseData[selectedMuscle]?[chosedExercise]?.remove("set ${setNumber}");
+                                                    // await dbFirebase.DeleteExerciseData(dbFirebase.splitName, dbFirebase.chosedMuscle!, dbFirebase.chosedExercise!, "set ${setNumber}");
+                                                    dbFirebase.fullMapExercises[dbFirebase.splitName][dbFirebase.selectedMuscle][dbFirebase.chosedExercise]["date"][dbFirebase.time]["series"].remove("set ${setNumber}");
+
+                                                    print(dbFirebase.exerciseData);
+                                                    weightControllers.remove("set ${setNumber}");
+                                                    repsControllers.remove("set ${setNumber}");
+
                                                     await recount();
-                                                    setState(() {});
+                                                    await dbFirebase.SaveExerciseData();
+                                                    // setState(() {});
+                                                    print(weightControllers);
                                                   },
                                                 )
                                               ],
@@ -535,8 +529,9 @@ loadExerciseData(String splitName, String muscleName, String exerciseName)async{
                         ),
                       ),
                     ),
-                    onTap: () {
+                    onTap: () async {
                       int length = dbFirebase.exerciseData[selectedMuscle][chosedExercise].length;
+
                       if (length == 0) {
                         print("vytvoření prvního řádku");
                         dbFirebase.exerciseData = {
@@ -545,10 +540,10 @@ loadExerciseData(String splitName, String muscleName, String exerciseName)async{
 
                         weightControllers["set 1"] = TextEditingController();
                         repsControllers["set 1"] = TextEditingController();
-                        setState(() {});
+                        // setState(() {});
                       } else {
                         //přidání další položky v listview.builder
-
+                        print("1:   ${dbFirebase.exerciseData}");
                         dbFirebase.exerciseData[selectedMuscle][chosedExercise]["set ${length + 1}"] = {
                           "weight": null,
                           "reps": null,
@@ -559,6 +554,8 @@ loadExerciseData(String splitName, String muscleName, String exerciseName)async{
                         weightControllers["set ${length + 1}"] = TextEditingController();
                         repsControllers["set ${length + 1}"] = TextEditingController();
                       }
+                      print("2:   ${dbFirebase.exerciseData}");
+                      await dbFirebase.SaveExerciseData();
                       setState(() {});
                     },
                   ),
@@ -803,22 +800,12 @@ loadExerciseData(String splitName, String muscleName, String exerciseName)async{
                       ),
                     ),
                     onTap: () async {
-                      // // výpis exercise dat
-                      // print("dbFirebase.exerciseData:");
-                      // dbFirebase.exerciseData[selectedMuscle][chosedExercise].forEach((key, value) {
-                      //   print("$key: ${"weight: ${value["weight"]} reps: ${value["reps"]} difficulty: ${value["difficulty"]}"}");
-                      // });
-
-                      // //výpis controlerů
-                      // print("weightControllers: |${weightControllers.entries.map((entry) => "${entry.key}: ${entry.value.text}").join("| ")}|");
-                      // print("repsControllers:   |${repsControllers.entries.map((entry) => "${entry.key}: ${entry.value.text}").join("| ")}|");
-
+                      // await dbFirebase.SaveExerciseData();
                       // print(dbFirebase.exerciseData);
-                      // print("weight controllers: ${weightControllers.keys}");
-                      // print("reps controllers: ${repsControllers.keys}");
-
-                      await dbFirebase.SaveExerciseData();
-                      print("uloženo ");
+                      // print(dbFirebase.fullMapExercises);
+                      //fullmapexercises: split_name  muscle_name   exercise_name   date  1.1.2024  (comment, set_1 (special, difficulty, reps, weight))
+                      // print("full map exercises:    ${dbFirebase.fullMapExercises}");
+                      dbFirebase.LoadExerciseData("pull", "back", "vodorovné přítahy na kladce");
                       setState(() {});
                     },
                   )

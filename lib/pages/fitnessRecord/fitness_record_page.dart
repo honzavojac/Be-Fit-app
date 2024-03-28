@@ -94,6 +94,7 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
       selectedSplit = dbFirebase.listSplits[0]["name"];
       dbFirebase.splitName = dbFirebase.listSplits[0]["name"];
       initializedSplit = 1;
+      dbFirebase.getTrueSplitExercise(selectedSplit!);
     } else if (dbFirebase.listSplits.isNotEmpty) {
       //nothing - data is in list
     } else {
@@ -106,10 +107,16 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
     // await dbFirebase.getTrueSplitExercise(selectedSplit!);
 
     //získání cviků ze svalu se bude provádět při chodu listview.builderu -- zatím nevím
-    await dbFirebase.getCurrentSplitExercises(dbFirebase.splitName ?? dbFirebase.mapSplits[0]);
+    await dbFirebase.getCurrentSplitExercises(dbFirebase.splitName);
 
     setState(() {});
   }
+
+  // loadExerciseData() async {
+  //   var dbFirebase = Provider.of<FirestoreService>(context, listen: false);
+
+  //   dbFirebase.db.
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -117,6 +124,7 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
     var variablesProvider = Provider.of<VariablesProvider>(context);
 
     if (dbFirebase.listSplits.isEmpty == true && dbFirebase.listSplits == " ") {
+      print("1");
       return Column(
         children: [
           Padding(
@@ -229,6 +237,8 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
         ],
       );
     } else {
+      // print("2");
+
       return Stack(
         children: [
           Column(
@@ -269,6 +279,7 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                                   selectedSplit = value!; // Aktualizace vybraného splitu
                                   dbFirebase.splitName = value;
                                   dbFirebase.getTrueSplitExercise(value);
+
                                   setState(() {});
                                   loadData();
                                 });
@@ -349,7 +360,7 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
               ),
               Expanded(
                 child: Container(
-                  margin: EdgeInsets.only(left: 20, right: 20),
+                  margin: EdgeInsets.only(left: 15, right: 15),
                   decoration: BoxDecoration(
                     color: ColorsProvider.color_7,
                     // border: Border.all(color: Colors.white),
@@ -363,193 +374,199 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                           itemBuilder: (context, muscleIndex) {
                             String muscle = dbFirebase.mapFinalExercises[selectedSplit].keys.toList()[muscleIndex];
 
-                            return Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.fromLTRB(5, 10, 5, 0),
-                                  child: Container(
-                                    height: 50,
-                                    decoration: BoxDecoration(
-                                      color: ColorsProvider.color_2,
-                                      borderRadius: variablesProvider.zaobleni,
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        "$muscle",
-                                        style: TextStyle(
-                                          color: ColorsProvider.color_8,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 20,
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 15),
+                              child: Container(
+                                decoration: BoxDecoration(color: ColorsProvider.color_2, borderRadius: BorderRadius.circular(20)),
+                                child: Column(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.fromLTRB(5, 10, 5, 0),
+                                      child: Container(
+                                        height: 30,
+                                        decoration: BoxDecoration(
+                                          // color: ColorsProvider.color_2,
+                                          borderRadius: variablesProvider.zaobleni,
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            "$muscle".toUpperCase(),
+                                            style: TextStyle(
+                                              color: ColorsProvider.color_8,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 25,
+                                              letterSpacing: 2,
+                                            ),
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 5,
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 25, right: 25),
-                                  child: Container(
-                                    child: ListView.builder(
-                                      shrinkWrap: true,
-                                      physics: NeverScrollableScrollPhysics(),
-                                      itemCount: dbFirebase.mapFinalExercises[dbFirebase.splitName][muscle]?.length ?? 0,
-                                      itemBuilder: (context, exerciseIndex) {
-                                        String exercise = dbFirebase.mapFinalExercises[dbFirebase.splitName][muscle][exerciseIndex];
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                        left: 5,
+                                        right: 5,
+                                        top: 10,
+                                      ),
+                                      child: Container(
+                                        child: ListView.builder(
+                                          shrinkWrap: true,
+                                          physics: NeverScrollableScrollPhysics(),
+                                          itemCount: dbFirebase.mapFinalExercises[dbFirebase.splitName][muscle]?.length ?? 0,
+                                          itemBuilder: (context, exerciseIndex) {
+                                            String exercise = dbFirebase.mapFinalExercises[dbFirebase.splitName][muscle][exerciseIndex];
+                                            // dbFirebase.LoadExerciseData(selectedSplit!, muscle, exercise);
+                                            // print("load hotový");
+                                            return GestureDetector(
+                                              onTap: () async {
+                                                dbFirebase.selectedMuscle = muscle;
+                                                dbFirebase.chosedExercise = exercise;
 
-                                        return GestureDetector(
-                                          onTap: () async {
-                                            dbFirebase.selectedMuscle = muscle;
-                                            dbFirebase.chosedExercise = exercise;
+                                                await dbFirebase.LoadExerciseData(dbFirebase.splitName, "${dbFirebase.selectedMuscle}", "${dbFirebase.chosedExercise}");
+                                                //zakázání synchronizace s firebase
+                                                dbFirebase.disableSync();
 
-                                            await dbFirebase.LoadExerciseData(dbFirebase.splitName, "${dbFirebase.selectedMuscle}", "${dbFirebase.chosedExercise}");
-                                            //zakázání synchronizace s firebase
-                                            dbFirebase.disableSync();
-
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) => ExercisePage(),
-                                              ),
-                                            );
-                                          },
-                                          child: Padding(
-                                            padding: const EdgeInsets.only(bottom: 5),
-                                            child: Container(
-                                              height: 100,
-                                              decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(10),
-                                                color: ColorsProvider.color_2,
-                                              ),
-                                              child: Column(
-                                                children: [
-                                                  Row(
-                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) => ExercisePage(),
+                                                  ),
+                                                );
+                                              },
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(bottom: 5),
+                                                child: Container(
+                                                  height: 100,
+                                                  decoration: BoxDecoration(
+                                                    borderRadius: BorderRadius.circular(10),
+                                                    color: ColorsProvider.color_2,
+                                                  ),
+                                                  child: Column(
                                                     children: [
-                                                      Text(
-                                                        "$exercise",
-                                                        style: TextStyle(
-                                                          color: Colors.black,
-                                                          fontWeight: FontWeight.bold,
+                                                      Row(
+                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                        children: [
+                                                          Text(
+                                                            "$exercise".toUpperCase(),
+                                                            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 15),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      Expanded(
+                                                        child: Padding(
+                                                          padding: const EdgeInsets.only(left: 5, right: 5, bottom: 2),
+                                                          child: Container(
+                                                            decoration: BoxDecoration(color: Color.fromARGB(111, 0, 0, 0), borderRadius: variablesProvider.zaobleni),
+                                                            child: Row(
+                                                              children: [
+                                                                Padding(
+                                                                  padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
+                                                                  child: Container(
+                                                                    width: 60,
+                                                                    child: Column(
+                                                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                                      children: [
+                                                                        Text("Set"),
+                                                                        Text("Weight"),
+                                                                        Text("Reps"),
+                                                                        SizedBox(
+                                                                          height: 2,
+                                                                        )
+                                                                      ],
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                                Container(
+                                                                  width: 1,
+                                                                  color: Colors.black,
+                                                                ),
+                                                                Expanded(
+                                                                  child: Padding(
+                                                                    padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
+                                                                    child: Container(
+                                                                      child: ListView.builder(
+                                                                        itemCount: dbFirebase.exerciseData[muscle]?[exercise]?.length ?? 0,
+                                                                        scrollDirection: Axis.horizontal,
+                                                                        itemBuilder: (context, index) {
+                                                                          return Padding(
+                                                                            padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
+                                                                            child: Container(
+                                                                              width: 30,
+                                                                              child: Column(
+                                                                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                                                children: [
+                                                                                  Text("${index + 1}"),
+                                                                                  Text("${dbFirebase.exerciseData[muscle][exercise]["set ${index + 1}"]["weight"]}"),
+                                                                                  Text("${dbFirebase.exerciseData[muscle][exercise]["set ${index + 1}"]["reps"]}"),
+                                                                                  SizedBox(
+                                                                                    height: 2,
+                                                                                  )
+                                                                                ],
+                                                                              ),
+                                                                            ),
+                                                                          );
+                                                                        },
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                )
+                                                              ],
+                                                            ),
+                                                          ),
                                                         ),
                                                       ),
                                                     ],
                                                   ),
-                                                  Expanded(
-                                                    child: Padding(
-                                                      padding: const EdgeInsets.only(left: 5, right: 5, bottom: 2),
-                                                      child: Container(
-                                                        decoration: BoxDecoration(color: Color.fromARGB(111, 0, 0, 0), borderRadius: variablesProvider.zaobleni),
-                                                        child: Row(
-                                                          children: [
-                                                            Padding(
-                                                              padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
-                                                              child: Container(
-                                                                width: 60,
-                                                                child: Column(
-                                                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                                                  children: [
-                                                                    Text("Set"),
-                                                                    Text("Weight"),
-                                                                    Text("Reps"),
-                                                                    SizedBox(
-                                                                      height: 2,
-                                                                    )
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Container(
-                                                              width: 1,
-                                                              color: Colors.black,
-                                                            ),
-                                                            Expanded(
-                                                              child: Padding(
-                                                                padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
-                                                                child: Container(
-                                                                  child: ListView.builder(
-                                                                    itemCount: dbFirebase.exerciseData[muscle]?[exercise]?.length ?? 0,
-                                                                    scrollDirection: Axis.horizontal,
-                                                                    itemBuilder: (context, index) {
-                                                                      return Padding(
-                                                                        padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
-                                                                        child: Container(
-                                                                          width: 60,
-                                                                          child: Column(
-                                                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                                                            children: [
-                                                                              Text("${index + 1}"),
-                                                                              Text("${dbFirebase.exerciseData[muscle][exercise]["set ${index + 1}"]["weight"]}"),
-                                                                              Text("${dbFirebase.exerciseData[muscle][exercise]["set ${index + 1}"]["reps"]}"),
-                                                                              SizedBox(
-                                                                                height: 2,
-                                                                              )
-                                                                            ],
-                                                                          ),
-                                                                        ),
-                                                                      );
-                                                                    },
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            )
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
+                                                ),
                                               ),
-                                            ),
-                                          ),
-                                        );
-                                      },
+                                            );
+                                          },
+                                        ),
+                                      ),
                                     ),
-                                  ),
+                                  ],
                                 ),
-                              ],
+                              ),
                             );
                           },
                         ),
                       ),
                       SizedBox(
-                        height: 20,
+                        height: 10,
                       )
                     ],
                   ),
                 ),
               ),
-              SizedBox(
-                height: 20,
-              ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                //crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    //color: Colors.blue,
-                    height: 40,
-                    width: 150,
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        print(dbFirebase.exerciseData);
-                      },
-                      icon: Icon(Icons.add, size: 30),
-                      label: Text('Add', style: TextStyle(fontWeight: FontWeight.bold)),
-                      style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(ColorsProvider.color_2),
-                          foregroundColor: MaterialStateProperty.all(
-                            ColorsProvider.color_8,
-                          ) // Nastavení barvy zde
-                          ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                ],
-              )
+              // SizedBox(
+              //   height: 20,
+              // ),
+              // Column(
+              //   mainAxisAlignment: MainAxisAlignment.center,
+              //   //crossAxisAlignment: CrossAxisAlignment.center,
+              //   children: [
+              //     Container(
+              //       //color: Colors.blue,
+              //       height: 40,
+              //       width: 150,
+              //       child: ElevatedButton.icon(
+              //         onPressed: () {
+              //           print(dbFirebase.mapFinalExercises[selectedSplit]);
+              //         },
+              //         icon: Icon(Icons.add, size: 30),
+              //         label: Text('Add', style: TextStyle(fontWeight: FontWeight.bold)),
+              //         style: ButtonStyle(
+              //             backgroundColor: MaterialStateProperty.all(ColorsProvider.color_2),
+              //             foregroundColor: MaterialStateProperty.all(
+              //               ColorsProvider.color_8,
+              //             ) // Nastavení barvy zde
+              //             ),
+              //       ),
+              //     ),
+              //     SizedBox(
+              //       height: 20,
+              //     ),
+              //   ],
+              // )
             ],
           ),
         ],
