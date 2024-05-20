@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/firestore/firestore.dart';
 import 'package:kaloricke_tabulky_02/login/check_page.dart';
+import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:kaloricke_tabulky_02/variables_provider.dart';
 
 import 'package:provider/provider.dart';
@@ -23,12 +24,14 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  //inicializace supabase
+  SupabaseProvider dbSupabase = SupabaseProvider();
+  await dbSupabase.initialize();
+
   await dbHelper.initializeDB();
   FirestoreService dbFirebase = FirestoreService();
   ColorsProvider colorsProvider = ColorsProvider();
   VariablesProvider variablesProvider = VariablesProvider();
-
-  
 
   runApp(
     MultiProvider(
@@ -38,6 +41,9 @@ void main() async {
         ),
         ChangeNotifierProvider.value(
           value: dbFirebase,
+        ),
+        ChangeNotifierProvider.value(
+          value: dbSupabase,
         ),
         ChangeNotifierProvider.value(
           value: colorsProvider,
