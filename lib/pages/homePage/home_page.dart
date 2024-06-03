@@ -49,7 +49,7 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var dbSupabase = Provider.of<SupabaseProvider>(context);
+    Provider.of<SupabaseProvider>(context);
 
     return Stack(
       children: [

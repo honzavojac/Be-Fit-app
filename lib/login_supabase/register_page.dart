@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
-import 'package:kaloricke_tabulky_02/init_page.dart';
 import 'package:kaloricke_tabulky_02/login_supabase/splash_page.dart';
 import 'package:kaloricke_tabulky_02/main.dart';
 

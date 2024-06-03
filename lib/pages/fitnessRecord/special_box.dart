@@ -30,10 +30,9 @@ class _SpecialBoxState extends State<SpecialBox> {
     setState(() {});
   }
 
-  bool _isExpanded = false;
   @override
   Widget build(BuildContext context) {
-    var dbFirebase = Provider.of<FirestoreService>(context);
+    Provider.of<FirestoreService>(context);
 
     return AlertDialog(
       contentPadding: EdgeInsets.zero,

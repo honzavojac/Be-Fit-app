@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:kaloricke_tabulky_02/firestore/firestore.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/add_exercise_box.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/add_muscle_box.dart';
 import 'package:kaloricke_tabulky_02/supabase/supabase.dart';

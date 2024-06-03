@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/main.dart';
-import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LoginPage extends StatefulWidget {
@@ -17,7 +16,6 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  bool _isLoading = false;
   bool _redirecting = false;
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -27,9 +25,7 @@ class _LoginPageState extends State<LoginPage> {
     // _emailController.text = "honzavojac@gmail.com";
     // _passwordController.text = "Davidsrubek2408";
     try {
-      setState(() {
-        _isLoading = true;
-      });
+      setState(() {});
       await supabase.auth.signInWithPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
@@ -58,9 +54,7 @@ class _LoginPageState extends State<LoginPage> {
       }
     } finally {
       if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
+        setState(() {});
       }
     }
   }

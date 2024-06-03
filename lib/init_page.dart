@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:provider/provider.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/fitness_global_variables.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/fitness_record_page.dart';
