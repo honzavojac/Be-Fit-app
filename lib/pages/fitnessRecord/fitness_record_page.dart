@@ -2,16 +2,20 @@
 
 //import 'dart:html';
 
+import 'dart:ffi';
+
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:kaloricke_tabulky_02/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/firestore/firestore.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/exercise_page.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/statistics_page.dart';
-import 'package:kaloricke_tabulky_02/variables_provider.dart';
+import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
+import 'package:kaloricke_tabulky_02/providers/variables_provider.dart';
+import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
+import 'package:path/path.dart';
 import 'package:provider/provider.dart';
 
 import 'split_page.dart';
@@ -60,70 +64,39 @@ class FitnessRecordScreen extends StatefulWidget {
 }
 
 ScrollController _scrollController = ScrollController();
+int a = 0;
 
 class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
-  String? selectedSplit;
-  int initializedSplit = 0;
-
-  @override
-  void didChangeDependencies() {
-    var dbFirebase = Provider.of<FirestoreService>(context, listen: true);
-    if (dbFirebase.readyState == 0) {
-      setState(() {
-        dbFirebase.readyState = 1;
-      });
-    }
-
-    super.didChangeDependencies();
-    loadData();
-  }
-
   @override
   void initState() {
     super.initState();
   }
 
-  void loadData() async {
-    var dbFirebase = Provider.of<FirestoreService>(context, listen: false);
+  Future loadData(BuildContext context) async {
+    var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false);
 
-    //získání splitů do proměnné v provideru
-    await dbFirebase.getSplits();
-
-    // Nastavte výchozí hodnotu na první split, pokud není seznam prázdný
-    if (dbFirebase.listSplits.isNotEmpty && initializedSplit == 0) {
-      selectedSplit = dbFirebase.listSplits[0]["name"];
-      dbFirebase.splitName = dbFirebase.listSplits[0]["name"];
-      initializedSplit = 1;
-      dbFirebase.getTrueSplitExercise(selectedSplit!);
-    } else if (dbFirebase.listSplits.isNotEmpty) {
-      //nothing - data is in list
+    if (a == 0) {
+      // print(a);
+      a = 1;
+      await dbSupabase.getTodayFitness();
+      setState(() {});
     } else {
-      selectedSplit = " ";
-      dbFirebase.splitName = " ";
+      // print(a);
+      a = 0;
     }
-
-    //získání svalů ze splitu do proměnné v provideru
-
-    // await dbFirebase.getTrueSplitExercise(selectedSplit!);
-
-    //získání cviků ze svalu se bude provádět při chodu listview.builderu -- zatím nevím
-    await dbFirebase.getCurrentSplitExercises(dbFirebase.splitName);
-
-    setState(() {});
   }
 
-  // loadExerciseData() async {
-  //   var dbFirebase = Provider.of<FirestoreService>(context, listen: false);
-
-  //   dbFirebase.db.
-  // }
+  String? splitName;
+  int selectedSplit = 0;
 
   @override
   Widget build(BuildContext context) {
-    var dbFirebase = Provider.of<FirestoreService>(context);
+    var dbSupabase = Provider.of<SupabaseProvider>(context);
     var variablesProvider = Provider.of<VariablesProvider>(context);
+    loadData(context);
+    var splits = dbSupabase.splits;
 
-    if (dbFirebase.listSplits.isEmpty == true && dbFirebase.listSplits == " ") {
+    if (splits.isEmpty == true) {
       print("1");
       return Column(
         children: [
@@ -133,76 +106,7 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(25, 0, 25, 0),
-                    child: Container(
-                      height: 40,
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton2<String>(
-                          isExpanded: true,
-                          value: selectedSplit,
-                          items: dbFirebase.listSplits.map<DropdownMenuItem<String>>((split) {
-                            return DropdownMenuItem<String>(
-                              value: split["name"],
-                              child: Center(
-                                child: Text(
-                                  split["name"].toString().toUpperCase(),
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: ColorsProvider.color_1,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                          onChanged: (value) {
-                            setState(() {
-                              selectedSplit = value!; // Aktualizace vybraného splitu
-                              dbFirebase.splitName = value;
-                              dbFirebase.getTrueSplitExercise(value);
-                              setState(() {});
-                              loadData();
-                            });
-                          },
-                          buttonStyleData: ButtonStyleData(
-                            width: 180,
-                            padding: const EdgeInsets.symmetric(horizontal: 14),
-                            decoration: BoxDecoration(
-                              borderRadius: variablesProvider.zaobleni,
-                              border: Border.all(
-                                color: ColorsProvider.color_2,
-                                width: 0.5,
-                              ),
-                            ),
-                          ),
-                          iconStyleData: const IconStyleData(
-                            icon: Icon(Icons.keyboard_arrow_down_outlined),
-                            iconSize: 17,
-                            iconEnabledColor: ColorsProvider.color_1,
-                          ),
-                          dropdownStyleData: DropdownStyleData(
-                            maxHeight: 200,
-                            decoration: BoxDecoration(
-                              borderRadius: variablesProvider.zaobleni,
-                              border: Border.all(width: 2, color: ColorsProvider.color_2),
-                            ),
-                            offset: const Offset(0, -0),
-                            scrollbarTheme: ScrollbarThemeData(
-                              radius: const Radius.circular(40),
-                              thickness: MaterialStateProperty.all(6),
-                              thumbVisibility: MaterialStateProperty.all(true),
-                            ),
-                          ),
-                          menuItemStyleData: const MenuItemStyleData(
-                            height: 40,
-                            padding: EdgeInsets.only(left: 0, right: 18),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+                  child: _buildNoData(variablesProvider, splits),
                 ),
                 Container(
                   height: 32,
@@ -257,13 +161,13 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                           child: DropdownButtonHideUnderline(
                             child: DropdownButton2<String>(
                               isExpanded: true,
-                              value: selectedSplit,
-                              items: dbFirebase.listSplits.map<DropdownMenuItem<String>>((split) {
+                              value: splitName ?? (splits.isNotEmpty ? splits[0].nameSplit : null),
+                              items: splits.map<DropdownMenuItem<String>>((split) {
                                 return DropdownMenuItem<String>(
-                                  value: split["name"],
+                                  value: split.nameSplit,
                                   child: Center(
                                     child: Text(
-                                      split["name"].toString().toUpperCase(),
+                                      split.nameSplit.toString().toUpperCase(),
                                       style: const TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
@@ -275,14 +179,16 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                                 );
                               }).toList(),
                               onChanged: (value) {
-                                setState(() {
-                                  selectedSplit = value!; // Aktualizace vybraného splitu
-                                  dbFirebase.splitName = value;
-                                  dbFirebase.getTrueSplitExercise(value);
-
-                                  setState(() {});
-                                  loadData();
-                                });
+                                splitName = value!;
+                                for (var i = 0; i < splits.length; i++) {
+                                  if (splits[i].nameSplit == value) {
+                                    selectedSplit = i;
+                                    dbSupabase.clickedSplitTab = i;
+                                  }
+                                }
+                                setState(() {});
+                                print(splitName);
+                                print(selectedSplit);
                               },
                               buttonStyleData: ButtonStyleData(
                                 width: 180,
@@ -370,10 +276,9 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                     children: [
                       Expanded(
                         child: ListView.builder(
-                          itemCount: dbFirebase.mapFinalExercises[selectedSplit]?.length ?? 0,
+                          itemCount: splits[selectedSplit].splitMuscles!.length,
                           itemBuilder: (context, muscleIndex) {
-                            String muscle = dbFirebase.mapFinalExercises[selectedSplit].keys.toList()[muscleIndex];
-
+                            String muscle = splits[selectedSplit].splitMuscles![muscleIndex].muscles.nameOfMuscle;
                             return Padding(
                               padding: const EdgeInsets.only(bottom: 15),
                               child: Container(
@@ -411,20 +316,13 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                                         child: ListView.builder(
                                           shrinkWrap: true,
                                           physics: NeverScrollableScrollPhysics(),
-                                          itemCount: dbFirebase.mapFinalExercises[dbFirebase.splitName][muscle]?.length ?? 0,
+                                          itemCount: splits[selectedSplit].splitMuscles![muscleIndex].muscles.exercises!.length,
                                           itemBuilder: (context, exerciseIndex) {
-                                            String exercise = dbFirebase.mapFinalExercises[dbFirebase.splitName][muscle][exerciseIndex];
+                                            String exercise = splits[selectedSplit].splitMuscles![muscleIndex].muscles.exercises![exerciseIndex].nameOfExercise;
                                             // dbFirebase.LoadExerciseData(selectedSplit!, muscle, exercise);
                                             // print("load hotový");
                                             return GestureDetector(
                                               onTap: () async {
-                                                dbFirebase.selectedMuscle = muscle;
-                                                dbFirebase.chosedExercise = exercise;
-
-                                                await dbFirebase.LoadExerciseData(dbFirebase.splitName, "${dbFirebase.selectedMuscle}", "${dbFirebase.chosedExercise}");
-                                                //zakázání synchronizace s firebase
-                                                dbFirebase.disableSync();
-
                                                 Navigator.push(
                                                   context,
                                                   MaterialPageRoute(
@@ -484,9 +382,15 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                                                                     padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
                                                                     child: Container(
                                                                       child: ListView.builder(
-                                                                        itemCount: dbFirebase.exerciseData[muscle]?[exercise]?.length ?? 0,
+                                                                        itemCount: splits[selectedSplit].splitMuscles![muscleIndex].muscles.exercises![exerciseIndex].exerciseData!.length,
                                                                         scrollDirection: Axis.horizontal,
                                                                         itemBuilder: (context, index) {
+                                                                          int reps;
+                                                                          int weight;
+                                                                          // if (DateTime.now().toString().replaceRange(10, null, '') == splits[selectedSplit].splitMuscles![muscleIndex].muscles.exercises![exerciseIndex].exerciseData![index].time!.replaceRange(10, null, '')) {
+                                                                          reps = splits[selectedSplit].splitMuscles![muscleIndex].muscles.exercises![exerciseIndex].exerciseData![index].reps;
+                                                                          weight = splits[selectedSplit].splitMuscles![muscleIndex].muscles.exercises![exerciseIndex].exerciseData![index].weight;
+                                                                          // } else {}
                                                                           return Padding(
                                                                             padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
                                                                             child: Container(
@@ -495,8 +399,8 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                                                                                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                                                                 children: [
                                                                                   Text("${index + 1}"),
-                                                                                  Text("${dbFirebase.exerciseData[muscle][exercise]["set ${index + 1}"]["weight"]}"),
-                                                                                  Text("${dbFirebase.exerciseData[muscle][exercise]["set ${index + 1}"]["reps"]}"),
+                                                                                  Text("$weight"),
+                                                                                  Text("$reps"),
                                                                                   SizedBox(
                                                                                     height: 2,
                                                                                   )
@@ -574,3 +478,69 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
     }
   }
 }
+
+Widget _buildNoData(VariablesProvider variablesProvider, List<Split> splits) {
+  return Padding(
+    padding: const EdgeInsets.fromLTRB(25, 0, 25, 0),
+    child: Container(
+      height: 40,
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton2<String>(
+          isExpanded: true,
+          value: splits[0].nameSplit,
+          items: splits.map<DropdownMenuItem<String>>((split) {
+            return DropdownMenuItem<String>(
+              value: split.nameSplit,
+              child: Center(
+                child: Text(
+                  split.nameSplit.toString().toUpperCase(),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: ColorsProvider.color_1,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            );
+          }).toList(),
+          onChanged: (value) {},
+          buttonStyleData: ButtonStyleData(
+            width: 180,
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            decoration: BoxDecoration(
+              borderRadius: variablesProvider.zaobleni,
+              border: Border.all(
+                color: ColorsProvider.color_2,
+                width: 0.5,
+              ),
+            ),
+          ),
+          iconStyleData: const IconStyleData(
+            icon: Icon(Icons.keyboard_arrow_down_outlined),
+            iconSize: 17,
+            iconEnabledColor: ColorsProvider.color_1,
+          ),
+          dropdownStyleData: DropdownStyleData(
+            maxHeight: 200,
+            decoration: BoxDecoration(
+              borderRadius: variablesProvider.zaobleni,
+              border: Border.all(width: 2, color: ColorsProvider.color_2),
+            ),
+            offset: const Offset(0, -0),
+            scrollbarTheme: ScrollbarThemeData(
+              radius: const Radius.circular(40),
+              thickness: MaterialStateProperty.all(6),
+              thumbVisibility: MaterialStateProperty.all(true),
+            ),
+          ),
+          menuItemStyleData: const MenuItemStyleData(
+            height: 40,
+            padding: EdgeInsets.only(left: 0, right: 18),
+          ),
+        ),
+      ),
+    ),
+  );
+}
+/**/

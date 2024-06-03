@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:kaloricke_tabulky_02/firestore/firestore.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/add_exercise_box.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/add_muscle_box.dart';
+import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:provider/provider.dart';
 
-import '../../colors_provider.dart';
+import '../../providers/colors_provider.dart';
 
 class SplitPage extends StatefulWidget {
   const SplitPage({Key? key}) : super(key: key);
@@ -15,21 +15,19 @@ class SplitPage extends StatefulWidget {
 }
 
 class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
-  late FirestoreService dbFirebase;
-
   late TabController _tabController = TabController(length: 0, vsync: this);
 
   @override
   void initState() {
     super.initState();
     // dbFirebase = Provider.of<FirestoreService>(context);
-    loadData();
+    // loadData();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    loadData();
+    // loadData();
   }
 
   @override
@@ -37,29 +35,22 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  Future<void> loadData() async {
-    var dbFirebase = Provider.of<FirestoreService>(context, listen: false);
-
-    try {
-      await dbFirebase.getSplitMuscles(dbFirebase.splitName);
-      await dbFirebase.getSplits();
-      await dbFirebase.getTrueSplitExercise(dbFirebase.listSplits[dbFirebase.clickedSplitTab]["name"]);
-    } catch (e) {
-      print("chyba: $e");
-    }
-    // await dbFirebase.getCurrentSplitExercises(dbFirebase.listSplits[dbFirebase.clickedSplitTab]["name"]);
-
-    _tabController = TabController(length: dbFirebase.listSplits.length, vsync: this, initialIndex: dbFirebase.clickedSplitTab);
-
-    setState(() {});
+  loadData() async {
+    var dbSupabase = Provider.of<SupabaseProvider>(context);
+    int clickedSplitTab = dbSupabase.clickedSplitTab;
+    var splits = dbSupabase.splits;
+    _tabController = TabController(length: splits.length, vsync: this, initialIndex: clickedSplitTab);
   }
 
   @override
   Widget build(BuildContext context) {
-    var dbFirebase = Provider.of<FirestoreService>(context, listen: true);
+    loadData();
 
-    print("listsplits: ${dbFirebase.listSplits}");
-    if (dbFirebase.listSplits.isEmpty == true && dbFirebase.splitName == " ") {
+    var dbSupabase = Provider.of<SupabaseProvider>(context);
+    var splits = dbSupabase.splits;
+    int clickedSplitTab = dbSupabase.clickedSplitTab;
+    print('split_length:${splits.length}');
+    if (splits.isEmpty) {
       return Scaffold(
         appBar: AppBar(
           title: Row(
@@ -122,8 +113,8 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
               width: double.infinity,
               // color: Colors.blue,
               child: DefaultTabController(
-                length: dbFirebase.mapSplits.length,
-                initialIndex: dbFirebase.clickedSplitTab,
+                length: splits.length,
+                initialIndex: clickedSplitTab,
                 child: Container(
                   child: TabBar(
                     controller: _tabController,
@@ -132,7 +123,7 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                     labelColor: ColorsProvider.color_1,
                     isScrollable: true,
                     tabAlignment: TabAlignment.start,
-                    tabs: dbFirebase.listSplits.map((record) {
+                    tabs: splits.map((record) {
                       return Container(
                         height: 35,
                         constraints: BoxConstraints(
@@ -140,7 +131,7 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                         ),
                         child: Center(
                           child: Text(
-                            "${record["name"]}",
+                            "${record.nameSplit}",
                             style: TextStyle(
                               fontSize: 19,
                               fontWeight: FontWeight.bold,
@@ -150,10 +141,8 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                       );
                     }).toList(),
                     onTap: (value) {
-                      dbFirebase.clickedSplitTab = value;
-                      dbFirebase.splitName = dbFirebase.listSplits[value]["name"];
-                      // setState(() {});
-                      loadData();
+                      dbSupabase.clickedSplitTab = value;
+                      setState(() {});
                     },
                   ),
                 ),
@@ -164,9 +153,9 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
             ),
             Expanded(
               child: ListView.builder(
-                itemCount: dbFirebase.mapSplitMuscles[dbFirebase.splitName].length,
+                itemCount: splits[clickedSplitTab].splitMuscles!.length,
                 itemBuilder: (context, muscleIndex) {
-                  String muscle = dbFirebase.mapSplitMuscles[dbFirebase.splitName][muscleIndex];
+                  String muscle = splits[clickedSplitTab].splitMuscles![muscleIndex].muscles.nameOfMuscle;
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
@@ -208,9 +197,9 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                                       physics: NeverScrollableScrollPhysics(),
                                       shrinkWrap: true,
                                       reverse: true,
-                                      itemCount: dbFirebase.mapFinalExercises[dbFirebase.splitName][muscle]?.length ?? 0,
+                                      itemCount: splits[clickedSplitTab].splitMuscles![muscleIndex].muscles.exercises!.length,
                                       itemBuilder: (context, exerciseIndex) {
-                                        String exercise = dbFirebase.mapFinalExercises[dbFirebase.splitName][muscle][exerciseIndex];
+                                        String exercise = splits[clickedSplitTab].splitMuscles![muscleIndex].muscles.exercises![exerciseIndex].nameOfExercise;
                                         return Container(
                                           child: Column(
                                             children: [
@@ -259,7 +248,7 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                                         constraints: BoxConstraints.tightFor(height: 40, width: double.infinity),
                                         child: ElevatedButton(
                                           onPressed: () async {
-                                            dbFirebase.chosedMuscle = muscle;
+                                            // dbFirebase.chosedMuscle = muscle;
 
                                             setState(() {});
                                             showDialog(
@@ -345,11 +334,6 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                                   ),
                                 ),
                                 onPressed: () async {
-                                  await dbFirebase.deleteSplit(dbFirebase.listSplits[dbFirebase.clickedSplitTab]["name"]);
-                                  await dbFirebase.listSplits.remove(dbFirebase.listSplits[dbFirebase.clickedSplitTab]["name"]);
-
-                                  await loadData();
-
                                   ScaffoldMessenger.of(context).hideCurrentSnackBar();
                                   setState(() {});
                                 },

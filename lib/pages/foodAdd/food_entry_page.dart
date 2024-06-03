@@ -1,7 +1,7 @@
 // ignore_for_file: prefer_const_constructors, avoid_print, avoid_unnecessary_containers
 
 import 'package:flutter/material.dart';
-import 'package:kaloricke_tabulky_02/colors_provider.dart';
+import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/pages/foodAdd/newFood/food_add_page.dart';
 import 'package:kaloricke_tabulky_02/pages/foodAdd/data_boxes.dart';
 import 'package:kaloricke_tabulky_02/pages/foodAdd/my_search_bar.dart';
@@ -37,10 +37,8 @@ class FoodRecordAppBar extends StatelessWidget {
                 'New food',
               ),
               style: ButtonStyle(
-                backgroundColor:
-                    MaterialStateProperty.all(ColorsProvider.color_2),
-                foregroundColor:
-                    MaterialStateProperty.all(ColorsProvider.color_8),
+                backgroundColor: MaterialStateProperty.all(ColorsProvider.color_2),
+                foregroundColor: MaterialStateProperty.all(ColorsProvider.color_8),
               ),
             ),
           ),
@@ -92,10 +90,7 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                   padding: const EdgeInsets.only(left: 25),
                   child: Text(
                     'Food diary',
-                    style: TextStyle(
-                        fontSize: 20,
-                        color: ColorsProvider.color_1,
-                        fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 20, color: ColorsProvider.color_1, fontWeight: FontWeight.bold),
                   ),
                 ),
               ],
@@ -130,13 +125,10 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                         dbHelper.insertAllDataToNotes();
                       },
                       icon: Icon(Icons.add, size: 30),
-                      label: Text('Add',
-                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      label: Text('Add', style: TextStyle(fontWeight: FontWeight.bold)),
                       style: ButtonStyle(
-                        backgroundColor:
-                            MaterialStateProperty.all(ColorsProvider.color_2),
-                        foregroundColor:
-                            MaterialStateProperty.all(ColorsProvider.color_8),
+                        backgroundColor: MaterialStateProperty.all(ColorsProvider.color_2),
+                        foregroundColor: MaterialStateProperty.all(ColorsProvider.color_8),
                       ),
                     ),
                   ),

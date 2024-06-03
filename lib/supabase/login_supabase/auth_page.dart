@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:kaloricke_tabulky_02/login/login_page.dart';
-import 'package:kaloricke_tabulky_02/login/register_page.dart';
-
+import 'package:kaloricke_tabulky_02/login_supabase/login_page.dart';
+import 'package:kaloricke_tabulky_02/supabase/login_supabase/register_page.dart';
 
 class AuthPage extends StatefulWidget {
   const AuthPage({super.key});

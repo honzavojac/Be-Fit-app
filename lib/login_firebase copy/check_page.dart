@@ -4,11 +4,11 @@ import 'package:kaloricke_tabulky_02/firestore/firestore.dart';
 import 'package:provider/provider.dart';
 
 import 'auth_page.dart';
-import 'init_page.dart';
+import '../init_page.dart';
 
 class CheckPage extends StatelessWidget {
   const CheckPage({super.key});
-void loadData(BuildContext context) async {
+  void loadData(BuildContext context) async {
     var dbFirebase = Provider.of<FirestoreService>(context, listen: false);
 
     // Příklad: Získání aktuálně přihlášeného uživatele

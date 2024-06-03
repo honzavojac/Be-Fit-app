@@ -1,9 +1,6 @@
-
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:kaloricke_tabulky_02/colors_provider.dart';
-
+import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 
 class ResetPasswordPage extends StatefulWidget {
   ResetPasswordPage({super.key});
@@ -23,8 +20,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
   Future passwordReset() async {
     try {
-      await FirebaseAuth.instance
-          .sendPasswordResetEmail(email: _emailController.text.trim());
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: _emailController.text.trim());
       showDialog(
         context: context,
         builder: (context) {
@@ -108,10 +104,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                         decoration: InputDecoration(
                           border: InputBorder.none,
                           hintText: "Email",
-                          hintStyle: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15,
-                              color: ColorsProvider.color_2),
+                          hintStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: ColorsProvider.color_2),
                         ),
                         cursorColor: ColorsProvider.color_2,
                         style: TextStyle(color: ColorsProvider.color_2),

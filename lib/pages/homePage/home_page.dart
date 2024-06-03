@@ -1,11 +1,12 @@
 // ignore_for_file: no_leading_underscores_for_local_identifiers, prefer_const_constructors, sort_child_properties_last, avoid_unnecessary_containers, avoid_print
 
 import 'package:flutter/material.dart';
-import 'package:kaloricke_tabulky_02/colors_provider.dart';
+import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/pages/homePage/date_row.dart';
+import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
+import 'package:provider/provider.dart';
 
 import 'data_boxes.dart';
-import 'settings.dart';
 
 DateTime now = DateTime.now();
 String formattedDate = "${now.day}.${now.month}.${now.year}";
@@ -23,11 +24,8 @@ class HomeAppBar extends StatelessWidget {
         children: [
           const Text('Home page'),
           IconButton(
-              onPressed: () async {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Settings()),
-                );
+              onPressed: () {
+                Navigator.pushNamed(context, '/settings'); // Použijte pushNamed pro navigaci
               },
               icon: Icon(
                 Icons.settings,
@@ -41,10 +39,18 @@ class HomeAppBar extends StatelessWidget {
 
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
-
+  void printNavigationStack(BuildContext context) {
+    print('Navigation stack:');
+    Navigator.popUntil(context, (route) {
+      print(route.settings);
+      return true;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    var dbSupabase = Provider.of<SupabaseProvider>(context);
+
     return Stack(
       children: [
         Container(
@@ -55,9 +61,6 @@ class HomeScreen extends StatelessWidget {
                 height: 20,
               ),
               dataBoxes(),
-              const SizedBox(
-                height: 35,
-              ),
             ],
           ),
         ),

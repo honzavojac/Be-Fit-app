@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../colors_provider.dart';
+import '../../providers/colors_provider.dart';
 import 'home_page.dart';
 
 class dateRow extends StatefulWidget {
@@ -34,10 +34,7 @@ class _dateRowState extends State<dateRow> {
 
               child: Text(
                 formattedDate,
-                style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w900,
-                    color: ColorsProvider.color_1),
+                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900, color: ColorsProvider.color_1),
               ),
             ),
           ),
@@ -45,8 +42,7 @@ class _dateRowState extends State<dateRow> {
             onPressed: () {
               // nutrition.incrementKcal();
             },
-            child: Icon(Icons.arrow_forward_ios_rounded,
-                color: ColorsProvider.color_1),
+            child: Icon(Icons.arrow_forward_ios_rounded, color: ColorsProvider.color_1),
             style: ElevatedButton.styleFrom(
               fixedSize: Size(80, 30),
             ),

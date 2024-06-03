@@ -2,12 +2,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:kaloricke_tabulky_02/colors_provider.dart';
+import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/database/database_provider.dart';
 
 import 'package:kaloricke_tabulky_02/pages/foodAdd/newFood/food_main_add_boxes.dart';
 import 'package:provider/provider.dart';
-
 
 class FoodNewScreen extends StatefulWidget {
   const FoodNewScreen({super.key});
@@ -95,13 +94,8 @@ class _FoodNewScreenState extends State<FoodNewScreen> {
                           dbHelper.insertNewFood();
                         },
                         icon: Icon(Icons.add, size: 30),
-                        label: Text('Add',
-                            style: TextStyle(fontWeight: FontWeight.bold)),
-                        style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all(
-                                ColorsProvider.color_2),
-                            foregroundColor: MaterialStateProperty.all(
-                                ColorsProvider.color_8)),
+                        label: Text('Add', style: TextStyle(fontWeight: FontWeight.bold)),
+                        style: ButtonStyle(backgroundColor: MaterialStateProperty.all(ColorsProvider.color_2), foregroundColor: MaterialStateProperty.all(ColorsProvider.color_8)),
                       ),
                     ),
                   ],

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:kaloricke_tabulky_02/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/firestore/firestore.dart';
 import 'package:provider/provider.dart';
+
+import '../../providers/colors_provider.dart';
 
 class NewMuscleBox extends StatefulWidget {
   const NewMuscleBox({Key? key}) : super(key: key);
@@ -41,8 +42,7 @@ class _NewMuscleBoxState extends State<NewMuscleBox> {
                   child: Container(
                     child: Text(
                       "New Muscle",
-                      style: TextStyle(
-                          color: ColorsProvider.color_1, fontSize: 20),
+                      style: TextStyle(color: ColorsProvider.color_1, fontSize: 20),
                     ),
                   ),
                 ),

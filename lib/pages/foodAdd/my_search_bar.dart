@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kaloricke_tabulky_02/colors_provider.dart';
+import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../../database/database_provider.dart';
@@ -40,11 +40,9 @@ class _mySearchBarState extends State<mySearchBar> {
             )),
           );
         },
-        suggestionsBuilder:
-            (BuildContext context, SearchController controller) async {
+        suggestionsBuilder: (BuildContext context, SearchController controller) async {
           final List<String> czFoodNames = await dbHelper.getCzFoodNames();
-          final normalizedQuery =
-              _removeDiacritics(controller.text.toLowerCase());
+          final normalizedQuery = _removeDiacritics(controller.text.toLowerCase());
 
           final filteredJidla = czFoodNames.where((food) {
             final normalizedFood = _removeDiacritics(food.toLowerCase());
@@ -62,8 +60,7 @@ class _mySearchBarState extends State<mySearchBar> {
                 double fatValue = await dbHelper.getFatForFood(food);
                 double fiberValue = await dbHelper.getFiberForFood(food);
                 // Vložit vybranou položku jídla do databáze s odpovídající hodnotou ENERGYKCAL
-                await dbHelper.NutritionsData(food, kcalValue, proteinValue,
-                    carbsValue, fatValue, fiberValue);
+                await dbHelper.NutritionsData(food, kcalValue, proteinValue, carbsValue, fatValue, fiberValue);
 
                 // Zavřít pohled na vyhledávání a nastavit vybraný text
                 controller.text = food;

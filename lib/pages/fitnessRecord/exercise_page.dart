@@ -1,11 +1,9 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:expand_widget/expand_widget.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
-import 'package:kaloricke_tabulky_02/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/firestore/firestore.dart';
+import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:provider/provider.dart';
 
 class ExercisePage extends StatefulWidget {

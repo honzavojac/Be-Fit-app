@@ -3,9 +3,9 @@
 //import 'dart:html';
 
 import 'package:flutter/material.dart';
-import 'package:kaloricke_tabulky_02/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/statistics_page.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/chose_your_split.dart';
+import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 
 import 'split_page.dart';
 
@@ -35,8 +35,7 @@ class FitnessRecordAppBar extends StatelessWidget {
                 'Statistics',
               ),
               style: ButtonStyle(
-                foregroundColor:
-                    MaterialStateProperty.all(ColorsProvider.color_1),
+                foregroundColor: MaterialStateProperty.all(ColorsProvider.color_1),
               ),
             ),
           ),
@@ -94,10 +93,8 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                         ),
                       ),
                       style: ButtonStyle(
-                        backgroundColor:
-                            MaterialStateProperty.all(ColorsProvider.color_2),
-                        foregroundColor:
-                            MaterialStateProperty.all(ColorsProvider.color_8),
+                        backgroundColor: MaterialStateProperty.all(ColorsProvider.color_2),
+                        foregroundColor: MaterialStateProperty.all(ColorsProvider.color_8),
                       ),
                     ),
                   ),
@@ -129,9 +126,7 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                         return Padding(
                           padding: const EdgeInsets.fromLTRB(5, 0, 5, 20),
                           child: Container(
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: ColorsProvider.color_2),
+                            decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: ColorsProvider.color_2),
                             height: 80,
                             child: Row(
                               children: [
@@ -139,39 +134,29 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                                   child: Container(
                                     // color: Colors.white,
                                     child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
+                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                       children: [
                                         Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
+                                          mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
                                             Text(
                                               "Bicepsový zdvih s činkami",
-                                              style: TextStyle(
-                                                  fontSize: 18,
-                                                  color: ColorsProvider.color_8,
-                                                  fontWeight: FontWeight.bold),
+                                              style: TextStyle(fontSize: 18, color: ColorsProvider.color_8, fontWeight: FontWeight.bold),
                                             )
                                           ],
                                         ),
                                         Padding(
-                                          padding: const EdgeInsets.fromLTRB(
-                                              8, 0, 8, 0),
+                                          padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
                                           child: Container(
                                             decoration: BoxDecoration(
                                               border: Border(
-                                                bottom: BorderSide(
-                                                    color:
-                                                        ColorsProvider.color_8,
-                                                    width: 2),
+                                                bottom: BorderSide(color: ColorsProvider.color_8, width: 2),
                                               ),
                                             ),
                                           ),
                                         ),
                                         Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 10),
+                                          padding: const EdgeInsets.only(left: 10),
                                           child: Container(
                                             height: 45,
                                             child: Row(
@@ -181,30 +166,24 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                                                     Text(
                                                       "Set:",
                                                       style: TextStyle(
-                                                        color: ColorsProvider
-                                                            .color_8,
-                                                        fontWeight:
-                                                            FontWeight.bold,
+                                                        color: ColorsProvider.color_8,
+                                                        fontWeight: FontWeight.bold,
                                                       ),
                                                     ),
                                                     Text(
                                                       "Reps:",
                                                       style: TextStyle(
-                                                        color: ColorsProvider
-                                                            .color_8,
-                                                        fontWeight:
-                                                            FontWeight.bold,
+                                                        color: ColorsProvider.color_8,
+                                                        fontWeight: FontWeight.bold,
                                                       ),
                                                     ),
                                                   ],
                                                 ),
                                                 Expanded(
                                                   child: ListView.builder(
-                                                    scrollDirection:
-                                                        Axis.horizontal,
+                                                    scrollDirection: Axis.horizontal,
                                                     itemCount: 5,
-                                                    itemBuilder:
-                                                        (context, index) {
+                                                    itemBuilder: (context, index) {
                                                       return Container(
                                                         width: 35,
                                                         child: Column(
@@ -212,23 +191,15 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                                                             Text(
                                                               "${index + 1}",
                                                               style: TextStyle(
-                                                                color:
-                                                                    ColorsProvider
-                                                                        .color_8,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
+                                                                color: ColorsProvider.color_8,
+                                                                fontWeight: FontWeight.bold,
                                                               ),
                                                             ),
                                                             Text(
                                                               "12",
                                                               style: TextStyle(
-                                                                color:
-                                                                    ColorsProvider
-                                                                        .color_8,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
+                                                                color: ColorsProvider.color_8,
+                                                                fontWeight: FontWeight.bold,
                                                               ),
                                                             ),
                                                           ],
@@ -250,8 +221,7 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                                   // color: Colors.red,
                                   child: IconButton(
                                     onPressed: () {},
-                                    icon: Icon(Icons.edit,
-                                        color: ColorsProvider.color_8),
+                                    icon: Icon(Icons.edit, color: ColorsProvider.color_8),
                                   ),
                                 )
                               ],
@@ -278,8 +248,7 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                   child: ElevatedButton.icon(
                     onPressed: () {
                       setState(() {
-                        exerciseIndex
-                            .add('Exercise ${exerciseIndex.length + 1}');
+                        exerciseIndex.add('Exercise ${exerciseIndex.length + 1}');
                         // print(exerciseIndex);
                       });
                       // Po přidání položky posuňte pohled dolů
@@ -290,13 +259,8 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                       );
                     },
                     icon: Icon(Icons.add, size: 30),
-                    label: Text('Add',
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                    style: ButtonStyle(
-                        backgroundColor:
-                            MaterialStateProperty.all(ColorsProvider.color_2),
-                        foregroundColor: MaterialStateProperty.all(
-                            ColorsProvider.color_8) // Nastavení barvy zde
+                    label: Text('Add', style: TextStyle(fontWeight: FontWeight.bold)),
+                    style: ButtonStyle(backgroundColor: MaterialStateProperty.all(ColorsProvider.color_2), foregroundColor: MaterialStateProperty.all(ColorsProvider.color_8) // Nastavení barvy zde
                         ),
                   ),
                 ),

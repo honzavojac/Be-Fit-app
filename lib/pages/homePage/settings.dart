@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:kaloricke_tabulky_02/firestore/firestore.dart';
+import 'package:kaloricke_tabulky_02/login_supabase/splash_page.dart';
+import 'package:kaloricke_tabulky_02/main.dart';
 import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -14,11 +15,36 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
-  final user = FirebaseAuth.instance.currentUser!;
-  var idk;
+  Future<void> _signOut() async {
+    try {
+      await supabase.auth.signOut();
+    } on AuthException catch (error) {
+      if (mounted) {
+        SnackBar(
+          content: Text(error.message),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        );
+      }
+    } catch (error) {
+      if (mounted) {
+        SnackBar(
+          content: const Text('Unexpected error occurred'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        );
+      }
+    } finally {
+      if (mounted) {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => SplashPage()),
+          (Route<dynamic> route) => false,
+        );
+      }
+    }
+  }
+
   @override
   void dispose() {
-    idk = FirestoreService().getUsername();
     super.dispose();
   }
 
@@ -33,25 +59,29 @@ class _SettingsState extends State<Settings> {
     }
   }
 
-  List<Person> person = [
-    Person(id: 1, name: "honza"),
-  ];
-  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  void printNavigationStack(BuildContext context) {
+    print('Navigation stack:');
+    Navigator.popUntil(context, (route) {
+      print(route.settings);
+      return true;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    var dbFirebase = Provider.of<FirestoreService>(context);
-    var nameController = TextEditingController();
     var dbSupabase = Provider.of<SupabaseProvider>(context);
-    final _future = Supabase.instance.client.from('users').select();
+    var _nameController = TextEditingController();
+    dbSupabase.getUser();
+    _nameController.text = dbSupabase.user!.name;
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Settings"),
         actions: [
           IconButton(
             onPressed: () async {
+              _signOut();
               await _deleteCacheDir();
-
-              _firebaseAuth.signOut();
             },
             icon: Icon(
               Icons.logout,
@@ -68,24 +98,6 @@ class _SettingsState extends State<Settings> {
         padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
-            FutureBuilder(
-              future: dbFirebase.getUsername(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Expanded(
-                    child: Center(),
-                  );
-                }
-
-                final name = snapshot.data;
-
-                if (name != null) {
-                  return Text("Signed in as ${name.toString().toUpperCase()} with email ${user.email}");
-                } else {
-                  return Text("Signed in as ${"your name".toString().toUpperCase()} with email ${user.email}");
-                }
-              },
-            ),
             Container(
               height: 150,
               color: const Color.fromARGB(255, 1, 41, 73),
@@ -95,14 +107,15 @@ class _SettingsState extends State<Settings> {
                     padding: const EdgeInsets.all(8.0),
                     child: Center(
                       child: TextField(
-                        controller: nameController,
+                        controller: _nameController,
                       ),
                     ),
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      dbFirebase.addUsername(nameController.text.trim());
-                      setState(() {});
+                      dbSupabase.updateName(_nameController.text.trim());
+                      dbSupabase.user!.name = _nameController.text.trim();
+                      // setState(() {});
                     },
                     child: Text("save your name"),
                   )
@@ -118,11 +131,13 @@ class _SettingsState extends State<Settings> {
               child: Column(
                 children: [
                   ElevatedButton(
-                    onPressed: () {
-                      //  dbSupabase.createMuscle();
-                      setState(() {});
+                    onPressed: () async {
+                      // printNavigationStack(context);
+                      // dbSupabase.getUser();
+                      dbSupabase.getTodayFitness();
+                      // setState(() {});
                     },
-                    child: Text("${person[0].id}"),
+                    child: Text("uživatel ${dbSupabase.user!.email}"),
                   ),
                 ],
               ),

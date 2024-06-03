@@ -6,7 +6,7 @@ import 'package:kaloricke_tabulky_02/firestore/firestore.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/add_muscle_box.dart';
 import 'package:provider/provider.dart';
 
-import '../../colors_provider.dart';
+import '../../providers/colors_provider.dart';
 import 'add_exercise_box.dart';
 
 class SplitPage extends StatefulWidget {
@@ -33,8 +33,7 @@ class _SplitPageState extends State<SplitPage> {
             ),
             Container(
               child: IconButton(
-                icon: Icon(Icons.add_circle_outline_outlined,
-                    color: ColorsProvider.color_2, size: 35),
+                icon: Icon(Icons.add_circle_outline_outlined, color: ColorsProvider.color_2, size: 35),
                 onPressed: () {
                   showDialog(
                     context: context,
@@ -71,8 +70,7 @@ class _SplitPageState extends State<SplitPage> {
                         children: [
                           Text(
                             'You have to click this',
-                            style: TextStyle(
-                                fontSize: 20, color: ColorsProvider.color_1),
+                            style: TextStyle(fontSize: 20, color: ColorsProvider.color_1),
                           ),
                           SizedBox(
                             width: 5,
@@ -83,8 +81,7 @@ class _SplitPageState extends State<SplitPage> {
                           ),
                           Container(
                             child: IconButton(
-                              icon: Icon(Icons.add_circle_outline_outlined,
-                                  color: ColorsProvider.color_2, size: 50),
+                              icon: Icon(Icons.add_circle_outline_outlined, color: ColorsProvider.color_2, size: 50),
                               onPressed: () {
                                 showDialog(
                                   context: context,
@@ -163,18 +160,13 @@ class _SplitPageState extends State<SplitPage> {
                       child: Padding(
                         padding: const EdgeInsets.all(15.0),
                         child: Container(
-                          decoration: BoxDecoration(
-                              color: ColorsProvider.color_7,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(20))),
+                          decoration: BoxDecoration(color: ColorsProvider.color_7, borderRadius: BorderRadius.all(Radius.circular(20))),
                           child: FutureBuilder<List<Record>>(
                             future: dbHelper.getSvalyFromSplitId(dbHelper.tab),
                             builder: (context, snapshot) {
                               if (snapshot.hasError) {
-                                return Center(
-                                    child: Text('Chyba: ${snapshot.error}'));
-                              } else if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
+                                return Center(child: Text('Chyba: ${snapshot.error}'));
+                              } else if (snapshot.connectionState == ConnectionState.waiting) {
                                 return Container(
                                   child: Center(
                                     child: CircularProgressIndicator(
@@ -183,69 +175,40 @@ class _SplitPageState extends State<SplitPage> {
                                   ),
                                 );
                               } else {
-                                print(
-                                    "${dbHelper.hledaniSpravnehoSvalu}aaaaaaaaaaaaaaaa ${dbHelper.temphledaniSpravnehoSvalu} aaaaaaaaaaaaaaa");
+                                print("${dbHelper.hledaniSpravnehoSvalu}aaaaaaaaaaaaaaaa ${dbHelper.temphledaniSpravnehoSvalu} aaaaaaaaaaaaaaa");
                                 List<Record> records = snapshot.data!;
-                                dbHelper.temphledaniSpravnehoSvalu =
-                                    dbHelper.hledaniSpravnehoSvalu;
+                                dbHelper.temphledaniSpravnehoSvalu = dbHelper.hledaniSpravnehoSvalu;
                                 return ListView.builder(
                                   itemCount: records.length,
                                   itemBuilder: (context, index) {
-                                    dbHelper.hledaniSpravnehoSvalu =
-                                        records[index].idSvalu;
+                                    dbHelper.hledaniSpravnehoSvalu = records[index].idSvalu;
                                     // print(dbHelper.temphledaniSpravnehoSvalu);
                                     return Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Column(
                                         children: [
                                           Container(
-                                            decoration: BoxDecoration(
-                                                border: Border.all(
-                                                    color:
-                                                        ColorsProvider.color_2,
-                                                    width: 3),
-                                                color: ColorsProvider.color_7,
-                                                borderRadius:
-                                                    BorderRadius.circular(10)),
+                                            decoration: BoxDecoration(border: Border.all(color: ColorsProvider.color_2, width: 3), color: ColorsProvider.color_7, borderRadius: BorderRadius.circular(10)),
                                             height: 37,
                                             child: Center(
                                               child: Text(
                                                 "${records[index].nazevSvalu}",
-                                                style: TextStyle(
-                                                    fontSize: 25,
-                                                    color:
-                                                        ColorsProvider.color_1,
-                                                    fontWeight:
-                                                        FontWeight.bold),
+                                                style: TextStyle(fontSize: 25, color: ColorsProvider.color_1, fontWeight: FontWeight.bold),
                                               ),
                                             ),
                                           ),
                                           Padding(
-                                            padding: const EdgeInsets.fromLTRB(
-                                                20, 0, 20, 5),
+                                            padding: const EdgeInsets.fromLTRB(20, 0, 20, 5),
                                             child: Container(
                                               decoration: BoxDecoration(
                                                 border: Border(
                                                   top: BorderSide.none,
-                                                  bottom: BorderSide(
-                                                      color: ColorsProvider
-                                                          .color_2,
-                                                      width: 5),
-                                                  left: BorderSide(
-                                                      color: ColorsProvider
-                                                          .color_2,
-                                                      width: 5),
-                                                  right: BorderSide(
-                                                      color: ColorsProvider
-                                                          .color_2,
-                                                      width: 5),
+                                                  bottom: BorderSide(color: ColorsProvider.color_2, width: 5),
+                                                  left: BorderSide(color: ColorsProvider.color_2, width: 5),
+                                                  right: BorderSide(color: ColorsProvider.color_2, width: 5),
                                                 ),
                                                 color: ColorsProvider.color_4,
-                                                borderRadius: BorderRadius.only(
-                                                    bottomLeft:
-                                                        Radius.circular(30),
-                                                    bottomRight:
-                                                        Radius.circular(30)),
+                                                borderRadius: BorderRadius.only(bottomLeft: Radius.circular(30), bottomRight: Radius.circular(30)),
                                               ),
                                               child: Column(
                                                 mainAxisSize: MainAxisSize.min,
@@ -253,58 +216,37 @@ class _SplitPageState extends State<SplitPage> {
                                                 //     MainAxisAlignment.spaceBetween,
                                                 children: [
                                                   Container(
-                                                    color:
-                                                        ColorsProvider.color_7,
+                                                    color: ColorsProvider.color_7,
                                                     height: 160,
-                                                    child: FutureBuilder<
-                                                        List<Record>>(
-                                                      future:
-                                                          dbHelper.SvalCvik(),
-                                                      builder:
-                                                          (context, snapshot) {
+                                                    child: FutureBuilder<List<Record>>(
+                                                      future: dbHelper.SvalCvik(),
+                                                      builder: (context, snapshot) {
                                                         if (snapshot.hasError) {
-                                                          return Center(
-                                                              child: Text(
-                                                                  'Chyba: ${snapshot.error}'));
-                                                        } else if (snapshot
-                                                                .connectionState ==
-                                                            ConnectionState
-                                                                .waiting) {
+                                                          return Center(child: Text('Chyba: ${snapshot.error}'));
+                                                        } else if (snapshot.connectionState == ConnectionState.waiting) {
                                                           return Container(
                                                             child: Center(
-                                                              child:
-                                                                  CircularProgressIndicator(
-                                                                color:
-                                                                    ColorsProvider
-                                                                        .color_2,
+                                                              child: CircularProgressIndicator(
+                                                                color: ColorsProvider.color_2,
                                                               ),
                                                             ),
                                                           );
                                                         } else {
-                                                          List<Record> records =
-                                                              snapshot.data!;
-                                                          dbHelper.hledaniSpravnehoSvalu =
-                                                              dbHelper
-                                                                  .temphledaniSpravnehoSvalu;
+                                                          List<Record> records = snapshot.data!;
+                                                          dbHelper.hledaniSpravnehoSvalu = dbHelper.temphledaniSpravnehoSvalu;
                                                           return Container(
-                                                            child: ListView
-                                                                .builder(
+                                                            child: ListView.builder(
                                                               reverse: true,
-                                                              itemCount: records
-                                                                  .length,
-                                                              itemBuilder:
-                                                                  (context,
-                                                                      index) {
-                                                                print(dbHelper
-                                                                    .hledaniSpravnehoSvalu);
+                                                              itemCount: records.length,
+                                                              itemBuilder: (context, index) {
+                                                                print(dbHelper.hledaniSpravnehoSvalu);
                                                                 return Container(
                                                                   child: Column(
                                                                     children: [
                                                                       Row(
                                                                         children: [
                                                                           Expanded(
-                                                                            child:
-                                                                                Container(
+                                                                            child: Container(
                                                                               height: 40,
                                                                               decoration: BoxDecoration(
                                                                                 color: ColorsProvider.color_4,
@@ -339,85 +281,48 @@ class _SplitPageState extends State<SplitPage> {
                                                   Container(
                                                     height: 5,
                                                     width: double.infinity,
-                                                    color:
-                                                        ColorsProvider.color_2,
+                                                    color: ColorsProvider.color_2,
                                                   ),
                                                   Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
+                                                    mainAxisAlignment: MainAxisAlignment.center,
                                                     children: [
                                                       Expanded(
                                                         child: ConstrainedBox(
-                                                          constraints: BoxConstraints
-                                                              .tightFor(
-                                                                  height: 40,
-                                                                  width: double
-                                                                      .infinity),
+                                                          constraints: BoxConstraints.tightFor(height: 40, width: double.infinity),
                                                           child: ElevatedButton(
-                                                            onPressed:
-                                                                () async {
-                                                              print(
-                                                                  "nazev_svalu: ${records[index].nazevSvalu}");
+                                                            onPressed: () async {
+                                                              print("nazev_svalu: ${records[index].nazevSvalu}");
 
-                                                              dbHelper.hledaniSpravnehoSvalu =
-                                                                  await dbHelper
-                                                                      .getIdSvaluFromName(
-                                                                          records[index]
-                                                                              .nazevSvalu);
-                                                              dbHelper.selectedValue =
-                                                                  records[index]
-                                                                      .nazevSvalu;
+                                                              dbHelper.hledaniSpravnehoSvalu = await dbHelper.getIdSvaluFromName(records[index].nazevSvalu);
+                                                              dbHelper.selectedValue = records[index].nazevSvalu;
 
                                                               setState(() {});
                                                               showDialog(
-                                                                context:
-                                                                    context,
-                                                                builder:
-                                                                    (BuildContext
-                                                                        context) {
+                                                                context: context,
+                                                                builder: (BuildContext context) {
                                                                   return Center(
-                                                                    child:
-                                                                        AddExerciseBox(),
+                                                                    child: AddExerciseBox(),
                                                                   );
                                                                 },
                                                               );
                                                             },
-                                                            style:
-                                                                ElevatedButton
-                                                                    .styleFrom(
-                                                              shape:
-                                                                  RoundedRectangleBorder(
-                                                                side: BorderSide(
-                                                                    width: 2,
-                                                                    color: ColorsProvider
-                                                                        .color_8), // nastavte šířku a barvu ohraničení
+                                                            style: ElevatedButton.styleFrom(
+                                                              shape: RoundedRectangleBorder(
+                                                                side: BorderSide(width: 2, color: ColorsProvider.color_8), // nastavte šířku a barvu ohraničení
 
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .only(
-                                                                  bottomLeft: Radius
-                                                                      .circular(
-                                                                          25),
-                                                                  bottomRight: Radius
-                                                                      .circular(
-                                                                          25),
+                                                                borderRadius: BorderRadius.only(
+                                                                  bottomLeft: Radius.circular(25),
+                                                                  bottomRight: Radius.circular(25),
                                                                 ),
                                                               ),
-                                                              backgroundColor:
-                                                                  ColorsProvider
-                                                                      .color_2,
+                                                              backgroundColor: ColorsProvider.color_2,
                                                             ),
                                                             child: Text(
                                                               "exercises",
                                                               style: TextStyle(
-                                                                color:
-                                                                    ColorsProvider
-                                                                        .color_8,
+                                                                color: ColorsProvider.color_8,
                                                                 fontSize: 17,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
+                                                                fontWeight: FontWeight.bold,
                                                               ),
                                                             ),
                                                           ),
@@ -462,39 +367,29 @@ class _SplitPageState extends State<SplitPage> {
                                 content: Container(
                                   height: 50,
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Column(
                                         children: [
                                           Text(
                                             'Do you want delete this split?',
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 17),
+                                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
                                           ),
-                                          Text(
-                                              'Data of exercises will stay save in app')
+                                          Text('Data of exercises will stay save in app')
                                         ],
                                       ),
                                       ElevatedButton(
                                         style: ButtonStyle(
-                                          backgroundColor:
-                                              MaterialStatePropertyAll(
-                                                  Colors.black),
-                                          foregroundColor:
-                                              MaterialStatePropertyAll(
+                                          backgroundColor: MaterialStatePropertyAll(Colors.black),
+                                          foregroundColor: MaterialStatePropertyAll(
                                             ColorsProvider.color_1,
                                           ),
                                         ),
                                         onPressed: () async {
-                                          print(
-                                              "delete split tab ${dbHelper.tab}");
-                                          print(
-                                              "delete split initialIndex ${dbHelper.initialIndex}");
+                                          print("delete split tab ${dbHelper.tab}");
+                                          print("delete split initialIndex ${dbHelper.initialIndex}");
                                           if (dbHelper.initialIndex >= 0) {
-                                            if (dbHelper.initialIndex <= 0 ||
-                                                dbHelper.tab <= 1) {
+                                            if (dbHelper.initialIndex <= 0 || dbHelper.tab <= 1) {
                                               dbHelper.initialIndex = 0;
                                               dbHelper.tab = 1;
                                             }
@@ -510,8 +405,7 @@ class _SplitPageState extends State<SplitPage> {
                                           dbHelper.hledaniSpravnehoSvalu = 0;
 
                                           setState(() {});
-                                          ScaffoldMessenger.of(context)
-                                              .hideCurrentSnackBar();
+                                          ScaffoldMessenger.of(context).hideCurrentSnackBar();
                                         },
                                         child: Text("yes"),
                                       ),

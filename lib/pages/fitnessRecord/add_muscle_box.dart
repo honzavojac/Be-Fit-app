@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:kaloricke_tabulky_02/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/firestore/firestore.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/new_muscle_box.dart';
+import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:provider/provider.dart';
 
 class AddMuscleBox extends StatefulWidget {

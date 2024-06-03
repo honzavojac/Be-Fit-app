@@ -1,6 +1,6 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
-import 'package:kaloricke_tabulky_02/colors_provider.dart';
+import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/database/database_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -8,8 +8,7 @@ class changeDataBoxServingSize extends StatefulWidget {
   const changeDataBoxServingSize({super.key});
 
   @override
-  State<changeDataBoxServingSize> createState() =>
-      _changeDataBoxServingSizeState();
+  State<changeDataBoxServingSize> createState() => _changeDataBoxServingSizeState();
 }
 
 final List<String> items = [
@@ -48,10 +47,7 @@ class _changeDataBoxServingSizeState extends State<changeDataBoxServingSize> {
                       value: item,
                       child: Text(
                         item,
-                        style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: ColorsProvider.color_1),
+                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: ColorsProvider.color_1),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ))

@@ -1,15 +1,14 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:kaloricke_tabulky_02/colors_provider.dart';
-import 'package:kaloricke_tabulky_02/firestore/firestore.dart';
-import 'package:provider/provider.dart';
+import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
+import 'package:kaloricke_tabulky_02/init_page.dart';
+import 'package:kaloricke_tabulky_02/login_supabase/splash_page.dart';
+import 'package:kaloricke_tabulky_02/main.dart';
 
 class RegisterPage extends StatefulWidget {
-  final VoidCallback showLoginPage;
+  final VoidCallback? showLoginPage;
   const RegisterPage({
     Key? key,
-    required this.showLoginPage,
+    this.showLoginPage,
   }) : super(key: key);
 
   @override
@@ -17,8 +16,6 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  final FirebaseFirestore db = FirebaseFirestore.instance;
-
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -34,6 +31,18 @@ class _RegisterPageState extends State<RegisterPage> {
     super.dispose();
   }
 
+  bool passwordConfirmed() {
+    _nameController.text = "test";
+    _emailController.text = "test@gmail.com";
+    _passwordController.text = "123456";
+    _confirmpasswordController.text = "123456";
+    if (_passwordController.text.trim() == _confirmpasswordController.text.trim()) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   Future SignUp() async {
     if (passwordConfirmed()) {
       showDialog(
@@ -44,21 +53,17 @@ class _RegisterPageState extends State<RegisterPage> {
           );
         },
       );
-
-      var dbFirebase = Provider.of<FirestoreService>(context, listen: false);
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-      );
-
-      dbFirebase.addUser(
-        _nameController.text.trim(),
-        _emailController.text.trim(),
+      //vytvoření uživatele
+      await supabase.auth.signUp(email: _emailController.text.trim(), password: _passwordController.text.trim());
+      //vložení záznamu do tabulky users
+      await supabase.from("users").insert({'name': '${_nameController.text.trim()}', 'email': '${_emailController.text.trim()}'});
+      //odstranění minulých obrazovek z paměti
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => SplashPage()),
+        (Route<dynamic> route) => false,
       );
       print("hotovo");
-
-      Navigator.of(context).pop(dispose);
-      setState(() {});
     } else {
       showDialog(
         context: context,
@@ -68,15 +73,6 @@ class _RegisterPageState extends State<RegisterPage> {
           );
         },
       );
-    }
-  }
-
-  bool passwordConfirmed() {
-    if (_passwordController.text.trim() ==
-        _confirmpasswordController.text.trim()) {
-      return true;
-    } else {
-      return false;
     }
   }
 
@@ -90,6 +86,9 @@ class _RegisterPageState extends State<RegisterPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                SizedBox(
+                  height: 50,
+                ),
                 Image.asset(
                   'assets/gym.png',
                   height: 250,
@@ -125,10 +124,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         decoration: InputDecoration(
                           border: InputBorder.none,
                           hintText: "Name",
-                          hintStyle: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15,
-                              color: ColorsProvider.color_2),
+                          hintStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: ColorsProvider.color_2),
                         ),
                         cursorColor: ColorsProvider.color_2,
                         style: TextStyle(color: ColorsProvider.color_2),
@@ -154,10 +150,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         decoration: InputDecoration(
                           border: InputBorder.none,
                           hintText: "Email",
-                          hintStyle: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15,
-                              color: ColorsProvider.color_2),
+                          hintStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: ColorsProvider.color_2),
                         ),
                         cursorColor: ColorsProvider.color_2,
                         style: TextStyle(color: ColorsProvider.color_2),
@@ -184,10 +177,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         decoration: InputDecoration(
                           border: InputBorder.none,
                           hintText: "Password",
-                          hintStyle: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15,
-                              color: ColorsProvider.color_2),
+                          hintStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: ColorsProvider.color_2),
                         ),
                         cursorColor: ColorsProvider.color_2,
                         style: TextStyle(color: ColorsProvider.color_2),
@@ -214,10 +204,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         decoration: InputDecoration(
                           border: InputBorder.none,
                           hintText: "Confirm Password",
-                          hintStyle: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15,
-                              color: ColorsProvider.color_2),
+                          hintStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: ColorsProvider.color_2),
                         ),
                         cursorColor: ColorsProvider.color_2,
                         style: TextStyle(color: ColorsProvider.color_2),
@@ -242,10 +229,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       child: Center(
                         child: Text(
                           "Sign up",
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 25,
-                              fontWeight: FontWeight.bold),
+                          style: TextStyle(color: Colors.black, fontSize: 25, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),

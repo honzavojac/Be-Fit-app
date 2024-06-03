@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/database/database_provider.dart';
 import 'package:provider/provider.dart';
 
-import '../../colors_provider.dart';
+import '../../providers/colors_provider.dart';
 
 class dataBoxes extends StatefulWidget {
   const dataBoxes({super.key});
@@ -61,10 +61,7 @@ class _dataBoxesState extends State<dataBoxes> {
                       children: [
                         Text(
                           'Calories',
-                          style: TextStyle(
-                              fontSize: 15,
-                              color: ColorsProvider.color_1,
-                              fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: 15, color: ColorsProvider.color_1, fontWeight: FontWeight.bold),
                         ),
                         Text(
                           '${kcal}',
@@ -97,10 +94,7 @@ class _dataBoxesState extends State<dataBoxes> {
                       children: [
                         Text(
                           'Protein',
-                          style: TextStyle(
-                              fontSize: 15,
-                              color: ColorsProvider.color_1,
-                              fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: 15, color: ColorsProvider.color_1, fontWeight: FontWeight.bold),
                         ),
                         Text(
                           '${protein}',
@@ -125,10 +119,7 @@ class _dataBoxesState extends State<dataBoxes> {
                       children: [
                         Text(
                           'Carbs',
-                          style: TextStyle(
-                              fontSize: 15,
-                              color: ColorsProvider.color_1,
-                              fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: 15, color: ColorsProvider.color_1, fontWeight: FontWeight.bold),
                         ),
                         Text(
                           '${carbs}',
@@ -161,10 +152,7 @@ class _dataBoxesState extends State<dataBoxes> {
                       children: [
                         Text(
                           'Fat',
-                          style: TextStyle(
-                              fontSize: 15,
-                              color: ColorsProvider.color_1,
-                              fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: 15, color: ColorsProvider.color_1, fontWeight: FontWeight.bold),
                         ),
                         Text(
                           '${fat}',
@@ -189,10 +177,7 @@ class _dataBoxesState extends State<dataBoxes> {
                       children: [
                         Text(
                           'Fiber',
-                          style: TextStyle(
-                              fontSize: 15,
-                              color: ColorsProvider.color_1,
-                              fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: 15, color: ColorsProvider.color_1, fontWeight: FontWeight.bold),
                         ),
                         Text(
                           '${fiber}',

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kaloricke_tabulky_02/colors_provider.dart';
+import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/database/database_provider.dart';
 import 'package:marquee/marquee.dart';
 import 'package:provider/provider.dart';
@@ -59,25 +59,21 @@ class _foodDiaryBoxesState extends State<foodDiaryBoxes> {
                             children: [
                               Text(
                                 'Do you want delete this record?',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 15),
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                               ),
                               ElevatedButton(
                                 style: ButtonStyle(
-                                  backgroundColor:
-                                      MaterialStatePropertyAll(Colors.black),
+                                  backgroundColor: MaterialStatePropertyAll(Colors.black),
                                   foregroundColor: MaterialStatePropertyAll(
                                     ColorsProvider.color_1,
                                   ),
                                 ),
                                 onPressed: () {
                                   setState(() {
-                                    dbHelper.deleteItem(notes[index].id,
-                                        notes[index].czfoodname);
+                                    dbHelper.deleteItem(notes[index].id, notes[index].czfoodname);
                                     notes.removeAt(index);
                                   });
-                                  ScaffoldMessenger.of(context)
-                                      .hideCurrentSnackBar();
+                                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
                                 },
                                 child: Text("yes"),
                               ),
@@ -99,17 +95,13 @@ class _foodDiaryBoxesState extends State<foodDiaryBoxes> {
                         child: Row(
                           children: [
                             Expanded(
-                              child: LayoutBuilder(
-                                  builder: (context, constraints) {
+                              child: LayoutBuilder(builder: (context, constraints) {
                                 TextPainter textPainter = TextPainter(
-                                  text: TextSpan(
-                                      text: "${notes[index].czfoodname}",
-                                      style: TextStyle(fontSize: 16.0)),
+                                  text: TextSpan(text: "${notes[index].czfoodname}", style: TextStyle(fontSize: 16.0)),
                                   textDirection: TextDirection.ltr,
                                 );
 
-                                textPainter.layout(
-                                    maxWidth: constraints.maxWidth);
+                                textPainter.layout(maxWidth: constraints.maxWidth);
                                 // print(
                                 //     "${textPainter.width} ${constraints.maxWidth}");
                                 return Row(
@@ -118,10 +110,7 @@ class _foodDiaryBoxesState extends State<foodDiaryBoxes> {
                                     Expanded(
                                       child: Container(
                                         height: 20,
-                                        child: buildAnimatedText(
-                                            "${notes[index].czfoodname}",
-                                            textPainter.width,
-                                            constraints.maxWidth),
+                                        child: buildAnimatedText("${notes[index].czfoodname}", textPainter.width, constraints.maxWidth),
                                         //  Text(
                                         //     "description:${notes[index].czfoodname}")
                                         // Další informace, které chcete zobrazit
@@ -245,25 +234,18 @@ class _foodDiaryBoxesState extends State<foodDiaryBoxes> {
   }
 }
 
-Widget buildAnimatedText(
-    String text, double textPainter, double boxConstraints) {
+Widget buildAnimatedText(String text, double textPainter, double boxConstraints) {
   if (textPainter < boxConstraints) {
     // print("${text.indexOf(text)} ${text.length}");
     return Text(
       text,
-      style: TextStyle(
-          color: ColorsProvider.color_8,
-          fontWeight: FontWeight.bold,
-          fontSize: 15),
+      style: TextStyle(color: ColorsProvider.color_8, fontWeight: FontWeight.bold, fontSize: 15),
     );
   } else {
     // print("${text.length}text je větší než widget");
     return Marquee(
       text: text,
-      style: TextStyle(
-          color: ColorsProvider.color_8,
-          fontWeight: FontWeight.bold,
-          fontSize: 15),
+      style: TextStyle(color: ColorsProvider.color_8, fontWeight: FontWeight.bold, fontSize: 15),
       scrollAxis: Axis.horizontal,
       crossAxisAlignment: CrossAxisAlignment.start,
       blankSpace: 50.0,

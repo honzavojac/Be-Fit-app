@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:kaloricke_tabulky_02/colors_provider.dart';
+import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/database/database_provider.dart';
 import 'package:kaloricke_tabulky_02/pages/foodAdd/newFood/change_new_food_box_servingSize.dart';
 import 'package:provider/provider.dart';
@@ -24,8 +24,7 @@ class _foodMainAddBoxesState extends State<foodMainAddBoxes> {
         width: 250,
         child: TextField(
           inputFormatters: [
-            FilteringTextInputFormatter.allow(
-                RegExp(r'[A-Za-z0-9ěščřžýáíéóůú)(\-_\s]')),
+            FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z0-9ěščřžýáíéóůú)(\-_\s]')),
 // povoluje zadat pouze string hodnotu => použiju pro vyhledávání v databázi
             LengthLimitingTextInputFormatter(50)
           ],
@@ -55,9 +54,7 @@ class _foodMainAddBoxesState extends State<foodMainAddBoxes> {
             ),
             contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 15),
             hintText: 'Enter name of food:',
-            hintStyle: TextStyle(
-                color: ColorsProvider.color_1,
-                fontSize: 15), // zobrazí se pokud je textové pole prázdné
+            hintStyle: TextStyle(color: ColorsProvider.color_1, fontSize: 15), // zobrazí se pokud je textové pole prázdné
           ),
           controller: dbHelper.textEditingController1,
           onChanged: (input) {
@@ -79,12 +76,10 @@ class _foodMainAddBoxesState extends State<foodMainAddBoxes> {
           SizedBox(
             width: 150,
             child: TextField(
-              keyboardType: const TextInputType.numberWithOptions(
-                  signed: true, decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(signed: true, decimal: true),
               inputFormatters: [
                 FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
-                LengthLimitingTextInputFormatter(
-                    4) // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
+                LengthLimitingTextInputFormatter(4) // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
               ],
               decoration: const InputDecoration(
                 labelText: 'Serving size',
@@ -109,12 +104,9 @@ class _foodMainAddBoxesState extends State<foodMainAddBoxes> {
                     width: 3.0,
                   ),
                 ),
-                contentPadding:
-                    EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 15),
                 hintText: 'Enter value:',
-                hintStyle: TextStyle(
-                    color: ColorsProvider.color_1,
-                    fontSize: 15), // zobrazí se pokud je textové pole prázdné
+                hintStyle: TextStyle(color: ColorsProvider.color_1, fontSize: 15), // zobrazí se pokud je textové pole prázdné
               ),
               controller: dbHelper.textEditingController2,
               onChanged: (input) {
@@ -139,12 +131,10 @@ class _foodMainAddBoxesState extends State<foodMainAddBoxes> {
           SizedBox(
             width: 120,
             child: TextField(
-              keyboardType: const TextInputType.numberWithOptions(
-                  signed: true, decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(signed: true, decimal: true),
               inputFormatters: [
                 FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
-                LengthLimitingTextInputFormatter(
-                    4) // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
+                LengthLimitingTextInputFormatter(4) // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
               ],
               decoration: const InputDecoration(
                 labelText: 'Kcal',
@@ -169,12 +159,9 @@ class _foodMainAddBoxesState extends State<foodMainAddBoxes> {
                     width: 3.0,
                   ),
                 ),
-                contentPadding:
-                    EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 15),
                 hintText: 'Enter value:',
-                hintStyle: TextStyle(
-                    color: ColorsProvider.color_1,
-                    fontSize: 15), // zobrazí se pokud je textové pole prázdné
+                hintStyle: TextStyle(color: ColorsProvider.color_1, fontSize: 15), // zobrazí se pokud je textové pole prázdné
               ),
               controller: dbHelper.textEditingController3,
               onChanged: (input) {
@@ -198,13 +185,10 @@ class _foodMainAddBoxesState extends State<foodMainAddBoxes> {
           SizedBox(
             width: 120,
             child: TextField(
-              keyboardType: const TextInputType.numberWithOptions(
-                  signed: true, decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(signed: true, decimal: true),
               inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(
-                    r'[0-9.]')), // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
-                LengthLimitingTextInputFormatter(
-                    4) //omezí kolik znaků je možno zadat
+                FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')), // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
+                LengthLimitingTextInputFormatter(4) //omezí kolik znaků je možno zadat
               ],
               decoration: const InputDecoration(
                 labelText: 'Protein',
@@ -229,12 +213,9 @@ class _foodMainAddBoxesState extends State<foodMainAddBoxes> {
                     width: 3.0,
                   ),
                 ),
-                contentPadding:
-                    EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 15),
                 hintText: 'Enter value:',
-                hintStyle: TextStyle(
-                    color: ColorsProvider.color_1,
-                    fontSize: 15), // zobrazí se pokud je textové pole prázdné
+                hintStyle: TextStyle(color: ColorsProvider.color_1, fontSize: 15), // zobrazí se pokud je textové pole prázdné
               ),
               controller: dbHelper.textEditingController4,
               onChanged: (input) {
@@ -250,11 +231,9 @@ class _foodMainAddBoxesState extends State<foodMainAddBoxes> {
           SizedBox(
             width: 120,
             child: TextField(
-              keyboardType: const TextInputType.numberWithOptions(
-                  signed: true, decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(signed: true, decimal: true),
               inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(
-                    r'[0-9.]')), // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
+                FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')), // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
                 LengthLimitingTextInputFormatter(4)
               ],
               decoration: const InputDecoration(
@@ -280,12 +259,9 @@ class _foodMainAddBoxesState extends State<foodMainAddBoxes> {
                     width: 3.0,
                   ),
                 ),
-                contentPadding:
-                    EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 15),
                 hintText: 'Enter value:',
-                hintStyle: TextStyle(
-                    color: ColorsProvider.color_1,
-                    fontSize: 15), // zobrazí se pokud je textové pole prázdné
+                hintStyle: TextStyle(color: ColorsProvider.color_1, fontSize: 15), // zobrazí se pokud je textové pole prázdné
               ),
               controller: dbHelper.textEditingController5,
               onChanged: (input) {
@@ -309,12 +285,10 @@ class _foodMainAddBoxesState extends State<foodMainAddBoxes> {
           SizedBox(
             width: 120,
             child: TextField(
-              keyboardType: const TextInputType.numberWithOptions(
-                  signed: true, decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(signed: true, decimal: true),
               inputFormatters: [
                 FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
-                LengthLimitingTextInputFormatter(
-                    4) // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
+                LengthLimitingTextInputFormatter(4) // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
               ],
               decoration: const InputDecoration(
                 labelText: 'Fats',
@@ -339,12 +313,9 @@ class _foodMainAddBoxesState extends State<foodMainAddBoxes> {
                     width: 3.0,
                   ),
                 ),
-                contentPadding:
-                    EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 15),
                 hintText: 'Enter value:',
-                hintStyle: TextStyle(
-                    color: ColorsProvider.color_1,
-                    fontSize: 15), // zobrazí se pokud je textové pole prázdné
+                hintStyle: TextStyle(color: ColorsProvider.color_1, fontSize: 15), // zobrazí se pokud je textové pole prázdné
               ),
               controller: dbHelper.textEditingController6,
               onChanged: (input) {
@@ -391,12 +362,9 @@ class _foodMainAddBoxesState extends State<foodMainAddBoxes> {
                     width: 3.0,
                   ),
                 ),
-                contentPadding:
-                    EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 15),
                 hintText: 'Enter value:',
-                hintStyle: TextStyle(
-                    color: ColorsProvider.color_1,
-                    fontSize: 15), // zobrazí se pokud je textové pole prázdné
+                hintStyle: TextStyle(color: ColorsProvider.color_1, fontSize: 15), // zobrazí se pokud je textové pole prázdné
               ),
               controller: dbHelper.textEditingController7,
               onChanged: (input) {

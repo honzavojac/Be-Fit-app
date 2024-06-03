@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:kaloricke_tabulky_02/colors_provider.dart';
+import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/database/database_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -24,12 +24,10 @@ class _myDataboxesState extends State<myDataboxes> {
         SizedBox(
           width: 150,
           child: TextField(
-            keyboardType: const TextInputType.numberWithOptions(
-                signed: true, decimal: true),
+            keyboardType: const TextInputType.numberWithOptions(signed: true, decimal: true),
             inputFormatters: [
               FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
-              LengthLimitingTextInputFormatter(
-                  4) // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
+              LengthLimitingTextInputFormatter(4) // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
             ],
             decoration: const InputDecoration(
                 labelText: 'Serving size',
@@ -52,12 +50,9 @@ class _myDataboxesState extends State<myDataboxes> {
                     width: 3.0,
                   ),
                 ),
-                contentPadding:
-                    EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 15),
                 hintText: 'Enter value:',
-                hintStyle: TextStyle(
-                    color: ColorsProvider.color_1,
-                    fontSize: 15) // zobrazí se pokud je textové pole prázdné
+                hintStyle: TextStyle(color: ColorsProvider.color_1, fontSize: 15) // zobrazí se pokud je textové pole prázdné
                 //  icon: Icon(Icons.text_fields), //
                 ),
             onChanged: (input) {
