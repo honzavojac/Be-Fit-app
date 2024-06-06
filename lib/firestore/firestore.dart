@@ -187,7 +187,7 @@ class FirestoreService extends ChangeNotifier {
 
       // Naplnění mapy svalů ze seznamu svalů
       for (int i = 0; i < muscles.length; i++) {
-        var muscleName = muscles[i] as String;
+        var muscleName = muscles[i];
 
         if (isCheckedList.length > i) {
           musclesMap[muscleName] = isCheckedList[i];

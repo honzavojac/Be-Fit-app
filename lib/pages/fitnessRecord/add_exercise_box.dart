@@ -1,13 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 
-import 'package:kaloricke_tabulky_02/firestore/firestore.dart';
+import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:provider/provider.dart';
 
 import 'new_exercise_box.dart';
 
 class AddExerciseBox extends StatefulWidget {
-  const AddExerciseBox({Key? key}) : super(key: key);
+  final int splitIndex;
+  final int muscleIndex;
+  final Function() notifyParent;
+  const AddExerciseBox({
+    Key? key,
+    required this.splitIndex,
+    required this.muscleIndex,
+    required this.notifyParent,
+  }) : super(key: key);
 
   @override
   _AddExerciseBoxState createState() => _AddExerciseBoxState();
@@ -17,37 +25,62 @@ class _AddExerciseBoxState extends State<AddExerciseBox> {
   List<bool> isCheckedList = [];
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    loadData();
-  }
-
-  @override
   void initState() {
     super.initState();
-    // You can keep this method empty if you don't have any specific initialization.
+    // loadData();
   }
 
-  Future<void> loadData() async {
-    var dbFirebase = Provider.of<FirestoreService>(context);
-    await dbFirebase.getExercises();
-    await dbFirebase.getTrueSplitExercise(dbFirebase.splitName);
-    isCheckedList = List.generate(dbFirebase.allExercises.length, (index) => false);
-    print(dbFirebase.mapFinalExercises[dbFirebase.splitName][dbFirebase.chosedMuscle]);
-    for (var i = 0; i < dbFirebase.allExercises.length; i++) {
-      for (var j = 0; j < dbFirebase.mapFinalExercises[dbFirebase.splitName][dbFirebase.chosedMuscle].length; j++) {
-        if (dbFirebase.allExercises[i] == dbFirebase.mapFinalExercises[dbFirebase.splitName][dbFirebase.chosedMuscle][j]) {
-          isCheckedList[i] = true;
+  void refresh() {
+    a = 0;
+    setState(() {});
+  }
+
+  int a = 0;
+  Future<void> loadData(BuildContext context) async {
+    var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false); // listen: false to avoid rebuilds
+
+    if (dbSupabase.initChecklist == 0) {
+      if (a == 0) {
+        dbSupabase.clickedSplitTab = widget.splitIndex;
+        dbSupabase.muscleIndex = widget.muscleIndex;
+        await dbSupabase.generateFalseExerciseCheckbox(widget.splitIndex, widget.muscleIndex);
+        for (var i = 0; i < dbSupabase.splits[widget.splitIndex].selectedMuscle![widget.muscleIndex].selectedExercises!.length; i++) {
+          String selectedExerciseName = dbSupabase.splits[widget.splitIndex].selectedMuscle![widget.muscleIndex].selectedExercises![i].exercises.nameOfExercise;
+
+          // print(i);
+          // print(dbSupabase.splits[widget.splitIndex].selectedMuscle![widget.muscleIndex].muscles!.exercises![i].nameOfExercise);
+          for (var j = 0; j < dbSupabase.splits[widget.splitIndex].selectedMuscle![widget.muscleIndex].muscles!.exercises!.length; j++) {
+            String exerciseName = dbSupabase.splits[widget.splitIndex].selectedMuscle![widget.muscleIndex].muscles!.exercises![j].nameOfExercise;
+            if (exerciseName == selectedExerciseName) {
+              // print("true $i");
+              dbSupabase.exercisesCheckedList[j] = true;
+            } else {
+              // print("false $i");
+            }
+          }
         }
+
+        isCheckedList = dbSupabase.exercisesCheckedList;
+        setState(() {});
+        a = 1;
+        dbSupabase.initChecklist = 1;
+      } else {
+        a = 0;
       }
     }
-    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    var dbFirebase = Provider.of<FirestoreService>(context);
-
+    loadData(context);
+    var dbSupabase = Provider.of<SupabaseProvider>(context);
+    var exercises = dbSupabase.splits[widget.splitIndex].selectedMuscle![widget.muscleIndex].muscles!.exercises;
+    // print("object");
+    // for (var element in exercises!) {
+    //   print(element.idExercise);
+    // }
+    var data = dbSupabase.splits[widget.splitIndex].selectedMuscle![widget.muscleIndex];
+    // splits[widget.splitIndex].selectedMuscle![widget.muscleIndex].muscles!.exercises;
     return AlertDialog(
       contentPadding: EdgeInsets.zero,
       content: Container(
@@ -70,19 +103,33 @@ class _AddExerciseBoxState extends State<AddExerciseBox> {
                       Expanded(
                         child: Container(
                           child: ListView.builder(
-                            itemCount: dbFirebase.allExercises.length,
+                            itemCount: exercises!.length,
                             itemBuilder: (context, index) {
                               return Padding(
                                 padding: const EdgeInsets.only(left: 20, right: 20),
                                 child: Row(
                                   children: [
                                     Expanded(
-                                      child: Text(dbFirebase.allExercises[index]),
+                                      child: Text("${exercises[index].nameOfExercise}"),
                                     ),
                                     Checkbox(
                                       value: isCheckedList[index],
-                                      onChanged: (value) {
+                                      onChanged: (value) async {
                                         isCheckedList[index] = value ?? false;
+                                        var finalExercise = exercises[index];
+                                        print(index);
+                                        await dbSupabase.updateSelectedExercise(
+                                          finalExercise.idExercise,
+                                          finalExercise.nameOfExercise,
+                                          value!,
+                                          data.idSelectedMuscle,
+                                          widget.splitIndex,
+                                          widget.muscleIndex,
+                                          index,
+                                        );
+
+                                        await dbSupabase.getTodayFitness();
+                                        widget.notifyParent();
                                         setState(() {});
                                       },
                                     ),
@@ -104,15 +151,15 @@ class _AddExerciseBoxState extends State<AddExerciseBox> {
                   width: double.infinity,
                   child: TextButton(
                     onPressed: () async {
-                      for (var i = 0; i < dbFirebase.allExercises.length; i++) {
-                        if (isCheckedList[i] == true) {
-                          print("add");
-                          dbFirebase.addTrueSplitExercise(dbFirebase.allExercises[i]);
-                        } else if (isCheckedList[i] == false) {
-                          print("delete");
-                          dbFirebase.DeleteTrueSplitExercise(dbFirebase.allExercises[i]);
-                        }
-                      }
+                      // for (var i = 0; i < dbFirebase.allExercises.length; i++) {
+                      //   if (isCheckedList[i] == true) {
+                      //     print("add");
+                      //     dbFirebase.addTrueSplitExercise(dbFirebase.allExercises[i]);
+                      //   } else if (isCheckedList[i] == false) {
+                      //     print("delete");
+                      //     dbFirebase.DeleteTrueSplitExercise(dbFirebase.allExercises[i]);
+                      //   }
+                      // }
                       Navigator.of(context).pop();
                     },
                     style: TextButton.styleFrom(
@@ -154,7 +201,11 @@ class _AddExerciseBoxState extends State<AddExerciseBox> {
                           context: context,
                           builder: (BuildContext context) {
                             return Center(
-                              child: NewExerciseBox(),
+                              child: NewExerciseBox(
+                                splitIndex: widget.splitIndex,
+                                muscleIndex: widget.muscleIndex,
+                                notifyParent: refresh,
+                              ),
                             );
                           },
                         );

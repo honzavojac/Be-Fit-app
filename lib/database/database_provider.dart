@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 ///
@@ -42,8 +41,7 @@ class DBHelper extends ChangeNotifier {
     databasesPath = (await getApplicationDocumentsDirectory()).path;
     String appPath = join(databasesPath, 'database.db');
 
-    _database = await openDatabase(appPath, version: 1,
-        onCreate: (Database db, int version) {
+    _database = await openDatabase(appPath, version: 1, onCreate: (Database db, int version) {
       db.execute(
         '''CREATE TABLE Notes (
             ID INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -114,8 +112,7 @@ class DBHelper extends ChangeNotifier {
 
     _assetsDatabasePath = await assetsDB();
 
-    await _database
-        .rawQuery('''ATTACH DATABASE '$_assetsDatabasePath' AS DB''');
+    await _database.rawQuery('''ATTACH DATABASE '$_assetsDatabasePath' AS DB''');
 
     // var result = await _database.query('Notes');
     // print("Notes database:$result");
@@ -161,8 +158,7 @@ class DBHelper extends ChangeNotifier {
       }
 
       ByteData data = await rootBundle.load(join("assets", "foodDatabase.db"));
-      List<int> bytes =
-          data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+      List<int> bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
 
       await File(assetsPath).writeAsBytes(bytes, flush: true);
       print("vytvoření assets databáze proběhlo úspěšně");
@@ -178,17 +174,14 @@ class DBHelper extends ChangeNotifier {
   ///
   ///
   Future<List<Record>> Split() async {
-    final maps = await _database
-        .rawQuery('''SELECT ID_SPLITU,NAZEV_SPLITU FROM Split''');
+    final maps = await _database.rawQuery('''SELECT ID_SPLITU,NAZEV_SPLITU FROM Split''');
     print("Split tabulka: ");
     for (var map in maps) {
       print(map);
     }
 
     return List.generate(maps.length, (index) {
-      return Record(
-          idSplitu: maps[index]['ID_SPLITU'] as int,
-          nazevSplitu: maps[index]['NAZEV_SPLITU'] as String);
+      return Record(idSplitu: maps[index]['ID_SPLITU'] as int, nazevSplitu: maps[index]['NAZEV_SPLITU'] as String);
     });
   }
 
@@ -201,8 +194,7 @@ class DBHelper extends ChangeNotifier {
   }
 
   Future<int> findSplit(String text) async {
-    final result = await _database.rawQuery(
-        '''SELECT ID_SPLITU FROM Split WHERE NAZEV_SPLITU IS ('$text')''');
+    final result = await _database.rawQuery('''SELECT ID_SPLITU FROM Split WHERE NAZEV_SPLITU IS ('$text')''');
 
     if (result.isNotEmpty) {
       final idSplitu = result.first['ID_SPLITU'] as int;
@@ -237,10 +229,8 @@ class DBHelper extends ChangeNotifier {
     bool hotovo = true;
     // tab = 3;
     await _database.rawQuery('''DELETE FROM Split WHERE ID_SPLITU IS $tab''');
-    await _database
-        .rawQuery('''DELETE FROM SplitSval WHERE ID_SPLITU IS $tab''');
-    await _database
-        .rawQuery('''DELETE FROM SvalCvik WHERE ID_SPLITU IS $tab''');
+    await _database.rawQuery('''DELETE FROM SplitSval WHERE ID_SPLITU IS $tab''');
+    await _database.rawQuery('''DELETE FROM SvalCvik WHERE ID_SPLITU IS $tab''');
 // potřebuju celé tři tabulky přepočítat od začátku tak aby začínaly od 1 a nebyla žádná mezera
     try {
       // Pokusit se odstranit existující tabulky
@@ -290,15 +280,13 @@ class DBHelper extends ChangeNotifier {
         var nazev_splitu = mapSplit[i]['NAZEV_SPLITU'] as String;
         if (id_splitu != temp) {
           temp = id_splitu;
-          await _database.rawQuery(
-              '''INSERT INTO NewSplit (NAZEV_SPLITU) VALUES('$nazev_splitu')''');
+          await _database.rawQuery('''INSERT INTO NewSplit (NAZEV_SPLITU) VALUES('$nazev_splitu')''');
         } else {}
         print(mapSplit[i]);
       }
       //---------------------------------------------
       temp = 1;
-      final mapSplitSval =
-          await _database.rawQuery('''SELECT * FROM SplitSval''');
+      final mapSplitSval = await _database.rawQuery('''SELECT * FROM SplitSval''');
       print("SplitSval:");
       for (var i = 0; i < mapSplitSval.length; i++) {
         var id_splitu = mapSplitSval[i]['ID_SPLITU'] as int;
@@ -341,8 +329,7 @@ class DBHelper extends ChangeNotifier {
 
       //-----------------------------------------
       temp = 1;
-      final mapSvalCvik =
-          await _database.rawQuery('''SELECT * FROM SvalCvik''');
+      final mapSvalCvik = await _database.rawQuery('''SELECT * FROM SvalCvik''');
       print("SvalCvik:");
       for (var i = 0; i < mapSvalCvik.length; i++) {
         var id_splitu = mapSvalCvik[i]['ID_SPLITU'] as int;
@@ -395,14 +382,12 @@ class DBHelper extends ChangeNotifier {
       for (var new_split in new_splits) {
         print(new_split);
       }
-      var new_splitsvals =
-          await _database.rawQuery('''SELECT * FROM NewSplitSval''');
+      var new_splitsvals = await _database.rawQuery('''SELECT * FROM NewSplitSval''');
       print("NewSplitSval");
       for (var new_splitsval in new_splitsvals) {
         print(new_splitsval);
       }
-      var new_splitcviks =
-          await _database.rawQuery('''SELECT * FROM NewSvalCvik''');
+      var new_splitcviks = await _database.rawQuery('''SELECT * FROM NewSvalCvik''');
       print("NewSvalCvik");
       for (var new_splitcvik in new_splitcviks) {
         print(new_splitcvik);
@@ -421,10 +406,8 @@ class DBHelper extends ChangeNotifier {
     }
     try {
       await _database.rawQuery('''ALTER TABLE NewSplit RENAME TO Split''');
-      await _database
-          .rawQuery('''ALTER TABLE NewSplitSval RENAME TO SplitSval''');
-      await _database
-          .rawQuery('''ALTER TABLE NewSvalCvik RENAME TO SvalCvik''');
+      await _database.rawQuery('''ALTER TABLE NewSplitSval RENAME TO SplitSval''');
+      await _database.rawQuery('''ALTER TABLE NewSvalCvik RENAME TO SvalCvik''');
       print("Nové tabulky BYLY přejmenovány");
     } catch (e) {
       print("Nové tabulky NEBYLY přejmenovány");
@@ -452,8 +435,7 @@ class DBHelper extends ChangeNotifier {
   }
 
   Future<String?> SearchSval(int cislo) async {
-    List<Map<String, dynamic>> result = await _database
-        .rawQuery('''SELECT NAZEV_SVALU FROM Sval WHERE ID_SVALU is $cislo''');
+    List<Map<String, dynamic>> result = await _database.rawQuery('''SELECT NAZEV_SVALU FROM Sval WHERE ID_SVALU is $cislo''');
 
     if (result.isNotEmpty) {
       // Získání hodnoty z prvního řádku výsledku
@@ -471,8 +453,7 @@ class DBHelper extends ChangeNotifier {
   }
 
   SplitSval() async {
-    final maps = await _database
-        .rawQuery('''SELECT ID_SPLITU,ID_SVALU FROM SplitSval''');
+    final maps = await _database.rawQuery('''SELECT ID_SPLITU,ID_SVALU FROM SplitSval''');
     print("SplitSval tabulka: ");
     for (var map in maps) {
       print(map);
@@ -480,8 +461,7 @@ class DBHelper extends ChangeNotifier {
   }
 
   InsertSplitSval(int cislo1, int cislo2) async {
-    var a = await _database
-        .rawQuery('''INSERT INTO SplitSval VALUES(Null,$cislo1,$cislo2)''');
+    var a = await _database.rawQuery('''INSERT INTO SplitSval VALUES(Null,$cislo1,$cislo2)''');
     print(a);
   }
 
@@ -516,13 +496,10 @@ class DBHelper extends ChangeNotifier {
   }
 
   Future<List<Record>> Svaly() async {
-    final maps =
-        await _database.rawQuery('''SELECT ID_SVALU,NAZEV_SVALU FROM Sval''');
+    final maps = await _database.rawQuery('''SELECT ID_SVALU,NAZEV_SVALU FROM Sval''');
     print("svaly tabulka: $maps");
     return await List.generate(maps.length, (index) {
-      return Record(
-          idSvalu: maps[index]['ID_SVALU'] as int,
-          nazevSvalu: maps[index]['NAZEV_SVALU'] as String);
+      return Record(idSvalu: maps[index]['ID_SVALU'] as int, nazevSvalu: maps[index]['NAZEV_SVALU'] as String);
     });
   }
 
@@ -546,18 +523,14 @@ class DBHelper extends ChangeNotifier {
   late int temphledaniSpravnehoSvalu = 0;
   late int hledaniSpravnehoSvalu = 0;
   Future<List<Record>> Cviky() async {
-    final maps = await _database.rawQuery(
-        '''SELECT ID_CVIKU,ID_SVALU,NAZEV_CVIKU FROM Cvik WHERE ID_SVALU IS $hledaniSpravnehoSvalu order by ID_SVALU''');
+    final maps = await _database.rawQuery('''SELECT ID_CVIKU,ID_SVALU,NAZEV_CVIKU FROM Cvik WHERE ID_SVALU IS $hledaniSpravnehoSvalu order by ID_SVALU''');
     // print("cviky tabulka: $maps");
     for (var map in maps) {
       print(map);
     }
 
     return List.generate(maps.length, (index) {
-      return Record(
-          idCviku: maps[index]['ID_CVIKU'] as int,
-          idSvalu: maps[index]['ID_SVALU'] as int,
-          nazevCviku: maps[index]['NAZEV_CVIKU'] as String);
+      return Record(idCviku: maps[index]['ID_CVIKU'] as int, idSvalu: maps[index]['ID_SVALU'] as int, nazevCviku: maps[index]['NAZEV_CVIKU'] as String);
     });
   }
 
@@ -569,8 +542,7 @@ class DBHelper extends ChangeNotifier {
   late String selectedValue = "";
 
   Future<int> findMuscle(String text) async {
-    final result = await _database.rawQuery(
-        '''SELECT ID_SVALU FROM Sval WHERE NAZEV_SVALU IS ('$text')''');
+    final result = await _database.rawQuery('''SELECT ID_SVALU FROM Sval WHERE NAZEV_SVALU IS ('$text')''');
 
     if (result.isNotEmpty) {
       final idSvalu = result.first['ID_SVALU'] as int;
@@ -582,8 +554,7 @@ class DBHelper extends ChangeNotifier {
 
   InsertCvik() async {
     int id_svalu = await findMuscle(selectedValue);
-    _database
-        .rawQuery('''INSERT INTO Cvik VALUES(Null,$id_svalu,'$nazev_cviku')''');
+    _database.rawQuery('''INSERT INTO Cvik VALUES(Null,$id_svalu,'$nazev_cviku')''');
 
     notifyListeners();
   }
@@ -597,8 +568,7 @@ class DBHelper extends ChangeNotifier {
   }
 
   Future<List<Record>> SvalCvik() async {
-    final maps =
-        await _database.rawQuery('''SELECT SvalCvik.*, Cvik.NAZEV_CVIKU 
+    final maps = await _database.rawQuery('''SELECT SvalCvik.*, Cvik.NAZEV_CVIKU 
        FROM SvalCvik 
        JOIN Cvik ON SvalCvik.ID_CVIKU = Cvik.ID_CVIKU 
        WHERE SvalCvik.ID_SVALU IS $hledaniSpravnehoSvalu AND SvalCvik.BOOL_CVIKU IS true AND SvalCvik.ID_SPLITU IS $tab''');
@@ -620,14 +590,12 @@ class DBHelper extends ChangeNotifier {
   }
 
   Future<List<Record>> AutoInsert() async {
-    final cviky = await _database.rawQuery(
-        '''SELECT ID_CVIKU, ID_SVALU FROM Cvik WHERE ID_SVALU IS $hledaniSpravnehoSvalu ''');
+    final cviky = await _database.rawQuery('''SELECT ID_CVIKU, ID_SVALU FROM Cvik WHERE ID_SVALU IS $hledaniSpravnehoSvalu ''');
     print("Tabulka Cviky pro automatický insert");
     for (var cvik in cviky) {
       print(cvik);
     }
-    final maps = await _database
-        .rawQuery('''SELECT * FROM SvalCvik WHERE ID_SPLITU IS $tab''');
+    final maps = await _database.rawQuery('''SELECT * FROM SvalCvik WHERE ID_SPLITU IS $tab''');
     print("Tabulka pro automatický insert");
 
     for (var i = 0; i < cviky.length; i++) {
@@ -648,8 +616,7 @@ class DBHelper extends ChangeNotifier {
       if (vlozitHodnoty) {
         // Vložit hodnoty, protože ID_CVIKU z Cvik není nalezeno v SvalCvik
         print("Vložit hodnoty pro ID_CVIKU $idCvikuCviky");
-        await _database.rawQuery(
-            '''INSERT INTO SvalCvik values(Null,$tab,$hledaniSpravnehoSvalu,$idCvikuCviky,0)''');
+        await _database.rawQuery('''INSERT INTO SvalCvik values(Null,$tab,$hledaniSpravnehoSvalu,$idCvikuCviky,0)''');
         print("hodnoty byly vloženy");
       }
     }
@@ -666,8 +633,7 @@ class DBHelper extends ChangeNotifier {
 
   Future<List<Record>> SvalCvikAddBox() async {
     await AutoInsert();
-    final maps =
-        await _database.rawQuery('''SELECT SvalCvik.*, Cvik.NAZEV_CVIKU 
+    final maps = await _database.rawQuery('''SELECT SvalCvik.*, Cvik.NAZEV_CVIKU 
        FROM SvalCvik 
        JOIN Cvik ON SvalCvik.ID_CVIKU = Cvik.ID_CVIKU 
        WHERE SvalCvik.ID_SVALU IS $hledaniSpravnehoSvalu AND SvalCvik.ID_SPLITU IS $tab''');
@@ -691,8 +657,7 @@ class DBHelper extends ChangeNotifier {
 
   UpdateSvalCvik(bool boolCviku, int idCviku, int idSplitu, int idSvalu) async {
     print("aktualizace stavu");
-    await _database.rawQuery(
-        '''UPDATE SvalCvik SET BOOL_CVIKU = $boolCviku WHERE ID_CVIKU IS $idCviku AND ID_SPLITU IS $idSplitu AND ID_SVALU IS $idSvalu''');
+    await _database.rawQuery('''UPDATE SvalCvik SET BOOL_CVIKU = $boolCviku WHERE ID_CVIKU IS $idCviku AND ID_SPLITU IS $idSplitu AND ID_SVALU IS $idSvalu''');
   }
 
   InsertDataCviku() async {}
@@ -707,10 +672,8 @@ class DBHelper extends ChangeNotifier {
     await _database.rawQuery('''INSERT INTO Cvik VALUES(Null,1,'biceps2')''');
     await _database.rawQuery('''INSERT INTO Cvik VALUES(Null,2,'triceps1')''');
     await _database.rawQuery('''INSERT INTO Cvik VALUES(Null,2,'triceps2')''');
-    await _database
-        .rawQuery('''INSERT INTO Cvik VALUES(Null,3,'shoulders1')''');
-    await _database
-        .rawQuery('''INSERT INTO Cvik VALUES(Null,3,'shoulders2')''');
+    await _database.rawQuery('''INSERT INTO Cvik VALUES(Null,3,'shoulders1')''');
+    await _database.rawQuery('''INSERT INTO Cvik VALUES(Null,3,'shoulders2')''');
 
     print("hotovo");
   }
@@ -722,8 +685,7 @@ class DBHelper extends ChangeNotifier {
   ///
   ///
   Future<List<Note>> Notes() async {
-    final List<Map<String, dynamic>> maps = await _database.rawQuery(
-        '''SELECT ID,GRAMS,CZFOODNAME,ENERGYKCAL,PROTEIN,CARBS,FAT,FIBER FROM Notes''');
+    final List<Map<String, dynamic>> maps = await _database.rawQuery('''SELECT ID,GRAMS,CZFOODNAME,ENERGYKCAL,PROTEIN,CARBS,FAT,FIBER FROM Notes''');
     return List.generate(maps.length, (i) {
       return Note(
         id: maps[i]['ID'] as int,
@@ -739,8 +701,7 @@ class DBHelper extends ChangeNotifier {
   }
 
   Future<List<Note>> countNotes() async {
-    final List<Map<String, dynamic>> maps =
-        await _database.rawQuery('''SELECT ID,
+    final List<Map<String, dynamic>> maps = await _database.rawQuery('''SELECT ID,
         CZFOODNAME,
         SUM(ENERGYKCAL)as ENERGYKCAL,
         ROUND(SUM(PROTEIN),1)AS PROTEIN,
@@ -772,8 +733,7 @@ class DBHelper extends ChangeNotifier {
   }
 
   Future<int> getKcalForFood(String food) async {
-    final List<Map<String, dynamic>> result = await _database.rawQuery(
-        '''SELECT ENERGYKCAL FROM AppNutrients WHERE CZFOODNAME = '$food' UNION ALL
+    final List<Map<String, dynamic>> result = await _database.rawQuery('''SELECT ENERGYKCAL FROM AppNutrients WHERE CZFOODNAME = '$food' UNION ALL
 SELECT ENERGYKCAL FROM NutriDatabaseData WHERE CZFOODNAME = '$food' ''');
 
     if (result.isNotEmpty) {
@@ -784,8 +744,7 @@ SELECT ENERGYKCAL FROM NutriDatabaseData WHERE CZFOODNAME = '$food' ''');
   }
 
   Future<double> getProteinForFood(String food) async {
-    final List<Map<String, dynamic>> result = await _database.rawQuery(
-        '''SELECT PROTEIN FROM AppNutrients WHERE CZFOODNAME = '$food' UNION ALL SELECT PROTEIN FROM NutriDatabaseData WHERE CZFOODNAME = '$food' ''');
+    final List<Map<String, dynamic>> result = await _database.rawQuery('''SELECT PROTEIN FROM AppNutrients WHERE CZFOODNAME = '$food' UNION ALL SELECT PROTEIN FROM NutriDatabaseData WHERE CZFOODNAME = '$food' ''');
 
     if (result.isNotEmpty) {
       return result[0]['PROTEIN'];
@@ -795,8 +754,7 @@ SELECT ENERGYKCAL FROM NutriDatabaseData WHERE CZFOODNAME = '$food' ''');
   }
 
   Future<double> getCarbsForFood(String food) async {
-    final List<Map<String, dynamic>> result = await _database.rawQuery(
-        '''SELECT CARBS FROM AppNutrients WHERE CZFOODNAME = '$food' UNION ALL SELECT CARBS FROM NutriDatabaseData WHERE CZFOODNAME = '$food' ''');
+    final List<Map<String, dynamic>> result = await _database.rawQuery('''SELECT CARBS FROM AppNutrients WHERE CZFOODNAME = '$food' UNION ALL SELECT CARBS FROM NutriDatabaseData WHERE CZFOODNAME = '$food' ''');
 
     if (result.isNotEmpty) {
       return result[0]['CARBS'];
@@ -806,8 +764,7 @@ SELECT ENERGYKCAL FROM NutriDatabaseData WHERE CZFOODNAME = '$food' ''');
   }
 
   Future<double> getFatForFood(String food) async {
-    final List<Map<String, dynamic>> result = await _database.rawQuery(
-        '''SELECT FAT FROM AppNutrients WHERE CZFOODNAME = '$food' UNION ALL SELECT FAT FROM NutriDatabaseData WHERE CZFOODNAME = '$food' ''');
+    final List<Map<String, dynamic>> result = await _database.rawQuery('''SELECT FAT FROM AppNutrients WHERE CZFOODNAME = '$food' UNION ALL SELECT FAT FROM NutriDatabaseData WHERE CZFOODNAME = '$food' ''');
 
     if (result.isNotEmpty) {
       return result[0]['FAT'];
@@ -817,8 +774,7 @@ SELECT ENERGYKCAL FROM NutriDatabaseData WHERE CZFOODNAME = '$food' ''');
   }
 
   Future<double> getFiberForFood(String food) async {
-    final List<Map<String, dynamic>> result = await _database.rawQuery(
-        '''SELECT FIBER FROM AppNutrients WHERE CZFOODNAME = '$food' UNION ALL SELECT FIBER FROM NutriDatabaseData WHERE CZFOODNAME = '$food' ''');
+    final List<Map<String, dynamic>> result = await _database.rawQuery('''SELECT FIBER FROM AppNutrients WHERE CZFOODNAME = '$food' UNION ALL SELECT FIBER FROM NutriDatabaseData WHERE CZFOODNAME = '$food' ''');
 
     if (result.isNotEmpty) {
       return result[0]['FIBER'];
@@ -835,8 +791,7 @@ SELECT ENERGYKCAL FROM NutriDatabaseData WHERE CZFOODNAME = '$food' ''');
   late double fat;
   late double fiber;
 
-  NutritionsData(String text, int kcal, double protein, double carbs,
-      double fat, double fiber) async {
+  NutritionsData(String text, int kcal, double protein, double carbs, double fat, double fiber) async {
     databaseFactoryOrNull = null; //odstraní sql kecy
     this.nameOfFood = text;
     this.kcal = kcal;
@@ -873,17 +828,12 @@ SELECT ENERGYKCAL FROM NutriDatabaseData WHERE CZFOODNAME = '$food' ''');
 
   countData() async {
     await selectedMultiply();
-    this.finalKcal =
-        int.parse((this.kcal * this.finalGrams).round().toString());
+    this.finalKcal = int.parse((this.kcal * this.finalGrams).round().toString());
 
-    this.finalProtein =
-        (((this.protein * this.finalGrams * 10).round() / 10)).toDouble();
-    this.finalCarbs =
-        (((this.carbs * this.finalGrams * 10).round() / 10)).toDouble();
-    this.finalFat =
-        (((this.fat * this.finalGrams * 10).round() / 10)).toDouble();
-    this.finalFiber =
-        (((this.fiber * this.finalGrams * 10).round() / 10)).toDouble();
+    this.finalProtein = (((this.protein * this.finalGrams * 10).round() / 10)).toDouble();
+    this.finalCarbs = (((this.carbs * this.finalGrams * 10).round() / 10)).toDouble();
+    this.finalFat = (((this.fat * this.finalGrams * 10).round() / 10)).toDouble();
+    this.finalFiber = (((this.fiber * this.finalGrams * 10).round() / 10)).toDouble();
 
     if (this.finalSelectedValue == "grams") {
       this.finalGrams = double.parse((this.grams).toString());
@@ -896,8 +846,7 @@ SELECT ENERGYKCAL FROM NutriDatabaseData WHERE CZFOODNAME = '$food' ''');
     await countData();
     databaseFactoryOrNull = null; //odstraní sql kecy
 
-    await _database.rawQuery(
-        '''INSERT INTO Notes values(Null,${this.finalGrams},'${this.nameOfFood}',${this.finalKcal},${this.finalProtein},${this.finalCarbs},${this.finalFat},${this.finalFiber})''');
+    await _database.rawQuery('''INSERT INTO Notes values(Null,${this.finalGrams},'${this.nameOfFood}',${this.finalKcal},${this.finalProtein},${this.finalCarbs},${this.finalFat},${this.finalFiber})''');
 
     notifyListeners();
   }
@@ -943,8 +892,7 @@ SELECT ENERGYKCAL FROM NutriDatabaseData WHERE CZFOODNAME = '$food' ''');
 
   countNewFoodData() {
     selectedNewFoodMultiply();
-    this.newFoodKcal = int.parse(
-        (this.newFoodKcal / this.newFoodGrams * 100).round().toString());
+    this.newFoodKcal = int.parse((this.newFoodKcal / this.newFoodGrams * 100).round().toString());
     this.newFoodProtein = this.newFoodProtein / this.newFoodGrams * 100;
     this.newFoodCarbs = this.newFoodCarbs / this.newFoodGrams * 100;
     this.newFoodFat = this.newFoodFat / this.newFoodGrams * 100;
@@ -954,8 +902,7 @@ SELECT ENERGYKCAL FROM NutriDatabaseData WHERE CZFOODNAME = '$food' ''');
   insertNewFood() async {
     await countNewFoodData();
     databaseFactoryOrNull = null; //odstraní sql kecy
-    await _database.rawQuery(
-        '''INSERT INTO AppNutrients values(Null,'${this.newFoodNameOfFood}',${this.newFoodKcal},${this.newFoodProtein},${this.newFoodCarbs},${this.newFoodFat},${this.newFoodFiber})''');
+    await _database.rawQuery('''INSERT INTO AppNutrients values(Null,'${this.newFoodNameOfFood}',${this.newFoodKcal},${this.newFoodProtein},${this.newFoodCarbs},${this.newFoodFat},${this.newFoodFiber})''');
 
     resetBoxes();
     notifyListeners();
@@ -976,8 +923,7 @@ SELECT ENERGYKCAL FROM NutriDatabaseData WHERE CZFOODNAME = '$food' ''');
   Future<void> deleteItem(int id, String text) async {
     databaseFactoryOrNull = null;
 
-    await _database.delete('Notes',
-        where: 'ID = ? AND CZFOODNAME = ?', whereArgs: [id, text]);
+    await _database.delete('Notes', where: 'ID = ? AND CZFOODNAME = ?', whereArgs: [id, text]);
 
     var updatedData = await _database.query('Notes');
     print(updatedData);
@@ -1066,8 +1012,7 @@ class Record {
     this.komentar = "",
     DateTime? datum,
     this.boolCviku = false, // Umožňuje datum být null
-  }) : datum = datum ??
-            DateTime.now(); // Pokud je datum null, použije aktuální čas
+  }) : datum = datum ?? DateTime.now(); // Pokud je datum null, použije aktuální čas
 
   Record.fromMap(Map<String, dynamic> item)
       : idSvalu = item["ID"] ?? 0,

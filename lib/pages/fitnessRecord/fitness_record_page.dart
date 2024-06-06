@@ -19,32 +19,7 @@ class FitnessRecordAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text('Exercise recording '),
-          Container(
-            height: 37,
-            child: ElevatedButton.icon(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => StatisticsScreen(),
-                  ),
-                );
-              },
-              icon: Icon(Icons.moving),
-              label: Text(
-                'Statistics',
-              ),
-              style: ButtonStyle(
-                foregroundColor: MaterialStateProperty.all(ColorsProvider.color_1),
-              ),
-            ),
-          ),
-        ],
-      ),
+      title: _buildAppBar(context),
     );
   }
 }
@@ -56,7 +31,6 @@ class FitnessRecordScreen extends StatefulWidget {
   State<FitnessRecordScreen> createState() => _FitnessRecordScreenState();
 }
 
-ScrollController _scrollController = ScrollController();
 int a = 0;
 
 class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
@@ -79,6 +53,11 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
     }
   }
 
+  void refresh() {
+    a = 0;
+    setState(() {});
+  }
+
   String? splitName;
   int selectedSplit = 0;
 
@@ -88,9 +67,9 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
     var variablesProvider = Provider.of<VariablesProvider>(context);
     loadData(context);
     var splits = dbSupabase.splits;
-
-    if (splits.isEmpty == true) {
+    if (splits.isEmpty) {
       print("1");
+
       return Column(
         children: [
           Padding(
@@ -99,7 +78,80 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Expanded(
-                  child: _buildNoData(variablesProvider, splits),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(25, 0, 25, 0),
+                    child: Container(
+                      // width: 150,
+                      height: 40,
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton2<String>(
+                          isExpanded: true,
+                          value: splitName ?? (splits.isNotEmpty ? splits[0].nameSplit : null),
+                          items: splits.map<DropdownMenuItem<String>>((split) {
+                            return DropdownMenuItem<String>(
+                              value: split.nameSplit,
+                              child: Center(
+                                child: Text(
+                                  split.nameSplit.toString().toUpperCase(),
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: ColorsProvider.color_1,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            splitName = value!;
+                            for (var i = 0; i < splits.length; i++) {
+                              if (splits[i].nameSplit == value) {
+                                selectedSplit = i;
+                                dbSupabase.clickedSplitTab = i;
+                              }
+                            }
+                            setState(() {});
+                            print(splitName);
+                            print(selectedSplit);
+                          },
+                          buttonStyleData: ButtonStyleData(
+                            width: 180,
+                            padding: const EdgeInsets.symmetric(horizontal: 14),
+                            decoration: BoxDecoration(
+                              borderRadius: variablesProvider.zaobleni,
+                              border: Border.all(
+                                color: ColorsProvider.color_2,
+                                width: 0.5,
+                              ),
+                            ),
+                          ),
+                          iconStyleData: const IconStyleData(
+                            icon: Icon(Icons.keyboard_arrow_down_outlined),
+                            iconSize: 17,
+                            iconEnabledColor: ColorsProvider.color_1,
+                          ),
+                          dropdownStyleData: DropdownStyleData(
+                            maxHeight: 200,
+                            decoration: BoxDecoration(
+                              borderRadius: variablesProvider.zaobleni,
+                              border: Border.all(width: 2, color: ColorsProvider.color_2),
+                            ),
+                            offset: const Offset(0, -0),
+                            scrollbarTheme: ScrollbarThemeData(
+                              radius: const Radius.circular(40),
+                              thickness: MaterialStateProperty.all(6),
+                              thumbVisibility: MaterialStateProperty.all(true),
+                            ),
+                          ),
+                          menuItemStyleData: const MenuItemStyleData(
+                            height: 40,
+                            padding: EdgeInsets.only(left: 0, right: 18),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
                 Container(
                   height: 32,
@@ -108,7 +160,9 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => SplitPage(),
+                          builder: (context) => SplitPage(
+                            notifyParent: refresh,
+                          ),
                         ),
                       );
                     },
@@ -224,13 +278,18 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                     Container(
                       height: 32,
                       child: ElevatedButton.icon(
-                        onPressed: () {
-                          Navigator.push(
+                        onPressed: () async {
+                          await Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => SplitPage(),
+                              builder: (context) => SplitPage(
+                                notifyParent: refresh,
+                              ),
                             ),
                           );
+                          dbSupabase.getTodayFitness();
+                          dbSupabase.clickedSplitTab = 0;
+                          setState(() {});
                         },
                         icon: Icon(Icons.edit_outlined),
                         label: Text(
@@ -269,161 +328,212 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                     children: [
                       Expanded(
                         child: ListView.builder(
-                          itemCount: splits[selectedSplit].splitMuscles!.length,
+                          itemCount: splits[selectedSplit].selectedMuscle!.length,
                           itemBuilder: (context, muscleIndex) {
-                            String muscle = splits[selectedSplit].splitMuscles![muscleIndex].muscles.nameOfMuscle;
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 15),
-                              child: Container(
-                                decoration: BoxDecoration(color: ColorsProvider.color_2, borderRadius: BorderRadius.circular(20)),
-                                child: Column(
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.fromLTRB(5, 10, 5, 0),
-                                      child: Container(
-                                        height: 30,
-                                        decoration: BoxDecoration(
-                                          // color: ColorsProvider.color_2,
-                                          borderRadius: variablesProvider.zaobleni,
-                                        ),
-                                        child: Center(
-                                          child: Text(
-                                            "$muscle".toUpperCase(),
-                                            style: TextStyle(
-                                              color: ColorsProvider.color_8,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 25,
-                                              letterSpacing: 2,
+                            String muscle = splits[selectedSplit].selectedMuscle![muscleIndex].muscles!.nameOfMuscle;
+
+                            if (splits[selectedSplit].selectedMuscle![muscleIndex].selectedExercises!.isEmpty) {
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 15),
+                                child: Container(
+                                  decoration: BoxDecoration(color: ColorsProvider.color_2, borderRadius: BorderRadius.circular(20)),
+                                  child: Column(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.fromLTRB(5, 10, 5, 0),
+                                        child: Container(
+                                          height: 30,
+                                          decoration: BoxDecoration(
+                                            // color: ColorsProvider.color_2,
+                                            borderRadius: variablesProvider.zaobleni,
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                              "$muscle".toUpperCase(),
+                                              style: TextStyle(
+                                                color: ColorsProvider.color_8,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 25,
+                                                letterSpacing: 2,
+                                              ),
                                             ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                        left: 5,
-                                        right: 5,
-                                        top: 10,
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                          left: 5,
+                                          right: 5,
+                                          top: 10,
+                                        ),
+                                        child: Container(
+                                          child: Text(
+                                            "No exercises",
+                                            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
                                       ),
-                                      child: Container(
-                                        child: ListView.builder(
-                                          shrinkWrap: true,
-                                          physics: NeverScrollableScrollPhysics(),
-                                          itemCount: splits[selectedSplit].splitMuscles![muscleIndex].muscles.exercises!.length,
-                                          itemBuilder: (context, exerciseIndex) {
-                                            String exercise = splits[selectedSplit].splitMuscles![muscleIndex].muscles.exercises![exerciseIndex].nameOfExercise;
-                                            // dbFirebase.LoadExerciseData(selectedSplit!, muscle, exercise);
-                                            // print("load hotový");
-                                            return GestureDetector(
-                                              onTap: () async {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) => ExercisePage(),
-                                                  ),
-                                                );
-                                              },
-                                              child: Padding(
-                                                padding: const EdgeInsets.only(bottom: 5),
-                                                child: Container(
-                                                  height: 100,
-                                                  decoration: BoxDecoration(
-                                                    borderRadius: BorderRadius.circular(10),
-                                                    color: ColorsProvider.color_2,
-                                                  ),
-                                                  child: Column(
-                                                    children: [
-                                                      Row(
-                                                        mainAxisAlignment: MainAxisAlignment.center,
-                                                        children: [
-                                                          Text(
-                                                            "$exercise".toUpperCase(),
-                                                            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 15),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      Expanded(
-                                                        child: Padding(
-                                                          padding: const EdgeInsets.only(left: 5, right: 5, bottom: 2),
-                                                          child: Container(
-                                                            decoration: BoxDecoration(color: Color.fromARGB(111, 0, 0, 0), borderRadius: variablesProvider.zaobleni),
-                                                            child: Row(
-                                                              children: [
-                                                                Padding(
-                                                                  padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
-                                                                  child: Container(
-                                                                    width: 60,
-                                                                    child: Column(
-                                                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                                                      children: [
-                                                                        Text("Set"),
-                                                                        Text("Weight"),
-                                                                        Text("Reps"),
-                                                                        SizedBox(
-                                                                          height: 2,
-                                                                        )
-                                                                      ],
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                                Container(
-                                                                  width: 1,
-                                                                  color: Colors.black,
-                                                                ),
-                                                                Expanded(
-                                                                  child: Padding(
+                                      SizedBox(
+                                        height: 10,
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              );
+                            } else {
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 15),
+                                child: Container(
+                                  decoration: BoxDecoration(color: ColorsProvider.color_2, borderRadius: BorderRadius.circular(20)),
+                                  child: Column(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.fromLTRB(5, 10, 5, 0),
+                                        child: Container(
+                                          height: 30,
+                                          decoration: BoxDecoration(
+                                            // color: ColorsProvider.color_2,
+                                            borderRadius: variablesProvider.zaobleni,
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                              "$muscle".toUpperCase(),
+                                              style: TextStyle(
+                                                color: ColorsProvider.color_8,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 25,
+                                                letterSpacing: 2,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                          left: 5,
+                                          right: 5,
+                                          top: 10,
+                                        ),
+                                        child: Container(
+                                          child: ListView.builder(
+                                            shrinkWrap: true,
+                                            physics: NeverScrollableScrollPhysics(),
+                                            itemCount: splits[selectedSplit].selectedMuscle![muscleIndex].selectedExercises!.length,
+                                            itemBuilder: (context, exerciseIndex) {
+                                              String exercise = splits[selectedSplit].selectedMuscle![muscleIndex].selectedExercises![exerciseIndex].exercises.nameOfExercise;
+
+                                              return GestureDetector(
+                                                onTap: () async {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) => ExercisePage(),
+                                                    ),
+                                                  );
+                                                },
+                                                child: Padding(
+                                                  padding: const EdgeInsets.only(bottom: 5),
+                                                  child: Container(
+                                                    height: 100,
+                                                    decoration: BoxDecoration(
+                                                      borderRadius: BorderRadius.circular(10),
+                                                      color: ColorsProvider.color_2,
+                                                    ),
+                                                    child: Column(
+                                                      children: [
+                                                        Row(
+                                                          mainAxisAlignment: MainAxisAlignment.center,
+                                                          children: [
+                                                            Text(
+                                                              "$exercise".toUpperCase(),
+                                                              style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 15),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        Expanded(
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.only(left: 5, right: 5, bottom: 2),
+                                                            child: Container(
+                                                              decoration: BoxDecoration(color: Color.fromARGB(111, 0, 0, 0), borderRadius: variablesProvider.zaobleni),
+                                                              child: Row(
+                                                                children: [
+                                                                  Padding(
                                                                     padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
                                                                     child: Container(
-                                                                      child: ListView.builder(
-                                                                        itemCount: splits[selectedSplit].splitMuscles![muscleIndex].muscles.exercises![exerciseIndex].exerciseData!.length,
-                                                                        scrollDirection: Axis.horizontal,
-                                                                        itemBuilder: (context, index) {
-                                                                          int reps;
-                                                                          int weight;
-                                                                          // if (DateTime.now().toString().replaceRange(10, null, '') == splits[selectedSplit].splitMuscles![muscleIndex].muscles.exercises![exerciseIndex].exerciseData![index].time!.replaceRange(10, null, '')) {
-                                                                          reps = splits[selectedSplit].splitMuscles![muscleIndex].muscles.exercises![exerciseIndex].exerciseData![index].reps;
-                                                                          weight = splits[selectedSplit].splitMuscles![muscleIndex].muscles.exercises![exerciseIndex].exerciseData![index].weight;
-                                                                          // } else {}
-                                                                          return Padding(
-                                                                            padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
-                                                                            child: Container(
-                                                                              width: 30,
-                                                                              child: Column(
-                                                                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                                                                children: [
-                                                                                  Text("${index + 1}"),
-                                                                                  Text("$weight"),
-                                                                                  Text("$reps"),
-                                                                                  SizedBox(
-                                                                                    height: 2,
-                                                                                  )
-                                                                                ],
-                                                                              ),
-                                                                            ),
-                                                                          );
-                                                                        },
+                                                                      width: 60,
+                                                                      child: Column(
+                                                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                                        children: [
+                                                                          Text("Set"),
+                                                                          Text("Weight"),
+                                                                          Text("Reps"),
+                                                                          SizedBox(
+                                                                            height: 2,
+                                                                          )
+                                                                        ],
                                                                       ),
                                                                     ),
                                                                   ),
-                                                                )
-                                                              ],
+                                                                  Container(
+                                                                    width: 1,
+                                                                    color: Colors.black,
+                                                                  ),
+                                                                  Expanded(
+                                                                    child: Padding(
+                                                                      padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
+                                                                      child: Container(
+                                                                        child: ListView.builder(
+                                                                          itemCount: splits[selectedSplit].selectedMuscle![muscleIndex].selectedExercises![exerciseIndex].exercises.exerciseData!.length,
+                                                                          scrollDirection: Axis.horizontal,
+                                                                          itemBuilder: (context, index) {
+                                                                            var data = splits[selectedSplit].selectedMuscle![muscleIndex].selectedExercises![exerciseIndex].exercises.exerciseData![index];
+                                                                            int reps;
+                                                                            int weight;
+                                                                            // if (DateTime.now().toString().replaceRange(10, null, '') == splits[selectedSplit].selectedMuscle![muscleIndex].muscles.exercises![exerciseIndex].exerciseData![index].time!.replaceRange(10, null, '')) {
+                                                                            reps = data.reps;
+                                                                            weight = data.weight;
+                                                                            // } else {}
+                                                                            return Padding(
+                                                                              padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
+                                                                              child: Container(
+                                                                                width: 30,
+                                                                                child: Column(
+                                                                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                                                  children: [
+                                                                                    Text("${index + 1}"),
+                                                                                    Text("$weight"),
+                                                                                    Text("$reps"),
+                                                                                    SizedBox(
+                                                                                      height: 2,
+                                                                                    )
+                                                                                  ],
+                                                                                ),
+                                                                              ),
+                                                                            );
+                                                                          },
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  )
+                                                                ],
+                                                              ),
                                                             ),
                                                           ),
                                                         ),
-                                                      ),
-                                                    ],
+                                                      ],
+                                                    ),
                                                   ),
                                                 ),
-                                              ),
-                                            );
-                                          },
+                                              );
+                                            },
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            );
+                              );
+                            }
                           },
                         ),
                       ),
@@ -472,68 +582,32 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
   }
 }
 
-Widget _buildNoData(VariablesProvider variablesProvider, List<Split> splits) {
-  return Padding(
-    padding: const EdgeInsets.fromLTRB(25, 0, 25, 0),
-    child: Container(
-      height: 40,
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton2<String>(
-          isExpanded: true,
-          value: splits[0].nameSplit,
-          items: splits.map<DropdownMenuItem<String>>((split) {
-            return DropdownMenuItem<String>(
-              value: split.nameSplit,
-              child: Center(
-                child: Text(
-                  split.nameSplit.toString().toUpperCase(),
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: ColorsProvider.color_1,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
+/**/
+Widget _buildAppBar(BuildContext context) {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: [
+      Text('Exercise recording '),
+      Container(
+        height: 37,
+        child: ElevatedButton.icon(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => StatisticsScreen(),
               ),
             );
-          }).toList(),
-          onChanged: (value) {},
-          buttonStyleData: ButtonStyleData(
-            width: 180,
-            padding: const EdgeInsets.symmetric(horizontal: 14),
-            decoration: BoxDecoration(
-              borderRadius: variablesProvider.zaobleni,
-              border: Border.all(
-                color: ColorsProvider.color_2,
-                width: 0.5,
-              ),
-            ),
+          },
+          icon: Icon(Icons.moving),
+          label: Text(
+            'Statistics',
           ),
-          iconStyleData: const IconStyleData(
-            icon: Icon(Icons.keyboard_arrow_down_outlined),
-            iconSize: 17,
-            iconEnabledColor: ColorsProvider.color_1,
-          ),
-          dropdownStyleData: DropdownStyleData(
-            maxHeight: 200,
-            decoration: BoxDecoration(
-              borderRadius: variablesProvider.zaobleni,
-              border: Border.all(width: 2, color: ColorsProvider.color_2),
-            ),
-            offset: const Offset(0, -0),
-            scrollbarTheme: ScrollbarThemeData(
-              radius: const Radius.circular(40),
-              thickness: MaterialStateProperty.all(6),
-              thumbVisibility: MaterialStateProperty.all(true),
-            ),
-          ),
-          menuItemStyleData: const MenuItemStyleData(
-            height: 40,
-            padding: EdgeInsets.only(left: 0, right: 18),
+          style: ButtonStyle(
+            foregroundColor: MaterialStateProperty.all(ColorsProvider.color_1),
           ),
         ),
       ),
-    ),
+    ],
   );
 }
-/**/

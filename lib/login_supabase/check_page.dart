@@ -14,7 +14,7 @@ class CheckPage extends StatelessWidget {
     // Příklad: Získání aktuálně přihlášeného uživatele
     var currentUser = dbFirebase.auth.currentUser;
     if (currentUser != null) {
-      // print('Přihlášený uživatel: ${currentUser.email}');
+      print('Přihlášený uživatel: ${currentUser.email}');
     } else {
       print('Nikdo není přihlášen.');
     }

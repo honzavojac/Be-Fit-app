@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:provider/provider.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/fitness_global_variables.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/fitness_record_page.dart';
@@ -38,6 +39,8 @@ class _InitPageState extends State<InitPage> {
 
   @override
   Widget build(BuildContext context) {
+    var dbSupabase = Provider.of<SupabaseProvider>(context);
+    dbSupabase.getUser();
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<fitnessGlobalVariables>(

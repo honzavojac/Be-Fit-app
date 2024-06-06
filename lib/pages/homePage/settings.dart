@@ -58,13 +58,13 @@ class _SettingsState extends State<Settings> {
     }
   }
 
-  void printNavigationStack(BuildContext context) {
-    print('Navigation stack:');
-    Navigator.popUntil(context, (route) {
-      print(route.settings);
-      return true;
-    });
-  }
+  // void printNavigationStack(BuildContext context) {
+  //   print('Navigation stack:');
+  //   Navigator.popUntil(context, (route) {
+  //     print(route.settings);
+  //     return true;
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -79,8 +79,9 @@ class _SettingsState extends State<Settings> {
         actions: [
           IconButton(
             onPressed: () async {
-              _signOut();
               await _deleteCacheDir();
+              dbSupabase.clearUserData();
+              _signOut();
             },
             icon: Icon(
               Icons.logout,
@@ -133,7 +134,7 @@ class _SettingsState extends State<Settings> {
                     onPressed: () async {
                       // printNavigationStack(context);
                       // dbSupabase.getUser();
-                      dbSupabase.getTodayFitness();
+
                       // setState(() {});
                     },
                     child: Text("uživatel ${dbSupabase.user!.email}"),

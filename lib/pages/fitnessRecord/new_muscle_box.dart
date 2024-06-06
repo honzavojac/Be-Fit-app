@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:kaloricke_tabulky_02/firestore/firestore.dart';
+import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/colors_provider.dart';
 
 class NewMuscleBox extends StatefulWidget {
-  const NewMuscleBox({Key? key}) : super(key: key);
+  final Function() notifyParent;
+  const NewMuscleBox({
+    Key? key,
+    required this.notifyParent,
+  }) : super(key: key);
 
   @override
   _NewMuscleBoxState createState() => _NewMuscleBoxState();
@@ -22,7 +25,7 @@ class _NewMuscleBoxState extends State<NewMuscleBox> {
 
   @override
   Widget build(BuildContext context) {
-    var dbFirebase = Provider.of<FirestoreService>(context);
+    var dbSupabase = Provider.of<SupabaseProvider>(context);
 
     return AlertDialog(
       contentPadding: EdgeInsets.zero,
@@ -112,9 +115,12 @@ class _NewMuscleBoxState extends State<NewMuscleBox> {
                   width: double.infinity,
                   child: TextButton(
                     onPressed: () async {
+                      dbSupabase.isCheckedList.add(false);
+                      await dbSupabase.insertMuscle(textController.text.trim());
+                      await dbSupabase.getAllMuscles();
+
+                      widget.notifyParent();
                       Navigator.of(context).pop();
-                      dbFirebase.isCheckedList.add(false);
-                      await dbFirebase.addMuscle(textController.text.trim());
                     },
                     style: TextButton.styleFrom(
                       backgroundColor: ColorsProvider.color_2,

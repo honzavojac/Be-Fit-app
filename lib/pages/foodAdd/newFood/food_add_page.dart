@@ -1,7 +1,6 @@
 // ignore_for_file: avoid_print, avoid_unnecessary_containers
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/database/database_provider.dart';
 

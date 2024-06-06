@@ -17,6 +17,7 @@ class HomeAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // var dbHelper = Provider.of<DBHelper>(context);
+    var dbSupabase = Provider.of<SupabaseProvider>(context);
 
     return AppBar(
       title: Row(
@@ -25,6 +26,7 @@ class HomeAppBar extends StatelessWidget {
           const Text('Home page'),
           IconButton(
               onPressed: () {
+                dbSupabase.getUser();
                 Navigator.pushNamed(context, '/settings'); // Použijte pushNamed pro navigaci
               },
               icon: Icon(
@@ -39,13 +41,13 @@ class HomeAppBar extends StatelessWidget {
 
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
-  void printNavigationStack(BuildContext context) {
-    print('Navigation stack:');
-    Navigator.popUntil(context, (route) {
-      print(route.settings);
-      return true;
-    });
-  }
+  // void printNavigationStack(BuildContext context) {
+  //   print('Navigation stack:');
+  //   Navigator.popUntil(context, (route) {
+  //     print(route.settings);
+  //     return true;
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {

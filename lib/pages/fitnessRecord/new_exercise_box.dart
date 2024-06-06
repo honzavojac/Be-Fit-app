@@ -1,12 +1,21 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:kaloricke_tabulky_02/firestore/firestore.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
+import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:provider/provider.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class NewExerciseBox extends StatefulWidget {
-  const NewExerciseBox({Key? key}) : super(key: key);
+  final int splitIndex;
+  final int muscleIndex;
+  final Function() notifyParent;
+  const NewExerciseBox({
+    Key? key,
+    required this.splitIndex,
+    required this.muscleIndex,
+    required this.notifyParent,
+  }) : super(key: key);
 
   @override
   _NewExerciseBoxState createState() => _NewExerciseBoxState();
@@ -14,7 +23,7 @@ class NewExerciseBox extends StatefulWidget {
 
 class _NewExerciseBoxState extends State<NewExerciseBox> {
   String? selectedMuscle;
-  var textController = TextEditingController();
+  var _textController = TextEditingController();
 
   @override
   void didChangeDependencies() {
@@ -28,23 +37,31 @@ class _NewExerciseBoxState extends State<NewExerciseBox> {
   }
 
   void loadData() async {
-    var dbFirebase = Provider.of<FirestoreService>(context);
+    var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false); // listen: false to avoid rebuilds
 
-    await dbFirebase.getMuscles();
     // Nastavte výchozí hodnotu na první sval, pokud není seznam prázdný
-    if (dbFirebase.allMuscles.isNotEmpty) {
-      print("nastavení defaultní hodnoty");
-      selectedMuscle = dbFirebase.chosedMuscle;
+    if (dbSupabase.splits[widget.splitIndex].selectedMuscle!.isNotEmpty) {
+      selectedMuscle = dbSupabase.splits[widget.splitIndex].selectedMuscle![widget.muscleIndex].muscles!.nameOfMuscle;
     } else {
+      print("nastavení defaultní hodnoty");
       selectedMuscle = " ";
     }
     setState(() {});
   }
 
+  findIdMuscle() {
+    var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false);
+    for (var muscle in dbSupabase.muscles) {
+      if (muscle.nameOfMuscle == selectedMuscle) {
+        return muscle.idMuscle;
+      } else {}
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    var dbFirebase = Provider.of<FirestoreService>(context);
-
+    var dbSupabase = Provider.of<SupabaseProvider>(context);
+    var muscles = dbSupabase.muscles;
     return AlertDialog(
       contentPadding: EdgeInsets.zero,
       content: Container(
@@ -89,7 +106,7 @@ class _NewExerciseBoxState extends State<NewExerciseBox> {
                   child: Container(
                     width: 200,
                     child: TextField(
-                      controller: textController,
+                      controller: _textController,
                       decoration: const InputDecoration(
                         labelText: 'Name of Exercise:',
                         labelStyle: TextStyle(
@@ -137,14 +154,13 @@ class _NewExerciseBoxState extends State<NewExerciseBox> {
                   ),
                 ),
                 DropdownButtonHideUnderline(
-                  child: DropdownButton2<String>(
+                  child: DropdownButton2<Muscle>(
                     isExpanded: true,
-                    items: dbFirebase.allMuscles.map<DropdownMenuItem<String>>((String muscle) {
-                      print(dbFirebase.chosedMuscle);
-                      return DropdownMenuItem<String>(
+                    items: muscles.map<DropdownMenuItem<Muscle>>((Muscle muscle) {
+                      return DropdownMenuItem<Muscle>(
                         value: muscle,
                         child: Text(
-                          muscle,
+                          muscle.nameOfMuscle,
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
@@ -156,10 +172,10 @@ class _NewExerciseBoxState extends State<NewExerciseBox> {
                     }).toList(),
                     onChanged: (value) {
                       setState(() {
-                        selectedMuscle = value!; // Aktualizace vybraného svalu
+                        selectedMuscle = value!.nameOfMuscle.toString(); // Aktualizace vybraného svalu
                       });
                     },
-                    value: selectedMuscle,
+                    value: selectedMuscle != null ? muscles.firstWhere((muscle) => muscle.nameOfMuscle == selectedMuscle) : null,
                     buttonStyleData: ButtonStyleData(
                       height: 50,
                       width: 150,
@@ -205,9 +221,41 @@ class _NewExerciseBoxState extends State<NewExerciseBox> {
                   height: 50,
                   width: double.infinity,
                   child: TextButton(
-                    onPressed: () {
-                      dbFirebase.addExercise(textController.text.trim(), selectedMuscle!);
-                      Navigator.of(context).pop();
+                    onPressed: () async {
+                      if (_textController.text.trim().isNotEmpty) {
+                        await findIdMuscle();
+                        await dbSupabase.insertExercise(_textController.text.trim(), await findIdMuscle());
+                        await dbSupabase.getTodayFitness();
+                        dbSupabase.initChecklist = 0;
+
+                        await widget.notifyParent();
+                        Navigator.of(context).pop();
+                      } else {
+                        // ignore: unused_local_variable
+                        AnimationController localAnimationController;
+
+                        showTopSnackBar(
+                          Overlay.of(context),
+
+                          animationDuration: Duration(milliseconds: 1500),
+                          Container(
+                            height: 50,
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 25, right: 25),
+                              child: CustomSnackBar.error(
+                                message: "Name of new exercise is empty",
+                              ),
+                            ),
+                          ),
+                          // persistent: true,
+                          onAnimationControllerInit: (controller) => localAnimationController = controller,
+                          displayDuration: Duration(microseconds: 750),
+                          dismissType: DismissType.onSwipe,
+                          dismissDirection: [DismissDirection.endToStart],
+                          reverseAnimationDuration: Duration(milliseconds: 250),
+                          onTap: () {},
+                        );
+                      }
                     },
                     style: TextButton.styleFrom(
                       backgroundColor: ColorsProvider.color_2,

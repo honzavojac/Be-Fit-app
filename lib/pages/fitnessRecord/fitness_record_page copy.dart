@@ -57,6 +57,10 @@ ScrollController _scrollController = ScrollController();
 class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
   List<String> exerciseIndex = [];
 
+  void refresh() {
+    setState(() {});
+  }
+
   //final controller = PageController(initialPage: 0);
   @override
   Widget build(BuildContext context) {
@@ -81,7 +85,9 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => SplitPage(),
+                            builder: (context) => SplitPage(
+                              notifyParent: refresh,
+                            ),
                           ),
                         );
                       },

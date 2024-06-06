@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/main.dart';
+import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
+import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LoginPage extends StatefulWidget {
@@ -22,8 +24,8 @@ class _LoginPageState extends State<LoginPage> {
   late final StreamSubscription<AuthState> _authStateSubscription;
 
   Future<void> signIn() async {
-    // _emailController.text = "honzavojac@gmail.com";
-    // _passwordController.text = "Davidsrubek2408";
+    // _emailController.text = "test@gmail.com";
+    // _passwordController.text = "123456";
     try {
       setState(() {});
       await supabase.auth.signInWithPassword(
@@ -152,10 +154,15 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _buildSignInButton() {
+    var dbSupabase = Provider.of<SupabaseProvider>(context);
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 80),
       child: GestureDetector(
-        onTap: signIn,
+        onTap: () async {
+          await signIn();
+          await dbSupabase.getUser();
+        },
         child: Container(
           height: 55,
           decoration: BoxDecoration(
@@ -211,6 +218,8 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _buildSignInWithGoogle() {
+    var dbSupabase = Provider.of<SupabaseProvider>(context);
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 50),
       child: Column(
@@ -237,6 +246,8 @@ class _LoginPageState extends State<LoginPage> {
             ),
             onTap: () {
               print("google auth");
+
+              print(dbSupabase.user!.email);
               // AuthService().signInWithGoogle();
             },
           ),

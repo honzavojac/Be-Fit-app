@@ -1,19 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:kaloricke_tabulky_02/firestore/firestore.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/new_muscle_box.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
+import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:provider/provider.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
-class AddMuscleBox extends StatefulWidget {
-  const AddMuscleBox({Key? key}) : super(key: key);
+class AddSplitBox extends StatefulWidget {
+  final Function() notifyParent;
+  const AddSplitBox({
+    Key? key,
+    required this.notifyParent,
+  }) : super(key: key);
 
   @override
-  _AddMuscleBoxState createState() => _AddMuscleBoxState();
+  _AddSplitBoxState createState() => _AddSplitBoxState();
 }
 
-class _AddMuscleBoxState extends State<AddMuscleBox> {
-  var textController = TextEditingController();
-  List<String> listMuscles = [];
+class _AddSplitBoxState extends State<AddSplitBox> {
+  var _textController = TextEditingController();
+
+  List<Muscle> muscles = [];
   List<bool> isCheckedList = [];
 
   @override
@@ -28,21 +35,35 @@ class _AddMuscleBoxState extends State<AddMuscleBox> {
   }
 
   Future<void> loadData() async {
-    var dbFirebase = Provider.of<FirestoreService>(context);
-    listMuscles = await dbFirebase.getMuscles();
-    isCheckedList = List.generate(listMuscles.length, (index) => false);
-    textController.clear();
+    var dbSupabase = Provider.of<SupabaseProvider>(context);
+    await dbSupabase.getAllMuscles();
+    muscles = dbSupabase.muscles;
+    // dbSupabase.isCheckedList = List.generate(dbSupabase.muscles.length, (index) => false);
+    if (dbSupabase.splitText != null) {
+      _textController.text = dbSupabase.setTextController();
+    } else {
+      dbSupabase.clearTextController();
+    }
+  }
+
+  void refresh() {
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    var dbFirebase = Provider.of<FirestoreService>(context);
+    var dbSupabase = Provider.of<SupabaseProvider>(context);
+    loadData();
+    muscles = dbSupabase.muscles;
+    isCheckedList = dbSupabase.isCheckedList;
 
     return AlertDialog(
       contentPadding: EdgeInsets.zero,
       content: Container(
-        decoration: BoxDecoration(borderRadius: BorderRadius.circular(25), color: ColorsProvider.color_7),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(25),
+          color: ColorsProvider.color_7,
+        ),
         height: 300,
         width: 200,
         child: Stack(
@@ -88,7 +109,11 @@ class _AddMuscleBoxState extends State<AddMuscleBox> {
                                 fontSize: 15,
                               ),
                             ),
-                            controller: textController,
+                            controller: _textController,
+                            onChanged: (value) {
+                              dbSupabase.splitText = _textController.text.trim();
+                              print(_textController.text.trim());
+                            },
                             style: TextStyle(color: ColorsProvider.color_1),
                           ),
                         ),
@@ -96,7 +121,7 @@ class _AddMuscleBoxState extends State<AddMuscleBox> {
                       Expanded(
                         child: Container(
                           child: ListView.builder(
-                            itemCount: listMuscles.length,
+                            itemCount: dbSupabase.muscles.length,
                             itemBuilder: (context, index) {
                               return Padding(
                                 padding: const EdgeInsets.only(left: 20, right: 20),
@@ -104,13 +129,16 @@ class _AddMuscleBoxState extends State<AddMuscleBox> {
                                   children: [
                                     Expanded(
                                       child: Text(
-                                        listMuscles[index],
+                                        dbSupabase.muscles[index].nameOfMuscle,
                                       ),
                                     ),
                                     Checkbox(
                                       value: isCheckedList[index],
                                       onChanged: (value) {
                                         isCheckedList[index] = value ?? false;
+                                        print(isCheckedList);
+                                        print(_textController.text.trim());
+
                                         setState(() {});
                                       },
                                     ),
@@ -132,17 +160,44 @@ class _AddMuscleBoxState extends State<AddMuscleBox> {
                   width: double.infinity,
                   child: TextButton(
                     onPressed: () async {
-                      String finalName = "";
-
-                      for (var i = 0; i < isCheckedList.length; i++) {
-                        if (isCheckedList[i] == true) {
-                          print(finalName);
+                      if (_textController.text.trim().isNotEmpty) {
+                        dbSupabase.inserted = 0;
+                        for (var i = 0; i < isCheckedList.length; i++) {
+                          if (isCheckedList[i] == true) {
+                            int idMuscle = dbSupabase.muscles[i].idMuscle!.toInt();
+                            await dbSupabase.insertSplit('${_textController.text.trim()}', idMuscle);
+                          }
                         }
-                      }
+                        await dbSupabase.getTodayFitness();
+                        widget.notifyParent();
+                        // setState(() {});
+                        Navigator.of(context).pop();
+                      } else {
+                        // ignore: unused_local_variable
+                        AnimationController localAnimationController;
 
-                      await dbFirebase.addSplit("${textController.text.trim()}", isCheckedList);
-                      setState(() {});
-                      Navigator.of(context).pop();
+                        showTopSnackBar(
+                          Overlay.of(context),
+
+                          animationDuration: Duration(milliseconds: 1500),
+                          Container(
+                            height: 50,
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 25, right: 25),
+                              child: CustomSnackBar.error(
+                                message: "Name of split is empty",
+                              ),
+                            ),
+                          ),
+                          // persistent: true,
+                          onAnimationControllerInit: (controller) => localAnimationController = controller,
+                          displayDuration: Duration(microseconds: 750),
+                          dismissType: DismissType.onSwipe,
+                          dismissDirection: [DismissDirection.endToStart],
+                          reverseAnimationDuration: Duration(milliseconds: 250),
+                          onTap: () {},
+                        );
+                      }
                     },
                     style: TextButton.styleFrom(
                       backgroundColor: ColorsProvider.color_2,
@@ -183,7 +238,9 @@ class _AddMuscleBoxState extends State<AddMuscleBox> {
                           context: context,
                           builder: (BuildContext context) {
                             return Center(
-                              child: NewMuscleBox(),
+                              child: NewMuscleBox(
+                                notifyParent: refresh,
+                              ),
                             );
                           },
                         );
