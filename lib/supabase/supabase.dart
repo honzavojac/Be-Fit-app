@@ -90,7 +90,7 @@ class SupabaseProvider extends ChangeNotifier {
     };
   }
 
-  getTodayFitness() async {
+  getFitness() async {
     final uid = supabase.auth.currentUser!.id;
     final dateRange = getTodayDateRange();
 
@@ -114,8 +114,7 @@ class SupabaseProvider extends ChangeNotifier {
           id_selected_exercise,
           exercises (
             id_exercise,
-            name_of_exercise,
-            exercise_data (
+            name_of_exercise,exercise_data (
               id_ex_data,
               weight,
               reps,
@@ -136,7 +135,8 @@ class SupabaseProvider extends ChangeNotifier {
         .lt(
           'split.selected_muscles.selected_exercise.exercises.exercise_data.time',
           dateRange['end']!,
-        );
+        )
+        .order('id_ex_data', referencedTable: 'split.selected_muscles.selected_exercise.exercises.exercise_data', ascending: true);
 
     final List<dynamic> data = response[0]['split'];
     splits = data.map((json) => Split.fromJson(json as Map<String, dynamic>)).toList();
@@ -283,13 +283,75 @@ class SupabaseProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> actionExerciseData(List<ExerciseData> exerciseData) async {
+  Future<void> actionExerciseData(List<ExerciseData> exerciseData, int idExercise) async {
     // Převod TextEditingController na seznam int hodnot
-    for (var element in exerciseData) {
-      print(element);
+    // for (var element in exerciseData) {
+    //   print(element.operation);
+    // }
+
+    for (var i = 0; i < exerciseData.length; i++) {
+      var dataOfExercise = exerciseData[i];
+      switch (exerciseData[i].operation) {
+        case 0 || null:
+          //hodnota zůstává
+          print("hodnota zůstává");
+          break;
+        case 1:
+          print("insert");
+
+          try {
+            // print("insert: ${insert[i]}");
+            await supabase.from('exercise_data').insert(ExerciseData(
+                  weight: dataOfExercise.weight,
+                  reps: dataOfExercise.reps,
+                  difficulty: dataOfExercise.difficulty,
+                  exercisesIdExercise: idExercise,
+                ).toJson());
+            // insert(insert);
+          } catch (e) {
+            print("insert se nezdařil: $e");
+          }
+          break;
+        case 2:
+          print("update");
+
+          try {
+            print("update: ${dataOfExercise.reps}");
+            await supabase
+                .from('exercise_data')
+                .update(ExerciseData(
+                  weight: dataOfExercise.weight,
+                  reps: dataOfExercise.reps,
+                  difficulty: dataOfExercise.difficulty,
+                  exercisesIdExercise: idExercise,
+                  time: dataOfExercise.time,
+                ).toJson())
+                .match({'id_ex_data': dataOfExercise.idExData!});
+          } catch (e) {
+            print("update se nezdařil: $e");
+          }
+          break;
+        case 3:
+          print("delete");
+
+          try {
+            // print("delete: ${delete[i]}");
+            await supabase.from('exercise_data').delete().eq('id_ex_data', dataOfExercise.idExData!);
+          } catch (e) {
+            print("delete se nezdařil: $e");
+          }
+          break;
+        case 4:
+          print("nothing");
+          //nothing
+          //hodnota byla insertována a pak smázana
+          break;
+        default:
+      }
     }
-    // Refresh data
-    await getTodayFitness();
+
+    // efresh data
+    await getFitness();
   }
 }
 
@@ -315,7 +377,7 @@ class ExerciseData {
     this.technique,
     this.comment,
     this.time,
-    required this.exercisesIdExercise,
+    this.exercisesIdExercise,
     this.operation,
   }) : id = _incrementCounter(); // Assign the incremented ID
 
@@ -341,7 +403,7 @@ class ExerciseData {
       'difficulty': difficulty,
       'technique': technique,
       'comment': comment,
-      'time': time,
+      // 'time': time,
       'exercises_id_exercise': exercisesIdExercise,
     };
     if (idExData != null) {

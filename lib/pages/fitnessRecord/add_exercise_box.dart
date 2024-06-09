@@ -128,7 +128,7 @@ class _AddExerciseBoxState extends State<AddExerciseBox> {
                                           index,
                                         );
 
-                                        await dbSupabase.getTodayFitness();
+                                        await dbSupabase.getFitness();
                                         widget.notifyParent();
                                         setState(() {});
                                       },

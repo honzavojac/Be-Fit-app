@@ -40,34 +40,50 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
       // Aplikace přechází do pozadí nebo je neaktivní, zde můžete uložit data
-      print("lifecyclestate");
+
+      if (mounted) {
+        try {
+          saveDataToDatabase();
+        } catch (e) {
+          print("chyba v exercisePage při vkládání dat změněním stavu aplikace (zavřená app): $e");
+        }
+      }
     }
+  }
+
+  saveDataToDatabase() async {
+    var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false);
+    await dbSupabase.actionExerciseData(exerciseData, idExercise);
+    print("lifecyclestate");
+    load();
+    setState(() {});
   }
 
   load() {
     print("load called");
+    if (mounted) {
+      var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false);
+      nameOfExercise = dbSupabase.splits[widget.splitIndex].selectedMuscle![widget.muscleIndex].selectedExercises![widget.exerciseIndex].exercises.nameOfExercise;
+      idExercise = dbSupabase.splits[widget.splitIndex].selectedMuscle![widget.muscleIndex].selectedExercises![widget.exerciseIndex].exercises.idExercise;
 
-    var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false);
-    nameOfExercise = dbSupabase.splits[widget.splitIndex].selectedMuscle![widget.muscleIndex].selectedExercises![widget.exerciseIndex].exercises.nameOfExercise;
-    idExercise = dbSupabase.splits[widget.splitIndex].selectedMuscle![widget.muscleIndex].selectedExercises![widget.exerciseIndex].exercises.idExercise;
+      exerciseData = dbSupabase.splits[widget.splitIndex].selectedMuscle![widget.muscleIndex].selectedExercises![widget.exerciseIndex].exercises.exerciseData!;
 
-    exerciseData = dbSupabase.splits[widget.splitIndex].selectedMuscle![widget.muscleIndex].selectedExercises![widget.exerciseIndex].exercises.exerciseData!;
+      weightController.clear();
+      repsController.clear();
+      difficultyController.clear();
 
-    weightController.clear();
-    repsController.clear();
-    difficultyController.clear();
-
-    for (var i = 0; i < exerciseData.length; i++) {
-      //nastavení controlerů na hodnoty z exerciseData
-      weightController.add(TextEditingController(text: exerciseData[i].weight.toString()));
-      repsController.add(TextEditingController(text: exerciseData[i].reps.toString()));
-      difficultyController.add(exerciseData[i].difficulty);
-      // print(i);
-      // print(weightController[i].text.trim());
-      // print(repsController[i].text.trim());
-      // print("aaaaaaaaaaaaaaaaaaa ${exerciseData[i].id}");
+      for (var i = 0; i < exerciseData.length; i++) {
+        //nastavení controlerů na hodnoty z exerciseData
+        weightController.add(TextEditingController(text: exerciseData[i].weight.toString()));
+        repsController.add(TextEditingController(text: exerciseData[i].reps.toString()));
+        difficultyController.add(exerciseData[i].difficulty);
+        // print(i);
+        // print(weightController[i].text.trim());
+        // print(repsController[i].text.trim());
+        // print("aaaaaaaaaaaaaaaaaaa ${exerciseData[i].id}");
+      }
+      showWidget = true;
     }
-    showWidget = true;
   }
 
   actionExerciseRow(int idData, int value) {
@@ -75,9 +91,21 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
     //1 insert
     //2 update
     //3 delete
+    //4 nebude se insertovat
     for (var i = 0; i < exerciseData.length; i++) {
-      if (idData == exerciseData[i].id && exerciseData[i].operation != 1) {
-        exerciseData[i].operation = value;
+      if (exerciseData[i].operation == null) {
+        exerciseData[i].operation = 0;
+      }
+      if (idData == exerciseData[i].id) {
+        if (value == 3 && exerciseData[i].operation == 1) {
+          //nebude se insertrovat
+          exerciseData[i].operation = 4;
+        } else if (value == 2 && exerciseData[i].operation == 1) {
+          //nothing, hodnota se jen insertuje
+        } else {
+          //
+          exerciseData[i].operation = value;
+        }
       }
       // print(exerciseData[i].id);
     }
@@ -109,7 +137,7 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
 
     for (var i = 0; i < exerciseData.length; i++) {
       //odstranění hodnot
-      if (exerciseData[i].operation == 3) {
+      if (exerciseData[i].operation == 3 || exerciseData[i].operation == 4) {
         //nothing
       } else {
         finalData.add(exerciseData[i]);
@@ -118,6 +146,7 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
         repsController.add(TextEditingController(text: exerciseData[i].reps.toString()));
         difficultyController.add(exerciseData[i].difficulty);
       }
+      // print(exerciseData[i].operation);
     }
     for (var i = 0; i < finalData.length; i++) {
       // print(finalData[i].id);
@@ -347,6 +376,9 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
     } else {
       return PopScope(
         onPopInvoked: (didPop) async {
+          if (mounted) {
+            await saveDataToDatabase();
+          }
           await widget.notifyParent;
           print("uloženo");
         },
@@ -538,6 +570,9 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                                                       repsController[itemIndex].selectAll();
                                                       actionExerciseRow(finalExerciseData[itemIndex].id, 2);
                                                     },
+                                                    onChanged: (value) {
+                                                      saveValues(finalExerciseData);
+                                                    },
                                                     controller: repsController[itemIndex],
                                                     keyboardType: TextInputType.numberWithOptions(),
                                                     inputFormatters: [
@@ -584,7 +619,11 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                                                   isExpanded: true,
                                                   value: difficultyController[itemIndex] == 0 ? null : difficultyController[itemIndex],
                                                   onChanged: (int? value) async {
+                                                    print(value);
                                                     difficultyController[itemIndex] = value ?? 0;
+
+                                                    saveValues(finalExerciseData);
+                                                    actionExerciseRow(finalExerciseData[itemIndex].id, 2);
                                                     updateExerciseData();
                                                     setState(() {});
                                                   },
@@ -717,7 +756,15 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                                             weightController.add(TextEditingController(text: "0"));
                                             repsController.add(TextEditingController(text: "0"));
                                             difficultyController.add(0);
-                                            exerciseData.add(ExerciseData(weight: int.parse(weightController.last.text.trim()), reps: int.parse(repsController.last.text.trim()), difficulty: difficultyController.last, exercisesIdExercise: idExercise, operation: 1));
+                                            exerciseData.add(
+                                              ExerciseData(
+                                                weight: int.parse(weightController.last.text.trim()),
+                                                reps: int.parse(repsController.last.text.trim()),
+                                                difficulty: difficultyController.last,
+                                                exercisesIdExercise: idExercise,
+                                                operation: 1,
+                                              ),
+                                            );
 
                                             updateExerciseData();
                                             setState(() {});

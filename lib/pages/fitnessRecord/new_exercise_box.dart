@@ -225,7 +225,7 @@ class _NewExerciseBoxState extends State<NewExerciseBox> {
                       if (_textController.text.trim().isNotEmpty) {
                         await findIdMuscle();
                         await dbSupabase.insertExercise(_textController.text.trim(), await findIdMuscle());
-                        await dbSupabase.getTodayFitness();
+                        await dbSupabase.getFitness();
                         dbSupabase.initChecklist = 0;
 
                         await widget.notifyParent();

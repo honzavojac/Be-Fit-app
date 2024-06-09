@@ -7,7 +7,7 @@
   //   // Nastavte nový Timer, který zavolá updateExerciseData po x sekundách
   //   _debounce = Timer(const Duration(seconds: 1), () async {
   //     await dbSupabase.updateExerciseData(weight, reps, difficultyControlers);
-  //     await dbSupabase.getTodayFitness();
+  //     await dbSupabase.getFitness();
   //     a = 0;
   //     setState(() {});
   //     print("uloženo po 1 sekundě nečinosti");

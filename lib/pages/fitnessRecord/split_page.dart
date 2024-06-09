@@ -308,7 +308,7 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                                               dbSupabase.muscleIndex = muscleIndex;
                                               // dbSupabase.generateFalseExerciseCheckbox();
                                               dbSupabase.initChecklist = 0;
-                                              await dbSupabase.getTodayFitness();
+                                              await dbSupabase.getFitness();
                                               setState(() {});
                                               showDialog(
                                                 context: context,
@@ -400,7 +400,7 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                                     ScaffoldMessenger.of(context).hideCurrentSnackBar();
                                     int idSplit = splits[clickedSplitTab].idSplit!.toInt();
                                     await dbSupabase.deleteSplit(idSplit);
-                                    await dbSupabase.getTodayFitness();
+                                    await dbSupabase.getFitness();
                                     dbSupabase.clickedSplitTab = 0;
                                     a = 0;
                                     setState(() {});

@@ -168,7 +168,7 @@ class _AddSplitBoxState extends State<AddSplitBox> {
                             await dbSupabase.insertSplit('${_textController.text.trim()}', idMuscle);
                           }
                         }
-                        await dbSupabase.getTodayFitness();
+                        await dbSupabase.getFitness();
                         widget.notifyParent();
                         // setState(() {});
                         Navigator.of(context).pop();

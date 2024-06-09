@@ -44,7 +44,7 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
     if (a == 0) {
       // print(a);
       a = 1;
-      await dbSupabase.getTodayFitness();
+      await dbSupabase.getFitness();
       setState(() {});
     } else {
       // print(a);
@@ -288,7 +288,7 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                               ),
                             ),
                           );
-                          dbSupabase.getTodayFitness();
+                          dbSupabase.getFitness();
                           dbSupabase.clickedSplitTab = 0;
                           setState(() {});
                         },
@@ -426,7 +426,7 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                                               return GestureDetector(
                                                 onTap: () async {
                                                   ExerciseData.resetCounter();
-                                                  await dbSupabase.getTodayFitness();
+                                                  await dbSupabase.getFitness();
                                                   Navigator.push(
                                                     context,
                                                     MaterialPageRoute(
