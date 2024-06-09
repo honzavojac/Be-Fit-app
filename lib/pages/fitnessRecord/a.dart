@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -30,8 +32,6 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
-
     print("initState called");
     load();
   }
@@ -60,68 +60,54 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
     for (var i = 0; i < exerciseData.length; i++) {
       //nastavení controlerů na hodnoty z exerciseData
       weightController.add(TextEditingController(text: exerciseData[i].weight.toString()));
+      weight.add(exerciseData[i].weight);
       repsController.add(TextEditingController(text: exerciseData[i].reps.toString()));
+      reps.add(exerciseData[i].reps);
       difficultyController.add(exerciseData[i].difficulty);
       // print(i);
       // print(weightController[i].text.trim());
       // print(repsController[i].text.trim());
-      // print("aaaaaaaaaaaaaaaaaaa ${exerciseData[i].id}");
+      print(exerciseData[i].idExData);
     }
     showWidget = true;
   }
 
-  actionExerciseRow(int idData, int value) {
-    //0 nic se nestane
-    //1 insert
-    //2 update
-    //3 delete
+  deleteExerciseRow(int idExData) {
     for (var i = 0; i < exerciseData.length; i++) {
-      if (idData == exerciseData[i].id && exerciseData[i].operation != 1) {
-        exerciseData[i].operation = value;
+      if (idExData == exerciseData[i].idExData) {
+        exerciseData[i].operation = 3;
       }
-      // print(exerciseData[i].id);
-    }
-  }
-
-  saveValues(List<ExerciseData> data) {
-    for (var i = 0; i < exerciseData.length; i++) {
-      for (var j = 0; j < data.length; j++) {
-        if (data[j].id == exerciseData[i].id) {
-          try {
-            exerciseData[i].weight = int.parse(weightController[j].text.trim());
-            exerciseData[i].reps = int.parse(repsController[j].text.trim());
-            exerciseData[i].difficulty = difficultyController[j];
-          } catch (e) {}
-        }
-      }
+      // print(exerciseData[i].weight);
     }
   }
 
   List<ExerciseData> finalData = [];
   updateExerciseData() {
-    print("start");
-    saveValues(finalData);
-
+    for (var i = 0; i < exerciseData.length; i++) {
+      try {
+        for (var i = 0; i < exerciseData.length; i++) {
+          exerciseData[i].weight = weight[i];
+          exerciseData[i].reps = reps[i];
+          exerciseData[i].difficulty = difficultyController[i];
+        }
+      } catch (e) {}
+    }
     finalData = [];
     weightController = [];
     repsController = [];
     difficultyController = [];
-
     for (var i = 0; i < exerciseData.length; i++) {
       //odstranění hodnot
+
       if (exerciseData[i].operation == 3) {
-        //nothing
       } else {
         finalData.add(exerciseData[i]);
         weightController.add(TextEditingController(text: exerciseData[i].weight.toString()));
-
         repsController.add(TextEditingController(text: exerciseData[i].reps.toString()));
         difficultyController.add(exerciseData[i].difficulty);
       }
     }
-    for (var i = 0; i < finalData.length; i++) {
-      // print(finalData[i].id);
-    }
+
     return finalData;
   }
 
@@ -168,9 +154,8 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
           ),
         ),
         body: GestureDetector(
-          onTap: () async {
+          onTap: () {
             FocusScope.of(context).requestFocus(FocusNode());
-            print("focus changed");
           },
           child: Stack(
             children: [
@@ -481,15 +466,11 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                                                 height: 35,
                                                 child: Center(
                                                   child: TextField(
+                                                    onTap: () {},
+                                                    onChanged: (value) async {
+                                                      weight[itemIndex] = int.parse(value);
+                                                    },
                                                     controller: weightController[itemIndex],
-                                                    onTap: () {
-                                                      weightController[itemIndex].selectAll();
-                                                      actionExerciseRow(finalExerciseData[itemIndex].id, 2);
-                                                      print(weightController[itemIndex].text);
-                                                    },
-                                                    onChanged: (value) {
-                                                      saveValues(finalExerciseData);
-                                                    },
                                                     keyboardType: TextInputType.numberWithOptions(),
                                                     inputFormatters: [
                                                       LengthLimitingTextInputFormatter(3),
@@ -534,9 +515,8 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                                                 height: 35,
                                                 child: Center(
                                                   child: TextField(
-                                                    onTap: () {
-                                                      repsController[itemIndex].selectAll();
-                                                      actionExerciseRow(finalExerciseData[itemIndex].id, 2);
+                                                    onChanged: (value) async {
+                                                      reps[itemIndex] = int.parse(value);
                                                     },
                                                     controller: repsController[itemIndex],
                                                     keyboardType: TextInputType.numberWithOptions(),
@@ -585,7 +565,6 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                                                   value: difficultyController[itemIndex] == 0 ? null : difficultyController[itemIndex],
                                                   onChanged: (int? value) async {
                                                     difficultyController[itemIndex] = value ?? 0;
-                                                    updateExerciseData();
                                                     setState(() {});
                                                   },
                                                   items: List.generate(
@@ -631,8 +610,7 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                                               ),
                                               onTap: () async {
                                                 print("delete");
-                                                await saveValues(finalExerciseData);
-                                                actionExerciseRow(finalData[itemIndex].id, 3);
+                                                deleteExerciseRow(finalData[itemIndex].idExData!);
 
                                                 setState(() {});
                                               },
@@ -707,24 +685,8 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                                     Container(
                                       width: 40,
                                       child: IconButton(
-                                        icon: Icon(
-                                          Icons.add_circle_outline_outlined,
-                                          color: ColorsProvider.color_2,
-                                          size: 35,
-                                        ),
-                                        onPressed: () {
-                                          try {
-                                            weightController.add(TextEditingController(text: "0"));
-                                            repsController.add(TextEditingController(text: "0"));
-                                            difficultyController.add(0);
-                                            exerciseData.add(ExerciseData(weight: int.parse(weightController.last.text.trim()), reps: int.parse(repsController.last.text.trim()), difficulty: difficultyController.last, exercisesIdExercise: idExercise, operation: 1));
-
-                                            updateExerciseData();
-                                            setState(() {});
-                                          } catch (e) {
-                                            print(e);
-                                          }
-                                        },
+                                        icon: Icon(Icons.add_circle_outline_outlined, color: ColorsProvider.color_2, size: 35),
+                                        onPressed: () {},
                                       ),
                                     ),
                                   ],
@@ -765,12 +727,5 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
         ),
       );
     }
-  }
-}
-
-extension TextEditingControllerExt on TextEditingController {
-  void selectAll() {
-    if (text.isEmpty) return;
-    selection = TextSelection(baseOffset: 0, extentOffset: text.length);
   }
 }

@@ -31,14 +31,13 @@ class FitnessRecordScreen extends StatefulWidget {
   State<FitnessRecordScreen> createState() => _FitnessRecordScreenState();
 }
 
-int a = 0;
-
 class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
   @override
   void initState() {
     super.initState();
   }
 
+  int a = 0;
   Future loadData(BuildContext context) async {
     var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false);
 
@@ -161,7 +160,9 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => SplitPage(
-                            notifyParent: refresh,
+                            notifyParent: () {
+                              refresh();
+                            },
                           ),
                         ),
                       );
@@ -424,10 +425,17 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
 
                                               return GestureDetector(
                                                 onTap: () async {
+                                                  ExerciseData.resetCounter();
+                                                  await dbSupabase.getTodayFitness();
                                                   Navigator.push(
                                                     context,
                                                     MaterialPageRoute(
-                                                      builder: (context) => ExercisePage(),
+                                                      builder: (context) => ExercisePage(
+                                                        splitIndex: selectedSplit,
+                                                        muscleIndex: muscleIndex,
+                                                        exerciseIndex: exerciseIndex,
+                                                        notifyParent: refresh,
+                                                      ),
                                                     ),
                                                   );
                                                 },

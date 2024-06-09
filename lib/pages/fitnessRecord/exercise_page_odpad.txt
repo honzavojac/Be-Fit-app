@@ -1,0 +1,25 @@
+ // void _onSearchChanged(List<TextEditingController>? weight, List<TextEditingController>? reps, List<int> difficulty) {
+  //   var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false);
+
+  //   // Pokud existuje existující Timer, zrušte jej
+  //   if (_debounce?.isActive ?? false) _debounce?.cancel();
+
+  //   // Nastavte nový Timer, který zavolá updateExerciseData po x sekundách
+  //   _debounce = Timer(const Duration(seconds: 1), () async {
+  //     await dbSupabase.updateExerciseData(weight, reps, difficultyControlers);
+  //     await dbSupabase.getTodayFitness();
+  //     a = 0;
+  //     setState(() {});
+  //     print("uloženo po 1 sekundě nečinosti");
+  //   });
+  // }
+
+
+ convertControlersToInt(List<TextEditingController> weightControllers, List<TextEditingController> repsControllers) {
+    for (var i = 0; i < weightControllers.length; i++) {
+      weight.add(int.parse(weightControllers[i].text));
+    }
+    for (var i = 0; i < repsControllers.length; i++) {
+      reps.add(int.parse(repsControllers[i].text));
+    }
+  }

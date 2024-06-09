@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:kaloricke_tabulky_02/main.dart';
+import 'package:path/path.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SupabaseProvider extends ChangeNotifier {
@@ -72,7 +73,7 @@ class SupabaseProvider extends ChangeNotifier {
     User localUser = User.fromJson(response.first);
     user = localUser;
     name = localUser.name;
-    print(localUser.name);
+    // print(localUser.name);
     return localUser;
   }
 
@@ -115,6 +116,7 @@ class SupabaseProvider extends ChangeNotifier {
             id_exercise,
             name_of_exercise,
             exercise_data (
+              id_ex_data,
               weight,
               reps,
               difficulty,
@@ -280,44 +282,82 @@ class SupabaseProvider extends ChangeNotifier {
       // idSelectedExercise = splits[splitIndex].selectedMuscle![muscleIndex].selectedExercises![exerciseIndex].idSelectedExercise!;
     }
   }
+
+  Future<void> actionExerciseData(List<ExerciseData> exerciseData) async {
+    // Převod TextEditingController na seznam int hodnot
+    for (var element in exerciseData) {
+      print(element);
+    }
+    // Refresh data
+    await getTodayFitness();
+  }
 }
 
 class ExerciseData {
+  static int _counter = 0; // Static counter to keep track of the ID
+
+  int? idExData;
   int weight;
   int reps;
   int difficulty;
   String? technique;
   String? comment;
   String? time;
+  int? exercisesIdExercise;
+  int? operation;
+  int id;
 
   ExerciseData({
+    this.idExData,
     required this.weight,
     required this.reps,
     required this.difficulty,
     this.technique,
     this.comment,
     this.time,
-  });
+    required this.exercisesIdExercise,
+    this.operation,
+  }) : id = _incrementCounter(); // Assign the incremented ID
 
+  // Factory constructor to create an instance from a JSON object
   factory ExerciseData.fromJson(Map<String, dynamic> json) {
     return ExerciseData(
+      idExData: json['id_ex_data'],
       weight: json['weight'],
       reps: json['reps'],
       difficulty: json['difficulty'],
       technique: json['technique'],
       comment: json['comment'],
       time: json['time'],
+      exercisesIdExercise: json['exercises_id_exercise'],
     );
   }
+
+  // Method to convert the instance to a JSON object
   Map<String, dynamic> toJson() {
-    return {
+    final data = <String, dynamic>{
       'weight': weight,
       'reps': reps,
       'difficulty': difficulty,
       'technique': technique,
       'comment': comment,
       'time': time,
+      'exercises_id_exercise': exercisesIdExercise,
     };
+    if (idExData != null) {
+      data['id_ex_data'] = idExData;
+    }
+    return data;
+  }
+
+  // Static method to increment the counter and return the new value
+  static int _incrementCounter() {
+    return _counter++;
+  }
+
+  // Static method to reset the counter
+  static void resetCounter() {
+    _counter = 0;
   }
 }
 

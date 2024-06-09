@@ -1,0 +1,82 @@
+import 'package:flutter/material.dart';
+
+const Color darkBlue = Color.fromARGB(255, 18, 32, 47);
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      theme: ThemeData.dark().copyWith(
+        scaffoldBackgroundColor: darkBlue,
+      ),
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        body: Center(
+          child: MyWidget(),
+        ),
+      ),
+    );
+  }
+}
+
+class MyWidget extends StatefulWidget {
+  @override
+  State<MyWidget> createState() => _MyWidgetState();
+}
+
+class _MyWidgetState extends State<MyWidget> {
+  List<TextEditingController> controller = [];
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  load() {
+    controller = [
+      TextEditingController(text: "hello world"),
+      TextEditingController(text: "another field")
+    ];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    load();
+    return Column(
+      children: [
+        Container(
+          height: 100,
+          child: ListView.builder(
+            shrinkWrap: false,
+            itemCount: controller.length,
+            itemBuilder: (context, index) {
+              return TextField(
+                controller: controller[index],
+                onTap: () {
+                  controller[index].selectAll();
+                },
+              );
+            },
+          ),
+        ),
+        ElevatedButton(
+            onPressed: () {
+              load();
+              setState(() {});
+            },
+            child: Text("data")),
+      ],
+    );
+  }
+}
+
+extension TextEditingControllerExt on TextEditingController {
+  void selectAll() {
+    if (text.isEmpty) return;
+    selection = TextSelection(baseOffset: 0, extentOffset: text.length);
+  }
+}
