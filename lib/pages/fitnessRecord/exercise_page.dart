@@ -1,6 +1,8 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:provider/provider.dart';
@@ -21,42 +23,62 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
   late List<ExerciseData> exerciseData;
   List<TextEditingController> weightController = [];
   List<TextEditingController> repsController = [];
+  TextEditingController _descriptionController = TextEditingController();
   List<int> weight = [];
   List<int> reps = [];
   List<int> difficultyController = [];
   late String nameOfExercise;
   late int idExercise;
-
+  late bool saved;
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
 
     print("initState called");
+    saved = false;
     load();
   }
 
+  AppLifecycleState? _lastLifecycleState;
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
-    if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
-      // Aplikace přechází do pozadí nebo je neaktivní, zde můžete uložit data
+    // Pokud je aktuální stav stejný jako poslední stav, neprovádějte nic
+    if (_lastLifecycleState == state) return;
 
+    if (state == AppLifecycleState.inactive) {
+      // Aplikace přechází do pozadí, zde můžete uložit data
+      print("didchangeapplifecyclestate - inactive");
       if (mounted) {
         try {
-          saveDataToDatabase();
+          // if (saved == false) {
+          await saveDataToDatabase(); // Předpokládám, že saveDataToDatabase je asynchronní funkce
+
+          //   saved = true;
+          // }
         } catch (e) {
           print("chyba v exercisePage při vkládání dat změněním stavu aplikace (zavřená app): $e");
         }
       }
     }
+    // Uložte aktuální stav jako poslední stav
+    _lastLifecycleState = state;
   }
 
   saveDataToDatabase() async {
     var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false);
-    await dbSupabase.actionExerciseData(exerciseData, idExercise);
-    print("lifecyclestate");
-    load();
-    setState(() {});
+    if (mounted) {
+      print("hodnota byla předána provideru");
+      await dbSupabase.actionExerciseData(exerciseData, idExercise);
+
+      load();
+      try {
+        await widget.notifyParent;
+      } on Exception catch (e) {
+        print(e);
+      }
+    }
   }
 
   load() {
@@ -127,9 +149,6 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
 
   List<ExerciseData> finalData = [];
   updateExerciseData() {
-    print("start");
-    saveValues(finalData);
-
     finalData = [];
     weightController = [];
     repsController = [];
@@ -148,14 +167,13 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
       }
       // print(exerciseData[i].operation);
     }
-    for (var i = 0; i < finalData.length; i++) {
-      // print(finalData[i].id);
-    }
+
     return finalData;
   }
 
   @override
   Widget build(BuildContext context) {
+    saved = false;
     final _sheet = GlobalKey();
     final _controller = DraggableScrollableController();
     List<ExerciseData> finalExerciseData = updateExerciseData();
@@ -378,9 +396,13 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
         onPopInvoked: (didPop) async {
           if (mounted) {
             await saveDataToDatabase();
+
+            widget.notifyParent;
+            print("popscope---------------------------");
           }
-          await widget.notifyParent;
-          print("uloženo");
+          try {} on Exception catch (e) {
+            print(e);
+          }
         },
         child: Scaffold(
           appBar: AppBar(
@@ -413,6 +435,13 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
             leading: IconButton(
               icon: Icon(Icons.arrow_back), // Ikona zpětné šipky
               onPressed: () async {
+                // saveDataToDatabase();
+                try {
+                  await widget.notifyParent;
+                } on Exception catch (e) {
+                  print(e);
+                }
+
                 Navigator.of(context).pop(true);
               },
             ),
@@ -435,7 +464,7 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 Container(
-                                  width: 30,
+                                  width: 22,
                                   child: Center(
                                     child: Text(
                                       "Set",
@@ -444,7 +473,7 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                                   ),
                                 ),
                                 Container(
-                                  width: 60,
+                                  width: 70,
                                   child: Center(
                                     child: Text(
                                       "Weight",
@@ -453,7 +482,7 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                                   ),
                                 ),
                                 Container(
-                                  width: 60,
+                                  width: 70,
                                   child: Center(
                                     child: Text(
                                       "Reps",
@@ -462,7 +491,7 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                                   ),
                                 ),
                                 Container(
-                                  width: 60,
+                                  width: 70,
                                   child: Center(
                                     child: Text(
                                       "difficulty",
@@ -479,10 +508,10 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                                     ),
                                   ),
                                 ),
-                                SizedBox(
-                                  width: 25,
-                                )
                               ],
+                            ),
+                            SizedBox(
+                              height: 15,
                             ),
                             Expanded(
                               child: ListView.builder(
@@ -494,190 +523,242 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                                   return Column(
                                     children: [
                                       Container(
-                                        height: 60,
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                          children: [
-                                            Container(
-                                              width: 30,
-                                              child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                children: [
-                                                  Text("${setNumber}"),
-                                                ],
+                                        height: 45,
+                                        // color: ColorsProvider.color_7,
+                                        child: Dismissible(
+                                          direction: DismissDirection.endToStart,
+                                          key: ValueKey<int>(finalExerciseData[itemIndex].id),
+                                          background: Container(
+                                            color: ColorsProvider.color_9,
+                                            child: Align(
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(right: 16),
+                                                child: Icon(Icons.delete),
                                               ),
+                                              alignment: Alignment.centerRight,
                                             ),
-                                            Container(
-                                              width: 60,
-                                              child: Container(
-                                                height: 35,
-                                                child: Center(
-                                                  child: TextField(
-                                                    controller: weightController[itemIndex],
-                                                    onTap: () {
-                                                      weightController[itemIndex].selectAll();
-                                                      actionExerciseRow(finalExerciseData[itemIndex].id, 2);
-                                                      print(weightController[itemIndex].text);
-                                                    },
-                                                    onChanged: (value) {
-                                                      saveValues(finalExerciseData);
-                                                    },
-                                                    keyboardType: TextInputType.numberWithOptions(),
-                                                    inputFormatters: [
-                                                      LengthLimitingTextInputFormatter(3),
-                                                      FilteringTextInputFormatter.allow(
-                                                        RegExp(r'[0-9]'),
-                                                      )
+                                          ),
+                                          onDismissed: (direction) async {},
+                                          confirmDismiss: (direction) async {
+                                            await saveValues(finalExerciseData);
+                                            actionExerciseRow(finalData[itemIndex].id, 3);
+                                            setState(() {});
+                                            return true;
+                                          },
+                                          child: Center(
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                              children: [
+                                                Container(
+                                                  width: 22,
+                                                  child: Row(
+                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                    children: [
+                                                      Text("${setNumber}"),
                                                     ],
-                                                    decoration: const InputDecoration(
-                                                      labelStyle: TextStyle(
-                                                        color: ColorsProvider.color_1,
-                                                      ),
-                                                      enabledBorder: OutlineInputBorder(
-                                                        borderRadius: BorderRadius.all(
-                                                          Radius.circular(12),
-                                                        ),
-                                                        borderSide: BorderSide(
-                                                          color: ColorsProvider.color_2,
-                                                          width: 0.5,
-                                                        ),
-                                                      ),
-                                                      focusedBorder: OutlineInputBorder(
-                                                        borderRadius: BorderRadius.all(
-                                                          Radius.circular(12),
-                                                        ),
-                                                        borderSide: BorderSide(
-                                                          color: ColorsProvider.color_2,
-                                                          width: 3.0,
-                                                        ),
-                                                      ),
-                                                      contentPadding: EdgeInsets.symmetric(
-                                                        vertical: 0,
-                                                        horizontal: 15,
-                                                      ),
-                                                    ),
                                                   ),
                                                 ),
-                                              ),
-                                            ),
-                                            Container(
-                                              width: 60,
-                                              child: Container(
-                                                height: 35,
-                                                child: Center(
-                                                  child: TextField(
-                                                    onTap: () {
-                                                      repsController[itemIndex].selectAll();
-                                                      actionExerciseRow(finalExerciseData[itemIndex].id, 2);
-                                                    },
-                                                    onChanged: (value) {
-                                                      saveValues(finalExerciseData);
-                                                    },
-                                                    controller: repsController[itemIndex],
-                                                    keyboardType: TextInputType.numberWithOptions(),
-                                                    inputFormatters: [
-                                                      LengthLimitingTextInputFormatter(3),
-                                                      FilteringTextInputFormatter.allow(
-                                                        RegExp(r'[0-9]'),
-                                                      )
-                                                    ],
-                                                    decoration: const InputDecoration(
-                                                      labelStyle: TextStyle(
-                                                        color: ColorsProvider.color_1,
-                                                      ),
-                                                      enabledBorder: OutlineInputBorder(
-                                                        borderRadius: BorderRadius.all(
-                                                          Radius.circular(12),
-                                                        ),
-                                                        borderSide: BorderSide(
-                                                          color: ColorsProvider.color_2,
-                                                          width: 0.5,
-                                                        ),
-                                                      ),
-                                                      focusedBorder: OutlineInputBorder(
-                                                        borderRadius: BorderRadius.all(
-                                                          Radius.circular(12),
-                                                        ),
-                                                        borderSide: BorderSide(
-                                                          color: ColorsProvider.color_2,
-                                                          width: 3.0,
-                                                        ),
-                                                      ),
-                                                      contentPadding: EdgeInsets.symmetric(
-                                                        vertical: 0,
-                                                        horizontal: 15,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            Container(
-                                              width: 60,
-                                              child: DropdownButtonHideUnderline(
-                                                child: DropdownButton2<int>(
-                                                  isExpanded: true,
-                                                  value: difficultyController[itemIndex] == 0 ? null : difficultyController[itemIndex],
-                                                  onChanged: (int? value) async {
-                                                    print(value);
-                                                    difficultyController[itemIndex] = value ?? 0;
-
-                                                    saveValues(finalExerciseData);
-                                                    actionExerciseRow(finalExerciseData[itemIndex].id, 2);
-                                                    updateExerciseData();
-                                                    setState(() {});
-                                                  },
-                                                  items: List.generate(
-                                                    5,
-                                                    (index) {
-                                                      int difficulty = index + 1; // Začíná od 1 místo 0
-                                                      return DropdownMenuItem<int>(
-                                                        value: difficulty,
-                                                        child: Text(
-                                                          difficulty.toString(),
-                                                          style: TextStyle(
-                                                            fontSize: 16,
-                                                            fontWeight: FontWeight.bold,
-                                                            color: difficulty == 1
-                                                                ? Colors.green
-                                                                : difficulty == 2
-                                                                    ? Colors.lightGreen
-                                                                    : difficulty == 3
-                                                                        ? Colors.yellow
-                                                                        : difficulty == 4
-                                                                            ? Colors.orange
-                                                                            : Colors.red,
+                                                Container(
+                                                  width: 70,
+                                                  child: Container(
+                                                    height: 35,
+                                                    child: Center(
+                                                      child: TextField(
+                                                        controller: weightController[itemIndex],
+                                                        onTap: () {
+                                                          weightController[itemIndex].selectAll();
+                                                          actionExerciseRow(finalExerciseData[itemIndex].id, 2);
+                                                        },
+                                                        onChanged: (value) {
+                                                          saveValues(finalExerciseData);
+                                                        },
+                                                        keyboardType: TextInputType.numberWithOptions(),
+                                                        inputFormatters: [
+                                                          LengthLimitingTextInputFormatter(3),
+                                                          FilteringTextInputFormatter.allow(
+                                                            RegExp(r'[0-9]'),
+                                                          )
+                                                        ],
+                                                        decoration: const InputDecoration(
+                                                          filled: false,
+                                                          fillColor: ColorsProvider.color_2,
+                                                          labelStyle: TextStyle(
+                                                            color: ColorsProvider.color_1,
                                                           ),
-                                                          overflow: TextOverflow.ellipsis,
+                                                          enabledBorder: OutlineInputBorder(
+                                                            borderRadius: BorderRadius.all(
+                                                              Radius.circular(12),
+                                                            ),
+                                                            borderSide: BorderSide(
+                                                              color: ColorsProvider.color_2,
+                                                              width: 0.5,
+                                                            ),
+                                                          ),
+                                                          focusedBorder: OutlineInputBorder(
+                                                            borderRadius: BorderRadius.all(
+                                                              Radius.circular(12),
+                                                            ),
+                                                            borderSide: BorderSide(
+                                                              color: ColorsProvider.color_2,
+                                                              width: 2.0,
+                                                            ),
+                                                          ),
+                                                          contentPadding: EdgeInsets.symmetric(
+                                                            vertical: 0,
+                                                            horizontal: 15,
+                                                          ),
                                                         ),
-                                                      );
-                                                    },
-                                                  ).toList(),
+                                                        textAlign: TextAlign.center,
+                                                        style: TextStyle(
+                                                          // color: Colors.black,
+                                                          fontWeight: FontWeight.bold,
+                                                          fontSize: 18,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
                                                 ),
-                                              ),
-                                            ),
-                                            Container(
-                                              width: 50,
-                                              child: Text("Normal"),
-                                            ),
-                                            GestureDetector(
-                                              child: Container(
-                                                width: 25,
-                                                child: Icon(
-                                                  Icons.delete,
-                                                  color: ColorsProvider.color_5,
+                                                Container(
+                                                  width: 70,
+                                                  child: Container(
+                                                    height: 35,
+                                                    child: Center(
+                                                      child: TextField(
+                                                        onTap: () {
+                                                          repsController[itemIndex].selectAll();
+                                                          actionExerciseRow(finalExerciseData[itemIndex].id, 2);
+                                                        },
+                                                        onChanged: (value) {
+                                                          saveValues(finalExerciseData);
+                                                        },
+                                                        controller: repsController[itemIndex],
+                                                        keyboardType: TextInputType.numberWithOptions(),
+                                                        inputFormatters: [
+                                                          LengthLimitingTextInputFormatter(3),
+                                                          FilteringTextInputFormatter.allow(
+                                                            RegExp(r'[0-9]'),
+                                                          )
+                                                        ],
+                                                        decoration: const InputDecoration(
+                                                          labelStyle: TextStyle(
+                                                            color: ColorsProvider.color_1,
+                                                          ),
+                                                          enabledBorder: OutlineInputBorder(
+                                                            borderRadius: BorderRadius.all(
+                                                              Radius.circular(12),
+                                                            ),
+                                                            borderSide: BorderSide(
+                                                              color: ColorsProvider.color_2,
+                                                              width: 0.5,
+                                                            ),
+                                                          ),
+                                                          focusedBorder: OutlineInputBorder(
+                                                            borderRadius: BorderRadius.all(
+                                                              Radius.circular(12),
+                                                            ),
+                                                            borderSide: BorderSide(
+                                                              color: ColorsProvider.color_2,
+                                                              width: 2.0,
+                                                            ),
+                                                          ),
+                                                          contentPadding: EdgeInsets.symmetric(
+                                                            vertical: 0,
+                                                            horizontal: 15,
+                                                          ),
+                                                        ),
+                                                        textAlign: TextAlign.center,
+                                                        style: TextStyle(
+                                                          // color: Colors.black,
+                                                          fontWeight: FontWeight.bold,
+                                                          fontSize: 18,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
                                                 ),
-                                              ),
-                                              onTap: () async {
-                                                print("delete");
-                                                await saveValues(finalExerciseData);
-                                                actionExerciseRow(finalData[itemIndex].id, 3);
+                                                Container(
+                                                  width: 70,
+                                                  child: DropdownButtonHideUnderline(
+                                                    child: DropdownButton2<int>(
+                                                      alignment: Alignment.center,
+                                                      style: TextStyle(
+                                                        // color: Colors.black,
+                                                        fontWeight: FontWeight.bold,
+                                                        fontSize: 5,
+                                                      ),
+                                                      isDense: true,
+                                                      menuItemStyleData: MenuItemStyleData(
+                                                        height: 37,
+                                                      ),
+                                                      isExpanded: true,
+                                                      dropdownStyleData: DropdownStyleData(
+                                                        offset: Offset(-0, -3),
+                                                        elevation: 2,
+                                                        // width: 90,
+                                                        decoration: BoxDecoration(
+                                                          borderRadius: BorderRadius.circular(12),
+                                                          color: Color.fromARGB(195, 0, 0, 0),
+                                                        ),
+                                                      ),
+                                                      buttonStyleData: ButtonStyleData(
+                                                        height: 35,
+                                                        decoration: BoxDecoration(
+                                                          borderRadius: BorderRadius.circular(12),
+                                                          border: Border.all(width: 0.5, color: ColorsProvider.color_2),
+                                                        ),
+                                                        overlayColor: MaterialStatePropertyAll(Colors.transparent),
+                                                      ),
+                                                      value: difficultyController[itemIndex] == 0 ? null : difficultyController[itemIndex],
+                                                      onChanged: (int? value) async {
+                                                        print(value);
+                                                        difficultyController[itemIndex] = value ?? 0;
 
-                                                setState(() {});
-                                              },
-                                            )
-                                          ],
+                                                        saveValues(finalExerciseData);
+                                                        actionExerciseRow(finalExerciseData[itemIndex].id, 2);
+                                                        updateExerciseData();
+                                                        setState(() {});
+                                                      },
+                                                      items: List.generate(
+                                                        5,
+                                                        (index) {
+                                                          int difficulty = index + 1; // Začíná od 1 místo 0
+                                                          return DropdownMenuItem<int>(
+                                                            value: difficulty,
+                                                            alignment: Alignment.center,
+                                                            child: Text(
+                                                              difficulty.toString(),
+                                                              style: TextStyle(
+                                                                fontSize: 16,
+                                                                fontWeight: FontWeight.bold,
+                                                                color: difficulty == 1
+                                                                    ? Colors.green
+                                                                    : difficulty == 2
+                                                                        ? Colors.lightGreen
+                                                                        : difficulty == 3
+                                                                            ? Colors.yellow
+                                                                            : difficulty == 4
+                                                                                ? Colors.orange
+                                                                                : Colors.red,
+                                                              ),
+                                                              overflow: TextOverflow.ellipsis,
+                                                            ),
+                                                          );
+                                                        },
+                                                      ).toList(),
+                                                    ),
+                                                  ),
+                                                ),
+                                                Container(
+                                                  width: 50,
+                                                  child: Text("Normal"),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
                                         ),
+                                      ),
+                                      SizedBox(
+                                        height: 5,
                                       ),
                                     ],
                                   );
@@ -691,47 +772,48 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                   ],
                 ),
                 DraggableScrollableSheet(
-                  key: _sheet,
+                  key: _sheet, shouldCloseOnMinExtent: true,
                   initialChildSize: 0.1,
-                  maxChildSize: 0.7,
-                  minChildSize: 0.1,
+                  maxChildSize: 0.6,
+                  minChildSize: 0.1, snapAnimationDuration: Duration(milliseconds: 100),
                   expand: true,
                   snap: false,
                   snapSizes: [
-                    0.2,
+                    0.1,
+                    0.6,
                   ],
                   // snapAnimationDuration: Duration(milliseconds: 100),
                   controller: _controller,
                   builder: (context, scrollController) {
-                    return DecoratedBox(
-                      decoration: const BoxDecoration(
-                        color: Color.fromARGB(123, 0, 0, 0),
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(25),
-                          topRight: Radius.circular(25),
-                        ),
-                      ),
-                      child: CustomScrollView(
-                        controller: scrollController,
-                        slivers: [
-                          SliverToBoxAdapter(
-                            child: Container(
-                              height: 90,
-                              // color: Colors.amber,
-                              child: Padding(
-                                padding: const EdgeInsets.only(left: 20, right: 20),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Container(
-                                      width: 40,
-                                    ),
-                                    Row(
+                    return Stack(
+                      children: [
+                        DecoratedBox(
+                          decoration: const BoxDecoration(
+                            color: Color.fromARGB(123, 0, 0, 0),
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(25),
+                              topRight: Radius.circular(25),
+                            ),
+                          ),
+                          child: CustomScrollView(
+                            controller: scrollController,
+                            slivers: [
+                              SliverToBoxAdapter(
+                                child: Container(
+                                  height: 90,
+                                  // color: Colors.amber,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 20, right: 20),
+                                    child: Row(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         Text(
                                           'Swipe up',
-                                          style: TextStyle(color: ColorsProvider.color_1, fontSize: 20, fontWeight: FontWeight.bold),
+                                          style: TextStyle(
+                                            color: ColorsProvider.color_1,
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
                                         SizedBox(
                                           width: 10,
@@ -743,66 +825,142 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                                         ),
                                       ],
                                     ),
-                                    Container(
-                                      width: 40,
-                                      child: IconButton(
-                                        icon: Icon(
-                                          Icons.add_circle_outline_outlined,
-                                          color: ColorsProvider.color_2,
-                                          size: 35,
-                                        ),
-                                        onPressed: () {
-                                          try {
-                                            weightController.add(TextEditingController(text: "0"));
-                                            repsController.add(TextEditingController(text: "0"));
-                                            difficultyController.add(0);
-                                            exerciseData.add(
-                                              ExerciseData(
-                                                weight: int.parse(weightController.last.text.trim()),
-                                                reps: int.parse(repsController.last.text.trim()),
-                                                difficulty: difficultyController.last,
-                                                exercisesIdExercise: idExercise,
-                                                operation: 1,
-                                              ),
-                                            );
-
-                                            updateExerciseData();
-                                            setState(() {});
-                                          } catch (e) {
-                                            print(e);
-                                          }
-                                        },
-                                      ),
-                                    ),
-                                  ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          ),
-                          SliverList.list(
-                            children: [
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Container(
-                                  constraints: BoxConstraints(maxHeight: 150),
-                                  child: TextField(
-                                    maxLines: null,
-                                    keyboardType: TextInputType.multiline,
-                                    decoration: InputDecoration(
-                                      hintText: 'Enter your description',
-                                      border: OutlineInputBorder(),
+                              SliverList.list(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(10.0),
+                                    child: Container(
+                                      // constraints: BoxConstraints(maxHeight: 150),
+                                      child: TextField(
+                                        maxLines: 8,
+                                        minLines: 2,
+                                        onTap: () {},
+                                        controller: _descriptionController,
+                                        decoration: const InputDecoration(
+                                          label: Text(
+                                            "Enter description of today split...",
+                                            style: TextStyle(color: Colors.white),
+                                          ),
+                                          labelStyle: TextStyle(
+                                            color: ColorsProvider.color_1,
+                                          ),
+                                          enabledBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.all(
+                                              Radius.circular(12),
+                                            ),
+                                            borderSide: BorderSide(
+                                              color: ColorsProvider.color_2,
+                                              width: 0.5,
+                                            ),
+                                          ),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.all(
+                                              Radius.circular(12),
+                                            ),
+                                            borderSide: BorderSide(
+                                              color: ColorsProvider.color_2,
+                                              width: 2.0,
+                                            ),
+                                          ),
+                                          contentPadding: EdgeInsets.symmetric(
+                                            vertical: 10,
+                                            horizontal: 15,
+                                          ),
+                                        ),
+                                      ),
                                     ),
-                                    style: TextStyle(height: 1),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(10.0),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          "old values".toUpperCase(),
+                                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 20),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SliverList(
+                                delegate: SliverChildBuilderDelegate(
+                                  (BuildContext context, int index) {
+                                    return Column(
+                                      children: [
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.fromLTRB(10, 0, 10, 5),
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              color: ColorsProvider.color_2,
+                                              borderRadius: BorderRadius.circular(16),
+                                            ),
+                                            height: 100,
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                  childCount: 20,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Positioned(
+                          top: 15,
+                          left: 0,
+                          right: 20,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  try {
+                                    print("object");
+                                    // weightController.add(TextEditingController(text: "0"));
+                                    // repsController.add(TextEditingController(text: "0"));
+                                    // difficultyController.add(0);
+                                    exerciseData.add(
+                                      ExerciseData(
+                                        weight: 0,
+                                        reps: 0,
+                                        difficulty: 0,
+                                        exercisesIdExercise: idExercise,
+                                        operation: 1,
+                                      ),
+                                    );
+                                    widget.notifyParent;
+                                    // updateExerciseData();
+                                    setState(() {});
+                                  } catch (e) {
+                                    print(e);
+                                  }
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    // borderRadius: BorderRadius.circular(50),
+                                    shape: BoxShape.circle,
+                                    color: Colors.black,
+                                  ),
+                                  child: Icon(
+                                    Icons.add_circle_outline_outlined,
+                                    color: ColorsProvider.color_2,
+                                    size: 50,
                                   ),
                                 ),
                               ),
                             ],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     );
                   },
                 ),

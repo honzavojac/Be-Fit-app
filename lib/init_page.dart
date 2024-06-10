@@ -1,4 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:provider/provider.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/fitness_global_variables.dart';
@@ -14,9 +17,9 @@ class InitPage extends StatefulWidget {
 }
 
 final List<Widget> _appBars = [
-  FitnessRecordAppBar(),
-  HomeAppBar(),
-  FoodRecordAppBar(),
+  // FitnessRecordAppBar(),
+  // HomeAppBar(),
+  // FoodRecordAppBar(),
 ];
 
 final List<Widget> _pages = [
@@ -48,10 +51,64 @@ class _InitPageState extends State<InitPage> {
         ),
       ],
       child: Scaffold(
-        appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(50),
-          child: _appBars[pageProvider],
+        drawer: Drawer(
+          width: MediaQuery.of(context).size.width / 2,
+          // Add a ListView to the drawer. This ensures the user can scroll
+          // through the options in the drawer if there isn't enough vertical
+          // space to fit everything.
+          child: ListView(
+            // Important: Remove any padding from the ListView.
+            padding: EdgeInsets.zero,
+            children: [
+              Container(
+                height: 60,
+              ),
+              GestureDetector(
+                onTap: () {
+                  dbSupabase.getUser();
+                  Navigator.pushNamed(context, '/settings'); // Použijte pushNamed pro navigaci
+                },
+                child: Container(
+                  height: 50,
+                  color: ColorsProvider.color_2,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 15),
+                    child: Row(
+                      children: [
+                        const Text(
+                          'Settings',
+                          style: TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.bold),
+                        ),
+                        // Icon(
+                        //   Icons.settings,
+                        //   color: ColorsProvider.color_1,
+                        //   size: ,
+                        // ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
+        appBar: AppBar(
+            // leading: Builder(
+            //   builder: (context) {
+            //     return Row(
+            //       mainAxisAlignment: MainAxisAlignment.end,
+            //       children: [
+            //         IconButton(
+            //           icon: const Icon(Icons.menu),
+            //           onPressed: () {
+            //             Scaffold.of(context).openDrawer();
+            //           },
+            //         ),
+            //       ],
+            //     );
+            //   },
+            // ),
+            ),
         body: PageView(
           controller: controller,
           onPageChanged: (index) {
@@ -63,6 +120,7 @@ class _InitPageState extends State<InitPage> {
         ),
         key: scaffoldKey,
         bottomNavigationBar: NavigationBar(
+          elevation: 0,
           height: 65,
           onDestinationSelected: (index) {
             setState(() {
@@ -70,7 +128,7 @@ class _InitPageState extends State<InitPage> {
               controller.jumpToPage(pageProvider);
             });
           },
-          indicatorColor: Colors.amber[800],
+          indicatorColor: ColorsProvider.color_2,
           selectedIndex: pageProvider,
           animationDuration: const Duration(milliseconds: 1000),
           destinations: const [
@@ -79,7 +137,9 @@ class _InitPageState extends State<InitPage> {
                 Icons.fitness_center_rounded,
                 color: Colors.black,
               ),
-              icon: Icon(Icons.fitness_center_rounded),
+              icon: Icon(
+                Icons.fitness_center_rounded,
+              ),
               label: 'Fitness',
             ),
             NavigationDestination(
@@ -87,7 +147,9 @@ class _InitPageState extends State<InitPage> {
                 Icons.home,
                 color: Colors.black,
               ),
-              icon: Icon(Icons.home_outlined),
+              icon: Icon(
+                Icons.home_outlined,
+              ),
               label: 'Home',
             ),
             NavigationDestination(
@@ -95,7 +157,9 @@ class _InitPageState extends State<InitPage> {
                 Icons.fastfood_rounded,
                 color: Colors.black,
               ),
-              icon: Icon(Icons.fastfood),
+              icon: Icon(
+                Icons.fastfood,
+              ),
               label: 'Add food',
             ),
           ],

@@ -1,0 +1,322 @@
+ Container(
+                              color: ColorsProvider.color_2,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    Container(
+                                      width: 22,
+                                      child: Center(
+                                        child: Text(
+                                          "Set",
+                                          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      width: 70,
+                                      child: Center(
+                                        child: Text(
+                                          "Weight",
+                                          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      width: 70,
+                                      child: Center(
+                                        child: Text(
+                                          "Reps",
+                                          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      width: 70,
+                                      child: Center(
+                                        child: Text(
+                                          "difficulty",
+                                          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      width: 50,
+                                      child: Center(
+                                        child: Text(
+                                          "Special",
+                                          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: Container(
+                                color: Color.fromARGB(216, 255, 145, 0),
+                                child: ListView.builder(
+                                  shrinkWrap: false,
+                                  // physics: NeverScrollableScrollPhysics(),
+                                  itemCount: finalExerciseData.length,
+                                  itemBuilder: (context, itemIndex) {
+                                    int setNumber = itemIndex + 1;
+                                    return Column(
+                                      children: [
+                                        Container(
+                                          height: 45,
+                                          // color: ColorsProvider.color_7,
+                                          child: Dismissible(
+                                            direction: DismissDirection.endToStart,
+                                            key: ValueKey<int>(finalExerciseData[itemIndex].id),
+                                            background: Container(
+                                              color: ColorsProvider.color_9,
+                                              child: Align(
+                                                child: Padding(
+                                                  padding: const EdgeInsets.only(right: 16),
+                                                  child: Icon(Icons.delete),
+                                                ),
+                                                alignment: Alignment.centerRight,
+                                              ),
+                                            ),
+                                            onDismissed: (direction) async {},
+                                            confirmDismiss: (direction) async {
+                                              await saveValues(finalExerciseData);
+                                              actionExerciseRow(finalData[itemIndex].id, 3);
+                                              setState(() {});
+                                              return true;
+                                            },
+                                            child: Center(
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                children: [
+                                                  Container(
+                                                    width: 22,
+                                                    child: Row(
+                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                      children: [
+                                                        Text(
+                                                          "${setNumber}",
+                                                          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  Container(
+                                                    width: 70,
+                                                    child: Container(
+                                                      height: 35,
+                                                      child: Center(
+                                                        child: TextField(
+                                                          controller: weightController[itemIndex],
+                                                          onTap: () {
+                                                            weightController[itemIndex].selectAll();
+                                                            actionExerciseRow(finalExerciseData[itemIndex].id, 2);
+                                                          },
+                                                          onChanged: (value) {
+                                                            saveValues(finalExerciseData);
+                                                          },
+                                                          keyboardType: TextInputType.numberWithOptions(),
+                                                          inputFormatters: [
+                                                            LengthLimitingTextInputFormatter(3),
+                                                            FilteringTextInputFormatter.allow(
+                                                              RegExp(r'[0-9]'),
+                                                            )
+                                                          ],
+                                                          decoration: const InputDecoration(
+                                                            // filled: true,
+                                                            fillColor: ColorsProvider.color_8,
+                                                            labelStyle: TextStyle(
+                                                              color: ColorsProvider.color_1,
+                                                            ),
+                                                            enabledBorder: OutlineInputBorder(
+                                                              borderRadius: BorderRadius.all(
+                                                                Radius.circular(12),
+                                                              ),
+                                                              borderSide: BorderSide(
+                                                                color: ColorsProvider.color_8,
+                                                                width: 1.5,
+                                                              ),
+                                                            ),
+                                                            focusedBorder: OutlineInputBorder(
+                                                              borderRadius: BorderRadius.all(
+                                                                Radius.circular(12),
+                                                              ),
+                                                              borderSide: BorderSide(
+                                                                color: ColorsProvider.color_8,
+                                                                width: 3.0,
+                                                              ),
+                                                            ),
+                                                            contentPadding: EdgeInsets.symmetric(
+                                                              vertical: 0,
+                                                              horizontal: 15,
+                                                            ),
+                                                          ),
+                                                          textAlign: TextAlign.center,
+                                                          cursorColor: Colors.black,
+                                                          style: TextStyle(
+                                                            color: Colors.black,
+                                                            fontWeight: FontWeight.bold,
+                                                            fontSize: 18,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Container(
+                                                    width: 70,
+                                                    child: Container(
+                                                      height: 35,
+                                                      child: Center(
+                                                        child: TextField(
+                                                          onTap: () {
+                                                            repsController[itemIndex].selectAll();
+                                                            actionExerciseRow(finalExerciseData[itemIndex].id, 2);
+                                                          },
+                                                          onChanged: (value) {
+                                                            saveValues(finalExerciseData);
+                                                          },
+                                                          controller: repsController[itemIndex],
+                                                          keyboardType: TextInputType.numberWithOptions(),
+                                                          inputFormatters: [
+                                                            LengthLimitingTextInputFormatter(3),
+                                                            FilteringTextInputFormatter.allow(
+                                                              RegExp(r'[0-9]'),
+                                                            )
+                                                          ],
+                                                          decoration: const InputDecoration(
+                                                            // filled: true,
+                                                            fillColor: ColorsProvider.color_8,
+                                                            labelStyle: TextStyle(
+                                                              color: ColorsProvider.color_1,
+                                                            ),
+                                                            enabledBorder: OutlineInputBorder(
+                                                              borderRadius: BorderRadius.all(
+                                                                Radius.circular(12),
+                                                              ),
+                                                              borderSide: BorderSide(
+                                                                color: ColorsProvider.color_8,
+                                                                width: 1.5,
+                                                              ),
+                                                            ),
+                                                            focusedBorder: OutlineInputBorder(
+                                                              borderRadius: BorderRadius.all(
+                                                                Radius.circular(12),
+                                                              ),
+                                                              borderSide: BorderSide(
+                                                                color: ColorsProvider.color_8,
+                                                                width: 3.0,
+                                                              ),
+                                                            ),
+                                                            contentPadding: EdgeInsets.symmetric(
+                                                              vertical: 0,
+                                                              horizontal: 15,
+                                                            ),
+                                                          ),
+                                                          textAlign: TextAlign.center,
+                                                          cursorColor: Colors.black,
+                                                          style: TextStyle(
+                                                            color: Colors.black,
+                                                            fontWeight: FontWeight.bold,
+                                                            fontSize: 18,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Container(
+                                                    width: 70,
+                                                    child: DropdownButtonHideUnderline(
+                                                      child: DropdownButton2<int>(
+                                                        alignment: Alignment.center,
+                                                        style: TextStyle(
+                                                          // color: Colors.black,
+                                                          fontWeight: FontWeight.bold,
+                                                          fontSize: 5,
+                                                        ),
+                                                        isDense: true,
+                                                        menuItemStyleData: MenuItemStyleData(
+                                                          height: 37,
+                                                        ),
+                                                        isExpanded: true,
+                                                        dropdownStyleData: DropdownStyleData(
+                                                          offset: Offset(-0, -3),
+                                                          elevation: 2,
+                                                          // width: 90,
+                                                          decoration: BoxDecoration(
+                                                            borderRadius: BorderRadius.circular(12),
+                                                            color: Color.fromARGB(195, 0, 0, 0),
+                                                          ),
+                                                        ),
+                                                        buttonStyleData: ButtonStyleData(
+                                                          height: 35,
+                                                          decoration: BoxDecoration(
+                                                            color: const Color.fromARGB(123, 0, 0, 0),
+                                                            borderRadius: BorderRadius.circular(12),
+                                                            border: Border.all(width: 1.5, color: ColorsProvider.color_8),
+                                                          ),
+                                                          overlayColor: MaterialStatePropertyAll(const Color.fromARGB(0, 148, 22, 22)),
+                                                        ),
+                                                        value: difficultyController[itemIndex] == 0 ? null : difficultyController[itemIndex],
+                                                        onChanged: (int? value) async {
+                                                          print(value);
+                                                          difficultyController[itemIndex] = value ?? 0;
+
+                                                          saveValues(finalExerciseData);
+                                                          actionExerciseRow(finalExerciseData[itemIndex].id, 2);
+                                                          updateExerciseData();
+                                                          setState(() {});
+                                                        },
+                                                        items: List.generate(
+                                                          5,
+                                                          (index) {
+                                                            int difficulty = index + 1; // Začíná od 1 místo 0
+                                                            return DropdownMenuItem<int>(
+                                                              value: difficulty,
+                                                              alignment: Alignment.center,
+                                                              child: Text(
+                                                                difficulty.toString(),
+                                                                style: TextStyle(
+                                                                  fontSize: 16,
+                                                                  fontWeight: FontWeight.bold,
+                                                                  color: difficulty == 1
+                                                                      ? Colors.green
+                                                                      : difficulty == 2
+                                                                          ? Colors.lightGreen
+                                                                          : difficulty == 3
+                                                                              ? Colors.yellow
+                                                                              : difficulty == 4
+                                                                                  ? Colors.orange
+                                                                                  : Colors.red,
+                                                                ),
+                                                                overflow: TextOverflow.ellipsis,
+                                                              ),
+                                                            );
+                                                          },
+                                                        ).toList(),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Container(
+                                                    width: 50,
+                                                    child: Text(
+                                                      "Normal",
+                                                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 5,
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),

@@ -25,14 +25,15 @@ class HomeAppBar extends StatelessWidget {
         children: [
           const Text('Home page'),
           IconButton(
-              onPressed: () {
-                dbSupabase.getUser();
-                Navigator.pushNamed(context, '/settings'); // Použijte pushNamed pro navigaci
-              },
-              icon: Icon(
-                Icons.settings,
-                color: ColorsProvider.color_1,
-              ))
+            onPressed: () {
+              dbSupabase.getUser();
+              Navigator.pushNamed(context, '/settings'); // Použijte pushNamed pro navigaci
+            },
+            icon: Icon(
+              Icons.settings,
+              color: ColorsProvider.color_1,
+            ),
+          ),
         ],
       ),
     );

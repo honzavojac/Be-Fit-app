@@ -288,9 +288,12 @@ class SupabaseProvider extends ChangeNotifier {
     // for (var element in exerciseData) {
     //   print(element.operation);
     // }
-
+    // for (var element in exerciseData) {
+    //   print(element);
+    // }
     for (var i = 0; i < exerciseData.length; i++) {
       var dataOfExercise = exerciseData[i];
+
       switch (exerciseData[i].operation) {
         case 0 || null:
           //hodnota zůstává
@@ -351,7 +354,9 @@ class SupabaseProvider extends ChangeNotifier {
     }
 
     // efresh data
+    print("ble");
     await getFitness();
+    notifyListeners();
   }
 }
 
