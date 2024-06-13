@@ -1,44 +1,56 @@
+import 'dart:math';
+
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:intl/intl.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:provider/provider.dart';
 
 class ExercisePage extends StatefulWidget {
+  final String nameOfExercise;
+  final int idExercise;
+  final int splitId;
+  final int? idStartedCompleted;
   final int splitIndex;
   final int muscleIndex;
   final int exerciseIndex;
+  final Function()? loadData;
   final Function() notifyParent;
-  const ExercisePage({super.key, required this.splitIndex, required this.muscleIndex, required this.exerciseIndex, required this.notifyParent});
+  const ExercisePage({
+    super.key,
+    required this.nameOfExercise,
+    required this.idExercise,
+    required this.splitId,
+    this.idStartedCompleted,
+    required this.splitIndex,
+    required this.muscleIndex,
+    required this.exerciseIndex,
+    this.loadData,
+    required this.notifyParent,
+  });
 
   @override
   State<ExercisePage> createState() => _ExercisePageState();
 }
 
+// double initialDragableSize = 0.1;
+
 class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver {
   bool showWidget = false;
   late List<ExerciseData> exerciseData;
+
   List<TextEditingController> weightController = [];
   List<TextEditingController> repsController = [];
-  TextEditingController _descriptionController = TextEditingController();
-  List<int> weight = [];
-  List<int> reps = [];
   List<int> difficultyController = [];
-  late String nameOfExercise;
-  late int idExercise;
-  late bool saved;
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
+  TextEditingController _descriptionController = TextEditingController();
 
-    print("initState called");
-    saved = false;
-    load();
-  }
+  String? nameOfExercise;
+
+  late int idExercise;
 
   AppLifecycleState? _lastLifecycleState;
 
@@ -48,63 +60,113 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
     if (_lastLifecycleState == state) return;
 
     if (state == AppLifecycleState.inactive) {
-      // Aplikace přechází do pozadí, zde můžete uložit data
       print("didchangeapplifecyclestate - inactive");
       if (mounted) {
         try {
-          // if (saved == false) {
-          await saveDataToDatabase(); // Předpokládám, že saveDataToDatabase je asynchronní funkce
-
-          //   saved = true;
-          // }
+          await saveDataToDatabase();
         } catch (e) {
           print("chyba v exercisePage při vkládání dat změněním stavu aplikace (zavřená app): $e");
         }
       }
     }
-    // Uložte aktuální stav jako poslední stav
     _lastLifecycleState = state;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+
+    print("initState called");
+    loadOldData();
+    loadData();
+  }
+
+  late Future<int?> idSplitStartedCompleted;
+
+  Future<void> loadData() async {
+    print("load called");
+    var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false);
+
+    var dataDb = await dbSupabase.exerciseData;
+
+    // Kontrola, zda dataDb není prázdné
+    if (dataDb.isNotEmpty) {
+      var selectedMuscleList = dataDb[widget.splitIndex].selectedMuscle;
+
+      // Kontrola, zda selectedMuscleList není prázdné
+      if (selectedMuscleList != null && selectedMuscleList.isNotEmpty && widget.muscleIndex < selectedMuscleList.length) {
+        var selectedExercisesList = selectedMuscleList[widget.muscleIndex].selectedExercises;
+
+        // Kontrola, zda selectedExercisesList není prázdné
+        if (selectedExercisesList != null && selectedExercisesList.isNotEmpty && widget.exerciseIndex < selectedExercisesList.length) {
+          var exData = selectedExercisesList[widget.exerciseIndex].exercises;
+
+          // Kontrola, zda exData není null a exData.exerciseData není prázdné
+          if (exData != null && exData.exerciseData != null && exData.exerciseData!.isNotEmpty) {
+            exerciseData = exData.exerciseData!;
+          } else {
+            print("exData je empty");
+            exerciseData = List.empty(growable: true); // Ujistěte se, že seznam lze rozšířit
+          }
+        } else {
+          print("selectedExercisesList je empty nebo neplatný index");
+          exerciseData = List.empty(growable: true); // Ujistěte se, že seznam lze rozšířit
+        }
+      } else {
+        print("selectedMuscleList je empty nebo neplatný index");
+        exerciseData = List.empty(growable: true); // Ujistěte se, že seznam lze rozšířit
+      }
+    } else {
+      print("dataDb je empty nebo neplatný index");
+      exerciseData = List.empty(growable: true); // Ujistěte se, že seznam lze rozšířit
+    }
+
+    print("konečně showwidget");
+    setState(() {
+      showWidget = true;
+    });
+  }
+
+  List<SplitStartedCompleted> oldDataFinal = [];
+  loadOldData() async {
+    oldDataFinal.clear();
+    print("load old data");
+    var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false);
+    List<Split> oldData = await dbSupabase.getOldExerciseData(widget.idExercise);
+    print("old data ${oldData.length}");
+    for (var element in oldData) {
+      // print(element.nameSplit);
+      for (var splitStartedCompleted in element.splitStartedCompleted!) {
+        for (var element in splitStartedCompleted.exerciseData!) {
+          if (element.exercisesIdExercise == widget.idExercise) {
+            oldDataFinal.add(splitStartedCompleted);
+            break;
+          }
+        }
+
+        // print(element.createdAt);
+        // for (var element in element.exerciseData!) {
+        //   print(element.weight);
+        // }
+      }
+    }
+    oldDataFinal.sort((a, b) => b.idStartedCompleted!.compareTo(a.idStartedCompleted!));
+    setState(() {});
   }
 
   saveDataToDatabase() async {
     var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false);
-    if (mounted) {
-      print("hodnota byla předána provideru");
-      await dbSupabase.actionExerciseData(exerciseData, idExercise);
-
-      load();
-      try {
-        await widget.notifyParent;
-      } on Exception catch (e) {
-        print(e);
+    var idStartedCompleted;
+    //generování idStartedCompleted pokud není ... false
+    if (exerciseData.isNotEmpty) {
+      if (dbSupabase.boolInsertSplitStartedCompleted == true) {
+        idStartedCompleted = await dbSupabase.insertSplitStartedCompleted(widget.splitId);
+      } else {
+        idStartedCompleted = await widget.idStartedCompleted;
       }
-    }
-  }
 
-  load() {
-    print("load called");
-    if (mounted) {
-      var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false);
-      nameOfExercise = dbSupabase.splits[widget.splitIndex].selectedMuscle![widget.muscleIndex].selectedExercises![widget.exerciseIndex].exercises.nameOfExercise;
-      idExercise = dbSupabase.splits[widget.splitIndex].selectedMuscle![widget.muscleIndex].selectedExercises![widget.exerciseIndex].exercises.idExercise;
-
-      exerciseData = dbSupabase.splits[widget.splitIndex].selectedMuscle![widget.muscleIndex].selectedExercises![widget.exerciseIndex].exercises.exerciseData!;
-
-      weightController.clear();
-      repsController.clear();
-      difficultyController.clear();
-
-      for (var i = 0; i < exerciseData.length; i++) {
-        //nastavení controlerů na hodnoty z exerciseData
-        weightController.add(TextEditingController(text: exerciseData[i].weight.toString()));
-        repsController.add(TextEditingController(text: exerciseData[i].reps.toString()));
-        difficultyController.add(exerciseData[i].difficulty);
-        // print(i);
-        // print(weightController[i].text.trim());
-        // print(repsController[i].text.trim());
-        // print("aaaaaaaaaaaaaaaaaaa ${exerciseData[i].id}");
-      }
-      showWidget = true;
+      await dbSupabase.actionExerciseData(exerciseData, idExercise, idStartedCompleted);
     }
   }
 
@@ -129,11 +191,13 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
           exerciseData[i].operation = value;
         }
       }
-      // print(exerciseData[i].id);
     }
   }
 
   saveValues(List<ExerciseData> data) {
+    var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false);
+
+    //insert do tabulky split_started_completed o startu splitu
     for (var i = 0; i < exerciseData.length; i++) {
       for (var j = 0; j < data.length; j++) {
         if (data[j].id == exerciseData[i].id) {
@@ -141,7 +205,9 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
             exerciseData[i].weight = int.parse(weightController[j].text.trim());
             exerciseData[i].reps = int.parse(repsController[j].text.trim());
             exerciseData[i].difficulty = difficultyController[j];
-          } catch (e) {}
+          } catch (e) {
+            print("problém: $e");
+          }
         }
       }
     }
@@ -155,28 +221,35 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
     difficultyController = [];
 
     for (var i = 0; i < exerciseData.length; i++) {
+      print("operation: ${exerciseData[i].operation}");
       //odstranění hodnot
       if (exerciseData[i].operation == 3 || exerciseData[i].operation == 4) {
         //nothing
       } else {
         finalData.add(exerciseData[i]);
         weightController.add(TextEditingController(text: exerciseData[i].weight.toString()));
-
         repsController.add(TextEditingController(text: exerciseData[i].reps.toString()));
         difficultyController.add(exerciseData[i].difficulty);
       }
-      // print(exerciseData[i].operation);
     }
-
+    // int i = 1;
+    // for (var element in exerciseData) {
+    //   print("$i: weight: ${element.weight}, reps: ${element.reps}, difficulty: ${element.difficulty}, operation: ${element.operation}");
+    //   i++;
+    // }
     return finalData;
   }
 
   @override
   Widget build(BuildContext context) {
-    saved = false;
+    print("show widget: $showWidget");
+    nameOfExercise = widget.nameOfExercise;
+    idExercise = widget.idExercise;
     final _sheet = GlobalKey();
     final _controller = DraggableScrollableController();
     List<ExerciseData> finalExerciseData = updateExerciseData();
+
+    print("final exercise data: ${finalExerciseData.length}");
 
     if (showWidget == false) {
       return Scaffold(
@@ -189,22 +262,22 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                 '${nameOfExercise}',
                 style: TextStyle(fontWeight: FontWeight.bold, color: ColorsProvider.color_1),
               ),
-              GestureDetector(
-                child: Container(
-                    decoration: BoxDecoration(
-                      color: ColorsProvider.color_2,
-                      border: Border.all(color: Colors.black),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(3, 4, 3, 4),
-                      child: Text(
-                        "Specials",
-                        style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 15),
-                      ),
-                    )),
-                onTap: () {},
-              )
+              // GestureDetector(
+              //   child: Container(
+              //       decoration: BoxDecoration(
+              //         color: ColorsProvider.color_2,
+              //         border: Border.all(color: Colors.black),
+              //         borderRadius: BorderRadius.circular(12),
+              //       ),
+              //       child: Padding(
+              //         padding: const EdgeInsets.fromLTRB(3, 4, 3, 4),
+              //         child: Text(
+              //           "Specials",
+              //           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 15),
+              //         ),
+              //       )),
+              //   onTap: () {},
+              // )
             ],
           ),
           leading: IconButton(
@@ -225,118 +298,113 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                 slivers: [
                   SliverFillRemaining(
                     hasScrollBody: true,
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: Container(
-                            height: MediaQuery.of(context).size.height * 0.35,
-                            child: Column(
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    Container(
-                                      width: 30,
-                                      child: Center(
-                                        child: Text(
-                                          "Set",
-                                          style: TextStyle(fontWeight: FontWeight.bold),
-                                        ),
-                                      ),
-                                    ),
-                                    Container(
-                                      width: 60,
-                                      child: Center(
-                                        child: Text(
-                                          "Weight",
-                                          style: TextStyle(fontWeight: FontWeight.bold),
-                                        ),
-                                      ),
-                                    ),
-                                    Container(
-                                      width: 60,
-                                      child: Center(
-                                        child: Text(
-                                          "Reps",
-                                          style: TextStyle(fontWeight: FontWeight.bold),
-                                        ),
-                                      ),
-                                    ),
-                                    Container(
-                                      width: 60,
-                                      child: Center(
-                                        child: Text(
-                                          "difficulty",
-                                          style: TextStyle(fontWeight: FontWeight.bold),
-                                        ),
-                                      ),
-                                    ),
-                                    Container(
-                                      width: 50,
-                                      child: Center(
-                                        child: Text(
-                                          "Special",
-                                          style: TextStyle(fontWeight: FontWeight.bold),
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: 25,
-                                    )
-                                  ],
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 10, 2, 0),
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Container(
+                                width: 30,
+                                child: Center(
+                                  child: Text(
+                                    "Set",
+                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                  ),
                                 ),
-                              ],
-                            ),
+                              ),
+                              Container(
+                                width: 60,
+                                child: Center(
+                                  child: Text(
+                                    "Weight",
+                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                width: 60,
+                                child: Center(
+                                  child: Text(
+                                    "Reps",
+                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                width: 60,
+                                child: Center(
+                                  child: Text(
+                                    "difficulty",
+                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                width: 50,
+                                child: Center(
+                                  child: Text(
+                                    "Special",
+                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
+                          SizedBox(
+                            height: 15,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],
               ),
               DraggableScrollableSheet(
                 key: _sheet,
+                // shouldCloseOnMinExtent: false,
                 initialChildSize: 0.1,
-                maxChildSize: 0.7,
-                minChildSize: 0.1,
+                maxChildSize: 0.6,
+                minChildSize: 0.1, snapAnimationDuration: Duration(milliseconds: 100),
                 expand: true,
                 snap: false,
                 snapSizes: [
-                  0.2,
+                  0.1,
+                  0.6,
                 ],
-                snapAnimationDuration: Duration(milliseconds: 200),
+                // snapAnimationDuration: Duration(milliseconds: 100),
                 controller: _controller,
                 builder: (context, scrollController) {
-                  return DecoratedBox(
-                    decoration: const BoxDecoration(
-                      color: Color.fromARGB(123, 0, 0, 0),
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(12),
-                        topRight: Radius.circular(12),
-                      ),
-                    ),
-                    child: CustomScrollView(
-                      controller: scrollController,
-                      slivers: [
-                        SliverToBoxAdapter(
-                          child: Container(
-                            height: 90,
-                            // color: Colors.amber,
-                            child: Padding(
-                              padding: const EdgeInsets.only(left: 20, right: 20),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Container(
-                                    width: 40,
-                                  ),
-                                  Row(
+                  return Stack(
+                    children: [
+                      DecoratedBox(
+                        decoration: const BoxDecoration(
+                          color: Color.fromARGB(123, 0, 0, 0),
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(25),
+                            topRight: Radius.circular(25),
+                          ),
+                        ),
+                        child: CustomScrollView(
+                          controller: scrollController,
+                          slivers: [
+                            SliverToBoxAdapter(
+                              child: Container(
+                                height: 90,
+                                // color: Colors.amber,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 20, right: 20),
+                                  child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
                                         'Swipe up',
-                                        style: TextStyle(color: ColorsProvider.color_1, fontSize: 20, fontWeight: FontWeight.bold),
+                                        style: TextStyle(
+                                          color: ColorsProvider.color_1,
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                       SizedBox(
                                         width: 10,
@@ -348,42 +416,277 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                                       ),
                                     ],
                                   ),
-                                  Container(
-                                    width: 40,
-                                    child: IconButton(
-                                      icon: Icon(Icons.add_circle_outline_outlined, color: ColorsProvider.color_2, size: 35),
-                                      onPressed: () {},
-                                    ),
-                                  ),
-                                ],
+                                ),
                               ),
                             ),
-                          ),
+                            // SliverList.list(
+                            //   children: [
+                            //     Padding(
+                            //       padding: const EdgeInsets.all(10.0),
+                            //       child: Container(
+                            //         // constraints: BoxConstraints(maxHeight: 150),
+                            //         child: TextField(
+                            //           maxLines: 8,
+                            //           minLines: 2,
+                            //           onTap: () {},
+                            //           controller: _descriptionController,
+                            //           decoration: const InputDecoration(
+                            //             label: Text(
+                            //               "Enter description of today split...",
+                            //               style: TextStyle(color: Colors.white),
+                            //             ),
+                            //             labelStyle: TextStyle(
+                            //               color: ColorsProvider.color_1,
+                            //             ),
+                            //             enabledBorder: OutlineInputBorder(
+                            //               borderRadius: BorderRadius.all(
+                            //                 Radius.circular(12),
+                            //               ),
+                            //               borderSide: BorderSide(
+                            //                 color: ColorsProvider.color_2,
+                            //                 width: 0.5,
+                            //               ),
+                            //             ),
+                            //             focusedBorder: OutlineInputBorder(
+                            //               borderRadius: BorderRadius.all(
+                            //                 Radius.circular(12),
+                            //               ),
+                            //               borderSide: BorderSide(
+                            //                 color: ColorsProvider.color_2,
+                            //                 width: 2.0,
+                            //               ),
+                            //             ),
+                            //             contentPadding: EdgeInsets.symmetric(
+                            //               vertical: 10,
+                            //               horizontal: 15,
+                            //             ),
+                            //           ),
+                            //         ),
+                            //       ),
+                            //     ),
+                            //     Padding(
+                            //       padding: const EdgeInsets.all(10.0),
+                            //       child: Row(
+                            //         mainAxisAlignment: MainAxisAlignment.center,
+                            //         children: [
+                            //           Text(
+                            //             "old values".toUpperCase(),
+                            //             style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 20),
+                            //           ),
+                            //         ],
+                            //       ),
+                            //     ),
+                            //   ],
+                            // ),
+                            // SliverList(
+                            //   delegate: SliverChildBuilderDelegate(
+                            //     childCount: splitData[widget.splitIndex].splitStartedCompleted!.length,
+                            //     (BuildContext context, int splitStartedindex) {
+                            //       String? rawDate = splitData[widget.splitIndex].splitStartedCompleted![splitStartedindex].createdAt!.substring(0, 25 - 15);
+                            //       DateTime dateTime = DateTime.parse(rawDate);
+                            //       DateFormat formatter = DateFormat('dd.MM.yyyy');
+                            //       String date = formatter.format(dateTime);
+                            //       return Padding(
+                            //         padding: const EdgeInsets.all(8.0),
+                            //         child: Container(
+                            //           height: 135,
+                            //           decoration: BoxDecoration(
+                            //             borderRadius: BorderRadius.circular(10),
+                            //             color: ColorsProvider.color_2,
+                            //           ),
+                            //           child: Column(
+                            //             children: [
+                            //               Padding(
+                            //                 padding: const EdgeInsets.only(
+                            //                   top: 5,
+                            //                 ),
+                            //                 child: Row(
+                            //                   mainAxisAlignment: MainAxisAlignment.center,
+                            //                   children: [
+                            //                     Text(
+                            //                       "$date",
+                            //                       style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20),
+                            //                     )
+                            //                   ],
+                            //                 ),
+                            //               ),
+                            //               Expanded(
+                            //                 child: Padding(
+                            //                   padding: const EdgeInsets.only(left: 5, right: 5, top: 5, bottom: 5),
+                            //                   child: Container(
+                            //                     decoration: BoxDecoration(color: Color.fromARGB(135, 0, 0, 0), borderRadius: BorderRadius.circular(12)),
+                            //                     child: Row(
+                            //                       children: [
+                            //                         Padding(
+                            //                           padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
+                            //                           child: Container(
+                            //                             width: 60,
+                            //                             child: Column(
+                            //                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            //                               children: [
+                            //                                 Text(
+                            //                                   "Set",
+                            //                                   style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
+                            //                                 ),
+                            //                                 Text(
+                            //                                   "Weight",
+                            //                                   style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
+                            //                                 ),
+                            //                                 Text(
+                            //                                   "Reps",
+                            //                                   style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
+                            //                                 ),
+                            //                                 SizedBox(
+                            //                                   height: 2,
+                            //                                 )
+                            //                               ],
+                            //                             ),
+                            //                           ),
+                            //                         ),
+                            //                         Container(
+                            //                           width: 1,
+                            //                           color: Colors.black,
+                            //                         ),
+                            //                         Expanded(
+                            //                           child: Padding(
+                            //                             padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
+                            //                             child: Container(
+                            //                               child: ListView.builder(
+                            //                                 itemCount: splitData[widget.splitIndex].splitStartedCompleted![splitStartedindex].exerciseData!.length,
+                            //                                 scrollDirection: Axis.horizontal,
+                            //                                 itemBuilder: (context, index) {
+                            //                                   var data = splitData[widget.splitIndex].splitStartedCompleted![splitStartedindex].exerciseData![index];
+                            //                                   int reps;
+                            //                                   int weight;
+                            //                                   int difficulty;
+                            //                                   // if (DateTime.now().toString().replaceRange(10, null, '') == splits[selectedSplit].selectedMuscle![muscleIndex].muscles.exercises![exerciseIndex].exerciseData![index].time!.replaceRange(10, null, '')) {
+                            //                                   reps = data.reps;
+                            //                                   weight = data.weight;
+                            //                                   difficulty = data.difficulty;
+                            //                                   // } else {}
+                            //                                   return Padding(
+                            //                                     padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
+                            //                                     child: Container(
+                            //                                       width: 30,
+                            //                                       child: Column(
+                            //                                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            //                                         children: [
+                            //                                           Text(
+                            //                                             "${index + 1}",
+                            //                                             style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
+                            //                                           ),
+                            //                                           Text(
+                            //                                             "$weight",
+                            //                                             style: TextStyle(
+                            //                                               fontWeight: FontWeight.bold,
+                            //                                               fontSize: 16,
+                            //                                               color: difficulty == 0
+                            //                                                   ? Colors.white
+                            //                                                   : difficulty == 1
+                            //                                                       ? Colors.green
+                            //                                                       : difficulty == 2
+                            //                                                           ? Colors.lightGreen
+                            //                                                           : difficulty == 3
+                            //                                                               ? Colors.yellow
+                            //                                                               : difficulty == 4
+                            //                                                                   ? Colors.orange
+                            //                                                                   : Colors.red,
+                            //                                             ),
+                            //                                           ),
+                            //                                           Text(
+                            //                                             "$reps",
+                            //                                             style: TextStyle(
+                            //                                               fontWeight: FontWeight.bold,
+                            //                                               fontSize: 16,
+                            //                                               color: difficulty == 0
+                            //                                                   ? Colors.white
+                            //                                                   : difficulty == 1
+                            //                                                       ? Colors.green
+                            //                                                       : difficulty == 2
+                            //                                                           ? Colors.lightGreen
+                            //                                                           : difficulty == 3
+                            //                                                               ? Colors.yellow
+                            //                                                               : difficulty == 4
+                            //                                                                   ? Colors.orange
+                            //                                                                   : Colors.red,
+                            //                                             ),
+                            //                                           ),
+                            //                                           SizedBox(
+                            //                                             height: 2,
+                            //                                           )
+                            //                                         ],
+                            //                                       ),
+                            //                                     ),
+                            //                                   );
+                            //                                 },
+                            //                               ),
+                            //                             ),
+                            //                           ),
+                            //                         )
+                            //                       ],
+                            //                     ),
+                            //                   ),
+                            //                 ),
+                            //               ),
+                            //             ],
+                            //           ),
+                            //         ),
+                            //       );
+                            //     },
+                            //   ),
+                            // ),
+                          ],
                         ),
-                        SliverList.list(
+                      ),
+                      Positioned(
+                        top: 15,
+                        left: 0,
+                        right: 20,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
+                            GestureDetector(
+                              onTap: () {
+                                try {
+                                  print("přidána položka");
+                                  // weightController.add(TextEditingController(text: "0"));
+                                  // repsController.add(TextEditingController(text: "0"));
+                                  // difficultyController.add(0);
+                                  exerciseData.add(
+                                    ExerciseData(
+                                      weight: 0,
+                                      reps: 0,
+                                      difficulty: 0,
+                                      exercisesIdExercise: idExercise,
+                                      operation: 1,
+                                      // idStartedCompleted:
+                                    ),
+                                  );
+                                  print(exerciseData.length);
+                                  // widget.notifyParent;
+                                  updateExerciseData();
+                                  // setState(() {});
+                                } catch (e) {
+                                  print("chyba při přidávání hodnot $e");
+                                }
+                              },
                               child: Container(
-                                constraints: BoxConstraints(maxHeight: 150),
-                                child: TextField(
-                                  maxLines: null,
-                                  keyboardType: TextInputType.multiline,
-                                  decoration: InputDecoration(
-                                    hintText: 'Enter your description',
-                                    border: OutlineInputBorder(),
-                                  ),
-                                  style: TextStyle(height: 1),
+                                decoration: BoxDecoration(
+                                  // borderRadius: BorderRadius.circular(50),
+                                  shape: BoxShape.circle,
+                                  color: Colors.black,
+                                ),
+                                child: Icon(
+                                  Icons.add_circle_outline_outlined,
+                                  color: ColorsProvider.color_2,
+                                  size: 50,
                                 ),
                               ),
                             ),
                           ],
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   );
                 },
               ),
@@ -397,7 +700,8 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
           if (mounted) {
             await saveDataToDatabase();
 
-            widget.notifyParent;
+            // widget.notifyParent;
+            // widget.loadData;
             print("popscope---------------------------");
           }
           try {} on Exception catch (e) {
@@ -435,9 +739,10 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
             leading: IconButton(
               icon: Icon(Icons.arrow_back), // Ikona zpětné šipky
               onPressed: () async {
+                print("icon");
                 // saveDataToDatabase();
                 try {
-                  await widget.notifyParent;
+                  // await widget.notifyParent;
                 } on Exception catch (e) {
                   print(e);
                 }
@@ -499,15 +804,15 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                                     ),
                                   ),
                                 ),
-                                Container(
-                                  width: 50,
-                                  child: Center(
-                                    child: Text(
-                                      "Special",
-                                      style: TextStyle(fontWeight: FontWeight.bold),
-                                    ),
-                                  ),
-                                ),
+                                // Container(
+                                //   width: 50,
+                                //   child: Center(
+                                //     child: Text(
+                                //       "Special",
+                                //       style: TextStyle(fontWeight: FontWeight.bold),
+                                //     ),
+                                //   ),
+                                // ),
                               ],
                             ),
                             SizedBox(
@@ -520,6 +825,7 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                                 itemCount: finalExerciseData.length,
                                 itemBuilder: (context, itemIndex) {
                                   int setNumber = itemIndex + 1;
+                                  int difficulty = finalExerciseData[itemIndex].difficulty;
                                   return Column(
                                     children: [
                                       Container(
@@ -610,7 +916,17 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                                                         ),
                                                         textAlign: TextAlign.center,
                                                         style: TextStyle(
-                                                          // color: Colors.black,
+                                                          color: difficulty == 0
+                                                              ? Colors.white
+                                                              : difficulty == 1
+                                                                  ? Colors.green
+                                                                  : difficulty == 2
+                                                                      ? Colors.lightGreen
+                                                                      : difficulty == 3
+                                                                          ? Colors.yellow
+                                                                          : difficulty == 4
+                                                                              ? Colors.orange
+                                                                              : Colors.red,
                                                           fontWeight: FontWeight.bold,
                                                           fontSize: 18,
                                                         ),
@@ -668,7 +984,17 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                                                         ),
                                                         textAlign: TextAlign.center,
                                                         style: TextStyle(
-                                                          // color: Colors.black,
+                                                          color: difficulty == 0
+                                                              ? Colors.white
+                                                              : difficulty == 1
+                                                                  ? Colors.green
+                                                                  : difficulty == 2
+                                                                      ? Colors.lightGreen
+                                                                      : difficulty == 3
+                                                                          ? Colors.yellow
+                                                                          : difficulty == 4
+                                                                              ? Colors.orange
+                                                                              : Colors.red,
                                                           fontWeight: FontWeight.bold,
                                                           fontSize: 18,
                                                         ),
@@ -710,7 +1036,6 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                                                       ),
                                                       value: difficultyController[itemIndex] == 0 ? null : difficultyController[itemIndex],
                                                       onChanged: (int? value) async {
-                                                        print(value);
                                                         difficultyController[itemIndex] = value ?? 0;
 
                                                         saveValues(finalExerciseData);
@@ -730,15 +1055,17 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                                                               style: TextStyle(
                                                                 fontSize: 16,
                                                                 fontWeight: FontWeight.bold,
-                                                                color: difficulty == 1
-                                                                    ? Colors.green
-                                                                    : difficulty == 2
-                                                                        ? Colors.lightGreen
-                                                                        : difficulty == 3
-                                                                            ? Colors.yellow
-                                                                            : difficulty == 4
-                                                                                ? Colors.orange
-                                                                                : Colors.red,
+                                                                color: difficulty == 0
+                                                                    ? Colors.white
+                                                                    : difficulty == 1
+                                                                        ? Colors.green
+                                                                        : difficulty == 2
+                                                                            ? Colors.lightGreen
+                                                                            : difficulty == 3
+                                                                                ? Colors.yellow
+                                                                                : difficulty == 4
+                                                                                    ? Colors.orange
+                                                                                    : Colors.red,
                                                               ),
                                                               overflow: TextOverflow.ellipsis,
                                                             ),
@@ -748,10 +1075,10 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                                                     ),
                                                   ),
                                                 ),
-                                                Container(
-                                                  width: 50,
-                                                  child: Text("Normal"),
-                                                ),
+                                                // Container(
+                                                //   width: 50,
+                                                //   child: Text("Normal"),
+                                                // ),
                                               ],
                                             ),
                                           ),
@@ -772,7 +1099,8 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                   ],
                 ),
                 DraggableScrollableSheet(
-                  key: _sheet, shouldCloseOnMinExtent: true,
+                  key: _sheet,
+                  // shouldCloseOnMinExtent: false,
                   initialChildSize: 0.1,
                   maxChildSize: 0.6,
                   minChildSize: 0.1, snapAnimationDuration: Duration(milliseconds: 100),
@@ -828,87 +1156,220 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                                   ),
                                 ),
                               ),
-                              SliverList.list(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(10.0),
-                                    child: Container(
-                                      // constraints: BoxConstraints(maxHeight: 150),
-                                      child: TextField(
-                                        maxLines: 8,
-                                        minLines: 2,
-                                        onTap: () {},
-                                        controller: _descriptionController,
-                                        decoration: const InputDecoration(
-                                          label: Text(
-                                            "Enter description of today split...",
-                                            style: TextStyle(color: Colors.white),
-                                          ),
-                                          labelStyle: TextStyle(
-                                            color: ColorsProvider.color_1,
-                                          ),
-                                          enabledBorder: OutlineInputBorder(
-                                            borderRadius: BorderRadius.all(
-                                              Radius.circular(12),
-                                            ),
-                                            borderSide: BorderSide(
-                                              color: ColorsProvider.color_2,
-                                              width: 0.5,
-                                            ),
-                                          ),
-                                          focusedBorder: OutlineInputBorder(
-                                            borderRadius: BorderRadius.all(
-                                              Radius.circular(12),
-                                            ),
-                                            borderSide: BorderSide(
-                                              color: ColorsProvider.color_2,
-                                              width: 2.0,
-                                            ),
-                                          ),
-                                          contentPadding: EdgeInsets.symmetric(
-                                            vertical: 10,
-                                            horizontal: 15,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(10.0),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          "old values".toUpperCase(),
-                                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 20),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
+                              // SliverList.list(
+                              //   children: [
+                              //     Padding(
+                              //       padding: const EdgeInsets.all(10.0),
+                              //       child: Container(
+                              //         // constraints: BoxConstraints(maxHeight: 150),
+                              //         child: TextField(
+                              //           maxLines: 8,
+                              //           minLines: 2,
+                              //           onTap: () {},
+                              //           controller: _descriptionController,
+                              //           decoration: const InputDecoration(
+                              //             label: Text(
+                              //               "Enter description of today split...",
+                              //               style: TextStyle(color: Colors.white),
+                              //             ),
+                              //             labelStyle: TextStyle(
+                              //               color: ColorsProvider.color_1,
+                              //             ),
+                              //             enabledBorder: OutlineInputBorder(
+                              //               borderRadius: BorderRadius.all(
+                              //                 Radius.circular(12),
+                              //               ),
+                              //               borderSide: BorderSide(
+                              //                 color: ColorsProvider.color_2,
+                              //                 width: 0.5,
+                              //               ),
+                              //             ),
+                              //             focusedBorder: OutlineInputBorder(
+                              //               borderRadius: BorderRadius.all(
+                              //                 Radius.circular(12),
+                              //               ),
+                              //               borderSide: BorderSide(
+                              //                 color: ColorsProvider.color_2,
+                              //                 width: 2.0,
+                              //               ),
+                              //             ),
+                              //             contentPadding: EdgeInsets.symmetric(
+                              //               vertical: 10,
+                              //               horizontal: 15,
+                              //             ),
+                              //           ),
+                              //         ),
+                              //       ),
+                              //     ),
+                              //     Padding(
+                              //       padding: const EdgeInsets.all(10.0),
+                              //       child: Row(
+                              //         mainAxisAlignment: MainAxisAlignment.center,
+                              //         children: [
+                              //           Text(
+                              //             "old values".toUpperCase(),
+                              //             style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 20),
+                              //           ),
+                              //         ],
+                              //       ),
+                              //     ),
+                              //   ],
+                              // ),
                               SliverList(
                                 delegate: SliverChildBuilderDelegate(
-                                  (BuildContext context, int index) {
-                                    return Column(
-                                      children: [
-                                        SizedBox(
-                                          height: 10,
+                                  childCount: oldDataFinal.length,
+                                  (BuildContext context, int splitStartedindex) {
+                                    String? rawDate = oldDataFinal[splitStartedindex].createdAt!.substring(0, 25 - 15);
+                                    DateTime dateTime = DateTime.parse(rawDate);
+                                    DateFormat formatter = DateFormat('dd.MM.yyyy');
+                                    String date = formatter.format(dateTime);
+                                    return Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Container(
+                                        height: 135,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(10),
+                                          color: ColorsProvider.color_2,
                                         ),
-                                        Padding(
-                                          padding: const EdgeInsets.fromLTRB(10, 0, 10, 5),
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              color: ColorsProvider.color_2,
-                                              borderRadius: BorderRadius.circular(16),
+                                        child: Column(
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                top: 5,
+                                              ),
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                children: [
+                                                  Text(
+                                                    "$date",
+                                                    style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20),
+                                                  )
+                                                ],
+                                              ),
                                             ),
-                                            height: 100,
-                                          ),
+                                            Expanded(
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(left: 5, right: 5, top: 5, bottom: 5),
+                                                child: Container(
+                                                  decoration: BoxDecoration(color: Color.fromARGB(135, 0, 0, 0), borderRadius: BorderRadius.circular(12)),
+                                                  child: Row(
+                                                    children: [
+                                                      Padding(
+                                                        padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
+                                                        child: Container(
+                                                          width: 60,
+                                                          child: Column(
+                                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                            children: [
+                                                              Text(
+                                                                "Set",
+                                                                style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
+                                                              ),
+                                                              Text(
+                                                                "Weight",
+                                                                style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
+                                                              ),
+                                                              Text(
+                                                                "Reps",
+                                                                style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
+                                                              ),
+                                                              SizedBox(
+                                                                height: 2,
+                                                              )
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Container(
+                                                        width: 1,
+                                                        color: Colors.black,
+                                                      ),
+                                                      Expanded(
+                                                        child: Padding(
+                                                          padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
+                                                          child: Container(
+                                                            child: ListView.builder(
+                                                              itemCount: oldDataFinal[splitStartedindex].exerciseData!.length,
+                                                              scrollDirection: Axis.horizontal,
+                                                              itemBuilder: (context, index) {
+                                                                var data = oldDataFinal[splitStartedindex].exerciseData![index];
+                                                                int reps;
+                                                                int weight;
+                                                                int difficulty;
+                                                                // if (DateTime.now().toString().replaceRange(10, null, '') == splits[selectedSplit].selectedMuscle![muscleIndex].muscles.exercises![exerciseIndex].exerciseData![index].time!.replaceRange(10, null, '')) {
+                                                                reps = data.reps;
+                                                                weight = data.weight;
+                                                                difficulty = data.difficulty;
+                                                                // } else {}
+                                                                return Padding(
+                                                                  padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
+                                                                  child: Container(
+                                                                    width: 30,
+                                                                    child: Column(
+                                                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                                      children: [
+                                                                        Text(
+                                                                          "${index + 1}",
+                                                                          style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
+                                                                        ),
+                                                                        Text(
+                                                                          "$weight",
+                                                                          style: TextStyle(
+                                                                            fontWeight: FontWeight.bold,
+                                                                            fontSize: 16,
+                                                                            color: difficulty == 0
+                                                                                ? Colors.white
+                                                                                : difficulty == 1
+                                                                                    ? Colors.green
+                                                                                    : difficulty == 2
+                                                                                        ? Colors.lightGreen
+                                                                                        : difficulty == 3
+                                                                                            ? Colors.yellow
+                                                                                            : difficulty == 4
+                                                                                                ? Colors.orange
+                                                                                                : Colors.red,
+                                                                          ),
+                                                                        ),
+                                                                        Text(
+                                                                          "$reps",
+                                                                          style: TextStyle(
+                                                                            fontWeight: FontWeight.bold,
+                                                                            fontSize: 16,
+                                                                            color: difficulty == 0
+                                                                                ? Colors.white
+                                                                                : difficulty == 1
+                                                                                    ? Colors.green
+                                                                                    : difficulty == 2
+                                                                                        ? Colors.lightGreen
+                                                                                        : difficulty == 3
+                                                                                            ? Colors.yellow
+                                                                                            : difficulty == 4
+                                                                                                ? Colors.orange
+                                                                                                : Colors.red,
+                                                                          ),
+                                                                        ),
+                                                                        SizedBox(
+                                                                          height: 2,
+                                                                        )
+                                                                      ],
+                                                                    ),
+                                                                  ),
+                                                                );
+                                                              },
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      )
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                      ],
+                                      ),
                                     );
                                   },
-                                  childCount: 20,
                                 ),
                               ),
                             ],
@@ -924,7 +1385,7 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                               GestureDetector(
                                 onTap: () {
                                   try {
-                                    print("object");
+                                    print("přidána položka");
                                     // weightController.add(TextEditingController(text: "0"));
                                     // repsController.add(TextEditingController(text: "0"));
                                     // difficultyController.add(0);
@@ -935,13 +1396,15 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                                         difficulty: 0,
                                         exercisesIdExercise: idExercise,
                                         operation: 1,
+                                        // idStartedCompleted:
                                       ),
                                     );
-                                    widget.notifyParent;
-                                    // updateExerciseData();
+
+                                    // widget.notifyParent;
+                                    updateExerciseData();
                                     setState(() {});
                                   } catch (e) {
-                                    print(e);
+                                    print("chyba při přidávání hodnot $e");
                                   }
                                 },
                                 child: Container(

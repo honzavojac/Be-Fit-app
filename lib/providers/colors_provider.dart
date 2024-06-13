@@ -10,7 +10,7 @@ class ColorsProvider extends ChangeNotifier {
   //transparent
   static const Color color_4 = Color(0x00000000);
   //červená pro delete button
-  static const Color color_5 = Color.fromARGB(111, 255, 21, 4);
+  static const Color color_5 = Color.fromARGB(164, 255, 17, 0);
   //white12
   static const Color color_6 = Color(0xB3FFFFFF);
   //black12

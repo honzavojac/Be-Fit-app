@@ -22,10 +22,10 @@ dependencies:
   sqlite3_flutter_libs: ^0.5.18
   marquee: ^2.2.3
   intl: ^0.19.0
-  cloud_firestore: ^4.15.5
-  firebase_core: ^2.25.4
-  firebase_auth: ^4.17.4
-  firebase_database: ^10.4.6
+  cloud_firestore: ^5.0.1
+  firebase_core: ^3.1.0
+  firebase_auth: ^5.1.0
+  firebase_database: ^11.0.1
   google_sign_in: ^6.2.1
   expandable_widgets: ^1.0.3+1
   expand_widget: ^3.1.1
@@ -37,6 +37,7 @@ dependencies:
   top_snackbar_flutter: ^3.1.0
   sliding_up_panel: ^2.0.0+1
   draggable_bottom_sheet: ^1.0.2
+  openfoodfacts: ^3.11.0
   
 
 dev_dependencies:

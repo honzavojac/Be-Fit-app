@@ -1,7 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:kaloricke_tabulky_02/main.dart';
-import 'package:path/path.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SupabaseProvider extends ChangeNotifier {
@@ -13,6 +13,9 @@ class SupabaseProvider extends ChangeNotifier {
   User? user;
   String name = '';
   List<Split> splits = List.empty();
+  List<Split> splitStartedCompleted = List.empty();
+  List<Split> fitnessData = List.empty();
+  List<Split> exerciseData = List.empty();
   String? splitText;
   //pro jednotlivé stránky pro správu stavu
   //split_page
@@ -56,6 +59,13 @@ class SupabaseProvider extends ChangeNotifier {
     exercisesCheckedList = await List.generate(splits[idSplit].selectedMuscle![idMuscle].muscles!.exercises!.length, (index) => false);
   }
 
+//exercise_page
+  int? idSplitStartedCompleted;
+  bool boolInsertSplitStartedCompleted = false;
+  /* toto pak změním ve fitness_record_page 
+  že když bude true tak budu muset ukončit widget tlačítkem ukončit a nebo smazat 
+  a smažu všechny hodnoty co jsem insertoval */
+
   initialize() async {
     db = await Supabase.initialize(url: url, anonKey: anonKey);
 
@@ -90,20 +100,31 @@ class SupabaseProvider extends ChangeNotifier {
     };
   }
 
+//**************************************************************************************************************************** */
+//**************************************************************************************************************************** */
+//**************************************************************************************************************************** */
+//**************************************************************************************************************************** */
+//**************************************************************************************************************************** */
   getFitness() async {
     final uid = supabase.auth.currentUser!.id;
-    final dateRange = getTodayDateRange();
+    // final dateRange = getTodayDateRange();
 
-    final response = await supabase
-        .from('users')
-        .select('''
+    final response = await supabase.from('users').select('''
     split (
       id_split,
       name_split,
+      split_started_completed (
+        id_started_completed,
+        split_id,
+        created_at,
+        ended_at, 
+        ended
+      ),
       selected_muscles (
         id_selected_muscle,
         muscles (
           name_of_muscle,
+          id_muscle,
           exercises (
             id_exercise,
             name_of_exercise
@@ -114,7 +135,54 @@ class SupabaseProvider extends ChangeNotifier {
           id_selected_exercise,
           exercises (
             id_exercise,
-            name_of_exercise,exercise_data (
+            name_of_exercise,
+            exercise_data (
+              
+            )
+          )
+        )
+      )
+    )
+  ''').eq('user_id', uid);
+
+    final List<dynamic> data = response[0]['split'];
+    splits = data.map((json) => Split.fromJson(json as Map<String, dynamic>)).toList();
+  }
+
+  getCurrentFitness(int? idStartedCompleted) async {
+    final uid = supabase.auth.currentUser!.id;
+    // final dateRange = getTodayDateRange();
+
+    final response = await supabase
+        .from('users')
+        .select('''
+    split (
+      id_split,
+      name_split,
+      split_started_completed (
+        id_started_completed,
+        split_id,
+        created_at,
+        ended_at, 
+        ended
+      ),
+      selected_muscles (
+        id_selected_muscle,
+        muscles (
+          name_of_muscle,
+          id_muscle,
+          exercises (
+            id_exercise,
+            name_of_exercise
+          )
+        ),
+        selected_exercise (
+          id_selected_muscle,
+          id_selected_exercise,
+          exercises (
+            id_exercise,
+            name_of_exercise,
+            exercise_data (
               id_ex_data,
               weight,
               reps,
@@ -128,44 +196,22 @@ class SupabaseProvider extends ChangeNotifier {
     )
   ''')
         .eq('user_id', uid)
-        .gte(
-          'split.selected_muscles.selected_exercise.exercises.exercise_data.time',
-          dateRange['start']!,
+        .eq(
+          'split.selected_muscles.selected_exercise.exercises.exercise_data.id_started_completed',
+          idStartedCompleted!,
         )
-        .lt(
-          'split.selected_muscles.selected_exercise.exercises.exercise_data.time',
-          dateRange['end']!,
-        )
-        .order('id_ex_data', referencedTable: 'split.selected_muscles.selected_exercise.exercises.exercise_data', ascending: true);
+        .order(
+          'id_ex_data',
+          ascending: true,
+          referencedTable: 'split.selected_muscles.selected_exercise.exercises.exercise_data',
+        );
 
     final List<dynamic> data = response[0]['split'];
-    splits = data.map((json) => Split.fromJson(json as Map<String, dynamic>)).toList();
+    exerciseData = data.map((json) => Split.fromJson(json as Map<String, dynamic>)).toList();
+  }
 
-    // for (var i = 0; i < split.length; i++) {
-    //   print(split[i].nameSplit);
-    //   for (var y = 0; y < split[y].nameSplit.length; y++) {
-    //     print('object');
-    //   }
-    // }
-
-    // for (var split in splits) {
-    //   print("Split name: ${split.nameSplit}");
-    //   for (var SelectedMuscle in split.selectedMuscle!) {
-    //     print("  Muscle name: ${SelectedMuscle.muscles!.nameOfMuscle}");
-    //     // if (SelectedMuscle.muscles[0].exercises != null) {
-    //     //   for (var exercise in SelectedMuscle.muscles[0].exercises!) {
-    //     //     print("   Exercise name: ${exercise.nameOfExercise}");
-
-    //     //     for (var exerciseData in exercise.exerciseData!) {
-    //     //       if (DateTime.now().toString().replaceRange(10, null, '') == exerciseData.time?.replaceRange(10, null, '')) {
-    //     //         print("    záznam: weight: ${exerciseData.weight} reps: ${exerciseData.reps} difficulty: ${exerciseData.difficulty} technique: ${exerciseData.technique} time: ${exerciseData.time?.replaceRange(10, null, '') ?? null}");
-    //     //       }
-    //     //     }
-    //     //   }
-    //     // }
-    //   }
-    // }
-    // notifyListeners();
+  notify() {
+    notifyListeners();
   }
 
   getAllMuscles() async {
@@ -186,6 +232,94 @@ class SupabaseProvider extends ChangeNotifier {
     muscles = data.map((json) => Muscle.fromJson(json as Map<String, dynamic>)).toList();
   }
 
+  Future<List<Split>> getOldExerciseData(int idExercise) async {
+    final uid = await supabase.auth.currentUser!.id;
+
+    final response = await supabase
+        .from('users')
+        .select('''
+                  split (
+                    id_split,
+                    name_split,
+                    split_started_completed (
+                      id_started_completed,
+                      split_id,
+                      created_at,
+                      ended_at, 
+                      ended,
+                      exercise_data (
+                        id_ex_data,
+                        exercises_id_exercise,
+                        weight,
+                        reps,
+                        difficulty,
+                        technique,
+                        time,
+                        id_started_completed
+                      )
+                    )
+                  )
+                ''')
+        .eq('user_id', uid)
+        .eq('split.split_started_completed.exercise_data.exercises_id_exercise', idExercise)
+        .eq('split.split_started_completed.ended', true)
+        .order(
+          'id_ex_data',
+          referencedTable: 'split.split_started_completed.exercise_data',
+          ascending: true,
+        )
+        .order(
+          'id_started_completed',
+          referencedTable: 'split.split_started_completed',
+          ascending: false,
+        );
+
+    final List<dynamic> data = response[0]['split'];
+
+    splitStartedCompleted = data.map((json) => Split.fromJson(json as Map<String, dynamic>)).toList();
+    return splitStartedCompleted;
+  }
+
+  Future<int?> insertSplitStartedCompleted(int splitId) async {
+    try {
+      // Vložení nového záznamu a získání id_started_completed
+      final response = await supabase
+          .from('split_started_completed')
+          .insert({
+            'created_at': DateTime.now().toIso8601String(),
+            'split_id': splitId,
+          })
+          .select('id_started_completed')
+          .single();
+
+      // Získání vložené hodnoty id_started_completed z odpovědi
+      int? idStartedCompleted = response['id_started_completed'];
+      print("id_started_completed: $idStartedCompleted");
+
+      // Vrácení vloženého id
+      return idStartedCompleted;
+    } catch (e) {
+      // Ošetření chyby
+      print("Error inserting split_started_completed: $e");
+      return null;
+    }
+  }
+
+  endSplitStartedCompleted(int idStartedCompleted) async {
+    final response = await supabase.from('split_started_completed').update({
+      'ended': true,
+      'ended_at': DateTime.now().toIso8601String(),
+    }).eq('id_started_completed', idStartedCompleted);
+    exerciseData.clear();
+    notifyListeners();
+  }
+
+//**************************************************************************************************************************** */
+//**************************************************************************************************************************** */
+//**************************************************************************************************************************** */
+//**************************************************************************************************************************** */
+//**************************************************************************************************************************** */
+
   int inserted = 0;
   insertSplit(String nameSplit, int idMuscle) async {
     var idRow;
@@ -198,6 +332,7 @@ class SupabaseProvider extends ChangeNotifier {
 
     int splitIdSplit = idRow.first['id_split'];
     await supabase.from('selected_muscles').insert({'split_id_split': splitIdSplit, 'muscles_id_muscle': idMuscle});
+    notifyListeners();
   }
 
   deleteSplit(int idSplit) async {
@@ -211,43 +346,16 @@ class SupabaseProvider extends ChangeNotifier {
 
   insertMuscle(String nameOfMuscle) async {
     await supabase.from('muscles').insert({'name_of_muscle': nameOfMuscle, 'id_user': user!.idUser});
+    notifyListeners();
   }
 
   updateName(String newName) async {
     await supabase.from('users').update({'name': '$newName'}).eq('user_id', uid);
   }
 
-  // data() async {
-  //   final dat = await supabase.from('split').select('''
-  //     name_split,
-  //     selected_muscles (
-  //       muscles (
-  //         name_of_muscle,
-  //         exercises (
-  //           name_of_exercise
-  //         )
-  //       )
-  //     )
-  // ''').eq('user_id', supabase.auth.currentUser!.id).order('id_user', ascending: true);
-
-  //   // final List<dynamic> jsonData = dat.data;
-  //   List<User> users = dat.map((e) => User.fromJson(e)).toList();
-  //   // print(users);
-  //   for (var user in users) {
-  //     print("${user.idUser} ${user.name}");
-  //     // for (var split in user.split) {
-  //     //   print("  ${split.nameSplit}");
-  //     //   for (var SelectedMuscle in split.selectedMuscle) {
-  //     //     print('    ${SelectedMuscle.muscles.nameOfMuscle}');
-  //     //     for (var exercise in SelectedMuscle.muscles.exercises) {
-  //     //       print("      ${exercise.nameOfExercise}");
-  //     //     }
-  //     //   }
-  //     // }
-  //   }
-  // }
   insertExercise(String nameOfExercise, int idMuscle) async {
     await supabase.from('exercises').insert({'name_of_exercise': nameOfExercise, 'muscles_id_muscle': idMuscle});
+    notifyListeners();
   }
 
   updateSelectedExercise(
@@ -283,14 +391,7 @@ class SupabaseProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> actionExerciseData(List<ExerciseData> exerciseData, int idExercise) async {
-    // Převod TextEditingController na seznam int hodnot
-    // for (var element in exerciseData) {
-    //   print(element.operation);
-    // }
-    // for (var element in exerciseData) {
-    //   print(element);
-    // }
+  Future<void> actionExerciseData(List<ExerciseData> exerciseData, int idExercise, int idStartedCompleted) async {
     for (var i = 0; i < exerciseData.length; i++) {
       var dataOfExercise = exerciseData[i];
 
@@ -309,6 +410,7 @@ class SupabaseProvider extends ChangeNotifier {
                   reps: dataOfExercise.reps,
                   difficulty: dataOfExercise.difficulty,
                   exercisesIdExercise: idExercise,
+                  idStartedCompleted: idStartedCompleted,
                 ).toJson());
             // insert(insert);
           } catch (e) {
@@ -317,9 +419,9 @@ class SupabaseProvider extends ChangeNotifier {
           break;
         case 2:
           print("update");
-
+          print("idstartedcompleted: $idStartedCompleted");
           try {
-            print("update: ${dataOfExercise.reps}");
+            // print("update: ${dataOfExercise.reps}");
             await supabase
                 .from('exercise_data')
                 .update(ExerciseData(
@@ -328,8 +430,13 @@ class SupabaseProvider extends ChangeNotifier {
                   difficulty: dataOfExercise.difficulty,
                   exercisesIdExercise: idExercise,
                   time: dataOfExercise.time,
+                  idStartedCompleted: idStartedCompleted,
                 ).toJson())
-                .match({'id_ex_data': dataOfExercise.idExData!});
+                .match(
+              {'id_ex_data': dataOfExercise.idExData!},
+            ).match(
+              {'id_started_completed': idStartedCompleted},
+            );
           } catch (e) {
             print("update se nezdařil: $e");
           }
@@ -353,9 +460,9 @@ class SupabaseProvider extends ChangeNotifier {
       }
     }
 
-    // efresh data
-    print("ble");
+    // refresh data
     await getFitness();
+    await getCurrentFitness(idStartedCompleted);
     notifyListeners();
   }
 }
@@ -373,18 +480,9 @@ class ExerciseData {
   int? exercisesIdExercise;
   int? operation;
   int id;
+  int? idStartedCompleted;
 
-  ExerciseData({
-    this.idExData,
-    required this.weight,
-    required this.reps,
-    required this.difficulty,
-    this.technique,
-    this.comment,
-    this.time,
-    this.exercisesIdExercise,
-    this.operation,
-  }) : id = _incrementCounter(); // Assign the incremented ID
+  ExerciseData({this.idExData, required this.weight, required this.reps, required this.difficulty, this.technique, this.comment, this.time, this.exercisesIdExercise, this.operation, this.idStartedCompleted}) : id = _incrementCounter(); // Assign the incremented ID
 
   // Factory constructor to create an instance from a JSON object
   factory ExerciseData.fromJson(Map<String, dynamic> json) {
@@ -397,6 +495,7 @@ class ExerciseData {
       comment: json['comment'],
       time: json['time'],
       exercisesIdExercise: json['exercises_id_exercise'],
+      idStartedCompleted: json['id_started_completed'],
     );
   }
 
@@ -410,6 +509,7 @@ class ExerciseData {
       'comment': comment,
       // 'time': time,
       'exercises_id_exercise': exercisesIdExercise,
+      'id_started_completed': idStartedCompleted
     };
     if (idExData != null) {
       data['id_ex_data'] = idExData;
@@ -548,25 +648,73 @@ class SelectedExercise {
   }
 }
 
+class SplitStartedCompleted {
+  int? idStartedCompleted;
+  int? splitId;
+  String? createdAt;
+  String? endedAt;
+  bool ended;
+  List<ExerciseData>? exerciseData;
+
+  SplitStartedCompleted({
+    this.idStartedCompleted,
+    this.splitId,
+    this.createdAt,
+    this.endedAt,
+    this.exerciseData,
+    required this.ended,
+  });
+
+  factory SplitStartedCompleted.fromJson(Map<String, dynamic> json) {
+    var exerciseDataFromJson = json['exercise_data'] as List?;
+    List<ExerciseData>? exerciseDataList = exerciseDataFromJson?.map((e) => ExerciseData.fromJson(e)).toList();
+
+    return SplitStartedCompleted(
+      idStartedCompleted: json['id_started_completed'],
+      splitId: json['split_id'],
+      createdAt: json['created_at'],
+      endedAt: json['ended_at'],
+      ended: json['ended'],
+      exerciseData: exerciseDataList,
+    );
+  }
+  Map<String, dynamic> toJson() {
+    return {
+      'id_started_completed': idStartedCompleted,
+      'split_id': splitId,
+      'created_ad': createdAt,
+      'ended_at': endedAt,
+      'ended': ended,
+      'exercise_data': exerciseData,
+    };
+  }
+}
+
 class Split {
   int? idSplit;
   String nameSplit;
   List<SelectedMuscle>? selectedMuscle;
+  List<SplitStartedCompleted>? splitStartedCompleted;
 
   Split({
     this.idSplit,
     required this.nameSplit,
     this.selectedMuscle,
+    this.splitStartedCompleted,
   });
 
   factory Split.fromJson(Map<String, dynamic> json) {
-    var selectedMuscleFromJson = json['selected_muscles'] as List<dynamic>;
+    var selectedMuscleFromJson = json['selected_muscles'] as List<dynamic>? ?? [];
     List<SelectedMuscle> selectedMusclesList = selectedMuscleFromJson.map((e) => SelectedMuscle.fromJson(e)).toList();
+
+    var splitStartedCompletedFromJson = json['split_started_completed'] as List<dynamic>? ?? []; //pokud jsou data null tak se nastaví prázdný seznam
+    List<SplitStartedCompleted> splitStartedCompletedList = splitStartedCompletedFromJson.map((e) => SplitStartedCompleted.fromJson(e)).toList();
 
     return Split(
       idSplit: json['id_split'],
       nameSplit: json['name_split'],
       selectedMuscle: selectedMusclesList,
+      splitStartedCompleted: splitStartedCompletedList,
     );
   }
 
