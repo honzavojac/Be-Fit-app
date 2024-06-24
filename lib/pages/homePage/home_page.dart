@@ -22,19 +22,7 @@ class HomeAppBar extends StatelessWidget {
     return AppBar(
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          const Text('Home page'),
-          IconButton(
-            onPressed: () {
-              dbSupabase.getUser();
-              Navigator.pushNamed(context, '/settings'); // Použijte pushNamed pro navigaci
-            },
-            icon: Icon(
-              Icons.settings,
-              color: ColorsProvider.color_1,
-            ),
-          ),
-        ],
+        children: [],
       ),
     );
   }

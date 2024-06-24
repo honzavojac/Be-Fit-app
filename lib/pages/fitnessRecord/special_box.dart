@@ -52,7 +52,7 @@ class _SpecialBoxState extends State<SpecialBox> {
                       ),
                       Container(
                         height: 50,
-                        // color: Colors.blue,
+                        // color: ColorsProvider.color_8,
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 15),
                           child: TextField(
@@ -93,7 +93,7 @@ class _SpecialBoxState extends State<SpecialBox> {
                       ),
                       Container(
                         // height: 50,
-                        // color: Colors.blue,
+                        // color: ColorsProvider.color_8,
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 15),
                           child: TextField(

@@ -40,7 +40,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                   height: 60,
                 ),
                 Container(
-                  // color: Colors.blue,
+                  // color: ColorsProvider.color_8,
                   child: Text(
                     "Resset your password",
                     style: TextStyle(
@@ -53,7 +53,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                   height: 30,
                 ),
                 Container(
-                  // color: Colors.blue,
+                  // color: ColorsProvider.color_8,
                   child: Text(
                     "Enter Yourt Email and we will send you a password reset link",
                     textAlign: TextAlign.center,
@@ -71,7 +71,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.grey[800],
-                      border: Border.all(color: Colors.black, width: 4),
+                      border: Border.all(color: ColorsProvider.color_8, width: 4),
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: Padding(
@@ -99,15 +99,15 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                     child: Container(
                       height: 55,
                       decoration: BoxDecoration(
-                        border: Border.all(color: Colors.black, width: 3),
-                        color: Colors.red,
+                        border: Border.all(color: ColorsProvider.color_8, width: 3),
+                        color: ColorsProvider.color_9,
                         borderRadius: BorderRadius.circular(15),
                       ),
                       child: Center(
                         child: Text(
                           "Reset password",
                           style: TextStyle(
-                            color: Colors.black,
+                            color: ColorsProvider.color_8,
                             fontSize: 25,
                             fontWeight: FontWeight.bold,
                           ),

@@ -159,7 +159,7 @@
 //           height: 55,
 //           decoration: BoxDecoration(
 //             border: Border.all(color: Colors.black, width: 3),
-//             color: Colors.red,
+//             color: ColorsProvider.color_9,
 //             borderRadius: BorderRadius.circular(15),
 //           ),
 //           child: const Center(
@@ -187,7 +187,7 @@
 //           child: const Text(
 //             "Register now",
 //             style: TextStyle(
-//               color: Colors.blue,
+//               color: ColorsProvider.color_8,
 //               fontWeight: FontWeight.bold,
 //               fontSize: 14.5,
 //             ),
@@ -237,6 +237,6 @@
 //                         },
 //                         child: Text(
 //                           "Reset password?",
-//                           style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
+//                           style: TextStyle(color: ColorsProvider.color_8, fontWeight: FontWeight.bold),
 //                         ),
 //                       ),

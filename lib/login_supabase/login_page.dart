@@ -104,7 +104,7 @@ class _LoginPageState extends State<LoginPage> {
                   "Login",
                   style: TextStyle(
                     fontSize: 40,
-                    color: Colors.black,
+                    color: ColorsProvider.color_8,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -132,7 +132,7 @@ class _LoginPageState extends State<LoginPage> {
       child: Container(
         decoration: BoxDecoration(
           color: Colors.grey[800],
-          border: Border.all(color: Colors.black, width: 4),
+          border: Border.all(color: ColorsProvider.color_8, width: 4),
           borderRadius: BorderRadius.circular(15),
         ),
         child: Padding(
@@ -166,15 +166,15 @@ class _LoginPageState extends State<LoginPage> {
         child: Container(
           height: 55,
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.black, width: 3),
-            color: Colors.red,
+            border: Border.all(color: ColorsProvider.color_8, width: 3),
+            color: ColorsProvider.color_9,
             borderRadius: BorderRadius.circular(15),
           ),
           child: const Center(
             child: Text(
               "Sign in",
               style: TextStyle(
-                color: Colors.black,
+                color: ColorsProvider.color_8,
                 fontSize: 25,
                 fontWeight: FontWeight.bold,
               ),
@@ -194,7 +194,7 @@ class _LoginPageState extends State<LoginPage> {
           const Text(
             "Not a member? ",
             style: TextStyle(
-              color: Colors.black,
+              color: ColorsProvider.color_8,
             ),
           ),
           if (widget.showRegisterPage != null) // Tady provádíme ověření, zda je showRegisterPage dostupné
@@ -206,7 +206,7 @@ class _LoginPageState extends State<LoginPage> {
               child: const Text(
                 "Register now",
                 style: TextStyle(
-                  color: Colors.blue,
+                  color: ColorsProvider.color_8,
                   fontWeight: FontWeight.bold,
                   fontSize: 14.5,
                 ),
@@ -227,7 +227,7 @@ class _LoginPageState extends State<LoginPage> {
           const Text(
             "or sign in with",
             style: TextStyle(
-              color: Colors.black,
+              color: ColorsProvider.color_8,
             ),
           ),
           const SizedBox(height: 10),
@@ -237,7 +237,7 @@ class _LoginPageState extends State<LoginPage> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.black, width: 2),
+                border: Border.all(color: ColorsProvider.color_8, width: 2),
               ),
               child: const Padding(
                 padding: EdgeInsets.all(2.0),

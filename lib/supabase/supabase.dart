@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:kaloricke_tabulky_02/main.dart';
+import 'package:openfoodfacts/openfoodfacts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SupabaseProvider extends ChangeNotifier {
@@ -10,7 +11,7 @@ class SupabaseProvider extends ChangeNotifier {
   var db;
   var dbS;
   var uid;
-  User? user;
+  UserSupabase? user;
   String name = '';
   List<Split> splits = List.empty();
   List<Split> splitStartedCompleted = List.empty();
@@ -61,7 +62,7 @@ class SupabaseProvider extends ChangeNotifier {
 
 //exercise_page
   int? idSplitStartedCompleted;
-  bool boolInsertSplitStartedCompleted = false;
+  bool boolInsertSplitStartedCompleted = true;
   /* toto pak změním ve fitness_record_page 
   že když bude true tak budu muset ukončit widget tlačítkem ukončit a nebo smazat 
   a smažu všechny hodnoty co jsem insertoval */
@@ -75,12 +76,12 @@ class SupabaseProvider extends ChangeNotifier {
     } catch (e) {}
   }
 
-  Future<User?> getUser() async {
+  Future<UserSupabase?> getUser() async {
     final uid = supabase.auth.currentUser!.id;
 
     final response = await supabase.from('users').select('id_user, name, email').eq('user_id', uid);
     // print(response);
-    User localUser = User.fromJson(response.first);
+    UserSupabase localUser = UserSupabase.fromJson(response.first);
     user = localUser;
     name = localUser.name;
     // print(localUser.name);
@@ -341,6 +342,7 @@ class SupabaseProvider extends ChangeNotifier {
     await supabase.from('selected_muscles').delete().match({'split_id_split': idSplit});
     //odstranění hodnoty z tabulky split
     await supabase.from('split').delete().match({'id_split': idSplit});
+
     notifyListeners();
   }
 
@@ -355,6 +357,7 @@ class SupabaseProvider extends ChangeNotifier {
 
   insertExercise(String nameOfExercise, int idMuscle) async {
     await supabase.from('exercises').insert({'name_of_exercise': nameOfExercise, 'muscles_id_muscle': idMuscle});
+
     notifyListeners();
   }
 
@@ -389,6 +392,7 @@ class SupabaseProvider extends ChangeNotifier {
 
       // idSelectedExercise = splits[splitIndex].selectedMuscle![muscleIndex].selectedExercises![exerciseIndex].idSelectedExercise!;
     }
+    notifyListeners();
   }
 
   Future<void> actionExerciseData(List<ExerciseData> exerciseData, int idExercise, int idStartedCompleted) async {
@@ -464,6 +468,50 @@ class SupabaseProvider extends ChangeNotifier {
     await getFitness();
     await getCurrentFitness(idStartedCompleted);
     notifyListeners();
+  }
+
+  ///
+  ///
+  ///
+  ///
+  ///
+  ///
+  ///
+  ///
+  ///
+  ///
+  ///
+  ///
+  ///
+  ///
+  ///
+  ///
+  ///
+  ///
+  ///
+  ///
+  ///
+  ///
+  ///
+  ///
+  ///
+  ///
+  ///
+  ///
+  ///
+  ///
+
+//food část
+  void initFoodApi() async {
+    OpenFoodAPIConfiguration.userAgent = UserAgent(name: 'Be fit');
+
+    OpenFoodAPIConfiguration.globalLanguages = <OpenFoodFactsLanguage>[OpenFoodFactsLanguage.CZECH];
+
+    OpenFoodAPIConfiguration.globalCountry = OpenFoodFactsCountry.CZECHIA;
+  }
+
+  getProduct() async {
+    // print(result.products?[0].productName);
   }
 }
 
@@ -727,14 +775,14 @@ class Split {
   }
 }
 
-class User {
+class UserSupabase {
   int idUser;
   String name;
   String email;
   List<Muscle>? muscles;
   List<Split>? split;
 
-  User({
+  UserSupabase({
     required this.idUser,
     required this.name,
     required this.email,
@@ -742,14 +790,14 @@ class User {
     this.split,
   });
 
-  factory User.fromJson(Map<String, dynamic> json) {
+  factory UserSupabase.fromJson(Map<String, dynamic> json) {
     var musclesFromJson = json['muscles'] as List<dynamic>?; // Add null check
     List<Muscle>? musclesList = musclesFromJson?.map((e) => Muscle.fromJson(e)).toList();
 
     var splitsFromJson = json['split'] as List<dynamic>?; // Add null check
     List<Split>? splitList = splitsFromJson?.map((e) => Split.fromJson(e)).toList();
 
-    return User(
+    return UserSupabase(
       idUser: json['id_user'],
       name: json['name'],
       email: json['email'],

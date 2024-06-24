@@ -10,7 +10,7 @@
                                       child: Center(
                                         child: Text(
                                           "Set",
-                                          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                          style: TextStyle(fontWeight: FontWeight.bold, color: ColorsProvider.color_8),
                                         ),
                                       ),
                                     ),
@@ -19,7 +19,7 @@
                                       child: Center(
                                         child: Text(
                                           "Weight",
-                                          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                          style: TextStyle(fontWeight: FontWeight.bold, color: ColorsProvider.color_8),
                                         ),
                                       ),
                                     ),
@@ -28,7 +28,7 @@
                                       child: Center(
                                         child: Text(
                                           "Reps",
-                                          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                          style: TextStyle(fontWeight: FontWeight.bold, color: ColorsProvider.color_8),
                                         ),
                                       ),
                                     ),
@@ -37,7 +37,7 @@
                                       child: Center(
                                         child: Text(
                                           "difficulty",
-                                          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                          style: TextStyle(fontWeight: FontWeight.bold, color: ColorsProvider.color_8),
                                         ),
                                       ),
                                     ),
@@ -46,7 +46,7 @@
                                       child: Center(
                                         child: Text(
                                           "Special",
-                                          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                          style: TextStyle(fontWeight: FontWeight.bold, color: ColorsProvider.color_8),
                                         ),
                                       ),
                                     ),
@@ -99,7 +99,7 @@
                                                       children: [
                                                         Text(
                                                           "${setNumber}",
-                                                          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                                                          style: TextStyle(color: ColorsProvider.color_8, fontWeight: FontWeight.bold),
                                                         ),
                                                       ],
                                                     ),
@@ -155,9 +155,9 @@
                                                             ),
                                                           ),
                                                           textAlign: TextAlign.center,
-                                                          cursorColor: Colors.black,
+                                                          cursorColor: ColorsProvider.color_8,
                                                           style: TextStyle(
-                                                            color: Colors.black,
+                                                            color: ColorsProvider.color_8,
                                                             fontWeight: FontWeight.bold,
                                                             fontSize: 18,
                                                           ),
@@ -216,9 +216,9 @@
                                                             ),
                                                           ),
                                                           textAlign: TextAlign.center,
-                                                          cursorColor: Colors.black,
+                                                          cursorColor: ColorsProvider.color_8,
                                                           style: TextStyle(
-                                                            color: Colors.black,
+                                                            color: ColorsProvider.color_8,
                                                             fontWeight: FontWeight.bold,
                                                             fontSize: 18,
                                                           ),
@@ -232,7 +232,7 @@
                                                       child: DropdownButton2<int>(
                                                         alignment: Alignment.center,
                                                         style: TextStyle(
-                                                          // color: Colors.black,
+                                                          // color: ColorsProvider.color_8,
                                                           fontWeight: FontWeight.bold,
                                                           fontSize: 5,
                                                         ),
@@ -289,7 +289,7 @@
                                                                               ? Colors.yellow
                                                                               : difficulty == 4
                                                                                   ? Colors.orange
-                                                                                  : Colors.red,
+                                                                                  : ColorsProvider.color_9,
                                                                 ),
                                                                 overflow: TextOverflow.ellipsis,
                                                               ),
@@ -303,7 +303,7 @@
                                                     width: 50,
                                                     child: Text(
                                                       "Normal",
-                                                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                                      style: TextStyle(fontWeight: FontWeight.bold, color: ColorsProvider.color_8),
                                                     ),
                                                   ),
                                                 ],

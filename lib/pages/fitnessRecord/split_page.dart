@@ -7,8 +7,8 @@ import 'package:provider/provider.dart';
 import '../../providers/colors_provider.dart';
 
 class SplitPage extends StatefulWidget {
-  final Function() notifyParent;
-  const SplitPage({Key? key, required this.notifyParent}) : super(key: key);
+  final Function()? notifyParent;
+  const SplitPage({Key? key, this.notifyParent}) : super(key: key);
 
   @override
   State<SplitPage> createState() => _SplitPageState();
@@ -74,10 +74,11 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
             leading: IconButton(
               onPressed: () {
                 widget.notifyParent;
+                Navigator.of(context).pop(true);
               },
               icon: Icon(
                 Icons.arrow_back,
-                color: Colors.amber,
+                color: ColorsProvider.color_2,
               ),
             ),
             title: Row(
@@ -89,7 +90,11 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                 ),
                 Container(
                   child: IconButton(
-                    icon: Icon(Icons.add_circle_outline_outlined, color: ColorsProvider.color_2, size: 35),
+                    icon: Icon(
+                      Icons.add_circle_outline_outlined,
+                      color: ColorsProvider.color_2,
+                      size: 35,
+                    ),
                     onPressed: () {
                       dbSupabase.generateFalseMuscleCheckbox();
                       dbSupabase.getAllMuscles();
@@ -124,7 +129,7 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
             leading: IconButton(
               onPressed: () {
                 widget.notifyParent;
-                Navigator.pop(context);
+                Navigator.of(context).pop(true);
               },
               icon: Icon(
                 Icons.arrow_back,
@@ -166,7 +171,7 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
             children: [
               Container(
                 width: double.infinity,
-                // color: Colors.blue,
+                // color: ColorsProvider.color_8,
                 child: DefaultTabController(
                   length: splits.length,
                   initialIndex: clickedSplitTab,
@@ -362,66 +367,69 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                   // width: 50,
                   height: 45,
 
-                  child: TextButton(
-                    style: TextButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(17),
-                      ),
-                      foregroundColor: ColorsProvider.color_6,
-                      backgroundColor: ColorsProvider.color_5,
-                    ),
-                    onPressed: () async {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          duration: Duration(seconds: 5),
-                          backgroundColor: ColorsProvider.color_2,
-                          content: Container(
-                            height: 50,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Column(
-                                  children: [
-                                    Text(
-                                      'Do you want delete this split?',
-                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
-                                    ),
-                                    Text('Data of exercises will stay save in app')
-                                  ],
-                                ),
-                                ElevatedButton(
-                                  style: ButtonStyle(
-                                    backgroundColor: MaterialStatePropertyAll(Colors.black),
-                                    foregroundColor: MaterialStatePropertyAll(
-                                      ColorsProvider.color_1,
-                                    ),
-                                  ),
-                                  onPressed: () async {
-                                    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                                    int idSplit = splits[clickedSplitTab].idSplit!.toInt();
-                                    await dbSupabase.deleteSplit(idSplit);
-                                    await dbSupabase.getFitness();
-                                    dbSupabase.clickedSplitTab = 0;
-                                    a = 0;
-                                    setState(() {});
-                                  },
-                                  child: Text("yes"),
-                                ),
-                              ],
+                  child: dbSupabase.boolInsertSplitStartedCompleted == true
+                      ? TextButton(
+                          style: TextButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(17),
                             ),
+                            foregroundColor: ColorsProvider.color_6,
+                            backgroundColor: ColorsProvider.color_5,
                           ),
-                        ),
-                      );
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text("Delete current split"),
-                        SizedBox(width: 20),
-                        Icon(Icons.delete),
-                      ],
-                    ),
-                  ),
+                          onPressed: () async {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                duration: Duration(seconds: 5),
+                                backgroundColor: ColorsProvider.color_2,
+                                content: Container(
+                                  height: 50,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Column(
+                                        children: [
+                                          Text(
+                                            'Do you want delete this split?',
+                                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
+                                          ),
+                                          Text('Data of exercises will stay save in app')
+                                        ],
+                                      ),
+                                      ElevatedButton(
+                                        style: ButtonStyle(
+                                          backgroundColor: MaterialStatePropertyAll(ColorsProvider.color_8),
+                                          foregroundColor: MaterialStatePropertyAll(
+                                            ColorsProvider.color_1,
+                                          ),
+                                        ),
+                                        onPressed: () async {
+                                          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                                          int idSplit = splits[clickedSplitTab].idSplit!.toInt();
+                                          await dbSupabase.deleteSplit(idSplit);
+                                          await dbSupabase.getFitness();
+                                          dbSupabase.clickedSplitTab = 0;
+                                          a = 0;
+                                          widget.notifyParent;
+                                          setState(() {});
+                                        },
+                                        child: Text("yes"),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text("Delete current split"),
+                              SizedBox(width: 20),
+                              Icon(Icons.delete),
+                            ],
+                          ),
+                        )
+                      : Text("You can't delete this split right now"),
                 ),
               ),
             ],

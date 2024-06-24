@@ -63,7 +63,7 @@ class _foodDiaryBoxesState extends State<foodDiaryBoxes> {
                               ),
                               ElevatedButton(
                                 style: ButtonStyle(
-                                  backgroundColor: MaterialStatePropertyAll(Colors.black),
+                                  backgroundColor: MaterialStatePropertyAll(ColorsProvider.color_8),
                                   foregroundColor: MaterialStatePropertyAll(
                                     ColorsProvider.color_1,
                                   ),
@@ -126,7 +126,7 @@ class _foodDiaryBoxesState extends State<foodDiaryBoxes> {
                       Padding(
                         padding: const EdgeInsets.fromLTRB(10, 1, 10, 5),
                         child: Container(
-                          // color: Colors.black,
+                          // color: ColorsProvider.color_8,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [

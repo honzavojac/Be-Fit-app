@@ -25,6 +25,7 @@ void main() async {
   SupabaseProvider dbSupabase = SupabaseProvider();
   await dbSupabase.initialize();
   dbSupabase.getUser();
+  dbSupabase.initFoodApi();
 
   DBHelper dbHelper = DBHelper();
   await dbHelper.initializeDB();

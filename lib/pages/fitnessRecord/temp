@@ -124,7 +124,7 @@ class _SplitPageState extends State<SplitPage> {
                   width: 5,
                 ),
                 IconButton(
-                  color: Colors.black,
+                  color: ColorsProvider.color_8,
                   style: ButtonStyle(
                       backgroundColor:
                           MaterialStatePropertyAll(Colors.amber[800])),
@@ -184,7 +184,7 @@ class _SplitPageState extends State<SplitPage> {
                                           "${records[index].nazevSvalu}",
                                           style: TextStyle(
                                               fontSize: 20,
-                                              color: Colors.black,
+                                              color: ColorsProvider.color_8,
                                               fontWeight: FontWeight.bold),
                                         ),
                                       ),
@@ -194,7 +194,7 @@ class _SplitPageState extends State<SplitPage> {
                                           25, 0, 25, 5),
                                       child: Flexible(
                                         child: Container(
-                                          color: Colors.red,
+                                          color: ColorsProvider.color_9,
                                           height: 200,
                                           child: Column(
                                             // mainAxisAlignment:

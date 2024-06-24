@@ -224,7 +224,7 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                                 ),
                                 Container(
                                   width: 50,
-                                  // color: Colors.red,
+                                  // color: ColorsProvider.color_9,
                                   child: IconButton(
                                     onPressed: () {},
                                     icon: Icon(Icons.edit, color: ColorsProvider.color_8),
@@ -248,7 +248,7 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
               //crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Container(
-                  //color: Colors.blue,
+                  //color: ColorsProvider.color_8,
                   height: 40,
                   width: 150,
                   child: ElevatedButton.icon(

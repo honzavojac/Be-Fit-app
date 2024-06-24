@@ -17,9 +17,9 @@ class InitPage extends StatefulWidget {
 }
 
 final List<Widget> _appBars = [
-  // FitnessRecordAppBar(),
-  // HomeAppBar(),
-  // FoodRecordAppBar(),
+  FitnessRecordAppBar(),
+  HomeAppBar(),
+  FoodRecordAppBar(),
 ];
 
 final List<Widget> _pages = [
@@ -52,63 +52,72 @@ class _InitPageState extends State<InitPage> {
       ],
       child: Scaffold(
         drawer: Drawer(
-          width: MediaQuery.of(context).size.width / 2,
-          // Add a ListView to the drawer. This ensures the user can scroll
-          // through the options in the drawer if there isn't enough vertical
-          // space to fit everything.
-          child: ListView(
-            // Important: Remove any padding from the ListView.
-            padding: EdgeInsets.zero,
+          backgroundColor: ColorsProvider.color_2,
+          width: MediaQuery.of(context).size.width / 1.50,
+          child: Column(
             children: [
               Container(
-                height: 60,
+                height: 50,
               ),
-              GestureDetector(
-                onTap: () {
-                  dbSupabase.getUser();
-                  Navigator.pushNamed(context, '/settings'); // Použijte pushNamed pro navigaci
-                },
-                child: Container(
-                  height: 50,
-                  color: ColorsProvider.color_2,
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 15),
-                    child: Row(
-                      children: [
-                        const Text(
-                          'Settings',
-                          style: TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.bold),
+              Container(
+                height: 50,
+                child: Row(
+                  // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 15),
+                      child: Container(
+                        height: 45,
+                        width: 45,
+                        decoration: BoxDecoration(
+                          color: ColorsProvider.color_3,
+                          borderRadius: BorderRadius.circular(50),
                         ),
-                        // Icon(
-                        //   Icons.settings,
-                        //   color: ColorsProvider.color_1,
-                        //   size: ,
-                        // ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 8,
+                    ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "${dbSupabase.name}",
+                          style: TextStyle(
+                            color: ColorsProvider.color_8,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                          ),
+                        ),
                       ],
                     ),
-                  ),
+                    SizedBox(
+                      width: 50,
+                    ),
+                  ],
                 ),
+              ),
+              _categoryWidget('Food'),
+              _buttonWidget(dbSupabase, context, '/scanFood', 'Scan food', Icons.fit_screen_rounded),
+              _buttonWidget(dbSupabase, context, '/addFood', 'Add food', Icons.search_rounded),
+              _buttonWidget(dbSupabase, context, '/newFood', 'New food', Icons.add_circle_outline_outlined),
+              _buttonWidget(dbSupabase, context, '/foodStatistic', 'Statistic', Icons.bar_chart_rounded),
+              _categoryWidget('Workout'),
+              _buttonWidget(dbSupabase, context, '/fitnessNames', 'Manage fitness names', Icons.text_fields_rounded),
+              _buttonWidget(dbSupabase, context, '/editDeleteExerciseData', 'Edit/Delete exercise data', Icons.edit_rounded),
+              _buttonWidget(dbSupabase, context, '/fitnessStatistic', 'Statistic', Icons.insights_rounded),
+              Spacer(),
+              _buttonWidget(dbSupabase, context, '/settings', 'Settings', Icons.settings_outlined, paddingLeft: 0),
+              SizedBox(
+                height: 10,
               ),
             ],
           ),
         ),
-        appBar: AppBar(
-            // leading: Builder(
-            //   builder: (context) {
-            //     return Row(
-            //       mainAxisAlignment: MainAxisAlignment.end,
-            //       children: [
-            //         IconButton(
-            //           icon: const Icon(Icons.menu),
-            //           onPressed: () {
-            //             Scaffold.of(context).openDrawer();
-            //           },
-            //         ),
-            //       ],
-            //     );
-            //   },
-            // ),
-            ),
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(50),
+          child: _appBars[pageProvider],
+        ),
         body: PageView(
           controller: controller,
           onPageChanged: (index) {
@@ -135,7 +144,7 @@ class _InitPageState extends State<InitPage> {
             NavigationDestination(
               selectedIcon: Icon(
                 Icons.fitness_center_rounded,
-                color: Colors.black,
+                color: ColorsProvider.color_8,
               ),
               icon: Icon(
                 Icons.fitness_center_rounded,
@@ -145,7 +154,7 @@ class _InitPageState extends State<InitPage> {
             NavigationDestination(
               selectedIcon: Icon(
                 Icons.home,
-                color: Colors.black,
+                color: ColorsProvider.color_8,
               ),
               icon: Icon(
                 Icons.home_outlined,
@@ -155,7 +164,7 @@ class _InitPageState extends State<InitPage> {
             NavigationDestination(
               selectedIcon: Icon(
                 Icons.fastfood_rounded,
-                color: Colors.black,
+                color: ColorsProvider.color_8,
               ),
               icon: Icon(
                 Icons.fastfood,
@@ -167,4 +176,63 @@ class _InitPageState extends State<InitPage> {
       ),
     );
   }
+}
+
+Widget _categoryWidget(String category) {
+  return Padding(
+    padding: const EdgeInsets.only(top: 15),
+    child: Container(
+      height: 35,
+      color: Color.fromARGB(50, 0, 0, 0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            "$category",
+            style: TextStyle(
+              color: ColorsProvider.color_8,
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+Widget _buttonWidget(SupabaseProvider dbSupabase, BuildContext context, String page, String name, IconData icon, {double paddingLeft = 20}) {
+  return GestureDetector(
+    onTap: () {
+      dbSupabase.getUser();
+      Navigator.pushNamed(context, page);
+    },
+    child: Container(
+      height: 55,
+      color: ColorsProvider.color_2,
+      child: Padding(
+        padding: EdgeInsets.only(left: paddingLeft),
+        child: Row(
+          mainAxisAlignment: page == '/settings' ? MainAxisAlignment.center : MainAxisAlignment.start,
+          children: [
+            Icon(
+              icon,
+              color: ColorsProvider.color_8,
+            ),
+            SizedBox(
+              width: 5,
+            ),
+            Text(
+              '$name',
+              style: TextStyle(
+                fontSize: 18,
+                color: ColorsProvider.color_8,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
 }

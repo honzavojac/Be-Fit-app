@@ -31,10 +31,10 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   bool passwordConfirmed() {
-    _nameController.text = "test";
-    _emailController.text = "test@gmail.com";
-    _passwordController.text = "123456";
-    _confirmpasswordController.text = "123456";
+    // _nameController.text = "test";
+    // _emailController.text = "test@gmail.com";
+    // _passwordController.text = "123456";
+    // _confirmpasswordController.text = "123456";
     if (_passwordController.text.trim() == _confirmpasswordController.text.trim()) {
       return true;
     } else {
@@ -96,10 +96,11 @@ class _RegisterPageState extends State<RegisterPage> {
                   height: 60,
                 ),
                 Container(
-                  // color: Colors.blue,
+                  // color: ColorsProvider.color_8,
                   child: Text(
                     "Sign Up",
                     style: TextStyle(
+                      color: ColorsProvider.color_8,
                       fontSize: 40,
                       fontWeight: FontWeight.bold,
                     ),
@@ -113,7 +114,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.grey[800],
-                      border: Border.all(color: Colors.black, width: 4),
+                      border: Border.all(color: ColorsProvider.color_8, width: 4),
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: Padding(
@@ -139,7 +140,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.grey[800],
-                      border: Border.all(color: Colors.black, width: 4),
+                      border: Border.all(color: ColorsProvider.color_8, width: 4),
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: Padding(
@@ -165,7 +166,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.grey[800],
-                      border: Border.all(color: Colors.black, width: 4),
+                      border: Border.all(color: ColorsProvider.color_8, width: 4),
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: Padding(
@@ -192,7 +193,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.grey[800],
-                      border: Border.all(color: Colors.black, width: 4),
+                      border: Border.all(color: ColorsProvider.color_8, width: 4),
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: Padding(
@@ -221,14 +222,14 @@ class _RegisterPageState extends State<RegisterPage> {
                     child: Container(
                       height: 55,
                       decoration: BoxDecoration(
-                        border: Border.all(color: Colors.black, width: 3),
-                        color: Colors.red,
+                        border: Border.all(color: ColorsProvider.color_8, width: 3),
+                        color: ColorsProvider.color_9,
                         borderRadius: BorderRadius.circular(15),
                       ),
                       child: Center(
                         child: Text(
                           "Sign up",
-                          style: TextStyle(color: Colors.black, fontSize: 25, fontWeight: FontWeight.bold),
+                          style: TextStyle(color: ColorsProvider.color_8, fontSize: 25, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
@@ -242,13 +243,16 @@ class _RegisterPageState extends State<RegisterPage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text("Already have an account? "),
+                      Text(
+                        "Already have an account? ",
+                        style: TextStyle(color: ColorsProvider.color_8),
+                      ),
                       GestureDetector(
                         onTap: widget.showLoginPage,
                         child: Text(
                           "Login",
                           style: TextStyle(
-                            color: Colors.blue,
+                            color: ColorsProvider.color_8,
                             fontWeight: FontWeight.bold,
                             fontSize: 14.5,
                           ),

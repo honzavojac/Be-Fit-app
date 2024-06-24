@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/login_supabase/splash_page.dart';
 import 'package:kaloricke_tabulky_02/main.dart';
+import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -85,7 +86,7 @@ class _SettingsState extends State<Settings> {
             },
             icon: Icon(
               Icons.logout,
-              color: Colors.red,
+              color: ColorsProvider.color_9,
               size: 25,
             ),
           ),

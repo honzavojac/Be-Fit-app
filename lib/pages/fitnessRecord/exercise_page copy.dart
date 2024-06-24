@@ -244,14 +244,14 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                 child: Container(
                     decoration: BoxDecoration(
                       color: ColorsProvider.color_2,
-                      border: Border.all(color: Colors.black),
+                      border: Border.all(color: ColorsProvider.color_8),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(3, 4, 3, 4),
                       child: Text(
                         "Specials",
-                        style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 15),
+                        style: TextStyle(color: ColorsProvider.color_8, fontWeight: FontWeight.bold, fontSize: 15),
                       ),
                     )),
                 onTap: () {},
@@ -462,14 +462,14 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                   child: Container(
                       decoration: BoxDecoration(
                         color: ColorsProvider.color_2,
-                        border: Border.all(color: Colors.black),
+                        border: Border.all(color: ColorsProvider.color_8),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(3, 4, 3, 4),
                         child: Text(
                           "Specials",
-                          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 15),
+                          style: TextStyle(color: ColorsProvider.color_8, fontWeight: FontWeight.bold, fontSize: 15),
                         ),
                       )),
                   onTap: () {},
@@ -747,7 +747,7 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                                                     child: DropdownButton2<int>(
                                                       alignment: Alignment.center,
                                                       style: TextStyle(
-                                                        // color: Colors.black,
+                                                        // color: ColorsProvider.color_8,
                                                         fontWeight: FontWeight.bold,
                                                         fontSize: 5,
                                                       ),
@@ -804,7 +804,7 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                                                                                 ? Colors.yellow
                                                                                 : difficulty == 4
                                                                                     ? Colors.orange
-                                                                                    : Colors.red,
+                                                                                    : ColorsProvider.color_9,
                                                               ),
                                                               overflow: TextOverflow.ellipsis,
                                                             ),
@@ -981,7 +981,7 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                               //                   children: [
                               //                     Text(
                               //                       "$date",
-                              //                       style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20),
+                              //                       style: TextStyle(color: ColorsProvider.color_8, fontWeight: FontWeight.bold, fontSize: 20),
                               //                     )
                               //                   ],
                               //                 ),
@@ -1021,7 +1021,7 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                               //                         ),
                               //                         Container(
                               //                           width: 1,
-                              //                           color: Colors.black,
+                              //                           color: ColorsProvider.color_8,
                               //                         ),
                               //                         Expanded(
                               //                           child: Padding(
@@ -1066,7 +1066,7 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                               //                                                               ? Colors.yellow
                               //                                                               : difficulty == 4
                               //                                                                   ? Colors.orange
-                              //                                                                   : Colors.red,
+                              //                                                                   : ColorsProvider.color_9,
                               //                                             ),
                               //                                           ),
                               //                                           Text(
@@ -1084,7 +1084,7 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                               //                                                               ? Colors.yellow
                               //                                                               : difficulty == 4
                               //                                                                   ? Colors.orange
-                              //                                                                   : Colors.red,
+                              //                                                                   : ColorsProvider.color_9,
                               //                                             ),
                               //                                           ),
                               //                                           SizedBox(
@@ -1149,7 +1149,7 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                                   decoration: BoxDecoration(
                                     // borderRadius: BorderRadius.circular(50),
                                     shape: BoxShape.circle,
-                                    color: Colors.black,
+                                    color: ColorsProvider.color_8,
                                   ),
                                   child: Icon(
                                     Icons.add_circle_outline_outlined,
