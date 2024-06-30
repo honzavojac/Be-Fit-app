@@ -140,37 +140,10 @@ class _InitPageState extends State<InitPage> {
           indicatorColor: ColorsProvider.color_2,
           selectedIndex: pageProvider,
           animationDuration: const Duration(milliseconds: 1000),
-          destinations: const [
-            NavigationDestination(
-              selectedIcon: Icon(
-                Icons.fitness_center_rounded,
-                color: ColorsProvider.color_8,
-              ),
-              icon: Icon(
-                Icons.fitness_center_rounded,
-              ),
-              label: 'Fitness',
-            ),
-            NavigationDestination(
-              selectedIcon: Icon(
-                Icons.home,
-                color: ColorsProvider.color_8,
-              ),
-              icon: Icon(
-                Icons.home_outlined,
-              ),
-              label: 'Home',
-            ),
-            NavigationDestination(
-              selectedIcon: Icon(
-                Icons.fastfood_rounded,
-                color: ColorsProvider.color_8,
-              ),
-              icon: Icon(
-                Icons.fastfood,
-              ),
-              label: 'Add food',
-            ),
+          destinations: [
+            _navigation(null, null, "Fitness"),
+            _navigation(Icons.home, Icons.home_outlined, "Home"),
+            _navigation(Icons.fastfood_rounded, Icons.fastfood, "Food"),
           ],
         ),
       ),
@@ -198,6 +171,34 @@ Widget _categoryWidget(String category) {
         ],
       ),
     ),
+  );
+}
+
+Widget _navigation(IconData? primaryIconData, IconData? secondaryIconDaty, String name) {
+  return NavigationDestination(
+    selectedIcon: primaryIconData != null
+        ? Icon(
+            primaryIconData,
+            color: ColorsProvider.color_8,
+          )
+        : Image.asset(
+            'assets/icons/icon_half_bodybuilder.png', // Cesta k vašemu obrázku
+            // width: 24,
+            height: 32,
+            color: ColorsProvider.color_8, // Volitelně můžete nastavit barvu obrázku
+          ),
+    icon: secondaryIconDaty != null
+        ? Icon(
+            secondaryIconDaty,
+            color: Colors.white.withAlpha(170),
+          )
+        : Image.asset(
+            'assets/icons/icon_half_bodybuilder.png', // Cesta k vašemu obrázku
+            // width: 25,
+            height: 32,
+            color: Colors.white.withAlpha(170),
+          ),
+    label: '$name',
   );
 }
 

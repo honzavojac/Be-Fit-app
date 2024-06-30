@@ -56,17 +56,22 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
+    bool paused = false;
     // Pokud je aktuální stav stejný jako poslední stav, neprovádějte nic
     if (_lastLifecycleState == state) return;
 
-    if (state == AppLifecycleState.inactive) {
-      print("didchangeapplifecyclestate - inactive");
+    if (state == AppLifecycleState.paused) {
+      print("save immediately, app may be exit");
       if (mounted) {
         try {
+          print("saved");
           await saveDataToDatabase();
+          paused = true;
         } catch (e) {
           print("chyba v exercisePage při vkládání dat změněním stavu aplikace (zavřená app): $e");
         }
+      } else if (state == AppLifecycleState.resumed) {
+        paused = false;
       }
     }
     _lastLifecycleState = state;
@@ -160,13 +165,30 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
     var idStartedCompleted;
     //generování idStartedCompleted pokud není ... false
     if (exerciseData.isNotEmpty) {
+      print("fffffffffffffffff --- ${dbSupabase.boolInsertSplitStartedCompleted}");
       if (dbSupabase.boolInsertSplitStartedCompleted == true) {
         idStartedCompleted = await dbSupabase.insertSplitStartedCompleted(widget.splitId);
       } else {
         idStartedCompleted = await widget.idStartedCompleted;
+        print(idStartedCompleted);
       }
 
       await dbSupabase.actionExerciseData(exerciseData, idExercise, idStartedCompleted);
+      var newExerciseData = await dbSupabase.exerciseData[widget.splitIndex].selectedMuscle![widget.muscleIndex].selectedExercises![widget.exerciseIndex].exercises.exerciseData!;
+      print(newExerciseData.length);
+      print(exerciseData.length);
+      print("-------------------------------------------------------------------------------");
+      for (var i = 0; i < newExerciseData.length; i++) {
+        print(exerciseData[i].difficulty);
+        exerciseData[i].idExData = newExerciseData[i].idExData;
+      }
+      print("-------------------------------------------------------------------------------");
+      for (var i = 0; i < exerciseData.length; i++) {
+        print(exerciseData[i].idExData);
+        exerciseData[i].operation = 0;
+      }
+      // setState(() {});
+      // updateExerciseData();
     }
   }
 
@@ -195,8 +217,6 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
   }
 
   saveValues(List<ExerciseData> data) {
-    var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false);
-
     //insert do tabulky split_started_completed o startu splitu
     for (var i = 0; i < exerciseData.length; i++) {
       for (var j = 0; j < data.length; j++) {
@@ -717,22 +737,6 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                 Text(
                   '${nameOfExercise}',
                   style: TextStyle(fontWeight: FontWeight.bold, color: ColorsProvider.color_1),
-                ),
-                GestureDetector(
-                  child: Container(
-                      decoration: BoxDecoration(
-                        color: ColorsProvider.color_2,
-                        border: Border.all(color: ColorsProvider.color_8),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(3, 4, 3, 4),
-                        child: Text(
-                          "Specials",
-                          style: TextStyle(color: ColorsProvider.color_8, fontWeight: FontWeight.bold, fontSize: 15),
-                        ),
-                      )),
-                  onTap: () {},
                 ),
               ],
             ),

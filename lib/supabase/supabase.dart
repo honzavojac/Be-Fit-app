@@ -211,10 +211,6 @@ class SupabaseProvider extends ChangeNotifier {
     exerciseData = data.map((json) => Split.fromJson(json as Map<String, dynamic>)).toList();
   }
 
-  notify() {
-    notifyListeners();
-  }
-
   getAllMuscles() async {
     final uid = supabase.auth.currentUser!.id;
     final response = await supabase.from('users').select('''
@@ -346,6 +342,11 @@ class SupabaseProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  updateSplit(int idSplit, String updatedText) async {
+    await supabase.from("split").update({'name_split': updatedText}).eq('id_split', idSplit);
+    notifyListeners();
+  }
+
   insertMuscle(String nameOfMuscle) async {
     await supabase.from('muscles').insert({'name_of_muscle': nameOfMuscle, 'id_user': user!.idUser});
     notifyListeners();
@@ -405,7 +406,7 @@ class SupabaseProvider extends ChangeNotifier {
           print("hodnota zůstává");
           break;
         case 1:
-          print("insert");
+          // print("insert");
 
           try {
             // print("insert: ${insert[i]}");
@@ -422,7 +423,7 @@ class SupabaseProvider extends ChangeNotifier {
           }
           break;
         case 2:
-          print("update");
+          // print("update");
           print("idstartedcompleted: $idStartedCompleted");
           try {
             // print("update: ${dataOfExercise.reps}");
@@ -446,7 +447,7 @@ class SupabaseProvider extends ChangeNotifier {
           }
           break;
         case 3:
-          print("delete");
+          // print("delete");
 
           try {
             // print("delete: ${delete[i]}");
@@ -456,7 +457,7 @@ class SupabaseProvider extends ChangeNotifier {
           }
           break;
         case 4:
-          print("nothing");
+          // print("nothing");
           //nothing
           //hodnota byla insertována a pak smázana
           break;
@@ -527,7 +528,7 @@ class ExerciseData {
   String? time;
   int? exercisesIdExercise;
   int? operation;
-  int id;
+  int id; //auto incremment
   int? idStartedCompleted;
 
   ExerciseData({this.idExData, required this.weight, required this.reps, required this.difficulty, this.technique, this.comment, this.time, this.exercisesIdExercise, this.operation, this.idStartedCompleted}) : id = _incrementCounter(); // Assign the incremented ID

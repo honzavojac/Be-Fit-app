@@ -209,7 +209,46 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                 ),
               ),
               SizedBox(
-                height: 20,
+                height: 25,
+              ),
+              Container(
+                width: 200,
+                child: TextField(
+                  onChanged: (value) {
+                    // if (index == 1) {
+                    //   updateSplits![itemIndex] = true;
+                    // } else if (index == 2) {
+                    //   updateMuscles![itemIndex] = true;
+                    // }
+                  },
+                  controller: TextEditingController(text: splits[dbSupabase.clickedSplitTab].nameSplit),
+                  // controller: index == 1
+                  //     ? splitTextEditingControllers[itemIndex]
+                  //     : index == 2
+                  //         ? musclesTextEditingControllers[itemIndex]
+                  //         : TextEditingController(),
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: ColorsProvider.color_2,
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.black, width: 2),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.black, width: 3.5),
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    contentPadding: EdgeInsets.symmetric(horizontal: 10.0),
+                  ),
+                  cursorColor: ColorsProvider.color_8,
+                  style: TextStyle(
+                    color: ColorsProvider.color_8,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
               Expanded(
                 child: ListView.builder(

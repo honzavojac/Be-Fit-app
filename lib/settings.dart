@@ -66,7 +66,7 @@ class _SettingsState extends State<Settings> {
   //     return true;
   //   });
   // }
-
+  int a = 0;
   @override
   Widget build(BuildContext context) {
     var dbSupabase = Provider.of<SupabaseProvider>(context);
@@ -126,22 +126,32 @@ class _SettingsState extends State<Settings> {
             Container(
               height: 100,
             ),
-            Container(
-              height: 150,
-              // color: const Color.fromARGB(255, 1, 41, 73),
-              child: Column(
-                children: [
-                  ElevatedButton(
-                    onPressed: () async {
-                      // printNavigationStack(context);
-                      // dbSupabase.getUser();
-
-                      // setState(() {});
-                    },
-                    child: Text("uživatel ${dbSupabase.user!.email}"),
-                  ),
-                ],
-              ),
+            ElevatedButton(
+              onPressed: () {
+                if (a == 0) {
+                  a = 1;
+                } else {
+                  a = 0;
+                }
+                setState(() {});
+              },
+              child: Text("změna"),
+            ),
+            Expanded(
+              child: a == 0
+                  ? Container(
+                      color: ColorsProvider.color_2,
+                      child: Image.asset(
+                        'assets/icons/icon_half_bodybuilder.png',
+                        color: Colors.black,
+                      ),
+                    )
+                  : Container(
+                      child: Image.asset(
+                        'assets/icons/icon_half_bodybuilder.png',
+                        color: Colors.white,
+                      ),
+                    ),
             ),
           ],
         ),
