@@ -93,6 +93,7 @@ class _SettingsState extends State<Settings> {
           IconButton(
             onPressed: () async {
               await _deleteCacheDir();
+              dbFitness.DeleteAllTables();
               dbSupabase.clearUserData();
               _signOut();
             },

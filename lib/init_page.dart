@@ -1,3 +1,5 @@
+// ignore_for_file: unused_local_variable
+
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
 import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
@@ -57,16 +59,29 @@ class _InitPageState extends State<InitPage> {
     var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
 
     // Nastavíme proměnnou pro ukládání dat
-    List<Muscle> muscleList = [];
-    List<Exercise> exerciseList = [];
-    List<ExerciseData> exerciseDataList = [];
-    List<Split> splitList = [];
-    List<SelectedMuscle> selectedMuscleList = [];
-    List<SelectedExercise> selectedExeciseList = [];
-    List<SplitStartedCompleted> splitStartedCompletedList = [];
+    List<Muscle> supabaseMuscleList = [];
+    List<Exercise> supabaseExerciseList = [];
+    List<ExerciseData> supabaseExerciseDataList = [];
+    List<Split> supabaseSplitList = [];
+    List<SelectedMuscle> supabaseSelectedMuscleList = [];
+    List<SelectedExercise> supabaseSelectedExerciseList = [];
+    List<SplitStartedCompleted> supabaseSplitStartedCompletedList = [];
 
     if (loading == true) {
       // Spustíme načítání dat
+      //sqflite
+
+      List<Muscle> sqfliteMuscleList = await dbFitness.SelectMuscles();
+      List<Exercise> sqfliteExerciseList = await dbFitness.SelectExercises();
+      List<ExerciseData> sqfliteExerciseDataList = await dbFitness.SelectExerciseData();
+      List<Split> sqfliteSplitList = await dbFitness.SelectSplit();
+      List<SelectedMuscle> sqfliteSelectedMuscleList = await dbFitness.SelectSelectedMuscles();
+      List<SelectedExercise> sqfliteSelectedExerciseList = await dbFitness.SelectSelectedExercises();
+      List<SplitStartedCompleted> sqfliteSplitStartedCompletedList = await dbFitness.SelectSplitStartedCompleted();
+      print("sqflite hotovo");
+
+      //supabase
+
       final MuscleLoading = dbSupabase.MuscleTable();
       final ExerciseLoading = dbSupabase.ExerciseTable();
       final ExerciseDataLoading = dbSupabase.ExerciseDataTable();
@@ -78,21 +93,147 @@ class _InitPageState extends State<InitPage> {
 
       //načtení supabase do sqflite
 
-      await Future.delayed(Duration(seconds: 3), () async {
-        muscleList = await MuscleLoading;
-        exerciseList = await ExerciseLoading;
-        exerciseDataList = await ExerciseDataLoading;
-        splitList = await SplitLoading;
-        selectedMuscleList = await SelectedMuscleLoading;
-        selectedExeciseList = await SelectedExerciseLoading;
-        splitStartedCompletedList = await SplitStartedCompletedLoading;
-        if (muscleList.isNotEmpty) {
-          for (var element in muscleList) {
-            print(element.nameOfMuscle);
+      await Future.delayed(Duration(seconds: 0), () async {
+        supabaseMuscleList = await MuscleLoading;
+        supabaseExerciseList = await ExerciseLoading;
+        supabaseExerciseDataList = await ExerciseDataLoading;
+        supabaseSplitList = await SplitLoading;
+        supabaseSelectedMuscleList = await SelectedMuscleLoading;
+        supabaseSelectedExerciseList = await SelectedExerciseLoading;
+        supabaseSplitStartedCompletedList = await SplitStartedCompletedLoading;
+        print("supabase hotovo");
+        //muscle
+        if (sqfliteMuscleList.isNotEmpty) {
+          //update supabase jestli action není 0
+          print("update muscles");
+        } else {
+          //insert muscles
+          for (var muscle in supabaseMuscleList) {
+            await dbFitness.InsertMuscle(
+              muscle.idMuscle!,
+              muscle.nameOfMuscle,
+              0,
+            ); // 0 protože insertujeme do sqflite ne do supabase
+          }
+        }
+        //exercise
+        if (sqfliteExerciseList.isNotEmpty) {
+          print("update exercises");
+          for (var element in sqfliteExerciseList) {
+            // print(element.nameOfExercise);
           }
         } else {
-          print("Loading time exceeded 5 seconds");
+          //insert exercises
+          print("insert exercises");
+          for (var exercise in supabaseExerciseList) {
+            await dbFitness.InsertExercise(
+              exercise.idExercise,
+              exercise.nameOfExercise,
+              exercise.musclesIdMuscle!,
+              0,
+            ); // 0 protože insertujeme do sqflite ne do supabase
+          }
         }
+        //exerciseData
+        if (sqfliteExerciseDataList.isNotEmpty) {
+          //update supabase jestli action není 0
+          print("update exerciseData");
+          for (var element in sqfliteExerciseDataList) {
+            // print(element.weight);
+          }
+        } else {
+          //insert exercisedata
+          print("insert exerciseData");
+          for (var exerciseData in supabaseExerciseDataList) {
+            await dbFitness.InsertExerciseData(
+              exerciseData.idExData!,
+              exerciseData.weight,
+              exerciseData.reps,
+              exerciseData.difficulty,
+              exerciseData.exercisesIdExercise!,
+              exerciseData.idStartedCompleted!,
+              0,
+            ); // 0 protože insertujeme do sqflite ne do supabase
+          }
+        }
+        //split
+        if (sqfliteSplitList.isNotEmpty) {
+          //update supabase jestli action není 0
+          print("update split");
+          for (var element in sqfliteSplitList) {
+            // print(element.nameSplit);
+          }
+        } else {
+          //insert splits
+          print("insert splits");
+          for (var split in supabaseSplitList) {
+            await dbFitness.InsertSplit(
+              split.idSplit!,
+              split.nameSplit,
+              split.createdAt!,
+              0,
+            ); // 0 protože insertujeme do sqflite ne do supabase
+          }
+        }
+        //selectedMuscle
+        if (sqfliteSelectedMuscleList.isNotEmpty) {
+          //update supabase jestli action není 0
+          print("update selectedMuscle");
+          for (var element in sqfliteSelectedMuscleList) {
+            // print(element.supabaseIdSelectedMuscle);
+          }
+        } else {
+          //insert selectedMuscle
+          print("insert selectedMuscle");
+          for (var selectedMuscle in supabaseSelectedMuscleList) {
+            await dbFitness.InsertSelectedMuscle(
+              selectedMuscle.idSelectedMuscle,
+              selectedMuscle.splitIdSplit!,
+              selectedMuscle.musclesIdMuscle!,
+              0,
+            ); // 0 protože insertujeme do sqflite ne do supabase
+          }
+        }
+        //sqfliteSelectedExerciseList
+        if (sqfliteSelectedExerciseList.isNotEmpty) {
+          //update supabase jestli action není 0
+          print("update selectedExercise");
+          for (var element in sqfliteSelectedExerciseList) {
+            // print(element.supabaseIdSelectedExercise);
+          }
+        } else {
+          //insert selectedExercise
+          print("insert selectedExercise");
+          for (var selectedExercise in supabaseSelectedExerciseList) {
+            await dbFitness.InsertSelectedExercise(
+              selectedExercise.idSelectedExercise,
+              selectedExercise.idExercise!,
+              selectedExercise.idSelectedMuscle!,
+              0,
+            ); // 0 protože insertujeme do sqflite ne do supabase
+          }
+        }
+        //sqfliteSplitStartedCompletedList
+        if (sqfliteSplitStartedCompletedList.isNotEmpty) {
+          //update supabase jestli action není 0
+          print("update splitStartedCompleted");
+          for (var element in sqfliteSplitStartedCompletedList) {
+            print(element.ended);
+          }
+        } else {
+          //insert splitStartedCompleted
+          print("insert splitStartedCompleted");
+          for (var splitStartedCompleted in supabaseSplitStartedCompletedList) {
+            await dbFitness.InsertSplitStartedCompleted(
+              splitStartedCompleted.idStartedCompleted!,
+              splitStartedCompleted.createdAt!,
+              splitStartedCompleted.splitId!,
+              splitStartedCompleted.ended,
+              0,
+            ); // 0 protože insertujeme do sqflite ne do supabase
+          }
+        }
+
         // await Future.delayed(Duration(seconds: 10));
       });
 

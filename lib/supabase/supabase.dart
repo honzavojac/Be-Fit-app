@@ -503,7 +503,6 @@ class SupabaseProvider extends ChangeNotifier {
       )
     )
     ''').eq('user_id', uid);
-    print("object");
     final List<dynamic> userData = response;
     List<Exercise> exercisesList = [];
 
@@ -520,10 +519,10 @@ class SupabaseProvider extends ChangeNotifier {
       });
     });
     exercisesList.sort((a, b) => a.idExercise.compareTo(b.idExercise));
-    for (var exerciseItem in exercisesList) {
-      print('idExercise: ${exerciseItem.idExercise} exercise: ${exerciseItem.nameOfExercise}');
-      // Zde můžete provést další operace s každým záznamem cvičení, například ukládání do SQLite.
-    }
+    // for (var exerciseItem in exercisesList) {
+    //   print('idExercise: ${exerciseItem.idExercise} exercise: ${exerciseItem.nameOfExercise}');
+    //   // Zde můžete provést další operace s každým záznamem cvičení, například ukládání do SQLite.
+    // }
     return exercisesList;
   }
 
@@ -547,7 +546,6 @@ class SupabaseProvider extends ChangeNotifier {
       )
     )
     ''').eq('user_id', uid);
-    print("object");
     final List<dynamic> userData = response;
     List<ExerciseData> exerciseDataList = [];
 
@@ -569,10 +567,10 @@ class SupabaseProvider extends ChangeNotifier {
       });
     });
     exerciseDataList.sort((a, b) => a.idExData!.compareTo(b.idExData!));
-    for (var exerciseData in exerciseDataList) {
-      print('Cvičení: ${exerciseData.idExData}, Váha: ${exerciseData.weight} idStartedCompleted: ${exerciseData.idStartedCompleted} exercisesIdExercise: ${exerciseData.exercisesIdExercise}');
-      // Zde můžete provést další operace s každým záznamem cvičení, například ukládání do SQLite.
-    }
+    // for (var exerciseData in exerciseDataList) {
+    //   print('Cvičení: ${exerciseData.idExData}, Váha: ${exerciseData.weight} idStartedCompleted: ${exerciseData.idStartedCompleted} exercisesIdExercise: ${exerciseData.exercisesIdExercise}');
+    //   // Zde můžete provést další operace s každým záznamem cvičení, například ukládání do SQLite.
+    // }
     return exerciseDataList;
   }
 
@@ -590,9 +588,9 @@ class SupabaseProvider extends ChangeNotifier {
     final List<dynamic> data = response[0]["split"];
 
     List<Split> splits = data.map((json) => Split.fromJson(json as Map<String, dynamic>)).toList();
-    for (var element in splits) {
-      print("idSplit: ${element.idSplit} nameSplit: ${element.nameSplit}");
-    }
+    // for (var element in splits) {
+    //   print("idSplit: ${element.idSplit} nameSplit: ${element.nameSplit}");
+    // }
     return splits;
   }
 
@@ -629,10 +627,10 @@ class SupabaseProvider extends ChangeNotifier {
     });
 
     selectedMuscleDataList.sort((a, b) => a.idSelectedMuscle.compareTo(b.idSelectedMuscle));
-    for (var selectedMuscleData in selectedMuscleDataList) {
-      print('idSelectedMuscle: ${selectedMuscleData.idSelectedMuscle} splitIdSplit: ${selectedMuscleData.splitIdSplit}  musclesIdMuscle: ${selectedMuscleData.musclesIdMuscle} ');
-      // Zde můžete provést další operace s každým záznamem cvičení, například ukládání do SQLite.
-    }
+    // for (var selectedMuscleData in selectedMuscleDataList) {
+    //   print('idSelectedMuscle: ${selectedMuscleData.idSelectedMuscle} splitIdSplit: ${selectedMuscleData.splitIdSplit}  musclesIdMuscle: ${selectedMuscleData.musclesIdMuscle} ');
+    //   // Zde můžete provést další operace s každým záznamem cvičení, například ukládání do SQLite.
+    // }
     return selectedMuscleDataList;
   }
 
@@ -673,10 +671,10 @@ class SupabaseProvider extends ChangeNotifier {
 
     selectedExerciseDataList.sort((a, b) => a.idSelectedExercise.compareTo(b.idSelectedExercise));
 
-    for (var selectedExerciseData in selectedExerciseDataList) {
-      print('idSelectedExercise: ${selectedExerciseData.idSelectedExercise} idExercise: ${selectedExerciseData.idExercise} idSelectedMuscle: ${selectedExerciseData.idSelectedMuscle} ');
-      // Zde můžete provést další operace s každým záznamem cvičení, například ukládání do SQLite.
-    }
+    // for (var selectedExerciseData in selectedExerciseDataList) {
+    //   print('idSelectedExercise: ${selectedExerciseData.idSelectedExercise} idExercise: ${selectedExerciseData.idExercise} idSelectedMuscle: ${selectedExerciseData.idSelectedMuscle} ');
+    //   // Zde můžete provést další operace s každým záznamem cvičení, například ukládání do SQLite.
+    // }
     return selectedExerciseDataList;
   }
 
@@ -715,10 +713,10 @@ class SupabaseProvider extends ChangeNotifier {
     });
 
     splitStartedCompletedDataList.sort((a, b) => a.idStartedCompleted!.compareTo(b.idStartedCompleted!));
-    for (var splitStartedCompletedData in splitStartedCompletedDataList) {
-      print('idStartedCompleted: ${splitStartedCompletedData.idStartedCompleted} createdAt: ${splitStartedCompletedData.createdAt}  splitId: ${splitStartedCompletedData.splitId} endedAt: ${splitStartedCompletedData.endedAt} ended: ${splitStartedCompletedData.ended} ');
-      // Zde můžete provést další operace s každým záznamem cvičení, například ukládání do SQLite.
-    }
+    // for (var splitStartedCompletedData in splitStartedCompletedDataList) {
+    //   print('idStartedCompleted: ${splitStartedCompletedData.idStartedCompleted} createdAt: ${splitStartedCompletedData.createdAt}  splitId: ${splitStartedCompletedData.splitId} endedAt: ${splitStartedCompletedData.endedAt} ended: ${splitStartedCompletedData.ended} ');
+    //   // Zde můžete provést další operace s každým záznamem cvičení, například ukládání do SQLite.
+    // }
     return splitStartedCompletedDataList;
   }
 

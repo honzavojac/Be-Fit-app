@@ -1,3 +1,91 @@
+class Muscle {
+  int? idMuscle;
+  String nameOfMuscle;
+
+  int? action;
+  int? supabaseIdMuscle;
+  List<Exercise>? exercises;
+
+  Muscle({
+    this.idMuscle,
+    required this.nameOfMuscle,
+    this.supabaseIdMuscle,
+    this.action = 0,
+    this.exercises,
+  });
+
+  factory Muscle.fromJson(Map<String, dynamic> json) {
+    var exercisesFromJson = json['exercises'] as List?;
+    List<Exercise>? exercisesList;
+
+    if (exercisesFromJson != null) {
+      exercisesList = exercisesFromJson.map((e) => Exercise.fromJson(e)).toList();
+    }
+
+    return Muscle(
+      idMuscle: json['id_muscle'],
+      nameOfMuscle: json['name_of_muscle'],
+      supabaseIdMuscle: json['supabase_id_muscle'],
+      action: json['action'] ?? 0,
+      exercises: exercisesList,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id_muscle': idMuscle,
+      'name_of_muscle': nameOfMuscle,
+      'supabase_id_muscle': supabaseIdMuscle,
+      'action': action,
+      'exercises': exercises?.map((e) => e.toJson()).toList(),
+    };
+  }
+}
+
+class Exercise {
+  int idExercise;
+  String nameOfExercise;
+  int? musclesIdMuscle;
+  int? supabaseIdExercise;
+  int? action;
+
+  List<ExerciseData>? exerciseData;
+
+  Exercise({
+    required this.idExercise,
+    required this.nameOfExercise,
+    this.musclesIdMuscle,
+    this.supabaseIdExercise,
+    this.action = 0,
+    this.exerciseData,
+  });
+
+  factory Exercise.fromJson(Map<String, dynamic> json) {
+    var exerciseDataFromJson = json['exercise_data'] as List?;
+    List<ExerciseData>? exerciseDataList = exerciseDataFromJson?.map((e) => ExerciseData.fromJson(e)).toList();
+
+    return Exercise(
+      idExercise: json['id_exercise'],
+      nameOfExercise: json['name_of_exercise'],
+      musclesIdMuscle: json['muscles_id_muscle'],
+      supabaseIdExercise: json['supabase_id_exercise'],
+      action: json['action'] ?? 0,
+      exerciseData: exerciseDataList,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id_exercise': idExercise,
+      'name_of_exercise': nameOfExercise,
+      'muscles_id_muscle': musclesIdMuscle,
+      'supabase_id_exercise': supabaseIdExercise,
+      'action': action,
+      'exercise_data': exerciseData?.map((e) => e.toJson()).toList(),
+    };
+  }
+}
+
 class ExerciseData {
   static int _counter = 0; // Static counter to keep track of the ID
 
@@ -9,11 +97,26 @@ class ExerciseData {
   String? comment;
   String? time;
   int? exercisesIdExercise;
-  int? operation;
-  int id; //auto incremment
   int? idStartedCompleted;
+  int? supabaseIdExData;
+  int? action;
+  int id; //auto incremment
+  int? operation;
 
-  ExerciseData({this.idExData, required this.weight, required this.reps, required this.difficulty, this.technique, this.comment, this.time, this.exercisesIdExercise, this.operation, this.idStartedCompleted}) : id = _incrementCounter(); // Assign the incremented ID
+  ExerciseData({
+    this.idExData,
+    required this.weight,
+    required this.reps,
+    required this.difficulty,
+    this.technique,
+    this.comment,
+    this.time,
+    this.exercisesIdExercise,
+    this.idStartedCompleted,
+    this.supabaseIdExData,
+    this.action = 0,
+    this.operation,
+  }) : id = _incrementCounter(); // Assign the incremented ID
 
   // Factory constructor to create an instance from a JSON object
   factory ExerciseData.fromJson(Map<String, dynamic> json) {
@@ -27,6 +130,9 @@ class ExerciseData {
       time: json['time'],
       exercisesIdExercise: json['exercises_id_exercise'],
       idStartedCompleted: json['id_started_completed'],
+      operation: json['operation'],
+      action: json['action'] ?? 0,
+      supabaseIdExData: json['supabase_id_ex_data'],
     );
   }
 
@@ -38,9 +144,12 @@ class ExerciseData {
       'difficulty': difficulty,
       'technique': technique,
       'comment': comment,
-      // 'time': time,
+      'time': time,
       'exercises_id_exercise': exercisesIdExercise,
-      'id_started_completed': idStartedCompleted
+      'id_started_completed': idStartedCompleted,
+      'operation': operation,
+      'action': action,
+      'supabase_id_ex_data': supabaseIdExData,
     };
     if (idExData != null) {
       data['id_ex_data'] = idExData;
@@ -59,95 +168,76 @@ class ExerciseData {
   }
 }
 
-class Exercise {
-  int idExercise;
-  String nameOfExercise;
-  List<ExerciseData>? exerciseData;
+class Split {
+  int? idSplit;
+  String nameSplit;
+  String? createdAt;
+  int? supabaseIdSplit;
   int? action;
-  int? supabaseIdExercise;
+  List<SelectedMuscle>? selectedMuscle;
+  List<SplitStartedCompleted>? splitStartedCompleted;
 
-  Exercise({required this.idExercise, required this.nameOfExercise, this.exerciseData, this.action = 0, this.supabaseIdExercise});
-
-  factory Exercise.fromJson(Map<String, dynamic> json) {
-    var exerciseDataFromJson = json['exercise_data'] as List?;
-    List<ExerciseData>? exerciseDataList = exerciseDataFromJson?.map((e) => ExerciseData.fromJson(e)).toList();
-
-    return Exercise(
-      idExercise: json['id_exercise'],
-      nameOfExercise: json['name_of_exercise'],
-      exerciseData: exerciseDataList,
-      action: json['action'] ?? 0,
-      supabaseIdExercise: json['supabase_id_exercise'],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id_exercise': idExercise,
-      'name_of_exercise': nameOfExercise,
-      'exercise_data': exerciseData?.map((e) => e.toJson()).toList(),
-      'action': action,
-      'supabase_id_exercise': supabaseIdExercise,
-    };
-  }
-}
-
-class Muscle {
-  int? idMuscle;
-  String nameOfMuscle;
-  List<Exercise>? exercises;
-  int? action;
-  int? supabaseIdMuscle;
-
-  Muscle({
-    this.idMuscle,
-    required this.nameOfMuscle,
-    this.exercises,
+  Split({
+    this.idSplit,
+    required this.nameSplit,
+    this.createdAt,
+    this.supabaseIdSplit,
     this.action = 0,
-    this.supabaseIdMuscle,
+    this.selectedMuscle,
+    this.splitStartedCompleted,
   });
 
-  factory Muscle.fromJson(Map<String, dynamic> json) {
-    var exercisesFromJson = json['exercises'] as List?;
-    List<Exercise>? exercisesList;
+  factory Split.fromJson(Map<String, dynamic> json) {
+    var selectedMuscleFromJson = json['selected_muscles'] as List<dynamic>? ?? [];
+    List<SelectedMuscle> selectedMusclesList = selectedMuscleFromJson.map((e) => SelectedMuscle.fromJson(e)).toList();
 
-    if (exercisesFromJson != null) {
-      exercisesList = exercisesFromJson.map((e) => Exercise.fromJson(e)).toList();
-    }
+    var splitStartedCompletedFromJson = json['split_started_completed'] as List<dynamic>? ?? []; //pokud jsou data null tak se nastaví prázdný seznam
+    List<SplitStartedCompleted> splitStartedCompletedList = splitStartedCompletedFromJson
+        .map(
+          (e) => SplitStartedCompleted.fromJson(e),
+        )
+        .toList();
 
-    return Muscle(
-      idMuscle: json['id_muscle'],
-      nameOfMuscle: json['name_of_muscle'],
-      exercises: exercisesList,
+    return Split(
+      idSplit: json['id_split'],
+      nameSplit: json['name_split'],
+      createdAt: json['created_at'],
+      supabaseIdSplit: json['supabase_id_split'],
       action: json['action'] ?? 0,
-      supabaseIdMuscle: json['supabase_id_muscle'],
+      selectedMuscle: selectedMusclesList,
+      splitStartedCompleted: splitStartedCompletedList,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'id_muscle': idMuscle,
-      'name_of_muscle': nameOfMuscle,
-      'exercises': exercises?.map((e) => e.toJson()).toList(),
+      'id_split': idSplit,
+      'name_split': nameSplit,
+      'created_at': createdAt,
+      'selected_muscles': selectedMuscle,
       'action': action,
-      'supabase_id_muscle': supabaseIdMuscle,
+      'supabase_id_split': supabaseIdSplit,
     };
   }
 }
 
 class SelectedMuscle {
-  Muscle? muscles;
   int idSelectedMuscle;
-  List<SelectedExercise>? selectedExercises;
   int? splitIdSplit;
   int? musclesIdMuscle;
+  int? supabaseIdSelectedMuscle;
+  int? action;
+  Muscle? muscles;
+  List<SelectedExercise>? selectedExercises;
 
   SelectedMuscle({
-    this.muscles,
     required this.idSelectedMuscle,
-    this.selectedExercises,
     this.splitIdSplit,
     this.musclesIdMuscle,
+    this.supabaseIdSelectedMuscle,
+    this.action,
+    this.muscles,
+    this.selectedExercises,
   });
 
   factory SelectedMuscle.fromJson(Map<String, dynamic> json) {
@@ -158,74 +248,91 @@ class SelectedMuscle {
     List<SelectedExercise> selectedExercisesList = selectedExercisesFromJson.map((e) => SelectedExercise.fromJson(e as Map<String, dynamic>)).toList();
 
     return SelectedMuscle(
-      muscles: muscles,
       idSelectedMuscle: json['id_selected_muscle'],
-      selectedExercises: selectedExercisesList,
-      musclesIdMuscle: json['muscles_id_muscle'],
       splitIdSplit: json['split_id_split'],
+      musclesIdMuscle: json['muscles_id_muscle'],
+      supabaseIdSelectedMuscle: json['supabase_id_selected_muscle'],
+      action: json['action'] ?? 0,
+      muscles: muscles,
+      selectedExercises: selectedExercisesList,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'muscles': muscles?.toJson(),
       'id_selected_muscle': idSelectedMuscle,
-      'selected_exercises': selectedExercises?.map((e) => e.toJson()).toList(),
-      'muscles_id_muscle': musclesIdMuscle,
       'split_id_split': splitIdSplit,
+      'muscles_id_muscle': musclesIdMuscle,
+      'supabase_id_selected_muscle': supabaseIdSelectedMuscle,
+      'action': action,
+      'muscles': muscles?.toJson(),
+      'selected_exercises': selectedExercises?.map((e) => e.toJson()).toList(),
     };
   }
 }
 
 class SelectedExercise {
-  Exercise? exercises;
   int idSelectedExercise;
   int? idExercise;
   int? idSelectedMuscle;
+  int? supabaseIdSelectedExercise;
+  int? action;
+  Exercise? exercises;
 
   SelectedExercise({
-    required this.exercises,
     required this.idSelectedExercise,
     this.idExercise,
     this.idSelectedMuscle,
+    this.supabaseIdSelectedExercise,
+    this.action,
+    required this.exercises,
   });
 
   factory SelectedExercise.fromJson(Map<String, dynamic> json) {
     var exercisesFromJson = json['exercises'] != null ? json['exercises'] as Map<String, dynamic> : null;
     Exercise? exercises = exercisesFromJson != null ? Exercise.fromJson(exercisesFromJson) : null;
     return SelectedExercise(
-      exercises: exercises,
       idSelectedExercise: json['id_selected_exercise'],
       idExercise: json['id_exercise'],
       idSelectedMuscle: json['id_selected_muscle'],
+      supabaseIdSelectedExercise: json['supabase_id_selected_exercise'],
+      action: json['action'] ?? 0,
+      exercises: exercises,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'exercises': exercises!.toJson(),
       'id_selected_exercise': idSelectedExercise,
       'id_exercise': idExercise,
       'id_selected_muscle': idSelectedMuscle,
+      'supabase_id_selected_exercise': supabaseIdSelectedExercise,
+      'action': action,
+      'exercises': exercises!.toJson(),
     };
   }
 }
 
 class SplitStartedCompleted {
   int? idStartedCompleted;
-  int? splitId;
   String? createdAt;
+  int? splitId;
+
   String? endedAt;
   bool ended;
+  int? supabaseIdStartedCompleted;
+  int? action;
   List<ExerciseData>? exerciseData;
 
   SplitStartedCompleted({
     this.idStartedCompleted,
-    this.splitId,
     this.createdAt,
+    this.splitId,
     this.endedAt,
-    this.exerciseData,
     required this.ended,
+    this.supabaseIdStartedCompleted,
+    this.action = 0,
+    this.exerciseData,
   });
 
   factory SplitStartedCompleted.fromJson(Map<String, dynamic> json) {
@@ -234,58 +341,25 @@ class SplitStartedCompleted {
 
     return SplitStartedCompleted(
       idStartedCompleted: json['id_started_completed'],
-      splitId: json['split_id'],
       createdAt: json['created_at'],
+      splitId: json['split_id'],
       endedAt: json['ended_at'],
-      ended: json['ended'],
+      ended: json['ended'] == 1 ? false : true,
+      supabaseIdStartedCompleted: json['supabase_id_started_completed'],
+      action: json['action'] ?? 0,
       exerciseData: exerciseDataList,
     );
   }
   Map<String, dynamic> toJson() {
     return {
       'id_started_completed': idStartedCompleted,
-      'split_id': splitId,
       'created_ad': createdAt,
+      'split_id': splitId,
       'ended_at': endedAt,
       'ended': ended,
+      'supabase_id_started_completed': supabaseIdStartedCompleted,
+      'action': action,
       'exercise_data': exerciseData,
-    };
-  }
-}
-
-class Split {
-  int? idSplit;
-  String nameSplit;
-  List<SelectedMuscle>? selectedMuscle;
-  List<SplitStartedCompleted>? splitStartedCompleted;
-
-  Split({
-    this.idSplit,
-    required this.nameSplit,
-    this.selectedMuscle,
-    this.splitStartedCompleted,
-  });
-
-  factory Split.fromJson(Map<String, dynamic> json) {
-    var selectedMuscleFromJson = json['selected_muscles'] as List<dynamic>? ?? [];
-    List<SelectedMuscle> selectedMusclesList = selectedMuscleFromJson.map((e) => SelectedMuscle.fromJson(e)).toList();
-
-    var splitStartedCompletedFromJson = json['split_started_completed'] as List<dynamic>? ?? []; //pokud jsou data null tak se nastaví prázdný seznam
-    List<SplitStartedCompleted> splitStartedCompletedList = splitStartedCompletedFromJson.map((e) => SplitStartedCompleted.fromJson(e)).toList();
-
-    return Split(
-      idSplit: json['id_split'],
-      nameSplit: json['name_split'],
-      selectedMuscle: selectedMusclesList,
-      splitStartedCompleted: splitStartedCompletedList,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id_split': idSplit,
-      'name_split': nameSplit,
-      'selected_muscles': selectedMuscle,
     };
   }
 }
