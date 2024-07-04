@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
 import 'package:kaloricke_tabulky_02/login_supabase/auth_page.dart';
 import 'package:kaloricke_tabulky_02/settings.dart';
 import 'package:kaloricke_tabulky_02/side_panel/fitness/edit_delete_exercise_data.dart';
@@ -25,6 +26,14 @@ import 'package:kaloricke_tabulky_02/login_supabase/splash_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  FitnessProvider dbFitness = FitnessProvider();
+  await dbFitness.initializeDB();
+  // await dbFitness.deleteFile("fitnessDatabase.db");
+  // dbFitness.DeleteMuscle(1);
+  // dbFitness.SelectMuscles();
+  // dbFitness.UpdateMuscle("Triceps", 1);
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -47,6 +56,7 @@ void main() async {
         ChangeNotifierProvider.value(value: dbHelper),
         ChangeNotifierProvider.value(value: dbFirebase),
         ChangeNotifierProvider.value(value: dbSupabase),
+        ChangeNotifierProvider.value(value: dbFitness),
         ChangeNotifierProvider.value(value: colorsProvider),
         ChangeNotifierProvider.value(value: variablesProvider),
       ],

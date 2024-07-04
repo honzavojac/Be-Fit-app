@@ -231,7 +231,7 @@ class DBHelper extends ChangeNotifier {
     await _database.rawQuery('''DELETE FROM Split WHERE ID_SPLITU IS $tab''');
     await _database.rawQuery('''DELETE FROM SplitSval WHERE ID_SPLITU IS $tab''');
     await _database.rawQuery('''DELETE FROM SvalCvik WHERE ID_SPLITU IS $tab''');
-// potřebuju celé tři tabulky přepočítat od začátku tak aby začínaly od 1 a nebyla žádná mezera
+    // potřebuju celé tři tabulky přepočítat od začátku tak aby začínaly od 1 a nebyla žádná mezera
     try {
       // Pokusit se odstranit existující tabulky
       await _database.rawQuery('''DROP TABLE IF EXISTS NewSplit;''');
@@ -247,16 +247,16 @@ class DBHelper extends ChangeNotifier {
       CREATE TABLE NewSplit (
         ID_SPLITU INTEGER PRIMARY KEY AUTOINCREMENT,
         NAZEV_SPLITU TEXT NOT NULL
-  );
-''');
+    );
+  ''');
 
       await _database.rawQuery('''
       CREATE TABLE NewSplitSval (
         ID INTEGER PRIMARY KEY AUTOINCREMENT,
         ID_SPLITU INTEGER,
         ID_SVALU INTEGER
-  );
-''');
+    );
+  ''');
 
       await _database.rawQuery('''
       CREATE TABLE NewSvalCvik (

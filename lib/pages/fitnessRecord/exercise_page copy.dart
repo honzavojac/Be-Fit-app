@@ -1,9 +1,7 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
-import 'package:intl/intl.dart';
+import 'package:kaloricke_tabulky_02/data_classes.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:provider/provider.dart';
@@ -79,14 +77,14 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
         var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false);
         if (dbSupabase.boolInsertSplitStartedCompleted == false) {
           //je split_started_completed zadáván
-          nameOfExercise = dbSupabase.exerciseData[widget.splitIndex].selectedMuscle![widget.muscleIndex].selectedExercises![widget.exerciseIndex].exercises.nameOfExercise;
-          idExercise = dbSupabase.exerciseData[widget.splitIndex].selectedMuscle![widget.muscleIndex].selectedExercises![widget.exerciseIndex].exercises.idExercise;
+          nameOfExercise = dbSupabase.exerciseData[widget.splitIndex].selectedMuscle![widget.muscleIndex].selectedExercises![widget.exerciseIndex].exercises!.nameOfExercise;
+          idExercise = dbSupabase.exerciseData[widget.splitIndex].selectedMuscle![widget.muscleIndex].selectedExercises![widget.exerciseIndex].exercises!.idExercise;
 
-          exerciseData = dbSupabase.exerciseData[widget.splitIndex].selectedMuscle![widget.muscleIndex].selectedExercises![widget.exerciseIndex].exercises.exerciseData!;
+          exerciseData = dbSupabase.exerciseData[widget.splitIndex].selectedMuscle![widget.muscleIndex].selectedExercises![widget.exerciseIndex].exercises!.exerciseData!;
         } else {
           exerciseData = [];
-          idExercise = dbSupabase.splits[widget.splitIndex].selectedMuscle![widget.muscleIndex].selectedExercises![widget.exerciseIndex].exercises.idExercise;
-          nameOfExercise = dbSupabase.splits[widget.splitIndex].selectedMuscle![widget.muscleIndex].selectedExercises![widget.exerciseIndex].exercises.nameOfExercise;
+          idExercise = dbSupabase.splits[widget.splitIndex].selectedMuscle![widget.muscleIndex].selectedExercises![widget.exerciseIndex].exercises!.idExercise;
+          nameOfExercise = dbSupabase.splits[widget.splitIndex].selectedMuscle![widget.muscleIndex].selectedExercises![widget.exerciseIndex].exercises!.nameOfExercise;
         }
 
         splitData = dbSupabase.splitStartedCompleted;
@@ -125,7 +123,7 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
       forin:
       for (var muscle in muscles) {
         for (var exercise in muscle.selectedExercises!) {
-          for (var exeData in exercise.exercises.exerciseData!) {
+          for (var exeData in exercise.exercises!.exerciseData!) {
             if (exeData.idStartedCompleted != null) {
               dbSupabase.idSplitStartedCompleted = exeData.idStartedCompleted;
               dbSupabase.boolInsertSplitStartedCompleted = true;

@@ -1,6 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:kaloricke_tabulky_02/data_classes.dart';
 import 'package:kaloricke_tabulky_02/main.dart';
 import 'package:openfoodfacts/openfoodfacts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -60,7 +60,7 @@ class SupabaseProvider extends ChangeNotifier {
     exercisesCheckedList = await List.generate(splits[idSplit].selectedMuscle![idMuscle].muscles!.exercises!.length, (index) => false);
   }
 
-//exercise_page
+  //exercise_page
   int? idSplitStartedCompleted;
   bool boolInsertSplitStartedCompleted = true;
   /* toto pak změním ve fitness_record_page 
@@ -101,11 +101,6 @@ class SupabaseProvider extends ChangeNotifier {
     };
   }
 
-//**************************************************************************************************************************** */
-//**************************************************************************************************************************** */
-//**************************************************************************************************************************** */
-//**************************************************************************************************************************** */
-//**************************************************************************************************************************** */
   getFitness() async {
     final uid = supabase.auth.currentUser!.id;
     // final dateRange = getTodayDateRange();
@@ -114,6 +109,7 @@ class SupabaseProvider extends ChangeNotifier {
     split (
       id_split,
       name_split,
+      created_at,
       split_started_completed (
         id_started_completed,
         split_id,
@@ -144,7 +140,7 @@ class SupabaseProvider extends ChangeNotifier {
         )
       )
     )
-  ''').eq('user_id', uid);
+  ''').eq('user_id', uid).order("created_at", ascending: true, referencedTable: 'split');
 
     final List<dynamic> data = response[0]['split'];
     splits = data.map((json) => Split.fromJson(json as Map<String, dynamic>)).toList();
@@ -227,6 +223,7 @@ class SupabaseProvider extends ChangeNotifier {
     // print(response[0].toString());
     final List<dynamic> data = response[0]['muscles'];
     muscles = data.map((json) => Muscle.fromJson(json as Map<String, dynamic>)).toList();
+    return muscles;
   }
 
   Future<List<Split>> getOldExerciseData(int idExercise) async {
@@ -291,7 +288,6 @@ class SupabaseProvider extends ChangeNotifier {
 
       // Získání vložené hodnoty id_started_completed z odpovědi
       int? idStartedCompleted = response['id_started_completed'];
-      print("id_started_completed: $idStartedCompleted");
 
       // Vrácení vloženého id
       return idStartedCompleted;
@@ -310,12 +306,6 @@ class SupabaseProvider extends ChangeNotifier {
     exerciseData.clear();
     notifyListeners();
   }
-
-//**************************************************************************************************************************** */
-//**************************************************************************************************************************** */
-//**************************************************************************************************************************** */
-//**************************************************************************************************************************** */
-//**************************************************************************************************************************** */
 
   int inserted = 0;
   insertSplit(String nameSplit, int idMuscle) async {
@@ -372,19 +362,19 @@ class SupabaseProvider extends ChangeNotifier {
     int exerciseIndex,
   ) async {
     int idSelectedExercise;
-    print("idExercise $idExercise, nameOfExercise $nameOfExercise, idSelectedMuscle $idSelectedMuscle, splitIndex $splitIndex, muscleIndex $muscleIndex, exerciseIndex $exerciseIndex");
-    int i = 0;
-    for (var element in splits[splitIndex].selectedMuscle![muscleIndex].selectedExercises!) {
-      print("$i - ${element.exercises.nameOfExercise}");
-      i++;
-    }
+    // print("idExercise $idExercise, nameOfExercise $nameOfExercise, idSelectedMuscle $idSelectedMuscle, splitIndex $splitIndex, muscleIndex $muscleIndex, exerciseIndex $exerciseIndex");
+    // int i = 0;
+    // for (var element in splits[splitIndex].selectedMuscle![muscleIndex].selectedExercises!) {
+    //   print("$i - ${element.exercises.nameOfExercise}");
+    //   i++;
+    // }
     if (isChecked) {
       //pokud je cvik označen tak insert row
       await supabase.from('selected_exercise').insert({'id_exercise': idExercise, 'id_selected_muscle': idSelectedMuscle});
     } else {
       //pokud není cvik označen tak delete row
       for (var i = 0; i < splits[splitIndex].selectedMuscle![muscleIndex].selectedExercises!.length; i++) {
-        var exerciseName = splits[splitIndex].selectedMuscle![muscleIndex].selectedExercises![i].exercises.nameOfExercise;
+        var exerciseName = splits[splitIndex].selectedMuscle![muscleIndex].selectedExercises![i].exercises!.nameOfExercise;
         if (exerciseName == nameOfExercise) {
           idSelectedExercise = splits[splitIndex].selectedMuscle![muscleIndex].selectedExercises![i].idSelectedExercise;
           await supabase.from('selected_exercise').delete().match({'id_selected_exercise': idSelectedExercise});
@@ -393,6 +383,7 @@ class SupabaseProvider extends ChangeNotifier {
 
       // idSelectedExercise = splits[splitIndex].selectedMuscle![muscleIndex].selectedExercises![exerciseIndex].idSelectedExercise!;
     }
+    await getFitness();
     notifyListeners();
   }
 
@@ -471,38 +462,7 @@ class SupabaseProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  ///
-  ///
-  ///
-  ///
-  ///
-  ///
-  ///
-  ///
-  ///
-  ///
-  ///
-  ///
-  ///
-  ///
-  ///
-  ///
-  ///
-  ///
-  ///
-  ///
-  ///
-  ///
-  ///
-  ///
-  ///
-  ///
-  ///
-  ///
-  ///
-  ///
-
-//food část
+  //food část
   void initFoodApi() async {
     OpenFoodAPIConfiguration.userAgent = UserAgent(name: 'Be fit');
 
@@ -511,309 +471,256 @@ class SupabaseProvider extends ChangeNotifier {
     OpenFoodAPIConfiguration.globalCountry = OpenFoodFactsCountry.CZECHIA;
   }
 
-  getProduct() async {
-    // print(result.products?[0].productName);
-  }
-}
+  //sync tabulky
+  MuscleTable() async {
+    final uid = supabase.auth.currentUser!.id;
 
-class ExerciseData {
-  static int _counter = 0; // Static counter to keep track of the ID
+    final response = await supabase.from('users').select('''
+    muscles(
+      id_muscle,
+      name_of_muscle
+    )
+  ''').eq('user_id', uid);
 
-  int? idExData;
-  int weight;
-  int reps;
-  int difficulty;
-  String? technique;
-  String? comment;
-  String? time;
-  int? exercisesIdExercise;
-  int? operation;
-  int id; //auto incremment
-  int? idStartedCompleted;
+    final List<dynamic> data = response[0]["muscles"];
 
-  ExerciseData({this.idExData, required this.weight, required this.reps, required this.difficulty, this.technique, this.comment, this.time, this.exercisesIdExercise, this.operation, this.idStartedCompleted}) : id = _incrementCounter(); // Assign the incremented ID
-
-  // Factory constructor to create an instance from a JSON object
-  factory ExerciseData.fromJson(Map<String, dynamic> json) {
-    return ExerciseData(
-      idExData: json['id_ex_data'],
-      weight: json['weight'],
-      reps: json['reps'],
-      difficulty: json['difficulty'],
-      technique: json['technique'],
-      comment: json['comment'],
-      time: json['time'],
-      exercisesIdExercise: json['exercises_id_exercise'],
-      idStartedCompleted: json['id_started_completed'],
-    );
+    List<Muscle> muscles = data.map((json) => Muscle.fromJson(json as Map<String, dynamic>)).toList();
+    // for (var element in muscles) {
+    //   print(element.nameOfMuscle);
+    // }
+    return muscles;
   }
 
-  // Method to convert the instance to a JSON object
-  Map<String, dynamic> toJson() {
-    final data = <String, dynamic>{
-      'weight': weight,
-      'reps': reps,
-      'difficulty': difficulty,
-      'technique': technique,
-      'comment': comment,
-      // 'time': time,
-      'exercises_id_exercise': exercisesIdExercise,
-      'id_started_completed': idStartedCompleted
-    };
-    if (idExData != null) {
-      data['id_ex_data'] = idExData;
+  ExerciseTable() async {
+    final uid = supabase.auth.currentUser!.id;
+
+    final response = await supabase.from('users').select('''
+    muscles(
+      exercises(
+        id_exercise,
+        name_of_exercise,
+        muscles_id_muscle
+      )
+    )
+    ''').eq('user_id', uid);
+    print("object");
+    final List<dynamic> userData = response;
+    List<Exercise> exercisesList = [];
+
+    userData.forEach((user) {
+      List<dynamic> muscles = user['muscles'] ?? [];
+
+      muscles.forEach((muscle) {
+        List<dynamic> exercises = muscle['exercises'] ?? [];
+
+        exercises.forEach((exercise) {
+          Exercise exerciseItem = Exercise.fromJson(exercise as Map<String, dynamic>);
+          exercisesList.add(exerciseItem);
+        });
+      });
+    });
+    exercisesList.sort((a, b) => a.idExercise.compareTo(b.idExercise));
+    for (var exerciseItem in exercisesList) {
+      print('idExercise: ${exerciseItem.idExercise} exercise: ${exerciseItem.nameOfExercise}');
+      // Zde můžete provést další operace s každým záznamem cvičení, například ukládání do SQLite.
     }
-    return data;
+    return exercisesList;
   }
 
-  // Static method to increment the counter and return the new value
-  static int _incrementCounter() {
-    return _counter++;
+  ExerciseDataTable() async {
+    final uid = supabase.auth.currentUser!.id;
+
+    final response = await supabase.from('users').select('''
+    muscles(
+      exercises(
+        exercise_data(
+          id_ex_data,
+          weight,
+          reps,
+          difficulty,
+          technique,
+          comment,
+          time,
+          exercises_id_exercise,
+          id_started_completed
+        )
+      )
+    )
+    ''').eq('user_id', uid);
+    print("object");
+    final List<dynamic> userData = response;
+    List<ExerciseData> exerciseDataList = [];
+
+    // Průchod výsledky odpovědi a sběr dat z hloubky vnořených polí
+    userData.forEach((user) {
+      List<dynamic> muscles = user['muscles'] ?? [];
+
+      muscles.forEach((muscle) {
+        List<dynamic> exercises = muscle['exercises'] ?? [];
+
+        exercises.forEach((exercise) {
+          List<dynamic> exerciseData = exercise['exercise_data'] ?? [];
+
+          exerciseData.forEach((data) {
+            ExerciseData exerciseDataItem = ExerciseData.fromJson(data as Map<String, dynamic>);
+            exerciseDataList.add(exerciseDataItem);
+          });
+        });
+      });
+    });
+    exerciseDataList.sort((a, b) => a.idExData!.compareTo(b.idExData!));
+    for (var exerciseData in exerciseDataList) {
+      print('Cvičení: ${exerciseData.idExData}, Váha: ${exerciseData.weight} idStartedCompleted: ${exerciseData.idStartedCompleted} exercisesIdExercise: ${exerciseData.exercisesIdExercise}');
+      // Zde můžete provést další operace s každým záznamem cvičení, například ukládání do SQLite.
+    }
+    return exerciseDataList;
   }
 
-  // Static method to reset the counter
-  static void resetCounter() {
-    _counter = 0;
-  }
-}
+  SplitTable() async {
+    final uid = supabase.auth.currentUser!.id;
 
-class Exercise {
-  int idExercise;
-  String nameOfExercise;
-  List<ExerciseData>? exerciseData;
+    final response = await supabase.from('users').select('''
+    split(
+      id_split,
+      name_split,
+      created_at
+    )
+    ''').eq('user_id', uid);
 
-  Exercise({
-    required this.idExercise,
-    required this.nameOfExercise,
-    this.exerciseData,
-  });
+    final List<dynamic> data = response[0]["split"];
 
-  factory Exercise.fromJson(Map<String, dynamic> json) {
-    var exerciseDataFromJson = json['exercise_data'] as List?;
-    List<ExerciseData>? exerciseDataList = exerciseDataFromJson?.map((e) => ExerciseData.fromJson(e)).toList();
-
-    return Exercise(
-      idExercise: json['id_exercise'],
-      nameOfExercise: json['name_of_exercise'],
-      exerciseData: exerciseDataList,
-    );
+    List<Split> splits = data.map((json) => Split.fromJson(json as Map<String, dynamic>)).toList();
+    for (var element in splits) {
+      print("idSplit: ${element.idSplit} nameSplit: ${element.nameSplit}");
+    }
+    return splits;
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id_exercise': idExercise,
-      'name_of_exercise': nameOfExercise,
-      'exercise_data': exerciseData?.map((e) => e.toJson()).toList(),
-    };
-  }
-}
+  SelectedMuscleTable() async {
+    final uid = supabase.auth.currentUser!.id;
 
-class Muscle {
-  int? idMuscle;
-  String nameOfMuscle;
-  List<Exercise>? exercises;
+    final response = await supabase.from('users').select('''
+    split(
+      selected_muscles(
+        split_id_split,
+        muscles_id_muscle,
+        id_selected_muscle
+      )
+    )
+    ''').eq('user_id', uid);
 
-  Muscle({
-    this.idMuscle,
-    required this.nameOfMuscle,
-    this.exercises,
-  });
+    final List<dynamic> userData = response as List<dynamic>;
+    List<SelectedMuscle> selectedMuscleDataList = [];
 
-  factory Muscle.fromJson(Map<String, dynamic> json) {
-    var exercisesFromJson = json['exercises'] as List;
-    List<Exercise> exercisesList = exercisesFromJson.map((e) => Exercise.fromJson(e)).toList();
+    // Průchod výsledky odpovědi a sběr dat z hloubky vnořených polí
+    userData.forEach((user) {
+      List<dynamic> splits = user['split'] ?? [];
 
-    return Muscle(
-      idMuscle: json['id_muscle'],
-      nameOfMuscle: json['name_of_muscle'],
-      exercises: exercisesList,
-    );
-  }
+      splits.forEach((split) {
+        List<dynamic> selectedMuscles = split['selected_muscles'] ?? [];
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id_muscle': idMuscle,
-      'name_of_muscle': nameOfMuscle,
-      'exercises': exercises?.map((e) => e.toJson()).toList(),
-    };
-  }
-}
+        selectedMuscles.forEach((data) {
+          if (data != null && data is Map<String, dynamic>) {
+            SelectedMuscle selectedMuscleDataItem = SelectedMuscle.fromJson(data);
+            selectedMuscleDataList.add(selectedMuscleDataItem);
+          }
+        });
+      });
+    });
 
-class SelectedMuscle {
-  Muscle? muscles;
-  int idSelectedMuscle;
-  List<SelectedExercise>? selectedExercises;
-
-  SelectedMuscle({
-    this.muscles,
-    required this.idSelectedMuscle,
-    this.selectedExercises,
-  });
-
-  factory SelectedMuscle.fromJson(Map<String, dynamic> json) {
-    var muscleFromJson = json['muscles'] as Map<String, dynamic>;
-    Muscle muscles = Muscle.fromJson(muscleFromJson);
-
-    var selectedExercisesFromJson = json['selected_exercise'] as List<dynamic>;
-    List<SelectedExercise> selectedExercisesList = selectedExercisesFromJson.map((e) => SelectedExercise.fromJson(e as Map<String, dynamic>)).toList();
-
-    return SelectedMuscle(
-      muscles: muscles,
-      idSelectedMuscle: json['id_selected_muscle'],
-      selectedExercises: selectedExercisesList,
-    );
+    selectedMuscleDataList.sort((a, b) => a.idSelectedMuscle.compareTo(b.idSelectedMuscle));
+    for (var selectedMuscleData in selectedMuscleDataList) {
+      print('idSelectedMuscle: ${selectedMuscleData.idSelectedMuscle} splitIdSplit: ${selectedMuscleData.splitIdSplit}  musclesIdMuscle: ${selectedMuscleData.musclesIdMuscle} ');
+      // Zde můžete provést další operace s každým záznamem cvičení, například ukládání do SQLite.
+    }
+    return selectedMuscleDataList;
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'muscles': muscles?.toJson(),
-      'id_selected_muscle': idSelectedMuscle,
-      'selected_exercises': selectedExercises?.map((e) => e.toJson()).toList(),
-    };
-  }
-}
+  SelectedExericseTable() async {
+    final uid = supabase.auth.currentUser!.id;
 
-class SelectedExercise {
-  Exercise exercises;
-  int idSelectedExercise;
+    final response = await supabase.from('users').select('''
+    split(
+      selected_muscles(
+        selected_exercise(
+          id_selected_exercise,
+          id_exercise,
+          id_selected_muscle
+        )
+      )
+    )
+    ''').eq('user_id', uid);
 
-  SelectedExercise({
-    required this.exercises,
-    required this.idSelectedExercise,
-  });
+    final List<dynamic> userData = response as List<dynamic>;
+    List<SelectedExercise> selectedExerciseDataList = [];
 
-  factory SelectedExercise.fromJson(Map<String, dynamic> json) {
-    return SelectedExercise(
-      exercises: Exercise.fromJson(json['exercises']),
-      idSelectedExercise: json['id_selected_exercise'],
-    );
-  }
+    // Průchod výsledky odpovědi a sběr dat z hloubky vnořených polí
+    userData.forEach((user) {
+      List<dynamic> splits = user['split'] ?? [];
 
-  Map<String, dynamic> toJson() {
-    return {
-      'exercises': exercises.toJson(),
-      'id_selected_exercise': idSelectedExercise,
-    };
-  }
-}
+      splits.forEach((split) {
+        List<dynamic> selectedMuscles = split['selected_muscles'] ?? [];
 
-class SplitStartedCompleted {
-  int? idStartedCompleted;
-  int? splitId;
-  String? createdAt;
-  String? endedAt;
-  bool ended;
-  List<ExerciseData>? exerciseData;
+        selectedMuscles.forEach((selectedMuscle) {
+          List<dynamic> selectedExecises = selectedMuscle['selected_exercise'] ?? [];
+          selectedExecises.forEach((data) {
+            SelectedExercise selectedExerciseItem = SelectedExercise.fromJson(data as Map<String, dynamic>);
+            selectedExerciseDataList.add(selectedExerciseItem);
+          });
+        });
+      });
+    });
 
-  SplitStartedCompleted({
-    this.idStartedCompleted,
-    this.splitId,
-    this.createdAt,
-    this.endedAt,
-    this.exerciseData,
-    required this.ended,
-  });
+    selectedExerciseDataList.sort((a, b) => a.idSelectedExercise.compareTo(b.idSelectedExercise));
 
-  factory SplitStartedCompleted.fromJson(Map<String, dynamic> json) {
-    var exerciseDataFromJson = json['exercise_data'] as List?;
-    List<ExerciseData>? exerciseDataList = exerciseDataFromJson?.map((e) => ExerciseData.fromJson(e)).toList();
-
-    return SplitStartedCompleted(
-      idStartedCompleted: json['id_started_completed'],
-      splitId: json['split_id'],
-      createdAt: json['created_at'],
-      endedAt: json['ended_at'],
-      ended: json['ended'],
-      exerciseData: exerciseDataList,
-    );
-  }
-  Map<String, dynamic> toJson() {
-    return {
-      'id_started_completed': idStartedCompleted,
-      'split_id': splitId,
-      'created_ad': createdAt,
-      'ended_at': endedAt,
-      'ended': ended,
-      'exercise_data': exerciseData,
-    };
-  }
-}
-
-class Split {
-  int? idSplit;
-  String nameSplit;
-  List<SelectedMuscle>? selectedMuscle;
-  List<SplitStartedCompleted>? splitStartedCompleted;
-
-  Split({
-    this.idSplit,
-    required this.nameSplit,
-    this.selectedMuscle,
-    this.splitStartedCompleted,
-  });
-
-  factory Split.fromJson(Map<String, dynamic> json) {
-    var selectedMuscleFromJson = json['selected_muscles'] as List<dynamic>? ?? [];
-    List<SelectedMuscle> selectedMusclesList = selectedMuscleFromJson.map((e) => SelectedMuscle.fromJson(e)).toList();
-
-    var splitStartedCompletedFromJson = json['split_started_completed'] as List<dynamic>? ?? []; //pokud jsou data null tak se nastaví prázdný seznam
-    List<SplitStartedCompleted> splitStartedCompletedList = splitStartedCompletedFromJson.map((e) => SplitStartedCompleted.fromJson(e)).toList();
-
-    return Split(
-      idSplit: json['id_split'],
-      nameSplit: json['name_split'],
-      selectedMuscle: selectedMusclesList,
-      splitStartedCompleted: splitStartedCompletedList,
-    );
+    for (var selectedExerciseData in selectedExerciseDataList) {
+      print('idSelectedExercise: ${selectedExerciseData.idSelectedExercise} idExercise: ${selectedExerciseData.idExercise} idSelectedMuscle: ${selectedExerciseData.idSelectedMuscle} ');
+      // Zde můžete provést další operace s každým záznamem cvičení, například ukládání do SQLite.
+    }
+    return selectedExerciseDataList;
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id_split': idSplit,
-      'name_split': nameSplit,
-      'selected_muscles': selectedMuscle,
-    };
+  SplitStartedCompletedTable() async {
+    final uid = supabase.auth.currentUser!.id;
+
+    final response = await supabase.from('users').select('''
+    split(
+      split_started_completed(
+        id_started_completed,
+        created_at,
+        split_id,
+        ended_at,
+        ended
+      )
+    )
+    ''').eq('user_id', uid);
+
+    final List<dynamic> userData = response as List<dynamic>;
+    List<SplitStartedCompleted> splitStartedCompletedDataList = [];
+
+    // Průchod výsledky odpovědi a sběr dat z hloubky vnořených polí
+    userData.forEach((user) {
+      List<dynamic> splits = user['split'] ?? [];
+
+      splits.forEach((split) {
+        List<dynamic> splitStartedCompleteds = split['split_started_completed'] ?? [];
+
+        splitStartedCompleteds.forEach((data) {
+          if (data != null && data is Map<String, dynamic>) {
+            SplitStartedCompleted splitStartedCompletedDataItem = SplitStartedCompleted.fromJson(data);
+            splitStartedCompletedDataList.add(splitStartedCompletedDataItem);
+          }
+        });
+      });
+    });
+
+    splitStartedCompletedDataList.sort((a, b) => a.idStartedCompleted!.compareTo(b.idStartedCompleted!));
+    for (var splitStartedCompletedData in splitStartedCompletedDataList) {
+      print('idStartedCompleted: ${splitStartedCompletedData.idStartedCompleted} createdAt: ${splitStartedCompletedData.createdAt}  splitId: ${splitStartedCompletedData.splitId} endedAt: ${splitStartedCompletedData.endedAt} ended: ${splitStartedCompletedData.ended} ');
+      // Zde můžete provést další operace s každým záznamem cvičení, například ukládání do SQLite.
+    }
+    return splitStartedCompletedDataList;
   }
-}
 
-class UserSupabase {
-  int idUser;
-  String name;
-  String email;
-  List<Muscle>? muscles;
-  List<Split>? split;
-
-  UserSupabase({
-    required this.idUser,
-    required this.name,
-    required this.email,
-    this.muscles,
-    this.split,
-  });
-
-  factory UserSupabase.fromJson(Map<String, dynamic> json) {
-    var musclesFromJson = json['muscles'] as List<dynamic>?; // Add null check
-    List<Muscle>? musclesList = musclesFromJson?.map((e) => Muscle.fromJson(e)).toList();
-
-    var splitsFromJson = json['split'] as List<dynamic>?; // Add null check
-    List<Split>? splitList = splitsFromJson?.map((e) => Split.fromJson(e)).toList();
-
-    return UserSupabase(
-      idUser: json['id_user'],
-      name: json['name'],
-      email: json['email'],
-      muscles: musclesList,
-      split: splitList,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id_user': idUser,
-      'name': name,
-      'email': email,
-      'muscles': muscles,
-      'split': split,
-    };
-  }
+//
 }

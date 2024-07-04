@@ -45,7 +45,7 @@ class _AddExerciseBoxState extends State<AddExerciseBox> {
         dbSupabase.muscleIndex = widget.muscleIndex;
         await dbSupabase.generateFalseExerciseCheckbox(widget.splitIndex, widget.muscleIndex);
         for (var i = 0; i < dbSupabase.splits[widget.splitIndex].selectedMuscle![widget.muscleIndex].selectedExercises!.length; i++) {
-          String selectedExerciseName = dbSupabase.splits[widget.splitIndex].selectedMuscle![widget.muscleIndex].selectedExercises![i].exercises.nameOfExercise;
+          String selectedExerciseName = dbSupabase.splits[widget.splitIndex].selectedMuscle![widget.muscleIndex].selectedExercises![i].exercises!.nameOfExercise;
 
           // print(i);
           // print(dbSupabase.splits[widget.splitIndex].selectedMuscle![widget.muscleIndex].muscles!.exercises![i].nameOfExercise);

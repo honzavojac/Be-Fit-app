@@ -1,8 +1,6 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:kaloricke_tabulky_02/database/database.dart';
+import 'package:kaloricke_tabulky_02/data_classes.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/providers/variables_provider.dart';
 import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
@@ -276,11 +274,6 @@ class _CustomDropdownState extends State<CustomDropdown> {
 }
 
 Widget _myListViewBuilder(List<dynamic> data, int index, BuildContext context, List<bool>? updateSplits, List<bool>? updateMuscles, Map<int, List<bool>>? updateExercises) {
-  var dbSupabase = Provider.of<SupabaseProvider>(context);
-  print(updateSplits);
-  print(updateMuscles);
-  print(updateExercises);
-
   for (var i = 0; i < data.length; i++) {
     switch (index) {
       case 1:
@@ -444,7 +437,6 @@ Widget _myListViewBuilder(List<dynamic> data, int index, BuildContext context, L
                                     physics: NeverScrollableScrollPhysics(),
                                     itemCount: exercises.length,
                                     itemBuilder: (context, itemIndex) {
-                                      String nameOfExercise = exercises[itemIndex].nameOfExercise;
                                       return Padding(
                                         padding: const EdgeInsets.only(bottom: 5),
                                         child: Padding(

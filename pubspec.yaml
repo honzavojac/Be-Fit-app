@@ -39,6 +39,7 @@ dependencies:
   draggable_bottom_sheet: ^1.0.2
   openfoodfacts: ^3.11.0
   flutter_barcode_scanner: ^2.0.0
+  loading_animation_widget: ^1.2.1
   
 
 dev_dependencies:

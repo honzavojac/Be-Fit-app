@@ -1,7 +1,6 @@
 // ignore_for_file: no_leading_underscores_for_local_identifiers, prefer_const_constructors, sort_child_properties_last, avoid_unnecessary_containers, avoid_print
 
 import 'package:flutter/material.dart';
-import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/pages/homePage/date_row.dart';
 import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:provider/provider.dart';
@@ -16,9 +15,6 @@ class HomeAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // var dbHelper = Provider.of<DBHelper>(context);
-    var dbSupabase = Provider.of<SupabaseProvider>(context);
-
     return AppBar(
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

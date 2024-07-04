@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
+import 'package:kaloricke_tabulky_02/data_classes.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:provider/provider.dart';
@@ -61,10 +62,8 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
     if (_lastLifecycleState == state) return;
 
     if (state == AppLifecycleState.paused) {
-      print("save immediately, app may be exit");
       if (mounted) {
         try {
-          print("saved");
           await saveDataToDatabase();
           paused = true;
         } catch (e) {
@@ -82,7 +81,6 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
     super.initState();
     WidgetsBinding.instance.addObserver(this);
 
-    print("initState called");
     loadOldData();
     loadData();
   }
@@ -90,7 +88,6 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
   late Future<int?> idSplitStartedCompleted;
 
   Future<void> loadData() async {
-    print("load called");
     var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false);
 
     var dataDb = await dbSupabase.exerciseData;
@@ -98,6 +95,7 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
     // Kontrola, zda dataDb není prázdné
     if (dataDb.isNotEmpty) {
       var selectedMuscleList = dataDb[widget.splitIndex].selectedMuscle;
+      print(selectedMuscleList);
 
       // Kontrola, zda selectedMuscleList není prázdné
       if (selectedMuscleList != null && selectedMuscleList.isNotEmpty && widget.muscleIndex < selectedMuscleList.length) {
@@ -111,23 +109,18 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
           if (exData != null && exData.exerciseData != null && exData.exerciseData!.isNotEmpty) {
             exerciseData = exData.exerciseData!;
           } else {
-            print("exData je empty");
             exerciseData = List.empty(growable: true); // Ujistěte se, že seznam lze rozšířit
           }
         } else {
-          print("selectedExercisesList je empty nebo neplatný index");
           exerciseData = List.empty(growable: true); // Ujistěte se, že seznam lze rozšířit
         }
       } else {
-        print("selectedMuscleList je empty nebo neplatný index");
         exerciseData = List.empty(growable: true); // Ujistěte se, že seznam lze rozšířit
       }
     } else {
-      print("dataDb je empty nebo neplatný index");
       exerciseData = List.empty(growable: true); // Ujistěte se, že seznam lze rozšířit
     }
 
-    print("konečně showwidget");
     setState(() {
       showWidget = true;
     });
@@ -136,12 +129,9 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
   List<SplitStartedCompleted> oldDataFinal = [];
   loadOldData() async {
     oldDataFinal.clear();
-    print("load old data");
     var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false);
     List<Split> oldData = await dbSupabase.getOldExerciseData(widget.idExercise);
-    print("old data ${oldData.length}");
     for (var element in oldData) {
-      // print(element.nameSplit);
       for (var splitStartedCompleted in element.splitStartedCompleted!) {
         for (var element in splitStartedCompleted.exerciseData!) {
           if (element.exercisesIdExercise == widget.idExercise) {
@@ -149,11 +139,6 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
             break;
           }
         }
-
-        // print(element.createdAt);
-        // for (var element in element.exerciseData!) {
-        //   print(element.weight);
-        // }
       }
     }
     oldDataFinal.sort((a, b) => b.idStartedCompleted!.compareTo(a.idStartedCompleted!));
@@ -165,26 +150,20 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
     var idStartedCompleted;
     //generování idStartedCompleted pokud není ... false
     if (exerciseData.isNotEmpty) {
-      print("fffffffffffffffff --- ${dbSupabase.boolInsertSplitStartedCompleted}");
       if (dbSupabase.boolInsertSplitStartedCompleted == true) {
+        print(widget.splitId);
         idStartedCompleted = await dbSupabase.insertSplitStartedCompleted(widget.splitId);
       } else {
         idStartedCompleted = await widget.idStartedCompleted;
-        print(idStartedCompleted);
       }
 
       await dbSupabase.actionExerciseData(exerciseData, idExercise, idStartedCompleted);
-      var newExerciseData = await dbSupabase.exerciseData[widget.splitIndex].selectedMuscle![widget.muscleIndex].selectedExercises![widget.exerciseIndex].exercises.exerciseData!;
-      print(newExerciseData.length);
-      print(exerciseData.length);
-      print("-------------------------------------------------------------------------------");
+      var newExerciseData = await dbSupabase.exerciseData[widget.splitIndex].selectedMuscle![widget.muscleIndex].selectedExercises![widget.exerciseIndex].exercises!.exerciseData!;
+
       for (var i = 0; i < newExerciseData.length; i++) {
-        print(exerciseData[i].difficulty);
         exerciseData[i].idExData = newExerciseData[i].idExData;
       }
-      print("-------------------------------------------------------------------------------");
       for (var i = 0; i < exerciseData.length; i++) {
-        print(exerciseData[i].idExData);
         exerciseData[i].operation = 0;
       }
       // setState(() {});
@@ -241,7 +220,6 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
     difficultyController = [];
 
     for (var i = 0; i < exerciseData.length; i++) {
-      print("operation: ${exerciseData[i].operation}");
       //odstranění hodnot
       if (exerciseData[i].operation == 3 || exerciseData[i].operation == 4) {
         //nothing
@@ -252,24 +230,17 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
         difficultyController.add(exerciseData[i].difficulty);
       }
     }
-    // int i = 1;
-    // for (var element in exerciseData) {
-    //   print("$i: weight: ${element.weight}, reps: ${element.reps}, difficulty: ${element.difficulty}, operation: ${element.operation}");
-    //   i++;
-    // }
+
     return finalData;
   }
 
   @override
   Widget build(BuildContext context) {
-    print("show widget: $showWidget");
     nameOfExercise = widget.nameOfExercise;
     idExercise = widget.idExercise;
     final _sheet = GlobalKey();
     final _controller = DraggableScrollableController();
     List<ExerciseData> finalExerciseData = updateExerciseData();
-
-    print("final exercise data: ${finalExerciseData.length}");
 
     if (showWidget == false) {
       return Scaffold(
@@ -282,22 +253,6 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                 '${nameOfExercise}',
                 style: TextStyle(fontWeight: FontWeight.bold, color: ColorsProvider.color_1),
               ),
-              // GestureDetector(
-              //   child: Container(
-              //       decoration: BoxDecoration(
-              //         color: ColorsProvider.color_2,
-              //         border: Border.all(color: ColorsProvider.color_8),
-              //         borderRadius: BorderRadius.circular(12),
-              //       ),
-              //       child: Padding(
-              //         padding: const EdgeInsets.fromLTRB(3, 4, 3, 4),
-              //         child: Text(
-              //           "Specials",
-              //           style: TextStyle(color: ColorsProvider.color_8, fontWeight: FontWeight.bold, fontSize: 15),
-              //         ),
-              //       )),
-              //   onTap: () {},
-              // )
             ],
           ),
           leading: IconButton(
@@ -310,7 +265,6 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
         body: GestureDetector(
           onTap: () async {
             FocusScope.of(context).requestFocus(FocusNode());
-            print("focus changed");
           },
           child: Stack(
             children: [
@@ -668,7 +622,6 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                             GestureDetector(
                               onTap: () {
                                 try {
-                                  print("přidána položka");
                                   // weightController.add(TextEditingController(text: "0"));
                                   // repsController.add(TextEditingController(text: "0"));
                                   // difficultyController.add(0);
@@ -682,10 +635,8 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                                       // idStartedCompleted:
                                     ),
                                   );
-                                  print(exerciseData.length);
-                                  // widget.notifyParent;
+
                                   updateExerciseData();
-                                  // setState(() {});
                                 } catch (e) {
                                   print("chyba při přidávání hodnot $e");
                                 }
@@ -722,7 +673,6 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
 
             // widget.notifyParent;
             // widget.loadData;
-            print("popscope---------------------------");
           }
           try {} on Exception catch (e) {
             print(e);
@@ -743,7 +693,6 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
             leading: IconButton(
               icon: Icon(Icons.arrow_back), // Ikona zpětné šipky
               onPressed: () async {
-                print("icon");
                 // saveDataToDatabase();
                 try {
                   // await widget.notifyParent;
@@ -1395,10 +1344,6 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                               GestureDetector(
                                 onTap: () {
                                   try {
-                                    print("přidána položka");
-                                    // weightController.add(TextEditingController(text: "0"));
-                                    // repsController.add(TextEditingController(text: "0"));
-                                    // difficultyController.add(0);
                                     exerciseData.add(
                                       ExerciseData(
                                         weight: 0,

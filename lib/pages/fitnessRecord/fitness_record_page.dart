@@ -3,10 +3,12 @@
 //import 'dart:html';
 
 import 'dart:async';
+import 'dart:math';
 
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:kaloricke_tabulky_02/data_classes.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/exercise_page.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/statistics_page.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
@@ -66,8 +68,7 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
   List<Split> exerciseData = [];
   int? idStartedCompleted;
   Future<void> loadData() async {
-    print("load fitness record page");
-    var dbSupabase = Provider.of<SupabaseProvider>(context, listen: true);
+    var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false);
 
     idStartedCompleted = null;
 
@@ -81,7 +82,19 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
       var dataSplit = rawData[i].splitStartedCompleted;
       for (var j = 0; j < dataSplit!.length; j++) {
         var finalData = dataSplit[j];
+        // print(dataSplit.length);
         if (finalData.ended == false) {
+          print("i: $i");
+          print("j: $j");
+          print("idStartedCompleted: ${finalData.idStartedCompleted}");
+          print("splitId: ${finalData.splitId}");
+          print("**************************");
+          // for (var element in rawData) {
+          //   print("idSplit: ${element.idSplit} nameSplit: ${element.nameSplit}");
+          // }
+          // for (var element in dataSplit) {
+          //   print("idStartedCompleted: ${element.idStartedCompleted}, ${element.splitId}");
+          // }
           dbSupabase.boolInsertSplitStartedCompleted = false;
           idStartedCompleted = finalData.idStartedCompleted;
           selectedSplit = i; // Nastavení vybraného splitu
@@ -93,14 +106,28 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
     }
 
     if (idStartedCompleted != null) {
-      print("dbsupabase.exerciseData");
       await dbSupabase.getCurrentFitness(idStartedCompleted);
       exerciseData = dbSupabase.exerciseData;
     } else {
-      print("rawData");
       exerciseData = rawData;
     }
-    print("exerciseData after getCurrentFitness: $exerciseData");
+    // for (var element in exerciseData) {
+    //   print(element.nameSplit);
+    //   for (var element1 in element.selectedMuscle!) {
+    //     print(element1.idSelectedMuscle);
+    //     for (var element in element1.selectedExercises!) {
+    //       print(element.idSelectedExercise);
+    //       for (var element in element.exercises.exerciseData!) {
+    //         print("idstartedcompleted: ${element.idStartedCompleted}");
+    //       }
+    //     }
+    //   }
+    // }
+//sort exerciseData podle idSplitu
+    exerciseData.sort((a, b) => a.idSplit!.compareTo(b.idSplit!));
+    for (var i = 0; i < exerciseData.length; i++) {
+      print("idSplit: ${exerciseData[i].idSplit} ${exerciseData[i].nameSplit}");
+    }
     // Emitování nových dat do streamu
     _streamController.add(exerciseData);
   }
@@ -138,14 +165,16 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                           selectedSplit: selectedSplit,
                           refresh: refresh,
                           onChanged: (value) {
-                            splitName = value;
-                            for (var i = 0; i < exercisesData.length; i++) {
-                              if (exercisesData[i].nameSplit == value) {
-                                selectedSplit = i;
-                                dbSupabase.clickedSplitTab = i;
+                            setState(() {
+                              splitName = value;
+                              for (var i = 0; i < exercisesData.length; i++) {
+                                if (exercisesData[i].nameSplit == value) {
+                                  selectedSplit = i;
+                                  dbSupabase.clickedSplitTab = i;
+                                  break;
+                                }
                               }
-                            }
-                            setState(() {});
+                            });
                           },
                         )
                       : FitnessRecordEndSplit(
@@ -263,14 +292,13 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                                                 physics: NeverScrollableScrollPhysics(),
                                                 itemCount: exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises!.length,
                                                 itemBuilder: (context, exerciseIndex) {
-                                                  String nameOfExercise = exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises![exerciseIndex].exercises.nameOfExercise;
+                                                  String nameOfExercise = exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises![exerciseIndex].exercises!.nameOfExercise;
                                                   var idSplit = exercisesData[selectedSplit].idSplit!;
                                                   var idMuscle = exercisesData[selectedSplit].selectedMuscle![muscleIndex].idSelectedMuscle;
-                                                  var idExercise = exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises![exerciseIndex].exercises.idExercise;
-                                                  var exerciseData = exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises![exerciseIndex].exercises.exerciseData;
+                                                  var idExercise = exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises![exerciseIndex].exercises!.idExercise;
+                                                  var exerciseData = exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises![exerciseIndex].exercises!.exerciseData;
                                                   return GestureDetector(
                                                     onTap: () async {
-                                                      print(nameOfExercise);
                                                       ExerciseData.resetCounter();
                                                       await dbSupabase.getFitness();
                                                       if (idStartedCompleted != null) {
@@ -357,10 +385,10 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                                                                                 padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
                                                                                 child: Container(
                                                                                   child: ListView.builder(
-                                                                                    itemCount: exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises![exerciseIndex].exercises.exerciseData!.length,
+                                                                                    itemCount: exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises![exerciseIndex].exercises!.exerciseData!.length,
                                                                                     scrollDirection: Axis.horizontal,
                                                                                     itemBuilder: (context, index) {
-                                                                                      var data = exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises![exerciseIndex].exercises.exerciseData![index];
+                                                                                      var data = exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises![exerciseIndex].exercises!.exerciseData![index];
                                                                                       int reps;
                                                                                       int weight;
                                                                                       int difficulty;
@@ -557,7 +585,7 @@ class _FitnessRecordDropdownState extends State<FitnessRecordDropdown> {
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton2<String>(
                     isExpanded: true,
-                    value: widget.splitName ?? (widget.splits.isNotEmpty ? widget.splits![0].nameSplit : null),
+                    value: widget.splitName ?? (widget.splits.isNotEmpty ? widget.splits[0].nameSplit : null),
                     items: splits.map<DropdownMenuItem<String>>((split) {
                       return DropdownMenuItem<String>(
                         value: split.nameSplit,
@@ -615,36 +643,6 @@ class _FitnessRecordDropdownState extends State<FitnessRecordDropdown> {
               ),
             ),
           ),
-          // Container(
-          //   height: 35,
-          //   child: ElevatedButton.icon(
-          //     onPressed: () async {
-          //       await Navigator.push(
-          //         context,
-          //         MaterialPageRoute(
-          //           builder: (context) => SplitPage(
-          //             notifyParent: widget.refresh,
-          //           ),
-          //         ),
-          //       );
-          //       // widget.refresh();
-          //     },
-          //     icon: Icon(Icons.edit_outlined),
-          //     label: Text(
-          //       'Edit split',
-          //       style: TextStyle(
-          //         fontWeight: FontWeight.bold,
-          //       ),
-          //     ),
-          //     style: ButtonStyle(
-          //       backgroundColor: MaterialStateProperty.all(ColorsProvider.color_2),
-          //       foregroundColor: MaterialStateProperty.all(ColorsProvider.color_8),
-          //     ),
-          //   ),
-          // ),
-          // SizedBox(
-          //   width: 10,
-          // ),
         ],
       ),
     );
@@ -730,8 +728,6 @@ class _FitnessRecordEndSplitState extends State<FitnessRecordEndSplit> {
                                     await dbSupabase.endSplitStartedCompleted(widget.idStartedCompleted!);
                                     widget.refresh;
                                     Navigator.of(context).pop();
-
-                                    print("yes");
                                   },
                                   child: Container(
                                     height: 40,
