@@ -376,7 +376,7 @@ class SupabaseProvider extends ChangeNotifier {
       for (var i = 0; i < splits[splitIndex].selectedMuscle![muscleIndex].selectedExercises!.length; i++) {
         var exerciseName = splits[splitIndex].selectedMuscle![muscleIndex].selectedExercises![i].exercises!.nameOfExercise;
         if (exerciseName == nameOfExercise) {
-          idSelectedExercise = splits[splitIndex].selectedMuscle![muscleIndex].selectedExercises![i].idSelectedExercise;
+          idSelectedExercise = splits[splitIndex].selectedMuscle![muscleIndex].selectedExercises![i].idSelectedExercise!;
           await supabase.from('selected_exercise').delete().match({'id_selected_exercise': idSelectedExercise});
         }
       }
@@ -518,7 +518,7 @@ class SupabaseProvider extends ChangeNotifier {
         });
       });
     });
-    exercisesList.sort((a, b) => a.idExercise.compareTo(b.idExercise));
+    exercisesList.sort((a, b) => a.idExercise!.compareTo(b.idExercise!));
     // for (var exerciseItem in exercisesList) {
     //   print('idExercise: ${exerciseItem.idExercise} exercise: ${exerciseItem.nameOfExercise}');
     //   // Zde můžete provést další operace s každým záznamem cvičení, například ukládání do SQLite.
@@ -626,7 +626,7 @@ class SupabaseProvider extends ChangeNotifier {
       });
     });
 
-    selectedMuscleDataList.sort((a, b) => a.idSelectedMuscle.compareTo(b.idSelectedMuscle));
+    selectedMuscleDataList.sort((a, b) => a.idSelectedMuscle!.compareTo(b.idSelectedMuscle!));
     // for (var selectedMuscleData in selectedMuscleDataList) {
     //   print('idSelectedMuscle: ${selectedMuscleData.idSelectedMuscle} splitIdSplit: ${selectedMuscleData.splitIdSplit}  musclesIdMuscle: ${selectedMuscleData.musclesIdMuscle} ');
     //   // Zde můžete provést další operace s každým záznamem cvičení, například ukládání do SQLite.
@@ -669,7 +669,7 @@ class SupabaseProvider extends ChangeNotifier {
       });
     });
 
-    selectedExerciseDataList.sort((a, b) => a.idSelectedExercise.compareTo(b.idSelectedExercise));
+    selectedExerciseDataList.sort((a, b) => a.idSelectedExercise!.compareTo(b.idSelectedExercise!));
 
     // for (var selectedExerciseData in selectedExerciseDataList) {
     //   print('idSelectedExercise: ${selectedExerciseData.idSelectedExercise} idExercise: ${selectedExerciseData.idExercise} idSelectedMuscle: ${selectedExerciseData.idSelectedMuscle} ');

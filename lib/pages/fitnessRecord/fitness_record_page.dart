@@ -3,14 +3,11 @@
 //import 'dart:html';
 
 import 'dart:async';
-import 'dart:math';
 
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/exercise_page.dart';
-import 'package:kaloricke_tabulky_02/pages/fitnessRecord/statistics_page.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/providers/variables_provider.dart';
 import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
@@ -67,6 +64,7 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
   List<Split> rawData = [];
   List<Split> exerciseData = [];
   int? idStartedCompleted;
+  late bool foundActiveSplit;
   Future<void> loadData() async {
     var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false);
 
@@ -75,7 +73,7 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
     await dbSupabase.getFitness();
     rawData = dbSupabase.splits;
 
-    bool foundActiveSplit = false;
+    foundActiveSplit = false;
 
     // Provedení kontroly, zda existuje aktivní split s ended == false
     for (var i = 0; i < rawData.length; i++) {
@@ -105,7 +103,7 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
       if (foundActiveSplit) break;
     }
 
-    if (idStartedCompleted != null) {
+    if (foundActiveSplit) {
       await dbSupabase.getCurrentFitness(idStartedCompleted);
       exerciseData = dbSupabase.exerciseData;
     } else {
@@ -125,9 +123,9 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
     // }
 //sort exerciseData podle idSplitu
     exerciseData.sort((a, b) => a.idSplit!.compareTo(b.idSplit!));
-    for (var i = 0; i < exerciseData.length; i++) {
-      print("idSplit: ${exerciseData[i].idSplit} ${exerciseData[i].nameSplit}");
-    }
+    // for (var i = 0; i < exerciseData.length; i++) {
+    //   print("idSplit: ${exerciseData[i].idSplit} ${exerciseData[i].nameSplit}");
+    // }
     // Emitování nových dat do streamu
     _streamController.add(exerciseData);
   }
@@ -301,24 +299,23 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                                                     onTap: () async {
                                                       ExerciseData.resetCounter();
                                                       await dbSupabase.getFitness();
-                                                      if (idStartedCompleted != null) {
+                                                      print(idStartedCompleted);
+                                                      if (idSplitStartedCompleted != null) {
                                                         await dbSupabase.getCurrentFitness(idStartedCompleted);
                                                       }
 
-                                                      // await dbSupabase.getexercisesDatatartedCompleted(idStartedCompleted!);
                                                       Navigator.push(
                                                         context,
                                                         MaterialPageRoute(
                                                           builder: (context) => ExercisePage(
                                                             nameOfExercise: nameOfExercise,
-                                                            idExercise: idExercise,
+                                                            idExercise: idExercise!,
                                                             splitId: idSplit,
                                                             idStartedCompleted: idStartedCompleted,
                                                             splitIndex: selectedSplit,
                                                             muscleIndex: muscleIndex,
                                                             exerciseIndex: exerciseIndex,
-                                                            loadData: loadData,
-                                                            notifyParent: refresh,
+                                                            // notifyParent: refresh,
                                                           ),
                                                         ),
                                                       );

@@ -78,12 +78,12 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
         if (dbSupabase.boolInsertSplitStartedCompleted == false) {
           //je split_started_completed zadáván
           nameOfExercise = dbSupabase.exerciseData[widget.splitIndex].selectedMuscle![widget.muscleIndex].selectedExercises![widget.exerciseIndex].exercises!.nameOfExercise;
-          idExercise = dbSupabase.exerciseData[widget.splitIndex].selectedMuscle![widget.muscleIndex].selectedExercises![widget.exerciseIndex].exercises!.idExercise;
+          idExercise = dbSupabase.exerciseData[widget.splitIndex].selectedMuscle![widget.muscleIndex].selectedExercises![widget.exerciseIndex].exercises!.idExercise!;
 
           exerciseData = dbSupabase.exerciseData[widget.splitIndex].selectedMuscle![widget.muscleIndex].selectedExercises![widget.exerciseIndex].exercises!.exerciseData!;
         } else {
           exerciseData = [];
-          idExercise = dbSupabase.splits[widget.splitIndex].selectedMuscle![widget.muscleIndex].selectedExercises![widget.exerciseIndex].exercises!.idExercise;
+          idExercise = dbSupabase.splits[widget.splitIndex].selectedMuscle![widget.muscleIndex].selectedExercises![widget.exerciseIndex].exercises!.idExercise!;
           nameOfExercise = dbSupabase.splits[widget.splitIndex].selectedMuscle![widget.muscleIndex].selectedExercises![widget.exerciseIndex].exercises!.nameOfExercise;
         }
 

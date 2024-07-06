@@ -119,10 +119,10 @@ class _AddExerciseBoxState extends State<AddExerciseBox> {
                                         var finalExercise = exercises[index];
                                         print(index);
                                         await dbSupabase.updateSelectedExercise(
-                                          finalExercise.idExercise,
+                                          finalExercise.idExercise!,
                                           finalExercise.nameOfExercise,
                                           value!,
-                                          data.idSelectedMuscle,
+                                          data.idSelectedMuscle!,
                                           widget.splitIndex,
                                           widget.muscleIndex,
                                           index,

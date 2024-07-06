@@ -1,3 +1,7 @@
+import 'dart:math';
+
+import 'package:intl/intl.dart';
+
 class Muscle {
   int? idMuscle;
   String nameOfMuscle;
@@ -5,6 +9,7 @@ class Muscle {
   int? action;
   int? supabaseIdMuscle;
   List<Exercise>? exercises;
+  int? idUser;
 
   Muscle({
     this.idMuscle,
@@ -12,6 +17,7 @@ class Muscle {
     this.supabaseIdMuscle,
     this.action = 0,
     this.exercises,
+    this.idUser,
   });
 
   factory Muscle.fromJson(Map<String, dynamic> json) {
@@ -35,29 +41,38 @@ class Muscle {
     return {
       'id_muscle': idMuscle,
       'name_of_muscle': nameOfMuscle,
-      'supabase_id_muscle': supabaseIdMuscle,
-      'action': action,
+      // 'supabase_id_muscle': supabaseIdMuscle,
+      // 'action': action,
       'exercises': exercises?.map((e) => e.toJson()).toList(),
+      // 'users_id_user': idUser,
     };
+  }
+
+  printMuscle() {
+    print(
+      "id_muscle: $idMuscle *** name_of_muscle: $nameOfMuscle *** supabase_id_muscle: $supabaseIdMuscle *** action: $action *** exercises: $exercises",
+    );
   }
 }
 
 class Exercise {
-  int idExercise;
+  int? idExercise;
   String nameOfExercise;
   int? musclesIdMuscle;
   int? supabaseIdExercise;
   int? action;
+  int? idUser;
 
   List<ExerciseData>? exerciseData;
 
   Exercise({
-    required this.idExercise,
+    this.idExercise,
     required this.nameOfExercise,
     this.musclesIdMuscle,
     this.supabaseIdExercise,
     this.action = 0,
     this.exerciseData,
+    this.idUser,
   });
 
   factory Exercise.fromJson(Map<String, dynamic> json) {
@@ -79,10 +94,17 @@ class Exercise {
       'id_exercise': idExercise,
       'name_of_exercise': nameOfExercise,
       'muscles_id_muscle': musclesIdMuscle,
-      'supabase_id_exercise': supabaseIdExercise,
-      'action': action,
+      // 'supabase_id_exercise': supabaseIdExercise,
+      // 'action': action,
       'exercise_data': exerciseData?.map((e) => e.toJson()).toList(),
+      // 'users_id_user': idUser,
     };
+  }
+
+  printExercise() {
+    print(
+      "id_exercise: $idExercise *** muscles_id_muscle: $musclesIdMuscle *** supabase_id_exercise: $supabaseIdExercise *** action: $action *** exercise_data: $exerciseData *** name_of_exercise: $nameOfExercise",
+    );
   }
 }
 
@@ -102,6 +124,7 @@ class ExerciseData {
   int? action;
   int id; //auto incremment
   int? operation;
+  int? idUser;
 
   ExerciseData({
     this.idExData,
@@ -116,6 +139,7 @@ class ExerciseData {
     this.supabaseIdExData,
     this.action = 0,
     this.operation,
+    this.idUser,
   }) : id = _incrementCounter(); // Assign the incremented ID
 
   // Factory constructor to create an instance from a JSON object
@@ -144,12 +168,13 @@ class ExerciseData {
       'difficulty': difficulty,
       'technique': technique,
       'comment': comment,
-      'time': time,
+      // 'time': time,
       'exercises_id_exercise': exercisesIdExercise,
       'id_started_completed': idStartedCompleted,
-      'operation': operation,
-      'action': action,
-      'supabase_id_ex_data': supabaseIdExData,
+      // 'operation': operation,
+      // 'action': action,
+      // 'supabase_id_ex_data': supabaseIdExData,
+      // 'users_id_user': idUser,
     };
     if (idExData != null) {
       data['id_ex_data'] = idExData;
@@ -166,6 +191,10 @@ class ExerciseData {
   static void resetCounter() {
     _counter = 0;
   }
+
+  printExerciseData() {
+    print("weight: $weight *** reps: $reps *** difficulty: $difficulty *** technique: $technique *** comment: $comment *** time: $time *** exercises_id_exercise: $exercisesIdExercise *** id_started_completed: $idStartedCompleted *** operation: $operation *** action: $action *** supabase_id_ex_data: $supabaseIdExData");
+  }
 }
 
 class Split {
@@ -176,6 +205,7 @@ class Split {
   int? action;
   List<SelectedMuscle>? selectedMuscle;
   List<SplitStartedCompleted>? splitStartedCompleted;
+  int? idUser;
 
   Split({
     this.idSplit,
@@ -185,6 +215,7 @@ class Split {
     this.action = 0,
     this.selectedMuscle,
     this.splitStartedCompleted,
+    this.idUser,
   });
 
   factory Split.fromJson(Map<String, dynamic> json) {
@@ -208,36 +239,47 @@ class Split {
       splitStartedCompleted: splitStartedCompletedList,
     );
   }
-
   Map<String, dynamic> toJson() {
+    DateTime date = DateTime.now();
+    String formattedDate = DateFormat('yyyy:MM:dd').format(date);
+
     return {
       'id_split': idSplit,
       'name_split': nameSplit,
-      'created_at': createdAt,
+      'created_at': createdAt ?? formattedDate,
+      'users_id_user': idUser,
       'selected_muscles': selectedMuscle,
-      'action': action,
-      'supabase_id_split': supabaseIdSplit,
+      // 'action': action,
+      // 'supabase_id_split': supabaseIdSplit,
     };
+  }
+
+  printSplit() {
+    print(
+      "id_split: $idSplit *** name_split: $nameSplit *** created_at: $createdAt *** selected_muscles: $selectedMuscle *** action: $action *** supabase_id_split: $supabaseIdSplit",
+    );
   }
 }
 
 class SelectedMuscle {
-  int idSelectedMuscle;
+  int? idSelectedMuscle;
   int? splitIdSplit;
   int? musclesIdMuscle;
   int? supabaseIdSelectedMuscle;
   int? action;
   Muscle? muscles;
   List<SelectedExercise>? selectedExercises;
+  int? idUser;
 
   SelectedMuscle({
-    required this.idSelectedMuscle,
+    this.idSelectedMuscle,
     this.splitIdSplit,
     this.musclesIdMuscle,
     this.supabaseIdSelectedMuscle,
     this.action,
     this.muscles,
     this.selectedExercises,
+    this.idUser,
   });
 
   factory SelectedMuscle.fromJson(Map<String, dynamic> json) {
@@ -263,29 +305,36 @@ class SelectedMuscle {
       'id_selected_muscle': idSelectedMuscle,
       'split_id_split': splitIdSplit,
       'muscles_id_muscle': musclesIdMuscle,
-      'supabase_id_selected_muscle': supabaseIdSelectedMuscle,
-      'action': action,
+      // 'supabase_id_selected_muscle': supabaseIdSelectedMuscle,
+      // 'action': action,
       'muscles': muscles?.toJson(),
       'selected_exercises': selectedExercises?.map((e) => e.toJson()).toList(),
+      // 'users_id_user': idUser,
     };
+  }
+
+  printSelectedMuscle() {
+    print("id_selected_muscle: $idSelectedMuscle *** split_id_split: $splitIdSplit *** muscles_id_muscle: $musclesIdMuscle *** supabase_id_muscle: $supabaseIdSelectedMuscle *** action: $action *** muscles: $muscles ");
   }
 }
 
 class SelectedExercise {
-  int idSelectedExercise;
+  int? idSelectedExercise;
   int? idExercise;
   int? idSelectedMuscle;
   int? supabaseIdSelectedExercise;
   int? action;
   Exercise? exercises;
+  int? idUser;
 
   SelectedExercise({
-    required this.idSelectedExercise,
+    this.idSelectedExercise,
     this.idExercise,
     this.idSelectedMuscle,
     this.supabaseIdSelectedExercise,
     this.action,
-    required this.exercises,
+    this.exercises,
+    this.idUser,
   });
 
   factory SelectedExercise.fromJson(Map<String, dynamic> json) {
@@ -306,10 +355,17 @@ class SelectedExercise {
       'id_selected_exercise': idSelectedExercise,
       'id_exercise': idExercise,
       'id_selected_muscle': idSelectedMuscle,
-      'supabase_id_selected_exercise': supabaseIdSelectedExercise,
-      'action': action,
+      // 'supabase_id_selected_exercise': supabaseIdSelectedExercise,
+      // 'action': action,
       'exercises': exercises!.toJson(),
+      // 'users_id_user': idUser,
     };
+  }
+
+  printSelectedExercise() {
+    print(
+      "id_selected_exercise: $idSelectedExercise *** id_exercise: $idExercise *** id_selected_muscle: $idSelectedMuscle *** supabase_id_exercise: $supabaseIdSelectedExercise *** action: $action *** exercises: $exercises ",
+    );
   }
 }
 
@@ -323,6 +379,7 @@ class SplitStartedCompleted {
   int? supabaseIdStartedCompleted;
   int? action;
   List<ExerciseData>? exerciseData;
+  int? idUser;
 
   SplitStartedCompleted({
     this.idStartedCompleted,
@@ -333,18 +390,25 @@ class SplitStartedCompleted {
     this.supabaseIdStartedCompleted,
     this.action = 0,
     this.exerciseData,
+    this.idUser,
   });
 
   factory SplitStartedCompleted.fromJson(Map<String, dynamic> json) {
     var exerciseDataFromJson = json['exercise_data'] as List?;
     List<ExerciseData>? exerciseDataList = exerciseDataFromJson?.map((e) => ExerciseData.fromJson(e)).toList();
-
+    var lateEnded = json['ended'];
+    bool ended;
+    if (lateEnded == 1 || lateEnded == true) {
+      ended = true;
+    } else {
+      ended = false;
+    }
     return SplitStartedCompleted(
       idStartedCompleted: json['id_started_completed'],
       createdAt: json['created_at'],
       splitId: json['split_id'],
       endedAt: json['ended_at'],
-      ended: json['ended'] == 1 ? false : true,
+      ended: ended,
       supabaseIdStartedCompleted: json['supabase_id_started_completed'],
       action: json['action'] ?? 0,
       exerciseData: exerciseDataList,
@@ -357,10 +421,17 @@ class SplitStartedCompleted {
       'split_id': splitId,
       'ended_at': endedAt,
       'ended': ended,
-      'supabase_id_started_completed': supabaseIdStartedCompleted,
-      'action': action,
+      // 'supabase_id_started_completed': supabaseIdStartedCompleted,
+      // 'action': action,
       'exercise_data': exerciseData,
+      'users_id_user': idUser,
     };
+  }
+
+  printSplitStartedCompleted() {
+    print(
+      "id_started_completed: $idStartedCompleted *** created_at: $createdAt *** split_id: $splitId *** ended_at: $endedAt *** ended: $ended *** supabase_is_started_completed: $supabaseIdStartedCompleted *** action: $action *** exercise_data: $exerciseData",
+    );
   }
 }
 

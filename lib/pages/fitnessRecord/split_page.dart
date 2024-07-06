@@ -466,10 +466,10 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                                                                             await saveText(context);
                                                                             // !isCheckedList["${muscle.nameOfMuscle}"]![itemIndex];
                                                                             await dbSupabase.updateSelectedExercise(
-                                                                              exercises[itemIndex].idExercise,
+                                                                              exercises[itemIndex].idExercise!,
                                                                               exercises[itemIndex].nameOfExercise,
                                                                               !isChecked,
-                                                                              muscle.idSelectedMuscle,
+                                                                              muscle.idSelectedMuscle!,
                                                                               _tabController.index,
                                                                               muscleIndex,
                                                                               itemIndex,

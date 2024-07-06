@@ -1,10 +1,6 @@
-import 'dart:math';
-
 import 'package:dropdown_button2/dropdown_button2.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
@@ -19,8 +15,7 @@ class ExercisePage extends StatefulWidget {
   final int splitIndex;
   final int muscleIndex;
   final int exerciseIndex;
-  final Function()? loadData;
-  final Function() notifyParent;
+  // final Function() notifyParent;
   const ExercisePage({
     super.key,
     required this.nameOfExercise,
@@ -30,8 +25,7 @@ class ExercisePage extends StatefulWidget {
     required this.splitIndex,
     required this.muscleIndex,
     required this.exerciseIndex,
-    this.loadData,
-    required this.notifyParent,
+    // required this.notifyParent,
   });
 
   @override
@@ -83,6 +77,7 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
 
     loadOldData();
     loadData();
+    print("tttttttttttttttttttttttttttttt");
   }
 
   late Future<int?> idSplitStartedCompleted;
@@ -95,8 +90,18 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
     // Kontrola, zda dataDb není prázdné
     if (dataDb.isNotEmpty) {
       var selectedMuscleList = dataDb[widget.splitIndex].selectedMuscle;
-      print(selectedMuscleList);
 
+      print("selectedMuscleList ${selectedMuscleList}");
+      for (var element in selectedMuscleList!) {
+        print(element.muscles!.exercises!);
+        for (var element in element.selectedExercises!) {
+          print(element.idSelectedExercise!);
+          print(element.exercises!.nameOfExercise!);
+          for (var element in element.exercises!.exerciseData!) {
+            print("weigth ${element.reps}");
+          }
+        }
+      }
       // Kontrola, zda selectedMuscleList není prázdné
       if (selectedMuscleList != null && selectedMuscleList.isNotEmpty && widget.muscleIndex < selectedMuscleList.length) {
         var selectedExercisesList = selectedMuscleList[widget.muscleIndex].selectedExercises;
@@ -120,7 +125,6 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
     } else {
       exerciseData = List.empty(growable: true); // Ujistěte se, že seznam lze rozšířit
     }
-
     setState(() {
       showWidget = true;
     });

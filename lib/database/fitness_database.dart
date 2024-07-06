@@ -1,7 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
+import 'package:kaloricke_tabulky_02/main.dart';
 import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -142,33 +144,139 @@ class FitnessProvider extends ChangeNotifier {
     print("Delete tables hotový");
   }
 
-  UpdateAction(String dbTable, int action, int idItem) async {
+  SyncSqfliteToSupabase(SupabaseProvider dbSupabase, String dbTable, dynamic data, int action) async {
+    var idUser = dbSupabase.user!.idUser;
+    Muscle muscle;
+    Exercise exercise;
+    ExerciseData exerciseData;
+    Split split;
+    SelectedMuscle selectedMuscle;
+    SelectedExercise selectedExercise;
+    SplitStartedCompleted splitStartedCompleted;
+    dynamic finalData;
+    int idRecord;
+    String idItem = "";
     switch (dbTable) {
       case "muscles":
-        await _database.rawQuery('''UPDATE muscles SET action = $action WHERE id_muscle = $idItem''');
+        finalData = {
+          'name_of_muscle': data.nameOfMuscle,
+          'id_user': idUser,
+        };
+        idRecord = data.idMuscle;
+        idItem = "id_muscle";
         break;
       case "exercises":
-        await _database.rawQuery('''UPDATE exercises SET action = $action WHERE id_exercise = $idItem''');
+        finalData = {
+          'name_of_exercise': data.nameOfExercise,
+          'muscles_id_muscle': data.musclesIdMuscle,
+        };
+        idRecord = data.idExercise;
+        idItem = "id_exercise";
+        break;
+      case "exercise_data":
+        finalData = {
+          'weight': data.weight,
+          'reps': data.reps,
+          'difficulty': data.difficulty,
+          'exercises_id_exercise': data.exercisesIdExercise,
+          'time': data.time,
+          'id_started_completed': data.idStartedCompleted,
+        };
+        idRecord = data.idExData;
+        idItem = "id_ex_data";
+        break;
+      case "split":
+        finalData = {
+          'name_split': data.nameSplit,
+          'created_at': data.createdAt,
+          'sected_muscle': data.SelectMuscle,
+        };
+        idRecord = data.idSplit;
+        idItem = "id_split";
+        break;
+      case "selected_muscles":
+        finalData = {
+          'split_id_split': data.splitIdSplit,
+          'muscles_id_muscle': data.musclesIdMuscle,
+        };
+        idRecord = data.idSelectedMuscle;
+        idItem = "id_selected_muscle";
+        break;
+      case "selected_exercise":
+        finalData = {
+          'id_exercise': data.idExercise,
+          'id_selected_muscle': data.idSelectedMuscle,
+        };
+        idRecord = data.idSelectedExercise;
+        idItem = "id_selected_exercise";
+        break;
+      case "split_started_completed":
+        finalData = {
+          'created_at': data.createdAt,
+          'split_id': data.splitId,
+          'ended_at': data.endedAt,
+          'ended': data.ended,
+        };
+        idRecord = data.idStartedCompleted;
+        idItem = "id_started_completed";
+        break;
+      default:
+        //něco se pokazilo
+        idRecord = -1;
+        action = 99;
+        print("stala se chyba v fitness_database (nejspíš v jméně zadané tabulky)");
+    }
+    switch (action) {
+      case 0:
+        //data jsou stejné
+        // finalData.printSplit();
+        print("nic se neinsertovalo");
+        break;
+      case 1:
+        //insert do supabase
+
+        var responseData = await supabase.from('$dbTable').insert(finalData).select();
+        int supabaseIdItem = responseData[0]['$idItem'];
+
+        await UpdateAction(dbTable, idRecord, supabaseIdItem, 0);
+        break;
+      case 2:
+        //update do supabase
+        break;
+      case 3:
+        //delete do supabase
+        break;
+      default:
+    }
+  }
+
+  UpdateAction(String dbTable, int idRecord, int? supabaseIdItem, int action) async {
+    switch (dbTable) {
+      case "muscles":
+        await _database.rawQuery('''UPDATE muscles SET supabase_id_muscle = $supabaseIdItem, action = $action WHERE id_muscle = $idRecord''');
+        break;
+      case "exercises":
+        await _database.rawQuery('''UPDATE exercises SET supabase_id_exercise = $supabaseIdItem, action = $action WHERE id_exercise = $idRecord''');
 
         break;
       case "exercise_data":
-        await _database.rawQuery('''UPDATE exercise_data SET action = $action WHERE id_ex_data = $idItem''');
+        await _database.rawQuery('''UPDATE exercise_data SET supabase_id_ex_data = $supabaseIdItem, action = $action WHERE id_ex_data = $idRecord''');
 
         break;
       case "split":
-        await _database.rawQuery('''UPDATE split SET action = $action WHERE id_split = $idItem''');
+        await _database.rawQuery('''UPDATE split SET supabase_id_split = $supabaseIdItem, action = $action,  WHERE id_split = $idRecord''');
 
         break;
       case "selected_muscles":
-        await _database.rawQuery('''UPDATE selected_muscles SET action = $action WHERE id_selected_muscle = $idItem''');
+        await _database.rawQuery('''UPDATE selected_muscles SET supabase_id_selected_muscle = $supabaseIdItem, action = $action WHERE id_selected_muscle = $idRecord''');
 
         break;
       case "selected_exercise":
-        await _database.rawQuery('''UPDATE selected_exercise SET action = $action WHERE id_selected_exercise = $idItem''');
+        await _database.rawQuery('''UPDATE selected_exercise SET supabase_id_selected_exercise = $supabaseIdItem, action = $action WHERE id_selected_exercise = $idRecord''');
 
         break;
       case "split_started_completed":
-        await _database.rawQuery('''UPDATE split_started_completed SET action = $action WHERE id_started_completed = $idItem''');
+        await _database.rawQuery('''UPDATE split_started_completed SET supabase_id_started_completed = $supabaseIdItem, action = $action WHERE id_started_completed = $idRecord''');
 
         break;
       default:
@@ -187,7 +295,7 @@ class FitnessProvider extends ChangeNotifier {
   }
 
   InsertMuscle(
-    int supabaseIdMuscle,
+    int? supabaseIdMuscle,
     String nameOfMuscle,
     int action,
   ) async {
@@ -238,7 +346,7 @@ class FitnessProvider extends ChangeNotifier {
   }
 
   InsertExercise(
-    int supabaseIdExercise,
+    int? supabaseIdExercise,
     String nameOfExercise,
     int musclesIdMuscle,
     int action,
@@ -275,7 +383,7 @@ class FitnessProvider extends ChangeNotifier {
   DeleteAllExercises() async {
     List<Exercise> exerciseDelete = await SelectExercises();
     for (var element in exerciseDelete) {
-      await DeleteExercise(element.idExercise);
+      await DeleteExercise(element.idExercise!);
     }
     notifyListeners();
   }
@@ -292,7 +400,7 @@ class FitnessProvider extends ChangeNotifier {
   }
 
   InsertExerciseData(
-    int supabaseIdExerciseData,
+    int? supabaseIdExerciseData,
     int weight,
     int reps,
     int difficulty,
@@ -356,12 +464,14 @@ class FitnessProvider extends ChangeNotifier {
   }
 
   InsertSplit(
-    int supabaseIdSplit,
+    int? supabaseIdSplit,
     String nameOfSplit,
-    String createdAt,
+    String? createdAt,
     int action,
   ) async {
     //action 1 == insert
+    DateTime date = DateTime.now();
+    String formattedDate = DateFormat("yyyy-MM-ddTHH:mm:ss.SSS").format(date.toLocal());
     await _database.rawQuery('''INSERT INTO split (
       supabase_id_split, 
       name_split, 
@@ -371,7 +481,7 @@ class FitnessProvider extends ChangeNotifier {
       VALUES(
         $supabaseIdSplit,
         '$nameOfSplit',
-        '$createdAt', 
+        '${createdAt ?? formattedDate}', 
         $action
       )''');
     notifyListeners();
@@ -410,7 +520,7 @@ class FitnessProvider extends ChangeNotifier {
   }
 
   InsertSelectedMuscle(
-    int supabaseIdSelectedMuscle,
+    int? supabaseIdSelectedMuscle,
     int splitIdSplit,
     int musclesIdMuscle,
     int action,
@@ -464,7 +574,7 @@ class FitnessProvider extends ChangeNotifier {
   }
 
   InsertSelectedExercise(
-    int supabaseIdSelectedExercise,
+    int? supabaseIdSelectedExercise,
     int idExercise,
     int idSelectedMuscle,
     int action,
@@ -518,25 +628,30 @@ class FitnessProvider extends ChangeNotifier {
   }
 
   InsertSplitStartedCompleted(
-    int supabaseIdSplitStartedCompleted,
-    String createdAt,
+    int? supabaseIdSplitStartedCompleted,
+    String? createdAt,
+    String? endedAt,
     int splitId,
     bool ended,
     int action,
   ) async {
+    DateTime date = DateTime.now();
+    String formattedDate = DateFormat("yyyy-MM-ddTHH:mm:ss.SSS").format(date.toLocal());
     //action 1 == insert
     await _database.rawQuery('''INSERT INTO split_started_completed (
       supabase_id_started_completed, 
       created_at,
+      ended_at,
       split_id,
       ended,
       action
     ) 
     VALUES(
       $supabaseIdSplitStartedCompleted,
-      '$createdAt',
+      '${createdAt ?? formattedDate}',
+      '${endedAt}',
       $splitId,
-      ${!ended},
+      ${ended},
       $action
     )''');
 

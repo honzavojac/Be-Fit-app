@@ -127,7 +127,7 @@ class _InitPageState extends State<InitPage> {
           print("insert exercises");
           for (var exercise in supabaseExerciseList) {
             await dbFitness.InsertExercise(
-              exercise.idExercise,
+              exercise.idExercise!,
               exercise.nameOfExercise,
               exercise.musclesIdMuscle!,
               0,
@@ -187,7 +187,7 @@ class _InitPageState extends State<InitPage> {
           print("insert selectedMuscle");
           for (var selectedMuscle in supabaseSelectedMuscleList) {
             await dbFitness.InsertSelectedMuscle(
-              selectedMuscle.idSelectedMuscle,
+              selectedMuscle.idSelectedMuscle!,
               selectedMuscle.splitIdSplit!,
               selectedMuscle.musclesIdMuscle!,
               0,
@@ -206,7 +206,7 @@ class _InitPageState extends State<InitPage> {
           print("insert selectedExercise");
           for (var selectedExercise in supabaseSelectedExerciseList) {
             await dbFitness.InsertSelectedExercise(
-              selectedExercise.idSelectedExercise,
+              selectedExercise.idSelectedExercise!,
               selectedExercise.idExercise!,
               selectedExercise.idSelectedMuscle!,
               0,
@@ -227,6 +227,7 @@ class _InitPageState extends State<InitPage> {
             await dbFitness.InsertSplitStartedCompleted(
               splitStartedCompleted.idStartedCompleted!,
               splitStartedCompleted.createdAt!,
+              splitStartedCompleted.endedAt!,
               splitStartedCompleted.splitId!,
               splitStartedCompleted.ended,
               0,
@@ -248,6 +249,7 @@ class _InitPageState extends State<InitPage> {
   @override
   Widget build(BuildContext context) {
     loadDataFromSupabase();
+    loading = false;
     var dbSupabase = Provider.of<SupabaseProvider>(context);
     dbSupabase.getUser();
     if (loading == true) {

@@ -1,5 +1,5 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:kaloricke_tabulky_02/data_classes.dart';
 import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
 import 'package:kaloricke_tabulky_02/login_supabase/splash_page.dart';
 import 'package:kaloricke_tabulky_02/main.dart';
@@ -8,6 +8,8 @@ import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+import 'data_classes.dart';
 
 class Settings extends StatefulWidget {
   const Settings({super.key});
@@ -140,13 +142,48 @@ class _SettingsState extends State<Settings> {
             ),
             ElevatedButton(
               onPressed: () async {
-                // for (var i = 0; i < data.length; i++) {
-                //   print(data[i].supabaseIdMuscle);
-                // }
-                await dbSupabase.SplitStartedCompletedTable();
+                // await dbFitness.InsertSplit(null, "nameOfSplit1", null, 1);
+                List<SplitStartedCompleted> splits = await dbFitness.SelectSplitStartedCompleted();
+                for (var element in splits) {
+                  element.printSplitStartedCompleted();
+                }
+
                 setState(() {});
               },
               child: Text("select databáze"),
+            ),
+            SizedBox(
+              height: 40,
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                await dbFitness.InsertSplitStartedCompleted(null, null, null, 86, true, 1);
+                List<SplitStartedCompleted> splits = await dbFitness.SelectSplitStartedCompleted();
+                for (var element in splits) {
+                  element.printSplitStartedCompleted();
+                }
+
+                setState(() {});
+              },
+              child: Text("add item"),
+            ),
+            SizedBox(
+              height: 40,
+            ),
+
+            ElevatedButton(
+              onPressed: () async {
+                List<SplitStartedCompleted> splits = await dbFitness.SelectSplitStartedCompleted();
+                for (var element in splits) {
+                  await dbFitness.SyncSqfliteToSupabase(dbSupabase, "split_started_completed", element, element.action!);
+                }
+                List<SplitStartedCompleted> a = await dbSupabase.SplitStartedCompletedTable();
+                for (var element in a) {
+                  element.printSplitStartedCompleted();
+                }
+                setState(() {});
+              },
+              child: Text("to supabase"),
             ),
             // Row(
             //   children: [
