@@ -7,24 +7,27 @@ import 'package:provider/provider.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
-class NewExerciseBox extends StatefulWidget {
-  final int splitIndex;
-  final int muscleIndex;
+import '../../database/fitness_database.dart';
+
+class NewExerciseBoxCopy extends StatefulWidget {
+  final int idMuscle;
   final Function() notifyParent;
-  const NewExerciseBox({
+  final Function() loadParent;
+  const NewExerciseBoxCopy({
     Key? key,
-    required this.splitIndex,
-    required this.muscleIndex,
+    required this.idMuscle,
     required this.notifyParent,
+    required this.loadParent,
   }) : super(key: key);
 
   @override
-  _NewExerciseBoxState createState() => _NewExerciseBoxState();
+  _NewExerciseBoxCopyState createState() => _NewExerciseBoxCopyState();
 }
 
-class _NewExerciseBoxState extends State<NewExerciseBox> {
+class _NewExerciseBoxCopyState extends State<NewExerciseBoxCopy> {
   String? selectedMuscle;
   var _textController = TextEditingController();
+  List<Muscle> muscles = [];
 
   @override
   void didChangeDependencies() {
@@ -38,11 +41,17 @@ class _NewExerciseBoxState extends State<NewExerciseBox> {
   }
 
   void loadData() async {
-    var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false); // listen: false to avoid rebuilds
-
+    var dbSupabase = Provider.of<FitnessProvider>(context, listen: false); // listen: false to avoid rebuilds
+    muscles = await dbSupabase.SelectMuscles();
     // Nastavte výchozí hodnotu na první sval, pokud není seznam prázdný
-    if (dbSupabase.splits[widget.splitIndex].selectedMuscle!.isNotEmpty) {
-      selectedMuscle = dbSupabase.splits[widget.splitIndex].selectedMuscle![widget.muscleIndex].muscles!.nameOfMuscle;
+    print(widget.idMuscle);
+    if (muscles.isNotEmpty) {
+      for (var muscle in muscles) {
+        print("${muscle.nameOfMuscle} ${muscle.supabaseIdMuscle}");
+        if (muscle.supabaseIdMuscle == widget.idMuscle) {
+          selectedMuscle = muscle.nameOfMuscle;
+        }
+      }
     } else {
       print("nastavení defaultní hodnoty");
       selectedMuscle = " ";
@@ -50,24 +59,15 @@ class _NewExerciseBoxState extends State<NewExerciseBox> {
     setState(() {});
   }
 
-  findIdMuscle() {
-    var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false);
-    for (var muscle in dbSupabase.muscles) {
-      if (muscle.nameOfMuscle == selectedMuscle) {
-        return muscle.idMuscle;
-      } else {}
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    var dbSupabase = Provider.of<SupabaseProvider>(context);
-    var muscles = dbSupabase.muscles;
+    var dbFitness = Provider.of<FitnessProvider>(context);
+
     return AlertDialog(
       contentPadding: EdgeInsets.zero,
       content: Container(
         decoration: BoxDecoration(
-          color: ColorsProvider.color_7,
+          color: const Color.fromARGB(103, 33, 149, 243),
           borderRadius: BorderRadius.circular(25),
         ),
         height: 250,
@@ -223,13 +223,18 @@ class _NewExerciseBoxState extends State<NewExerciseBox> {
                   width: double.infinity,
                   child: TextButton(
                     onPressed: () async {
-                      if (_textController.text.trim().isNotEmpty) {
-                        await findIdMuscle();
-                        await dbSupabase.insertExercise(_textController.text.trim(), await findIdMuscle());
-                        await dbSupabase.getFitness();
-                        dbSupabase.initChecklist = 0;
+                      if (_textController.text.trim().isNotEmpty && selectedMuscle!.isNotEmpty) {
+                        List<Exercise> exercises = await dbFitness.SelectExercises();
+                        int newSupabaseIdExercise = 1 + (exercises.isNotEmpty ? exercises.last.supabaseIdExercise! : 0);
+                        late int muscleId;
+                        for (var muscle in muscles) {
+                          if (selectedMuscle == muscle.nameOfMuscle) {
+                            muscleId = muscle.supabaseIdMuscle!;
+                          }
+                        }
+                        await dbFitness.InsertExercise(newSupabaseIdExercise, _textController.text.trim(), muscleId, 1);
 
-                        await widget.notifyParent();
+                        widget.loadParent();
                         Navigator.of(context).pop();
                       } else {
                         // ignore: unused_local_variable

@@ -24,8 +24,8 @@ class _LoginPageState extends State<LoginPage> {
   late final StreamSubscription<AuthState> _authStateSubscription;
 
   Future<void> signIn() async {
-    // _emailController.text = "test@gmail.com";
-    // _passwordController.text = "123456";
+    // _emailController.text = "honzavojac@gmail.com";
+    // _passwordController.text = "Davidsrubek2408";
     try {
       setState(() {});
       await supabase.auth.signInWithPassword(

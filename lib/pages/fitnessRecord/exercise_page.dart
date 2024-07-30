@@ -231,7 +231,7 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
         finalData.add(exerciseData[i]);
         weightController.add(TextEditingController(text: exerciseData[i].weight.toString()));
         repsController.add(TextEditingController(text: exerciseData[i].reps.toString()));
-        difficultyController.add(exerciseData[i].difficulty);
+        difficultyController.add(exerciseData[i].difficulty!);
       }
     }
 
@@ -782,7 +782,7 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                                 itemCount: finalExerciseData.length,
                                 itemBuilder: (context, itemIndex) {
                                   int setNumber = itemIndex + 1;
-                                  int difficulty = finalExerciseData[itemIndex].difficulty;
+                                  int difficulty = finalExerciseData[itemIndex].difficulty!;
                                   return Column(
                                     children: [
                                       Container(
@@ -1260,9 +1260,9 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                                                                 int weight;
                                                                 int difficulty;
                                                                 // if (DateTime.now().toString().replaceRange(10, null, '') == splits[selectedSplit].selectedMuscle![muscleIndex].muscles.exercises![exerciseIndex].exerciseData![index].time!.replaceRange(10, null, '')) {
-                                                                reps = data.reps;
-                                                                weight = data.weight;
-                                                                difficulty = data.difficulty;
+                                                                reps = data.reps!;
+                                                                weight = data.weight!;
+                                                                difficulty = data.difficulty!;
                                                                 // } else {}
                                                                 return Padding(
                                                                   padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:kaloricke_tabulky_02/models/food_item.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/pages/foodAdd/newFood/food_add_page.dart';
@@ -75,54 +76,52 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Food Search'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: _controller,
-              decoration: InputDecoration(
-                labelText: 'Enter Food Name',
-                suffixIcon: IconButton(
-                  icon: Icon(Icons.search),
-                  onPressed: () {
-                    _searchFoods(_controller.text);
-                  },
-                ),
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        children: [
+          Container(
+            height: 80,
+          ),
+          TextField(
+            controller: _controller,
+            decoration: InputDecoration(
+              labelText: 'Enter Food Name',
+              suffixIcon: IconButton(
+                icon: Icon(Icons.search),
+                onPressed: () {
+                  _searchFoods(_controller.text);
+                },
               ),
             ),
-            SizedBox(height: 20),
-            if (_isLoading)
-              Center(child: CircularProgressIndicator())
-            else if (_errorMessage.isNotEmpty)
-              Center(child: Text(_errorMessage))
-            else if (_foodItems.isNotEmpty)
-              Expanded(
-                child: ListView.builder(
-                  itemCount: _foodItems.length,
-                  itemBuilder: (context, index) {
-                    final foodItem = _foodItems[index];
-                    return ListTile(
-                      title: Text(foodItem.name),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Energy: ${foodItem.energy} kcal'),
-                          Text('Protein: ${foodItem.protein} g'),
-                          Text('Fat: ${foodItem.fat} g'),
-                          Text('Carbohydrates: ${foodItem.carbohydrates} g'),
-                        ],
-                      ),
-                    );
-                  },
-                ),
+          ),
+          SizedBox(height: 20),
+          if (_isLoading)
+            Center(child: CircularProgressIndicator())
+          else if (_errorMessage.isNotEmpty)
+            Center(child: Text(_errorMessage))
+          else if (_foodItems.isNotEmpty)
+            Expanded(
+              child: ListView.builder(
+                itemCount: _foodItems.length,
+                itemBuilder: (context, index) {
+                  final foodItem = _foodItems[index];
+                  return ListTile(
+                    title: Text(foodItem.name),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Energy: ${foodItem.energy} kcal'),
+                        Text('Protein: ${foodItem.protein} g'),
+                        Text('Fat: ${foodItem.fat} g'),
+                        Text('Carbohydrates: ${foodItem.carbohydrates} g'),
+                      ],
+                    ),
+                  );
+                },
               ),
-          ],
-        ),
+            ),
+        ],
       ),
     );
   }

@@ -1,10 +1,8 @@
-import 'dart:math';
-
 import 'package:intl/intl.dart';
 
 class Muscle {
   int? idMuscle;
-  String nameOfMuscle;
+  String? nameOfMuscle;
 
   int? action;
   int? supabaseIdMuscle;
@@ -13,7 +11,7 @@ class Muscle {
 
   Muscle({
     this.idMuscle,
-    required this.nameOfMuscle,
+    this.nameOfMuscle,
     this.supabaseIdMuscle,
     this.action = 0,
     this.exercises,
@@ -50,14 +48,14 @@ class Muscle {
 
   printMuscle() {
     print(
-      "id_muscle: $idMuscle *** name_of_muscle: $nameOfMuscle *** supabase_id_muscle: $supabaseIdMuscle *** action: $action *** exercises: $exercises",
+      "id_muscle: $idMuscle  *** supabase_id_muscle: $supabaseIdMuscle *** action: $action *** name_of_muscle: $nameOfMuscle",
     );
   }
 }
 
 class Exercise {
   int? idExercise;
-  String nameOfExercise;
+  String? nameOfExercise;
   int? musclesIdMuscle;
   int? supabaseIdExercise;
   int? action;
@@ -67,7 +65,7 @@ class Exercise {
 
   Exercise({
     this.idExercise,
-    required this.nameOfExercise,
+    this.nameOfExercise,
     this.musclesIdMuscle,
     this.supabaseIdExercise,
     this.action = 0,
@@ -103,7 +101,7 @@ class Exercise {
 
   printExercise() {
     print(
-      "id_exercise: $idExercise *** muscles_id_muscle: $musclesIdMuscle *** supabase_id_exercise: $supabaseIdExercise *** action: $action *** exercise_data: $exerciseData *** name_of_exercise: $nameOfExercise",
+      "id_exercise: $idExercise *** muscles_id_muscle: $musclesIdMuscle *** supabase_id_exercise: $supabaseIdExercise *** action: $action *** name_of_exercise: $nameOfExercise",
     );
   }
 }
@@ -112,9 +110,9 @@ class ExerciseData {
   static int _counter = 0; // Static counter to keep track of the ID
 
   int? idExData;
-  int weight;
-  int reps;
-  int difficulty;
+  int? weight;
+  int? reps;
+  int? difficulty;
   String? technique;
   String? comment;
   String? time;
@@ -128,9 +126,9 @@ class ExerciseData {
 
   ExerciseData({
     this.idExData,
-    required this.weight,
-    required this.reps,
-    required this.difficulty,
+    this.weight,
+    this.reps,
+    this.difficulty,
     this.technique,
     this.comment,
     this.time,
@@ -149,8 +147,8 @@ class ExerciseData {
       weight: json['weight'],
       reps: json['reps'],
       difficulty: json['difficulty'],
-      technique: json['technique'],
-      comment: json['comment'],
+      technique: json['technique'] as String?,
+      comment: json['comment'] as String?,
       time: json['time'],
       exercisesIdExercise: json['exercises_id_exercise'],
       idStartedCompleted: json['id_started_completed'],
@@ -193,7 +191,7 @@ class ExerciseData {
   }
 
   printExerciseData() {
-    print("weight: $weight *** reps: $reps *** difficulty: $difficulty *** technique: $technique *** comment: $comment *** time: $time *** exercises_id_exercise: $exercisesIdExercise *** id_started_completed: $idStartedCompleted *** operation: $operation *** action: $action *** supabase_id_ex_data: $supabaseIdExData");
+    print("id_ex_data: $idExData *** weight: $weight *** reps: $reps *** difficulty: $difficulty *** technique: $technique *** comment: $comment *** time: ${time!.replaceRange(10, time!.length, "")} *** exercises_id_exercise: $exercisesIdExercise *** id_started_completed: $idStartedCompleted *** operation: $operation *** action: $action *** supabase_id_ex_data: $supabaseIdExData");
   }
 }
 
@@ -255,9 +253,7 @@ class Split {
   }
 
   printSplit() {
-    print(
-      "id_split: $idSplit *** name_split: $nameSplit *** created_at: $createdAt *** selected_muscles: $selectedMuscle *** action: $action *** supabase_id_split: $supabaseIdSplit",
-    );
+    print("id_split: $idSplit *** name_split: $nameSplit *** created_at: $createdAt ***  action: $action *** supabase_id_split: $supabaseIdSplit *** selected_muscles: $selectedMuscle");
   }
 }
 
@@ -375,7 +371,7 @@ class SplitStartedCompleted {
   int? splitId;
 
   String? endedAt;
-  bool ended;
+  bool? ended;
   int? supabaseIdStartedCompleted;
   int? action;
   List<ExerciseData>? exerciseData;

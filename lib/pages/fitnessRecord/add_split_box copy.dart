@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
+import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/new_muscle_box.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
@@ -7,44 +8,54 @@ import 'package:provider/provider.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
-class AddSplitBox extends StatefulWidget {
-  final Function() notifyParent;
-  const AddSplitBox({
+import 'new_muscle_box copy.dart';
+
+class AddSplitBoxCopy extends StatefulWidget {
+  final Function() loadParent;
+  final List<Split> splits;
+
+  const AddSplitBoxCopy({
     Key? key,
-    required this.notifyParent,
+    required this.loadParent,
+    required this.splits,
   }) : super(key: key);
 
   @override
-  _AddSplitBoxState createState() => _AddSplitBoxState();
+  _AddSplitBoxCopyState createState() => _AddSplitBoxCopyState();
 }
 
-class _AddSplitBoxState extends State<AddSplitBox> {
+class _AddSplitBoxCopyState extends State<AddSplitBoxCopy> {
   var _textController = TextEditingController();
 
   List<Muscle> muscles = [];
+  List<Split> splits = [];
   List<bool> isCheckedList = [];
 
   @override
   void initState() {
     super.initState();
+    loadData();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    loadData();
   }
 
   Future<void> loadData() async {
-    var dbSupabase = Provider.of<SupabaseProvider>(context);
-    await dbSupabase.getAllMuscles();
-    muscles = dbSupabase.muscles;
-    // dbSupabase.isCheckedList = List.generate(dbSupabase.muscles.length, (index) => false);
-    if (dbSupabase.splitText != null) {
-      _textController.text = dbSupabase.setTextController();
-    } else {
-      dbSupabase.clearTextController();
+    var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
+    muscles = await dbFitness.SelectMuscles();
+    if (isCheckedList.isEmpty) {
+      muscles.forEach((element) {
+        isCheckedList.add(false);
+      });
+    } else if (muscles.length == isCheckedList.length + 1) {
+      isCheckedList.add(false);
     }
+
+    splits = widget.splits;
+    splits.sort((a, b) => a.supabaseIdSplit!.compareTo(b.supabaseIdSplit!));
+    setState(() {});
   }
 
   void refresh() {
@@ -53,20 +64,18 @@ class _AddSplitBoxState extends State<AddSplitBox> {
 
   @override
   Widget build(BuildContext context) {
-    var dbSupabase = Provider.of<SupabaseProvider>(context);
-    loadData();
-    muscles = dbSupabase.muscles;
-    isCheckedList = dbSupabase.isCheckedList;
+    // var dbSupabase = Provider.of<SupabaseProvider>(context);
+    var dbFitness = Provider.of<FitnessProvider>(context);
 
     return AlertDialog(
       contentPadding: EdgeInsets.zero,
       content: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(25),
-          color: ColorsProvider.color_7,
+          color: const Color.fromARGB(103, 33, 149, 243),
         ),
-        height: 300,
-        width: 200,
+        height: 350,
+        width: 300,
         child: Stack(
           children: [
             Column(
@@ -111,10 +120,6 @@ class _AddSplitBoxState extends State<AddSplitBox> {
                               ),
                             ),
                             controller: _textController,
-                            onChanged: (value) {
-                              dbSupabase.splitText = _textController.text.trim();
-                              print(_textController.text.trim());
-                            },
                             style: TextStyle(color: ColorsProvider.color_1),
                           ),
                         ),
@@ -122,7 +127,7 @@ class _AddSplitBoxState extends State<AddSplitBox> {
                       Expanded(
                         child: Container(
                           child: ListView.builder(
-                            itemCount: dbSupabase.muscles.length,
+                            itemCount: muscles.length,
                             itemBuilder: (context, index) {
                               return Padding(
                                 padding: const EdgeInsets.only(left: 20, right: 20),
@@ -130,15 +135,13 @@ class _AddSplitBoxState extends State<AddSplitBox> {
                                   children: [
                                     Expanded(
                                       child: Text(
-                                        dbSupabase.muscles[index].nameOfMuscle!,
+                                        muscles[index].nameOfMuscle!,
                                       ),
                                     ),
                                     Checkbox(
                                       value: isCheckedList[index],
                                       onChanged: (value) {
                                         isCheckedList[index] = value ?? false;
-                                        print(isCheckedList);
-                                        print(_textController.text.trim());
 
                                         setState(() {});
                                       },
@@ -162,16 +165,37 @@ class _AddSplitBoxState extends State<AddSplitBox> {
                   child: TextButton(
                     onPressed: () async {
                       if (_textController.text.trim().isNotEmpty) {
-                        dbSupabase.inserted = 0;
-                        for (var i = 0; i < isCheckedList.length; i++) {
-                          if (isCheckedList[i] == true) {
-                            int idMuscle = dbSupabase.muscles[i].idMuscle!.toInt();
-                            await dbSupabase.insertSplit('${_textController.text.trim()}', idMuscle);
+                        try {
+                          DateTime now = DateTime.now();
+                          int newSupabaseIdSplit = 1 + (splits.isNotEmpty ? splits.last.supabaseIdSplit! : 0);
+                          List<SelectedMuscle> selectedMuscles = [];
+                          for (var element in splits) {
+                            for (var element in element.selectedMuscle!) {
+                              selectedMuscles.add(element);
+                            }
                           }
+                          int newSupabaseIdSelectedIdMuscle = 1 + (selectedMuscles.isNotEmpty ? selectedMuscles.last.supabaseIdSelectedMuscle! : 0);
+
+                          await dbFitness.InsertSplit(newSupabaseIdSplit, _textController.text.trim(), now.toString(), 1);
+
+                          for (var i = 0; i < isCheckedList.length; i++) {
+                            if (isCheckedList[i] == true) {
+                              int supabaseIdMuscle = muscles[i].supabaseIdMuscle!;
+                              // print(supabaseIdMuscle);
+                              await dbFitness.InsertSelectedMuscle(newSupabaseIdSelectedIdMuscle, newSupabaseIdSplit, supabaseIdMuscle, 1);
+                              newSupabaseIdSelectedIdMuscle++;
+                            }
+                          }
+                        } on Exception catch (e) {
+                          print("chyba: $e");
+                          // TODO
                         }
-                        await dbSupabase.getFitness();
-                        widget.notifyParent();
-                        // setState(() {});
+
+                        List<SelectedMuscle> a = await dbFitness.SelectSelectedMuscles();
+                        for (var element in a) {
+                          print(element.musclesIdMuscle);
+                        }
+                        widget.loadParent();
                         Navigator.of(context).pop();
                       } else {
                         // ignore: unused_local_variable
@@ -196,7 +220,6 @@ class _AddSplitBoxState extends State<AddSplitBox> {
                           dismissType: DismissType.onSwipe,
                           dismissDirection: [DismissDirection.endToStart],
                           reverseAnimationDuration: Duration(milliseconds: 250),
-                          onTap: () {},
                         );
                       }
                     },
@@ -239,8 +262,10 @@ class _AddSplitBoxState extends State<AddSplitBox> {
                           context: context,
                           builder: (BuildContext context) {
                             return Center(
-                              child: NewMuscleBox(
+                              child: NewMuscleBoxCopy(
+                                loadParent: loadData,
                                 notifyParent: refresh,
+                                muscles: muscles,
                               ),
                             );
                           },

@@ -338,8 +338,10 @@ class SupabaseProvider extends ChangeNotifier {
   }
 
   insertMuscle(String nameOfMuscle) async {
-    await supabase.from('muscles').insert({'name_of_muscle': nameOfMuscle, 'id_user': user!.idUser});
+    var idRow = await supabase.from('muscles').insert({'name_of_muscle': nameOfMuscle, 'id_user': user!.idUser}).select('id_muscle');
     notifyListeners();
+    int idMuscle = idRow[0]['id_muscle'];
+    return idMuscle;
   }
 
   updateName(String newName) async {

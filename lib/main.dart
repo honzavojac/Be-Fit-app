@@ -90,7 +90,7 @@ class _MyAppState extends State<MyApp> {
         '/auth': (context) => AuthPage(),
         '/fitnessNames': (context) => FitnessNames(),
         '/editDeleteExerciseData': (context) => EditDeleteExerciseData(),
-        '/fitnessStatistic': (context) => fitnessStatistic(),
+        '/fitnessStatistic': (context) => FitnessStatistic(),
         '/scanFood': (context) => ScanFood(),
         '/addFood': (context) => AddFood(),
         '/newFood': (context) => NewFood(),

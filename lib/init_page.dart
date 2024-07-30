@@ -1,13 +1,15 @@
 // ignore_for_file: unused_local_variable
 
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
 import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
+import 'package:kaloricke_tabulky_02/pages/fitnessRecord/fitness_record_page%20copy.dart';
+import 'package:kaloricke_tabulky_02/pages/fitnessRecord/fitness_record_page.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
+import 'package:kaloricke_tabulky_02/settings.dart';
 import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:provider/provider.dart';
-import 'package:kaloricke_tabulky_02/pages/fitnessRecord/fitness_global_variables.dart';
-import 'package:kaloricke_tabulky_02/pages/fitnessRecord/fitness_record_page.dart';
 import 'package:kaloricke_tabulky_02/pages/foodAdd/food_entry_page.dart';
 import 'package:kaloricke_tabulky_02/pages/homePage/home_page.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -19,23 +21,22 @@ class InitPage extends StatefulWidget {
   State<InitPage> createState() => _InitPageState();
 }
 
-final List<Widget> _appBars = [
-  FitnessRecordAppBar(),
-  HomeAppBar(),
-  FoodRecordAppBar(),
-];
-
-final List<Widget> _pages = [
-  FitnessRecordScreen(),
-  HomeScreen(),
-  FoodRecordScreen(),
-];
-
 class _InitPageState extends State<InitPage> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  final controller = PageController(initialPage: 1);
-  var pageProvider = 1;
+  final controller = PageController(initialPage: 0);
+  var pageProvider = 0;
 
+  // final List<Widget> _appBars = [
+  //   FitnessRecordAppBarCopy(),
+  //   HomeAppBar(),
+  //   FoodRecordAppBar(),
+  // ];
+  late bool switchButton;
+  // List<Widget> _pages = [
+  // switchButton == false ? FitnessRecordScreenCopy() : FitnessRecordScreen(),
+  //   HomeScreen(),
+  //   FoodRecordScreen(),
+  // ];
   // @override
   // void initState() {
   //   var dbSupabase = Provider.of<SupabaseProvider>(context);
@@ -58,6 +59,7 @@ class _InitPageState extends State<InitPage> {
     var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false);
     var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
 
+    switchButton = dbFitness.switchButton;
     // Nastavíme proměnnou pro ukládání dat
     List<Muscle> supabaseMuscleList = [];
     List<Exercise> supabaseExerciseList = [];
@@ -70,14 +72,23 @@ class _InitPageState extends State<InitPage> {
     if (loading == true) {
       // Spustíme načítání dat
       //sqflite
+      List result = await Future.wait([
+        dbFitness.SelectMuscles(),
+        dbFitness.SelectExercises(),
+        dbFitness.SelectExerciseData(),
+        dbFitness.SelectSplit(),
+        dbFitness.SelectSelectedMuscles(),
+        dbFitness.SelectSelectedExercises(),
+        dbFitness.SelectSplitStartedCompleted(),
+      ]);
 
-      List<Muscle> sqfliteMuscleList = await dbFitness.SelectMuscles();
-      List<Exercise> sqfliteExerciseList = await dbFitness.SelectExercises();
-      List<ExerciseData> sqfliteExerciseDataList = await dbFitness.SelectExerciseData();
-      List<Split> sqfliteSplitList = await dbFitness.SelectSplit();
-      List<SelectedMuscle> sqfliteSelectedMuscleList = await dbFitness.SelectSelectedMuscles();
-      List<SelectedExercise> sqfliteSelectedExerciseList = await dbFitness.SelectSelectedExercises();
-      List<SplitStartedCompleted> sqfliteSplitStartedCompletedList = await dbFitness.SelectSplitStartedCompleted();
+      List<Muscle> sqfliteMuscleList = result[0];
+      List<Exercise> sqfliteExerciseList = result[1];
+      List<ExerciseData> sqfliteExerciseDataList = result[2];
+      List<Split> sqfliteSplitList = result[3];
+      List<SelectedMuscle> sqfliteSelectedMuscleList = result[4];
+      List<SelectedExercise> sqfliteSelectedExerciseList = result[5];
+      List<SplitStartedCompleted> sqfliteSplitStartedCompletedList = result[6];
       print("sqflite hotovo");
 
       //supabase
@@ -93,150 +104,151 @@ class _InitPageState extends State<InitPage> {
 
       //načtení supabase do sqflite
 
-      await Future.delayed(Duration(seconds: 0), () async {
-        supabaseMuscleList = await MuscleLoading;
-        supabaseExerciseList = await ExerciseLoading;
-        supabaseExerciseDataList = await ExerciseDataLoading;
-        supabaseSplitList = await SplitLoading;
-        supabaseSelectedMuscleList = await SelectedMuscleLoading;
-        supabaseSelectedExerciseList = await SelectedExerciseLoading;
-        supabaseSplitStartedCompletedList = await SplitStartedCompletedLoading;
-        print("supabase hotovo");
-        //muscle
-        if (sqfliteMuscleList.isNotEmpty) {
-          //update supabase jestli action není 0
-          print("update muscles");
-        } else {
-          //insert muscles
-          for (var muscle in supabaseMuscleList) {
-            await dbFitness.InsertMuscle(
-              muscle.idMuscle!,
-              muscle.nameOfMuscle,
-              0,
-            ); // 0 protože insertujeme do sqflite ne do supabase
-          }
+      supabaseMuscleList = await MuscleLoading;
+      supabaseExerciseList = await ExerciseLoading;
+      supabaseExerciseDataList = await ExerciseDataLoading;
+      supabaseSplitList = await SplitLoading;
+      supabaseSelectedMuscleList = await SelectedMuscleLoading;
+      supabaseSelectedExerciseList = await SelectedExerciseLoading;
+      supabaseSplitStartedCompletedList = await SplitStartedCompletedLoading;
+      print("supabase hotovo");
+      //muscle
+      if (sqfliteMuscleList.isNotEmpty) {
+        //update supabase jestli action není 0
+        print("update muscles");
+      } else {
+        //insert muscles
+        for (var muscle in supabaseMuscleList) {
+          await dbFitness.InsertMuscle(
+            muscle.idMuscle!,
+            muscle.nameOfMuscle!,
+            0,
+          ); // 0 protože insertujeme do sqflite ne do supabase
         }
-        //exercise
-        if (sqfliteExerciseList.isNotEmpty) {
-          print("update exercises");
-          for (var element in sqfliteExerciseList) {
-            // print(element.nameOfExercise);
-          }
-        } else {
-          //insert exercises
-          print("insert exercises");
-          for (var exercise in supabaseExerciseList) {
-            await dbFitness.InsertExercise(
-              exercise.idExercise!,
-              exercise.nameOfExercise,
-              exercise.musclesIdMuscle!,
-              0,
-            ); // 0 protože insertujeme do sqflite ne do supabase
-          }
+      }
+      //exercise
+      if (sqfliteExerciseList.isNotEmpty) {
+        print("update exercises");
+        for (var element in sqfliteExerciseList) {
+          // print(element.nameOfExercise);
         }
-        //exerciseData
-        if (sqfliteExerciseDataList.isNotEmpty) {
-          //update supabase jestli action není 0
-          print("update exerciseData");
-          for (var element in sqfliteExerciseDataList) {
-            // print(element.weight);
-          }
-        } else {
-          //insert exercisedata
-          print("insert exerciseData");
-          for (var exerciseData in supabaseExerciseDataList) {
-            await dbFitness.InsertExerciseData(
-              exerciseData.idExData!,
-              exerciseData.weight,
-              exerciseData.reps,
-              exerciseData.difficulty,
-              exerciseData.exercisesIdExercise!,
-              exerciseData.idStartedCompleted!,
-              0,
-            ); // 0 protože insertujeme do sqflite ne do supabase
-          }
+      } else {
+        //insert exercises
+        print("insert exercises");
+        for (var exercise in supabaseExerciseList) {
+          await dbFitness.InsertExercise(
+            exercise.idExercise!,
+            exercise.nameOfExercise!,
+            exercise.musclesIdMuscle!,
+            0,
+          ); // 0 protože insertujeme do sqflite ne do supabase
         }
-        //split
-        if (sqfliteSplitList.isNotEmpty) {
-          //update supabase jestli action není 0
-          print("update split");
-          for (var element in sqfliteSplitList) {
-            // print(element.nameSplit);
-          }
-        } else {
-          //insert splits
-          print("insert splits");
-          for (var split in supabaseSplitList) {
-            await dbFitness.InsertSplit(
-              split.idSplit!,
-              split.nameSplit,
-              split.createdAt!,
-              0,
-            ); // 0 protože insertujeme do sqflite ne do supabase
-          }
+      }
+      //exerciseData
+      if (sqfliteExerciseDataList.isNotEmpty) {
+        //update supabase jestli action není 0
+        print("update exerciseData");
+        for (var element in sqfliteExerciseDataList) {
+          // print(element.weight);
         }
-        //selectedMuscle
-        if (sqfliteSelectedMuscleList.isNotEmpty) {
-          //update supabase jestli action není 0
-          print("update selectedMuscle");
-          for (var element in sqfliteSelectedMuscleList) {
-            // print(element.supabaseIdSelectedMuscle);
-          }
-        } else {
-          //insert selectedMuscle
-          print("insert selectedMuscle");
-          for (var selectedMuscle in supabaseSelectedMuscleList) {
-            await dbFitness.InsertSelectedMuscle(
-              selectedMuscle.idSelectedMuscle!,
-              selectedMuscle.splitIdSplit!,
-              selectedMuscle.musclesIdMuscle!,
-              0,
-            ); // 0 protože insertujeme do sqflite ne do supabase
-          }
+      } else {
+        //insert exercisedata
+        print("insert exerciseData");
+        for (var exerciseData in supabaseExerciseDataList) {
+          await dbFitness.InsertExerciseData(
+            exerciseData.idExData!,
+            exerciseData.weight,
+            exerciseData.reps,
+            exerciseData.difficulty,
+            exerciseData.technique,
+            exerciseData.comment,
+            exerciseData.time,
+            exerciseData.exercisesIdExercise!,
+            exerciseData.idStartedCompleted!,
+            0,
+          ); // 0 protože insertujeme do sqflite ne do supabase
         }
-        //sqfliteSelectedExerciseList
-        if (sqfliteSelectedExerciseList.isNotEmpty) {
-          //update supabase jestli action není 0
-          print("update selectedExercise");
-          for (var element in sqfliteSelectedExerciseList) {
-            // print(element.supabaseIdSelectedExercise);
-          }
-        } else {
-          //insert selectedExercise
-          print("insert selectedExercise");
-          for (var selectedExercise in supabaseSelectedExerciseList) {
-            await dbFitness.InsertSelectedExercise(
-              selectedExercise.idSelectedExercise!,
-              selectedExercise.idExercise!,
-              selectedExercise.idSelectedMuscle!,
-              0,
-            ); // 0 protože insertujeme do sqflite ne do supabase
-          }
+      }
+      //split
+      if (sqfliteSplitList.isNotEmpty) {
+        //update supabase jestli action není 0
+        print("update split");
+        for (var element in sqfliteSplitList) {
+          // print(element.nameSplit);
         }
-        //sqfliteSplitStartedCompletedList
-        if (sqfliteSplitStartedCompletedList.isNotEmpty) {
-          //update supabase jestli action není 0
-          print("update splitStartedCompleted");
-          for (var element in sqfliteSplitStartedCompletedList) {
-            print(element.ended);
-          }
-        } else {
-          //insert splitStartedCompleted
-          print("insert splitStartedCompleted");
-          for (var splitStartedCompleted in supabaseSplitStartedCompletedList) {
-            await dbFitness.InsertSplitStartedCompleted(
-              splitStartedCompleted.idStartedCompleted!,
-              splitStartedCompleted.createdAt!,
-              splitStartedCompleted.endedAt!,
-              splitStartedCompleted.splitId!,
-              splitStartedCompleted.ended,
-              0,
-            ); // 0 protože insertujeme do sqflite ne do supabase
-          }
+      } else {
+        //insert splits
+        print("insert splits");
+        for (var split in supabaseSplitList) {
+          await dbFitness.InsertSplit(
+            split.idSplit!,
+            split.nameSplit,
+            split.createdAt!,
+            0,
+          ); // 0 protože insertujeme do sqflite ne do supabase
         }
+      }
+      //selectedMuscle
+      if (sqfliteSelectedMuscleList.isNotEmpty) {
+        //update supabase jestli action není 0
+        print("update selectedMuscle");
+        for (var element in sqfliteSelectedMuscleList) {
+          // print(element.supabaseIdSelectedMuscle);
+        }
+      } else {
+        //insert selectedMuscle
+        print("insert selectedMuscle");
+        for (var selectedMuscle in supabaseSelectedMuscleList) {
+          await dbFitness.InsertSelectedMuscle(
+            selectedMuscle.idSelectedMuscle!,
+            selectedMuscle.splitIdSplit!,
+            selectedMuscle.musclesIdMuscle!,
+            0,
+          ); // 0 protože insertujeme do sqflite ne do supabase
+        }
+      }
+      //sqfliteSelectedExerciseList
+      if (sqfliteSelectedExerciseList.isNotEmpty) {
+        //update supabase jestli action není 0
+        print("update selectedExercise");
+        for (var element in sqfliteSelectedExerciseList) {
+          // print(element.supabaseIdSelectedExercise);
+        }
+      } else {
+        //insert selectedExercise
+        print("insert selectedExercise");
+        for (var selectedExercise in supabaseSelectedExerciseList) {
+          await dbFitness.InsertSelectedExercise(
+            selectedExercise.idSelectedExercise!,
+            selectedExercise.idExercise!,
+            selectedExercise.idSelectedMuscle!,
+            0,
+          ); // 0 protože insertujeme do sqflite ne do supabase
+        }
+      }
+      //sqfliteSplitStartedCompletedList
+      if (sqfliteSplitStartedCompletedList.isNotEmpty) {
+        //update supabase jestli action není 0
+        print("update splitStartedCompleted");
+        for (var element in sqfliteSplitStartedCompletedList) {
+          print(element.ended);
+        }
+      } else {
+        //insert splitStartedCompleted
+        print("insert splitStartedCompleted");
+        for (var splitStartedCompleted in supabaseSplitStartedCompletedList) {
+          await dbFitness.InsertSplitStartedCompleted(
+            splitStartedCompleted.idStartedCompleted!,
+            splitStartedCompleted.createdAt!,
+            splitStartedCompleted.endedAt,
+            splitStartedCompleted.splitId!,
+            splitStartedCompleted.ended!,
+            0,
+          ); // 0 protože insertujeme do sqflite ne do supabase
+        }
+      }
 
-        // await Future.delayed(Duration(seconds: 10));
-      });
+      // await Future.delayed(Duration(seconds: 10));
 
       // Pokud data byla načtena dříve než timeout
 
@@ -246,10 +258,11 @@ class _InitPageState extends State<InitPage> {
     }
   }
 
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
     loadDataFromSupabase();
-    loading = false;
+    loading == false;
     var dbSupabase = Provider.of<SupabaseProvider>(context);
     dbSupabase.getUser();
     if (loading == true) {
@@ -293,108 +306,118 @@ class _InitPageState extends State<InitPage> {
         ),
       );
     } else {
-      return MultiProvider(
-        providers: [
-          ChangeNotifierProvider<fitnessGlobalVariables>(
-            create: (_) => fitnessGlobalVariables(),
-          ),
-        ],
-        child: Scaffold(
-          drawer: Drawer(
-            backgroundColor: ColorsProvider.color_2,
-            width: MediaQuery.of(context).size.width / 1.50,
-            child: Column(
-              children: [
-                Container(
-                  height: 50,
-                ),
-                Container(
-                  height: 50,
-                  child: Row(
-                    // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 15),
-                        child: Container(
-                          height: 45,
-                          width: 45,
-                          decoration: BoxDecoration(
-                            color: ColorsProvider.color_3,
-                            borderRadius: BorderRadius.circular(50),
-                          ),
+      // print("hhhhhhhhhhhhhhhhhhhhhhhh${switchButton}hhhhhhhhhhhhhhhhhhhhhhhhhhh");
+      return Scaffold(
+        key: _scaffoldKey, drawerEnableOpenDragGesture: false,
+        drawer: Drawer(
+          backgroundColor: ColorsProvider.color_2,
+          width: MediaQuery.of(context).size.width / 1.50,
+          child: Column(
+            children: [
+              SizedBox(height: 50),
+              Container(
+                height: 50,
+                child: Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 15),
+                      child: Container(
+                        height: 45,
+                        width: 45,
+                        decoration: BoxDecoration(
+                          color: ColorsProvider.color_3,
+                          borderRadius: BorderRadius.circular(50),
                         ),
                       ),
-                      SizedBox(
-                        width: 8,
-                      ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "${dbSupabase.name}",
-                            style: TextStyle(
-                              color: ColorsProvider.color_8,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20,
-                            ),
+                    ),
+                    SizedBox(width: 8),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "${dbSupabase.name}",
+                          style: TextStyle(
+                            color: ColorsProvider.color_8,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
                           ),
-                        ],
-                      ),
-                      SizedBox(
-                        width: 50,
-                      ),
-                    ],
-                  ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(width: 50),
+                  ],
                 ),
-                _categoryWidget('Food'),
-                _buttonWidget(dbSupabase, context, '/scanFood', 'Scan food', Icons.fit_screen_rounded),
-                _buttonWidget(dbSupabase, context, '/addFood', 'Add food', Icons.search_rounded),
-                _buttonWidget(dbSupabase, context, '/newFood', 'New food', Icons.add_circle_outline_outlined),
-                _buttonWidget(dbSupabase, context, '/foodStatistic', 'Statistic', Icons.bar_chart_rounded),
-                _categoryWidget('Workout'),
-                _buttonWidget(dbSupabase, context, '/fitnessNames', 'Manage fitness names', Icons.text_fields_rounded),
-                _buttonWidget(dbSupabase, context, '/editDeleteExerciseData', 'Edit/Delete exercise data', Icons.edit_rounded),
-                _buttonWidget(dbSupabase, context, '/fitnessStatistic', 'Statistic', Icons.insights_rounded),
-                Spacer(),
-                _buttonWidget(dbSupabase, context, '/settings', 'Settings', Icons.settings_outlined, paddingLeft: 0),
-                SizedBox(
-                  height: 10,
-                ),
-              ],
-            ),
-          ),
-          appBar: PreferredSize(
-            preferredSize: const Size.fromHeight(50),
-            child: _appBars[pageProvider],
-          ),
-          body: PageView(
-            controller: controller,
-            onPageChanged: (index) {
-              setState(() {
-                pageProvider = index;
-              });
-            },
-            children: _pages,
-          ),
-          key: scaffoldKey,
-          bottomNavigationBar: NavigationBar(
-            elevation: 0,
-            height: 65,
-            onDestinationSelected: (index) {
-              setState(() {
-                pageProvider = index;
-                controller.jumpToPage(pageProvider);
-              });
-            },
-            indicatorColor: ColorsProvider.color_2,
-            selectedIndex: pageProvider,
-            animationDuration: const Duration(milliseconds: 1000),
-            destinations: [
-              _navigation(null, null, "Fitness"),
-              _navigation(Icons.home, Icons.home_outlined, "Home"),
-              _navigation(Icons.fastfood_rounded, Icons.fastfood, "Food"),
+              ),
+              _categoryWidget('Food'),
+              _buttonWidget(dbSupabase, context, '/scanFood', 'Scan food', Icons.fit_screen_rounded),
+              _buttonWidget(dbSupabase, context, '/addFood', 'Add food', Icons.search_rounded),
+              _buttonWidget(dbSupabase, context, '/newFood', 'New food', Icons.add_circle_outline_outlined),
+              _buttonWidget(dbSupabase, context, '/foodStatistic', 'Statistic', Icons.bar_chart_rounded),
+              _categoryWidget('Workout'),
+              _buttonWidget(dbSupabase, context, '/fitnessNames', 'Manage fitness names', Icons.text_fields_rounded),
+              _buttonWidget(dbSupabase, context, '/editDeleteExerciseData', 'Edit/Delete exercise data', Icons.edit_rounded),
+              _buttonWidget(dbSupabase, context, '/fitnessStatistic', 'Statistic', Icons.insights_rounded),
+              Spacer(),
+              _buttonWidget(dbSupabase, context, '/settings', 'Settings', Icons.settings_outlined, paddingLeft: 0),
+              SizedBox(height: 10),
             ],
           ),
+        ),
+        // appBar: AppBar(
+        //   title: Text('Your App Title'),
+        // ),
+        body: Stack(
+          children: [
+            PageView(
+              controller: controller,
+              onPageChanged: (index) {
+                setState(() {
+                  pageProvider = index;
+                });
+              },
+              children: [
+                switchButton == false ? FitnessRecordScreen() : FitnessRecordScreenCopy(),
+                HomeScreen(),
+                FoodRecordScreen(),
+              ],
+            ),
+            Positioned(
+              top: 40,
+              left: 5,
+              child: Row(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      print("object");
+                      _scaffoldKey.currentState?.openDrawer();
+                    },
+                    child: Icon(
+                      Icons.menu_rounded,
+                      size: 40,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        bottomNavigationBar: NavigationBar(
+          elevation: 0,
+          height: 65,
+          onDestinationSelected: (index) {
+            setState(() {
+              pageProvider = index;
+              controller.jumpToPage(pageProvider);
+            });
+          },
+          indicatorColor: ColorsProvider.color_2,
+          selectedIndex: pageProvider,
+          animationDuration: const Duration(milliseconds: 1000),
+          destinations: [
+            _navigation(null, null, "Fitness"),
+            _navigation(Icons.home, Icons.home_outlined, "Home"),
+            _navigation(Icons.fastfood_rounded, Icons.fastfood, "Food"),
+          ],
         ),
       );
     }

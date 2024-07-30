@@ -13,6 +13,7 @@ import 'package:kaloricke_tabulky_02/providers/variables_provider.dart';
 import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:provider/provider.dart';
 
+import 'split_page copy 3.dart';
 import 'split_page.dart';
 
 class FitnessRecordAppBar extends StatelessWidget {
@@ -156,32 +157,47 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
             } else {
               return Column(
                 children: [
-                  dbSupabase.boolInsertSplitStartedCompleted == true
-                      ? FitnessRecordDropdown(
-                          splits: exercisesData,
-                          splitName: splitName,
-                          selectedSplit: selectedSplit,
-                          refresh: refresh,
-                          onChanged: (value) {
-                            setState(() {
-                              splitName = value;
-                              for (var i = 0; i < exercisesData.length; i++) {
-                                if (exercisesData[i].nameSplit == value) {
-                                  selectedSplit = i;
-                                  dbSupabase.clickedSplitTab = i;
-                                  break;
+                  Container(
+                    height: 80,
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(0, 40, 15, 0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          CustomAppBar(),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: dbSupabase.boolInsertSplitStartedCompleted == true
+                        ? FitnessRecordDropdown(
+                            splits: exercisesData,
+                            splitName: splitName,
+                            selectedSplit: selectedSplit,
+                            refresh: refresh,
+                            onChanged: (value) {
+                              setState(() {
+                                splitName = value;
+                                for (var i = 0; i < exercisesData.length; i++) {
+                                  if (exercisesData[i].nameSplit == value) {
+                                    selectedSplit = i;
+                                    dbSupabase.clickedSplitTab = i;
+                                    break;
+                                  }
                                 }
-                              }
-                            });
-                          },
-                        )
-                      : FitnessRecordEndSplit(
-                          splitName: splitName,
-                          idStartedCompleted: idStartedCompleted,
-                          refresh: refresh,
-                          loadData: loadData,
-                          onChanged: (value) {},
-                        ),
+                              });
+                            },
+                          )
+                        : FitnessRecordEndSplit(
+                            splitName: splitName,
+                            idStartedCompleted: idStartedCompleted,
+                            refresh: refresh,
+                            loadData: loadData,
+                            onChanged: (value) {},
+                          ),
+                  ),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
                   ),
@@ -198,7 +214,7 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                             child: ListView.builder(
                               itemCount: exercisesData[selectedSplit].selectedMuscle!.length,
                               itemBuilder: (context, muscleIndex) {
-                                String muscle = exercisesData[selectedSplit].selectedMuscle![muscleIndex].muscles!.nameOfMuscle;
+                                String muscle = exercisesData[selectedSplit].selectedMuscle![muscleIndex].muscles!.nameOfMuscle!;
                                 if (exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises!.isEmpty) {
                                   return Padding(
                                     padding: const EdgeInsets.only(bottom: 15),
@@ -290,7 +306,7 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                                                 physics: NeverScrollableScrollPhysics(),
                                                 itemCount: exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises!.length,
                                                 itemBuilder: (context, exerciseIndex) {
-                                                  String nameOfExercise = exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises![exerciseIndex].exercises!.nameOfExercise;
+                                                  String nameOfExercise = exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises![exerciseIndex].exercises!.nameOfExercise!;
                                                   var idSplit = exercisesData[selectedSplit].idSplit!;
                                                   var idMuscle = exercisesData[selectedSplit].selectedMuscle![muscleIndex].idSelectedMuscle;
                                                   var idExercise = exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises![exerciseIndex].exercises!.idExercise;
@@ -390,14 +406,14 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                                                                                       int weight;
                                                                                       int difficulty;
                                                                                       // if (DateTime.now().toString().replaceRange(10, null, '') == exercisesData[selectedSplit].selectedMuscle![muscleIndex].muscles.exercises![exerciseIndex].exerciseData![index].time!.replaceRange(10, null, '')) {
-                                                                                      reps = data.reps;
-                                                                                      weight = data.weight;
-                                                                                      difficulty = data.difficulty;
+                                                                                      reps = data.reps!;
+                                                                                      weight = data.weight!;
+                                                                                      difficulty = data.difficulty!;
                                                                                       // } else {}
                                                                                       return Padding(
                                                                                         padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
                                                                                         child: Container(
-                                                                                          width: 30,
+                                                                                          width: 40,
                                                                                           child: Column(
                                                                                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                                                                             children: [
@@ -517,7 +533,9 @@ class _CustomAppBarState extends State<CustomAppBar> {
               await Navigator.push(
                 context,
                 MaterialPageRoute(
+                  //tady****************************************************************************************************************************
                   builder: (context) => SplitPage(
+                    // clickedSplitTab: 0,
                     notifyParent: widget.refresh,
                   ),
                 ),

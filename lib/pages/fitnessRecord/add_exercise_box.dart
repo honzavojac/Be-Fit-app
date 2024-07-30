@@ -45,12 +45,12 @@ class _AddExerciseBoxState extends State<AddExerciseBox> {
         dbSupabase.muscleIndex = widget.muscleIndex;
         await dbSupabase.generateFalseExerciseCheckbox(widget.splitIndex, widget.muscleIndex);
         for (var i = 0; i < dbSupabase.splits[widget.splitIndex].selectedMuscle![widget.muscleIndex].selectedExercises!.length; i++) {
-          String selectedExerciseName = dbSupabase.splits[widget.splitIndex].selectedMuscle![widget.muscleIndex].selectedExercises![i].exercises!.nameOfExercise;
+          String selectedExerciseName = dbSupabase.splits[widget.splitIndex].selectedMuscle![widget.muscleIndex].selectedExercises![i].exercises!.nameOfExercise!;
 
           // print(i);
           // print(dbSupabase.splits[widget.splitIndex].selectedMuscle![widget.muscleIndex].muscles!.exercises![i].nameOfExercise);
           for (var j = 0; j < dbSupabase.splits[widget.splitIndex].selectedMuscle![widget.muscleIndex].muscles!.exercises!.length; j++) {
-            String exerciseName = dbSupabase.splits[widget.splitIndex].selectedMuscle![widget.muscleIndex].muscles!.exercises![j].nameOfExercise;
+            String exerciseName = dbSupabase.splits[widget.splitIndex].selectedMuscle![widget.muscleIndex].muscles!.exercises![j].nameOfExercise!;
             if (exerciseName == selectedExerciseName) {
               // print("true $i");
               dbSupabase.exercisesCheckedList[j] = true;
@@ -120,7 +120,7 @@ class _AddExerciseBoxState extends State<AddExerciseBox> {
                                         print(index);
                                         await dbSupabase.updateSelectedExercise(
                                           finalExercise.idExercise!,
-                                          finalExercise.nameOfExercise,
+                                          finalExercise.nameOfExercise!,
                                           value!,
                                           data.idSelectedMuscle!,
                                           widget.splitIndex,

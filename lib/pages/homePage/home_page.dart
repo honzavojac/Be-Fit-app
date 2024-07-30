@@ -38,20 +38,19 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     Provider.of<SupabaseProvider>(context);
 
-    return Stack(
-      children: [
-        Container(
-          child: Column(
-            children: [
-              dateRow(),
-              const SizedBox(
-                height: 20,
-              ),
-              dataBoxes(),
-            ],
+    return Container(
+      child: Column(
+        children: [
+          Container(
+            height: 80,
           ),
-        ),
-      ],
+          dateRow(),
+          const SizedBox(
+            height: 20,
+          ),
+          dataBoxes(),
+        ],
+      ),
     );
   }
 }

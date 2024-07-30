@@ -406,7 +406,7 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                                                           itemCount: exercises!.length,
                                                           itemBuilder: (context, itemIndex) {
                                                             var selectedExercises = record.selectedMuscle![muscleIndex].selectedExercises;
-                                                            String nameOfExercise = exercises[itemIndex].nameOfExercise;
+                                                            String nameOfExercise = exercises[itemIndex].nameOfExercise!;
                                                             late int order;
                                                             bool isChecked = false;
 
@@ -467,7 +467,7 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                                                                             // !isCheckedList["${muscle.nameOfMuscle}"]![itemIndex];
                                                                             await dbSupabase.updateSelectedExercise(
                                                                               exercises[itemIndex].idExercise!,
-                                                                              exercises[itemIndex].nameOfExercise,
+                                                                              exercises[itemIndex].nameOfExercise!,
                                                                               !isChecked,
                                                                               muscle.idSelectedMuscle!,
                                                                               _tabController.index,
