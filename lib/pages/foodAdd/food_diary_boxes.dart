@@ -28,6 +28,10 @@ class _foodDiaryBoxesState extends State<foodDiaryBoxes> {
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Center(child: Text('Chyba: ${snapshot.error}'));
+          } else if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
           } else {
             List<Note> notes = snapshot.data!;
             return ListView.builder(

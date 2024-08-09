@@ -169,7 +169,7 @@ class _SettingsState extends State<Settings> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Text("supabase"),
+                  Text("sqflite"),
                   Switch(
                     activeTrackColor: ColorsProvider.color_2, activeColor: Colors.black,
                     // activeColor: ColorsProvider.color_2,
@@ -182,7 +182,7 @@ class _SettingsState extends State<Settings> {
                       Navigator.of(context).pushNamedAndRemoveUntil('/account', (Route<dynamic> route) => false);
                     },
                   ),
-                  Text("sqflite")
+                  Text("supabase"),
                 ],
               ),
             ),

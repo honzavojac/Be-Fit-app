@@ -1,9 +1,14 @@
+// ignore_for_file: prefer_const_constructors, avoid_print, avoid_unnecessary_containers
+
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:kaloricke_tabulky_02/models/food_item.dart';
-import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/pages/foodAdd/newFood/food_add_page.dart';
-import 'package:kaloricke_tabulky_02/services_open_food_api/food_service.dart';
+import 'package:kaloricke_tabulky_02/pages/foodAdd/data_boxes.dart';
+import 'package:kaloricke_tabulky_02/pages/foodAdd/my_search_bar.dart';
+import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
+import 'package:provider/provider.dart';
+
+import '../../database/database_provider.dart';
+import 'food_diary_boxes.dart';
 
 DateTime now = DateTime.now();
 String formattedDate = "${now.day}.${now.month}.${now.year}";
@@ -15,8 +20,9 @@ class FoodRecordAppBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return AppBar(
       title: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+          const Text('Food Add'),
           Container(
             height: 35,
             child: ElevatedButton.icon(
@@ -27,7 +33,9 @@ class FoodRecordAppBar extends StatelessWidget {
                 );
               },
               icon: Icon(Icons.add_circle_outline_sharp),
-              label: Text('New food'),
+              label: Text(
+                'New food',
+              ),
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all(ColorsProvider.color_2),
                 foregroundColor: MaterialStateProperty.all(ColorsProvider.color_8),
@@ -43,86 +51,136 @@ class FoodRecordAppBar extends StatelessWidget {
 String selected = 'g';
 
 class FoodRecordScreen extends StatefulWidget {
+  const FoodRecordScreen({super.key});
+
   @override
-  _FoodRecordScreenState createState() => _FoodRecordScreenState();
+  State<FoodRecordScreen> createState() => _FoodRecordScreenState();
 }
 
 class _FoodRecordScreenState extends State<FoodRecordScreen> {
-  final TextEditingController _controller = TextEditingController();
-  final FoodService _foodService = FoodService();
-  List<FoodItem> _foodItems = [];
-  bool _isLoading = false;
-  String _errorMessage = '';
-
-  void _searchFoods(String query) async {
-    setState(() {
-      _isLoading = true;
-      _errorMessage = '';
-    });
-
-    try {
-      final foodItems = await _foodService.fetchFoods(query);
-      setState(() {
-        _foodItems = foodItems;
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _errorMessage = 'Failed to load food items: $e'; // Zobrazíme konkrétní chybu
-        _isLoading = false;
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        children: [
-          Container(
-            height: 80,
+    var dbHelper = Provider.of<DBHelper>(context);
+
+    return Stack(
+      children: [
+        /*Positioned(
+          top: 5,
+          right: 30,
+          child: ElevatedButton.icon(
+            onPressed: () {},
+            label: Text('Add new food', style: TextStyle(fontSize: 10)),
+            icon: Icon(Icons.add, size: 20),
           ),
-          TextField(
-            controller: _controller,
-            decoration: InputDecoration(
-              labelText: 'Enter Food Name',
-              suffixIcon: IconButton(
-                icon: Icon(Icons.search),
-                onPressed: () {
-                  _searchFoods(_controller.text);
-                },
-              ),
-            ),
-          ),
-          SizedBox(height: 20),
-          if (_isLoading)
-            Center(child: CircularProgressIndicator())
-          else if (_errorMessage.isNotEmpty)
-            Center(child: Text(_errorMessage))
-          else if (_foodItems.isNotEmpty)
-            Expanded(
-              child: ListView.builder(
-                itemCount: _foodItems.length,
-                itemBuilder: (context, index) {
-                  final foodItem = _foodItems[index];
-                  return ListTile(
-                    title: Text(foodItem.name),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+        ),*/
+        Column(
+          children: [
+            Container(
+              height: 80,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(0, 40, 15, 0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        Text('Energy: ${foodItem.energy} kcal'),
-                        Text('Protein: ${foodItem.protein} g'),
-                        Text('Fat: ${foodItem.fat} g'),
-                        Text('Carbohydrates: ${foodItem.carbohydrates} g'),
+                        Container(
+                          height: 35,
+                          child: ElevatedButton.icon(
+                            onPressed: () async {
+                              await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    //tady****************************************************************************************************************************
+                                    builder: (context) => FoodNewScreen()),
+                              );
+                            },
+                            icon: Icon(Icons.add_circle_outline),
+                            label: Text(
+                              'New food',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all(ColorsProvider.color_2),
+                              foregroundColor: MaterialStateProperty.all(ColorsProvider.color_8),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
-                  );
-                },
+                  ),
+                  // SizedBox(
+                  //   width: 10,
+                  // ),
+                ],
               ),
             ),
-        ],
-      ),
+            mySearchBar(),
+            SizedBox(
+              height: 10,
+            ),
+            myDataboxes(),
+            SizedBox(
+              height: 20,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 25),
+                  child: Text(
+                    'Food diary',
+                    style: TextStyle(fontSize: 20, color: ColorsProvider.color_1, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+            //       GestureDetector(
+            // onHorizontalDragUpdate: (details) {
+            //   if (details.primaryDelta! > 0) {
+            //     print("object");
+            //     pageProvider.page = -1;
+            //   }
+            Expanded(
+              child: foodDiaryBoxes(),
+            ),
+            SizedBox(
+              height: 65,
+            )
+          ],
+        ),
+        Stack(
+          alignment: Alignment.bottomCenter,
+          children: [
+            Positioned(
+              bottom: 15,
+              child: Column(
+                children: [
+                  Container(
+                    height: 40,
+                    width: 150,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        //-------------------------------
+                        dbHelper.insertAllDataToNotes();
+                      },
+                      icon: Icon(Icons.add, size: 30),
+                      label: Text('Add', style: TextStyle(fontWeight: FontWeight.bold)),
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(ColorsProvider.color_2),
+                        foregroundColor: MaterialStateProperty.all(ColorsProvider.color_8),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

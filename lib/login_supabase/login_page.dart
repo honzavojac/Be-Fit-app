@@ -24,8 +24,44 @@ class _LoginPageState extends State<LoginPage> {
   late final StreamSubscription<AuthState> _authStateSubscription;
 
   Future<void> signIn() async {
-    // _emailController.text = "honzavojac@gmail.com";
-    // _passwordController.text = "Davidsrubek2408";
+    try {
+      setState(() {});
+      await supabase.auth.signInWithPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+      if (mounted) {
+        _emailController.clear();
+        _passwordController.clear();
+      }
+    } on AuthException catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(error.message),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Unexpected error occurred'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {});
+      }
+    }
+  }
+
+  Future<void> signIn2() async {
+    _emailController.text = "test@gmail.com";
+    _passwordController.text = "123456";
     try {
       setState(() {});
       await supabase.auth.signInWithPassword(
@@ -84,6 +120,8 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    var dbSupabase = Provider.of<SupabaseProvider>(context);
+
     return Scaffold(
       backgroundColor: ColorsProvider.color_2,
       body: SafeArea(
@@ -107,6 +145,18 @@ class _LoginPageState extends State<LoginPage> {
                     color: ColorsProvider.color_8,
                     fontWeight: FontWeight.bold,
                   ),
+                ),
+                ElevatedButton(
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStatePropertyAll(
+                      ColorsProvider.color_4,
+                    ),
+                  ),
+                  onPressed: () async {
+                    await signIn2();
+                    await dbSupabase.getUser();
+                  },
+                  child: Text("sign in to test account"),
                 ),
                 const SizedBox(height: 30),
                 _buildTextField(_emailController, "Email"),

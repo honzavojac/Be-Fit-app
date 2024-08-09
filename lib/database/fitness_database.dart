@@ -693,6 +693,37 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     return finalData.reversed.toList();
   }
 
+  SelectAllExData() async {
+    List<SplitStartedCompleted> finalData = [];
+    List<Split> splits = [];
+    List<SplitStartedCompleted> splitStartedCompleteds = [];
+    List<ExerciseData> exerciseData = [];
+    splits = await SelectSplit();
+    splitStartedCompleteds = await SelectSplitStartedCompletedWhereEnded(true);
+    exerciseData = await SelectExerciseData();
+    for (var split in splits) {
+      split.splitStartedCompleted = [];
+
+      // Přidání splitStartedCompleted do splits
+      for (var splitStartedCompleted in splitStartedCompleteds) {
+        if (split.supabaseIdSplit == splitStartedCompleted.splitId) {
+          splitStartedCompleted.exerciseData = [];
+
+          // Přidání exerciseData do splitStartedCompleted
+          for (var exerciseDataItem in exerciseData) {
+            if (exerciseDataItem.idStartedCompleted == splitStartedCompleted.supabaseIdStartedCompleted) {
+              splitStartedCompleted.exerciseData!.add(exerciseDataItem);
+            }
+          }
+
+          split.splitStartedCompleted!.add(splitStartedCompleted);
+        }
+        finalData.add(splitStartedCompleted);
+      }
+    }
+
+    return finalData.reversed.toList();
+  }
 //
 
   //Muscles
@@ -1067,8 +1098,8 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     notifyListeners();
   }
 
-  UpdateSelectedExercise(int action, int id) async {
-    await _database.rawQuery('''UPDATE selected_exercise SET action = $action WHERE id_selected_exercise = $id''');
+  UpdateSelectedExercise(int action, int idSelectedExercise) async {
+    await _database.rawQuery('''UPDATE selected_exercise SET action = $action WHERE supabase_id_selected_exercise = $idSelectedExercise''');
   }
 
   DeleteSelectedExercise(int id) async {

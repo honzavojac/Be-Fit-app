@@ -155,351 +155,354 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
             if (exercisesData.isEmpty) {
               return Container();
             } else {
-              return Column(
-                children: [
-                  Container(
-                    height: 80,
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(0, 40, 15, 0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          CustomAppBar(),
-                        ],
+              return Container(
+                color: Color.fromARGB(61, 233, 1, 1),
+                child: Column(
+                  children: [
+                    Container(
+                      height: 80,
+                      child: Padding(
+                        padding: EdgeInsets.fromLTRB(0, 40, 15, 0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            CustomAppBar(),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: dbSupabase.boolInsertSplitStartedCompleted == true
-                        ? FitnessRecordDropdown(
-                            splits: exercisesData,
-                            splitName: splitName,
-                            selectedSplit: selectedSplit,
-                            refresh: refresh,
-                            onChanged: (value) {
-                              setState(() {
-                                splitName = value;
-                                for (var i = 0; i < exercisesData.length; i++) {
-                                  if (exercisesData[i].nameSplit == value) {
-                                    selectedSplit = i;
-                                    dbSupabase.clickedSplitTab = i;
-                                    break;
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: dbSupabase.boolInsertSplitStartedCompleted == true
+                          ? FitnessRecordDropdown(
+                              splits: exercisesData,
+                              splitName: splitName,
+                              selectedSplit: selectedSplit,
+                              refresh: refresh,
+                              onChanged: (value) {
+                                setState(() {
+                                  splitName = value;
+                                  for (var i = 0; i < exercisesData.length; i++) {
+                                    if (exercisesData[i].nameSplit == value) {
+                                      selectedSplit = i;
+                                      dbSupabase.clickedSplitTab = i;
+                                      break;
+                                    }
                                   }
-                                }
-                              });
-                            },
-                          )
-                        : FitnessRecordEndSplit(
-                            splitName: splitName,
-                            idStartedCompleted: idStartedCompleted,
-                            refresh: refresh,
-                            loadData: loadData,
-                            onChanged: (value) {},
-                          ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Expanded(
-                    child: Container(
-                      // color: Color.fromARGB(99, 94, 94, 94),
-                      margin: EdgeInsets.only(left: 15, right: 15),
-                      child: Column(
-                        children: [
-                          Expanded(
-                            child: ListView.builder(
-                              itemCount: exercisesData[selectedSplit].selectedMuscle!.length,
-                              itemBuilder: (context, muscleIndex) {
-                                String muscle = exercisesData[selectedSplit].selectedMuscle![muscleIndex].muscles!.nameOfMuscle!;
-                                if (exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises!.isEmpty) {
-                                  return Padding(
-                                    padding: const EdgeInsets.only(bottom: 15),
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: ColorsProvider.color_2,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      child: Column(
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.fromLTRB(5, 10, 5, 0),
-                                            child: Container(
-                                              height: 30,
-                                              decoration: BoxDecoration(
-                                                // color: ColorsProvider.color_2,
-                                                borderRadius: variablesProvider.zaobleni,
-                                              ),
-                                              child: Center(
-                                                child: Text(
-                                                  "$muscle".toUpperCase(),
-                                                  style: TextStyle(
-                                                    color: ColorsProvider.color_8,
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 25,
-                                                    // letterSpacing: 2,
+                                });
+                              },
+                            )
+                          : FitnessRecordEndSplit(
+                              splitName: splitName,
+                              idStartedCompleted: idStartedCompleted,
+                              refresh: refresh,
+                              loadData: loadData,
+                              onChanged: (value) {},
+                            ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Expanded(
+                      child: Container(
+                        // color: Color.fromARGB(99, 94, 94, 94),
+                        margin: EdgeInsets.only(left: 15, right: 15),
+                        child: Column(
+                          children: [
+                            Expanded(
+                              child: ListView.builder(
+                                itemCount: exercisesData[selectedSplit].selectedMuscle!.length,
+                                itemBuilder: (context, muscleIndex) {
+                                  String muscle = exercisesData[selectedSplit].selectedMuscle![muscleIndex].muscles!.nameOfMuscle!;
+                                  if (exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises!.isEmpty) {
+                                    return Padding(
+                                      padding: const EdgeInsets.only(bottom: 15),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: ColorsProvider.color_2,
+                                          borderRadius: BorderRadius.circular(20),
+                                        ),
+                                        child: Column(
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.fromLTRB(5, 10, 5, 0),
+                                              child: Container(
+                                                height: 30,
+                                                decoration: BoxDecoration(
+                                                  // color: ColorsProvider.color_2,
+                                                  borderRadius: variablesProvider.zaobleni,
+                                                ),
+                                                child: Center(
+                                                  child: Text(
+                                                    "$muscle".toUpperCase(),
+                                                    style: TextStyle(
+                                                      color: ColorsProvider.color_8,
+                                                      fontWeight: FontWeight.bold,
+                                                      fontSize: 25,
+                                                      // letterSpacing: 2,
+                                                    ),
                                                   ),
                                                 ),
                                               ),
                                             ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                              left: 5,
-                                              right: 5,
-                                              top: 10,
-                                            ),
-                                            child: Container(
-                                              child: Text(
-                                                "No exercises",
-                                                style: TextStyle(color: ColorsProvider.color_8, fontWeight: FontWeight.bold),
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                left: 5,
+                                                right: 5,
+                                                top: 10,
                                               ),
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            height: 10,
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                } else {
-                                  return Padding(
-                                    padding: const EdgeInsets.only(bottom: 15),
-                                    child: Container(
-                                      decoration: BoxDecoration(color: ColorsProvider.color_2, borderRadius: BorderRadius.circular(20)),
-                                      child: Column(
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.fromLTRB(5, 10, 5, 0),
-                                            child: Container(
-                                              height: 30,
-                                              decoration: BoxDecoration(
-                                                // color: ColorsProvider.color_2,
-                                                borderRadius: variablesProvider.zaobleni,
-                                              ),
-                                              child: Center(
+                                              child: Container(
                                                 child: Text(
-                                                  "$muscle".toUpperCase(),
-                                                  style: TextStyle(
-                                                    color: ColorsProvider.color_8,
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 25,
-                                                    letterSpacing: 2,
+                                                  "No exercises",
+                                                  style: TextStyle(color: ColorsProvider.color_8, fontWeight: FontWeight.bold),
+                                                ),
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              height: 10,
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  } else {
+                                    return Padding(
+                                      padding: const EdgeInsets.only(bottom: 15),
+                                      child: Container(
+                                        decoration: BoxDecoration(color: ColorsProvider.color_2, borderRadius: BorderRadius.circular(20)),
+                                        child: Column(
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.fromLTRB(5, 10, 5, 0),
+                                              child: Container(
+                                                height: 30,
+                                                decoration: BoxDecoration(
+                                                  // color: ColorsProvider.color_2,
+                                                  borderRadius: variablesProvider.zaobleni,
+                                                ),
+                                                child: Center(
+                                                  child: Text(
+                                                    "$muscle".toUpperCase(),
+                                                    style: TextStyle(
+                                                      color: ColorsProvider.color_8,
+                                                      fontWeight: FontWeight.bold,
+                                                      fontSize: 25,
+                                                      letterSpacing: 2,
+                                                    ),
                                                   ),
                                                 ),
                                               ),
                                             ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                              left: 5,
-                                              right: 5,
-                                              top: 12,
-                                            ),
-                                            child: Container(
-                                              child: ListView.builder(
-                                                shrinkWrap: true,
-                                                physics: NeverScrollableScrollPhysics(),
-                                                itemCount: exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises!.length,
-                                                itemBuilder: (context, exerciseIndex) {
-                                                  String nameOfExercise = exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises![exerciseIndex].exercises!.nameOfExercise!;
-                                                  var idSplit = exercisesData[selectedSplit].idSplit!;
-                                                  var idMuscle = exercisesData[selectedSplit].selectedMuscle![muscleIndex].idSelectedMuscle;
-                                                  var idExercise = exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises![exerciseIndex].exercises!.idExercise;
-                                                  var exerciseData = exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises![exerciseIndex].exercises!.exerciseData;
-                                                  return GestureDetector(
-                                                    onTap: () async {
-                                                      ExerciseData.resetCounter();
-                                                      await dbSupabase.getFitness();
-                                                      print(idStartedCompleted);
-                                                      if (idSplitStartedCompleted != null) {
-                                                        await dbSupabase.getCurrentFitness(idStartedCompleted);
-                                                      }
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                left: 5,
+                                                right: 5,
+                                                top: 12,
+                                              ),
+                                              child: Container(
+                                                child: ListView.builder(
+                                                  shrinkWrap: true,
+                                                  physics: NeverScrollableScrollPhysics(),
+                                                  itemCount: exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises!.length,
+                                                  itemBuilder: (context, exerciseIndex) {
+                                                    String nameOfExercise = exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises![exerciseIndex].exercises!.nameOfExercise!;
+                                                    var idSplit = exercisesData[selectedSplit].idSplit!;
+                                                    var idMuscle = exercisesData[selectedSplit].selectedMuscle![muscleIndex].idSelectedMuscle;
+                                                    var idExercise = exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises![exerciseIndex].exercises!.idExercise;
+                                                    var exerciseData = exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises![exerciseIndex].exercises!.exerciseData;
+                                                    return GestureDetector(
+                                                      onTap: () async {
+                                                        ExerciseData.resetCounter();
+                                                        await dbSupabase.getFitness();
+                                                        print(idStartedCompleted);
+                                                        if (idSplitStartedCompleted != null) {
+                                                          await dbSupabase.getCurrentFitness(idStartedCompleted);
+                                                        }
 
-                                                      Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                          builder: (context) => ExercisePage(
-                                                            nameOfExercise: nameOfExercise,
-                                                            idExercise: idExercise!,
-                                                            splitId: idSplit,
-                                                            idStartedCompleted: idStartedCompleted,
-                                                            splitIndex: selectedSplit,
-                                                            muscleIndex: muscleIndex,
-                                                            exerciseIndex: exerciseIndex,
-                                                            // notifyParent: refresh,
-                                                          ),
-                                                        ),
-                                                      );
-                                                    },
-                                                    child: Padding(
-                                                      padding: const EdgeInsets.only(bottom: 5),
-                                                      child: Container(
-                                                        height: 105,
-                                                        decoration: BoxDecoration(
-                                                          borderRadius: BorderRadius.circular(10),
-                                                          color: ColorsProvider.color_2,
-                                                        ),
-                                                        child: Column(
-                                                          children: [
-                                                            Row(
-                                                              mainAxisAlignment: MainAxisAlignment.center,
-                                                              children: [
-                                                                Text(
-                                                                  "$nameOfExercise".toUpperCase(),
-                                                                  style: TextStyle(color: ColorsProvider.color_8, fontWeight: FontWeight.bold, fontSize: 18),
-                                                                ),
-                                                              ],
+                                                        Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                            builder: (context) => ExercisePage(
+                                                              nameOfExercise: nameOfExercise,
+                                                              idExercise: idExercise!,
+                                                              splitId: idSplit,
+                                                              idStartedCompleted: idStartedCompleted,
+                                                              splitIndex: selectedSplit,
+                                                              muscleIndex: muscleIndex,
+                                                              exerciseIndex: exerciseIndex,
+                                                              // notifyParent: refresh,
                                                             ),
-                                                            Expanded(
-                                                              child: Padding(
-                                                                padding: const EdgeInsets.only(left: 5, right: 5, bottom: 2),
-                                                                child: Container(
-                                                                  decoration: BoxDecoration(color: Color.fromARGB(125, 0, 0, 0), borderRadius: variablesProvider.zaobleni),
-                                                                  child: Row(
-                                                                    children: [
-                                                                      Padding(
-                                                                        padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
-                                                                        child: Container(
-                                                                          width: 60,
-                                                                          child: Column(
-                                                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                                                            children: [
-                                                                              Text(
-                                                                                "Set",
-                                                                                style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
-                                                                              ),
-                                                                              Text(
-                                                                                "Weight",
-                                                                                style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
-                                                                              ),
-                                                                              Text(
-                                                                                "Reps",
-                                                                                style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
-                                                                              ),
-                                                                              SizedBox(
-                                                                                height: 2,
-                                                                              )
-                                                                            ],
+                                                          ),
+                                                        );
+                                                      },
+                                                      child: Padding(
+                                                        padding: const EdgeInsets.only(bottom: 5),
+                                                        child: Container(
+                                                          height: 105,
+                                                          decoration: BoxDecoration(
+                                                            borderRadius: BorderRadius.circular(10),
+                                                            color: ColorsProvider.color_2,
+                                                          ),
+                                                          child: Column(
+                                                            children: [
+                                                              Row(
+                                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                                children: [
+                                                                  Text(
+                                                                    "$nameOfExercise".toUpperCase(),
+                                                                    style: TextStyle(color: ColorsProvider.color_8, fontWeight: FontWeight.bold, fontSize: 18),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              Expanded(
+                                                                child: Padding(
+                                                                  padding: const EdgeInsets.only(left: 5, right: 5, bottom: 2),
+                                                                  child: Container(
+                                                                    decoration: BoxDecoration(color: Color.fromARGB(125, 0, 0, 0), borderRadius: variablesProvider.zaobleni),
+                                                                    child: Row(
+                                                                      children: [
+                                                                        Padding(
+                                                                          padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
+                                                                          child: Container(
+                                                                            width: 60,
+                                                                            child: Column(
+                                                                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                                              children: [
+                                                                                Text(
+                                                                                  "Set",
+                                                                                  style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
+                                                                                ),
+                                                                                Text(
+                                                                                  "Weight",
+                                                                                  style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
+                                                                                ),
+                                                                                Text(
+                                                                                  "Reps",
+                                                                                  style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
+                                                                                ),
+                                                                                SizedBox(
+                                                                                  height: 2,
+                                                                                )
+                                                                              ],
+                                                                            ),
                                                                           ),
                                                                         ),
-                                                                      ),
-                                                                      Container(
-                                                                        width: 1,
-                                                                        color: ColorsProvider.color_8,
-                                                                      ),
-                                                                      exerciseData != null
-                                                                          ? Expanded(
-                                                                              child: Padding(
-                                                                                padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
-                                                                                child: Container(
-                                                                                  child: ListView.builder(
-                                                                                    itemCount: exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises![exerciseIndex].exercises!.exerciseData!.length,
-                                                                                    scrollDirection: Axis.horizontal,
-                                                                                    itemBuilder: (context, index) {
-                                                                                      var data = exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises![exerciseIndex].exercises!.exerciseData![index];
-                                                                                      int reps;
-                                                                                      int weight;
-                                                                                      int difficulty;
-                                                                                      // if (DateTime.now().toString().replaceRange(10, null, '') == exercisesData[selectedSplit].selectedMuscle![muscleIndex].muscles.exercises![exerciseIndex].exerciseData![index].time!.replaceRange(10, null, '')) {
-                                                                                      reps = data.reps!;
-                                                                                      weight = data.weight!;
-                                                                                      difficulty = data.difficulty!;
-                                                                                      // } else {}
-                                                                                      return Padding(
-                                                                                        padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
-                                                                                        child: Container(
-                                                                                          width: 40,
-                                                                                          child: Column(
-                                                                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                                                                            children: [
-                                                                                              Text(
-                                                                                                "${index + 1}",
-                                                                                                style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
-                                                                                              ),
-                                                                                              Text(
-                                                                                                "$weight",
-                                                                                                style: TextStyle(
-                                                                                                  fontWeight: FontWeight.bold,
-                                                                                                  fontSize: 16,
-                                                                                                  color: difficulty == 0
-                                                                                                      ? Colors.white
-                                                                                                      : difficulty == 1
-                                                                                                          ? Colors.green
-                                                                                                          : difficulty == 2
-                                                                                                              ? Colors.lightGreen
-                                                                                                              : difficulty == 3
-                                                                                                                  ? Colors.yellow
-                                                                                                                  : difficulty == 4
-                                                                                                                      ? Colors.orange
-                                                                                                                      : ColorsProvider.color_9,
+                                                                        Container(
+                                                                          width: 1,
+                                                                          color: ColorsProvider.color_8,
+                                                                        ),
+                                                                        exerciseData != null
+                                                                            ? Expanded(
+                                                                                child: Padding(
+                                                                                  padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
+                                                                                  child: Container(
+                                                                                    child: ListView.builder(
+                                                                                      itemCount: exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises![exerciseIndex].exercises!.exerciseData!.length,
+                                                                                      scrollDirection: Axis.horizontal,
+                                                                                      itemBuilder: (context, index) {
+                                                                                        var data = exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises![exerciseIndex].exercises!.exerciseData![index];
+                                                                                        int reps;
+                                                                                        int weight;
+                                                                                        int difficulty;
+                                                                                        // if (DateTime.now().toString().replaceRange(10, null, '') == exercisesData[selectedSplit].selectedMuscle![muscleIndex].muscles.exercises![exerciseIndex].exerciseData![index].time!.replaceRange(10, null, '')) {
+                                                                                        reps = data.reps!;
+                                                                                        weight = data.weight!;
+                                                                                        difficulty = data.difficulty!;
+                                                                                        // } else {}
+                                                                                        return Padding(
+                                                                                          padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
+                                                                                          child: Container(
+                                                                                            width: 40,
+                                                                                            child: Column(
+                                                                                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                                                              children: [
+                                                                                                Text(
+                                                                                                  "${index + 1}",
+                                                                                                  style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
                                                                                                 ),
-                                                                                              ),
-                                                                                              Text(
-                                                                                                "$reps",
-                                                                                                style: TextStyle(
-                                                                                                  fontWeight: FontWeight.bold,
-                                                                                                  fontSize: 16,
-                                                                                                  color: difficulty == 0
-                                                                                                      ? Colors.white
-                                                                                                      : difficulty == 1
-                                                                                                          ? Colors.green
-                                                                                                          : difficulty == 2
-                                                                                                              ? Colors.lightGreen
-                                                                                                              : difficulty == 3
-                                                                                                                  ? Colors.yellow
-                                                                                                                  : difficulty == 4
-                                                                                                                      ? Colors.orange
-                                                                                                                      : ColorsProvider.color_9,
+                                                                                                Text(
+                                                                                                  "$weight",
+                                                                                                  style: TextStyle(
+                                                                                                    fontWeight: FontWeight.bold,
+                                                                                                    fontSize: 16,
+                                                                                                    color: difficulty == 0
+                                                                                                        ? Colors.white
+                                                                                                        : difficulty == 1
+                                                                                                            ? Colors.green
+                                                                                                            : difficulty == 2
+                                                                                                                ? Colors.lightGreen
+                                                                                                                : difficulty == 3
+                                                                                                                    ? Colors.yellow
+                                                                                                                    : difficulty == 4
+                                                                                                                        ? Colors.orange
+                                                                                                                        : ColorsProvider.color_9,
+                                                                                                  ),
                                                                                                 ),
-                                                                                              ),
-                                                                                              SizedBox(
-                                                                                                height: 2,
-                                                                                              )
-                                                                                            ],
+                                                                                                Text(
+                                                                                                  "$reps",
+                                                                                                  style: TextStyle(
+                                                                                                    fontWeight: FontWeight.bold,
+                                                                                                    fontSize: 16,
+                                                                                                    color: difficulty == 0
+                                                                                                        ? Colors.white
+                                                                                                        : difficulty == 1
+                                                                                                            ? Colors.green
+                                                                                                            : difficulty == 2
+                                                                                                                ? Colors.lightGreen
+                                                                                                                : difficulty == 3
+                                                                                                                    ? Colors.yellow
+                                                                                                                    : difficulty == 4
+                                                                                                                        ? Colors.orange
+                                                                                                                        : ColorsProvider.color_9,
+                                                                                                  ),
+                                                                                                ),
+                                                                                                SizedBox(
+                                                                                                  height: 2,
+                                                                                                )
+                                                                                              ],
+                                                                                            ),
                                                                                           ),
-                                                                                        ),
-                                                                                      );
-                                                                                    },
+                                                                                        );
+                                                                                      },
+                                                                                    ),
                                                                                   ),
                                                                                 ),
-                                                                              ),
-                                                                            )
-                                                                          : Container(),
-                                                                    ],
+                                                                              )
+                                                                            : Container(),
+                                                                      ],
+                                                                    ),
                                                                   ),
                                                                 ),
                                                               ),
-                                                            ),
-                                                          ],
+                                                            ],
+                                                          ),
                                                         ),
                                                       ),
-                                                    ),
-                                                  );
-                                                },
+                                                    );
+                                                  },
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                  );
-                                }
-                              },
+                                    );
+                                  }
+                                },
+                              ),
                             ),
-                          ),
-                          SizedBox(
-                            height: 10,
-                          )
-                        ],
+                            SizedBox(
+                              height: 10,
+                            )
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               );
             }
           } else {

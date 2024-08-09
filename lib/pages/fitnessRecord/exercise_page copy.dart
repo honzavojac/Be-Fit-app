@@ -80,7 +80,6 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
     super.initState();
 
     WidgetsBinding.instance.addObserver(this);
-
     loadOldData();
     loadData();
   }
@@ -244,9 +243,9 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
   @override
   Widget build(BuildContext context) {
     var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
+    DraggableScrollableController _controller = DraggableScrollableController();
 
     final _sheet = GlobalKey();
-    final _controller = DraggableScrollableController();
 
     if (showWidget == false) {
       return Scaffold(
@@ -451,264 +450,123 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
                                 itemBuilder: (context, itemIndex) {
                                   int setNumber = itemIndex + 1;
                                   int? difficulty = finalExerciseData[itemIndex].difficulty;
-                                  return Column(
-                                    children: [
-                                      Container(
-                                        height: 50,
-                                        // color: ColorsProvider.color_7,
-                                        child: Dismissible(
-                                          direction: DismissDirection.endToStart,
-                                          key: ValueKey<int>(finalExerciseData[itemIndex].id),
-                                          background: Container(
-                                            color: ColorsProvider.color_9,
-                                            child: Align(
-                                              child: Padding(
-                                                padding: const EdgeInsets.only(right: 16),
-                                                child: Icon(Icons.delete),
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 15),
+                                    child: Container(
+                                      child: Column(
+                                        children: [
+                                          Container(
+                                            height: 50,
+                                            child: Dismissible(
+                                              direction: DismissDirection.endToStart,
+                                              key: ValueKey<int>(finalExerciseData[itemIndex].id),
+                                              background: Container(
+                                                color: ColorsProvider.color_9,
+                                                child: Align(
+                                                  child: Padding(
+                                                    padding: const EdgeInsets.only(right: 16),
+                                                    child: Icon(Icons.delete),
+                                                  ),
+                                                  alignment: Alignment.centerRight,
+                                                ),
                                               ),
-                                              alignment: Alignment.centerRight,
-                                            ),
-                                          ),
-                                          onDismissed: (direction) async {},
-                                          confirmDismiss: (direction) async {
-                                            try {
-                                              if (finalExerciseData[itemIndex].action == 1) {
-                                                for (var i = 0; i < tempExerciseData.length; i++) {
-                                                  if (tempExerciseData[i].idExData == finalExerciseData[itemIndex].idExData) {
-                                                    tempExerciseData[i].action = 4;
+                                              onDismissed: (direction) async {},
+                                              confirmDismiss: (direction) async {
+                                                try {
+                                                  if (finalExerciseData[itemIndex].action == 1) {
+                                                    for (var i = 0; i < tempExerciseData.length; i++) {
+                                                      if (tempExerciseData[i].idExData == finalExerciseData[itemIndex].idExData) {
+                                                        tempExerciseData[i].action = 4;
+                                                      }
+                                                    }
+                                                  } else if (finalExerciseData[itemIndex].action == 0 || finalExerciseData[itemIndex].action == 2) {
+                                                    for (var i = 0; i < tempExerciseData.length; i++) {
+                                                      if (tempExerciseData[i].idExData == finalExerciseData[itemIndex].idExData) {
+                                                        tempExerciseData[i].action = 3;
+                                                      }
+                                                    }
                                                   }
-                                                }
-                                              } else if (finalExerciseData[itemIndex].action == 0 || finalExerciseData[itemIndex].action == 2) {
-                                                for (var i = 0; i < tempExerciseData.length; i++) {
-                                                  if (tempExerciseData[i].idExData == finalExerciseData[itemIndex].idExData) {
-                                                    tempExerciseData[i].action = 3;
-                                                  }
-                                                }
-                                              }
 
-                                              finalExerciseData.removeAt(itemIndex);
-                                              weightController.removeAt(itemIndex);
-                                              repsController.removeAt(itemIndex);
-                                              difficultyController.removeAt(itemIndex);
-                                              saveToDatabase();
-                                              setState(() {});
-                                              return true;
-                                            } catch (e) {
-                                              print("Error during confirm dismiss: $e");
-                                              return false;
-                                            }
-                                          },
-                                          child: Center(
-                                            child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                              children: [
-                                                Container(
-                                                  width: 22,
+                                                  finalExerciseData.removeAt(itemIndex);
+                                                  weightController.removeAt(itemIndex);
+                                                  repsController.removeAt(itemIndex);
+                                                  difficultyController.removeAt(itemIndex);
+                                                  saveToDatabase();
+                                                  setState(() {});
+                                                  return true;
+                                                } catch (e) {
+                                                  print("Error during confirm dismiss: $e");
+                                                  return false;
+                                                }
+                                              },
+                                              child: Container(
+                                                child: Center(
                                                   child: Row(
-                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                                     children: [
-                                                      Text(
-                                                        "${setNumber}",
-                                                        style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                Container(
-                                                  width: 70,
-                                                  child: Container(
-                                                    height: 38,
-                                                    child: Center(
-                                                      child: TextField(
-                                                        controller: weightController[itemIndex],
-                                                        onTap: () {
-                                                          weightController[itemIndex].selectAll();
-                                                        },
-                                                        onTapOutside: (event) async {
-                                                          print("tapoutside*******************");
-                                                          await saveToDatabase();
-                                                          await loadData();
-                                                        },
-                                                        onChanged: (value) async {},
-                                                        keyboardType: TextInputType.numberWithOptions(),
-                                                        inputFormatters: [
-                                                          CustomInputFormatter(), // protože weight může být i expander který ubere váhu (např při shybech)
-                                                        ],
-                                                        decoration: const InputDecoration(
-                                                          filled: false,
-                                                          fillColor: ColorsProvider.color_2,
-                                                          labelStyle: TextStyle(
-                                                            color: ColorsProvider.color_1,
-                                                          ),
-                                                          enabledBorder: OutlineInputBorder(
-                                                            borderRadius: BorderRadius.all(
-                                                              Radius.circular(12),
+                                                      Container(
+                                                        width: 22,
+                                                        child: Row(
+                                                          mainAxisAlignment: MainAxisAlignment.center,
+                                                          children: [
+                                                            Text(
+                                                              "${setNumber}",
+                                                              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500),
                                                             ),
-                                                            borderSide: BorderSide(
-                                                              color: ColorsProvider.color_2,
-                                                              width: 0.5,
-                                                            ),
-                                                          ),
-                                                          focusedBorder: OutlineInputBorder(
-                                                            borderRadius: BorderRadius.all(
-                                                              Radius.circular(12),
-                                                            ),
-                                                            borderSide: BorderSide(
-                                                              color: ColorsProvider.color_2,
-                                                              width: 2.0,
-                                                            ),
-                                                          ),
-                                                          contentPadding: EdgeInsets.symmetric(
-                                                            vertical: 0,
-                                                            horizontal: 15,
-                                                          ),
-                                                        ),
-                                                        textAlign: TextAlign.center,
-                                                        style: TextStyle(
-                                                          color: difficulty == 0
-                                                              ? Colors.white
-                                                              : difficulty == 1
-                                                                  ? Colors.green
-                                                                  : difficulty == 2
-                                                                      ? Colors.lightGreen
-                                                                      : difficulty == 3
-                                                                          ? Colors.yellow
-                                                                          : difficulty == 4
-                                                                              ? Colors.orange
-                                                                              : ColorsProvider.color_9,
-                                                          fontWeight: FontWeight.bold,
-                                                          fontSize: 18,
+                                                          ],
                                                         ),
                                                       ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                Container(
-                                                  width: 70,
-                                                  child: Container(
-                                                    height: 38,
-                                                    child: Center(
-                                                      child: TextField(
-                                                        onTap: () {
-                                                          repsController[itemIndex].selectAll();
-                                                        },
-                                                        onTapOutside: (event) async {
-                                                          print("tapoutside*******************");
-                                                          await saveToDatabase();
-                                                          await loadData();
-                                                        },
-                                                        onChanged: (value) {},
-                                                        controller: repsController[itemIndex],
-                                                        keyboardType: TextInputType.numberWithOptions(),
-                                                        inputFormatters: [
-                                                          LengthLimitingTextInputFormatter(3),
-                                                          FilteringTextInputFormatter.allow(
-                                                            RegExp(r'[0-9]'),
-                                                          )
-                                                        ],
-                                                        decoration: const InputDecoration(
-                                                          labelStyle: TextStyle(
-                                                            color: ColorsProvider.color_1,
-                                                          ),
-                                                          enabledBorder: OutlineInputBorder(
-                                                            borderRadius: BorderRadius.all(
-                                                              Radius.circular(12),
-                                                            ),
-                                                            borderSide: BorderSide(
-                                                              color: ColorsProvider.color_2,
-                                                              width: 0.5,
-                                                            ),
-                                                          ),
-                                                          focusedBorder: OutlineInputBorder(
-                                                            borderRadius: BorderRadius.all(
-                                                              Radius.circular(12),
-                                                            ),
-                                                            borderSide: BorderSide(
-                                                              color: ColorsProvider.color_2,
-                                                              width: 2.0,
-                                                            ),
-                                                          ),
-                                                          contentPadding: EdgeInsets.symmetric(
-                                                            vertical: 0,
-                                                            horizontal: 15,
-                                                          ),
-                                                        ),
-                                                        textAlign: TextAlign.center,
-                                                        style: TextStyle(
-                                                          color: difficulty == 0
-                                                              ? Colors.white
-                                                              : difficulty == 1
-                                                                  ? Colors.green
-                                                                  : difficulty == 2
-                                                                      ? Colors.lightGreen
-                                                                      : difficulty == 3
-                                                                          ? Colors.yellow
-                                                                          : difficulty == 4
-                                                                              ? Colors.orange
-                                                                              : ColorsProvider.color_9,
-                                                          fontWeight: FontWeight.bold,
-                                                          fontSize: 18,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                Container(
-                                                  width: 70,
-                                                  child: DropdownButtonHideUnderline(
-                                                    child: DropdownButton2<int>(
-                                                      alignment: Alignment.center,
-                                                      style: TextStyle(
-                                                        // color: ColorsProvider.color_8,
-                                                        fontWeight: FontWeight.bold,
-                                                        fontSize: 5,
-                                                      ),
-                                                      isDense: true,
-                                                      menuItemStyleData: MenuItemStyleData(
-                                                        height: 37,
-                                                      ),
-                                                      isExpanded: true,
-                                                      dropdownStyleData: DropdownStyleData(
-                                                        offset: Offset(-0, -3),
-                                                        elevation: 2,
-                                                        // width: 90,
-                                                        decoration: BoxDecoration(
-                                                          borderRadius: BorderRadius.circular(12),
-                                                          color: Color.fromARGB(195, 0, 0, 0),
-                                                        ),
-                                                      ),
-                                                      buttonStyleData: ButtonStyleData(
-                                                        height: 38,
-                                                        decoration: BoxDecoration(
-                                                          borderRadius: BorderRadius.circular(12),
-                                                          border: Border.all(width: 0.5, color: ColorsProvider.color_2),
-                                                        ),
-                                                        overlayColor: MaterialStatePropertyAll(Colors.transparent),
-                                                      ),
-                                                      value: difficultyController[itemIndex] == 0 ? null : difficultyController[itemIndex],
-                                                      onChanged: (int? value) async {
-                                                        difficultyController[itemIndex] = value ?? 0;
-                                                        for (int i = 0; i < tempExerciseData.length; i++) {
-                                                          if (tempExerciseData[i].supabaseIdExData == finalExerciseData[itemIndex].supabaseIdExData) {
-                                                            tempDifficultyController[i] = value ?? 0;
-                                                          }
-                                                        }
-                                                        await saveToDatabase();
-                                                        loadData();
-                                                        // setState(() {});
-                                                      },
-                                                      items: List.generate(
-                                                        5,
-                                                        (index) {
-                                                          int difficulty = index + 1; // Začíná od 1 místo 0
-                                                          return DropdownMenuItem<int>(
-                                                            value: difficulty,
-                                                            alignment: Alignment.center,
-                                                            child: Text(
-                                                              difficulty.toString(),
+                                                      Container(
+                                                        width: 70,
+                                                        child: Container(
+                                                          height: 38,
+                                                          child: Center(
+                                                            child: TextField(
+                                                              controller: weightController[itemIndex],
+                                                              onTap: () {
+                                                                weightController[itemIndex].selectAll();
+                                                              },
+                                                              onTapOutside: (event) async {
+                                                                print("tapoutside*******************");
+                                                                await saveToDatabase();
+                                                                await loadData();
+                                                              },
+                                                              onChanged: (value) async {},
+                                                              keyboardType: TextInputType.numberWithOptions(),
+                                                              inputFormatters: [
+                                                                CustomInputFormatter(), // protože weight může být i expander který ubere váhu (např při shybech)
+                                                              ],
+                                                              decoration: const InputDecoration(
+                                                                filled: false,
+                                                                fillColor: ColorsProvider.color_2,
+                                                                labelStyle: TextStyle(
+                                                                  color: ColorsProvider.color_1,
+                                                                ),
+                                                                enabledBorder: OutlineInputBorder(
+                                                                  borderRadius: BorderRadius.all(
+                                                                    Radius.circular(12),
+                                                                  ),
+                                                                  borderSide: BorderSide(
+                                                                    color: ColorsProvider.color_2,
+                                                                    width: 0.5,
+                                                                  ),
+                                                                ),
+                                                                focusedBorder: OutlineInputBorder(
+                                                                  borderRadius: BorderRadius.all(
+                                                                    Radius.circular(12),
+                                                                  ),
+                                                                  borderSide: BorderSide(
+                                                                    color: ColorsProvider.color_2,
+                                                                    width: 2.0,
+                                                                  ),
+                                                                ),
+                                                                contentPadding: EdgeInsets.symmetric(
+                                                                  vertical: 0,
+                                                                  horizontal: 15,
+                                                                ),
+                                                              ),
+                                                              textAlign: TextAlign.center,
                                                               style: TextStyle(
-                                                                fontSize: 16,
-                                                                fontWeight: FontWeight.bold,
                                                                 color: difficulty == 0
                                                                     ? Colors.white
                                                                     : difficulty == 1
@@ -720,28 +578,177 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
                                                                                 : difficulty == 4
                                                                                     ? Colors.orange
                                                                                     : ColorsProvider.color_9,
+                                                                fontWeight: FontWeight.bold,
+                                                                fontSize: 18,
                                                               ),
-                                                              overflow: TextOverflow.ellipsis,
                                                             ),
-                                                          );
-                                                        },
-                                                      ).toList(),
-                                                    ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Container(
+                                                        width: 70,
+                                                        child: Container(
+                                                          height: 38,
+                                                          child: Center(
+                                                            child: TextField(
+                                                              onTap: () {
+                                                                repsController[itemIndex].selectAll();
+                                                              },
+                                                              onTapOutside: (event) async {
+                                                                print("tapoutside*******************");
+                                                                await saveToDatabase();
+                                                                await loadData();
+                                                              },
+                                                              onChanged: (value) {},
+                                                              controller: repsController[itemIndex],
+                                                              keyboardType: TextInputType.numberWithOptions(),
+                                                              inputFormatters: [
+                                                                LengthLimitingTextInputFormatter(3),
+                                                                FilteringTextInputFormatter.allow(
+                                                                  RegExp(r'[0-9]'),
+                                                                )
+                                                              ],
+                                                              decoration: const InputDecoration(
+                                                                labelStyle: TextStyle(
+                                                                  color: ColorsProvider.color_1,
+                                                                ),
+                                                                enabledBorder: OutlineInputBorder(
+                                                                  borderRadius: BorderRadius.all(
+                                                                    Radius.circular(12),
+                                                                  ),
+                                                                  borderSide: BorderSide(
+                                                                    color: ColorsProvider.color_2,
+                                                                    width: 0.5,
+                                                                  ),
+                                                                ),
+                                                                focusedBorder: OutlineInputBorder(
+                                                                  borderRadius: BorderRadius.all(
+                                                                    Radius.circular(12),
+                                                                  ),
+                                                                  borderSide: BorderSide(
+                                                                    color: ColorsProvider.color_2,
+                                                                    width: 2.0,
+                                                                  ),
+                                                                ),
+                                                                contentPadding: EdgeInsets.symmetric(
+                                                                  vertical: 0,
+                                                                  horizontal: 15,
+                                                                ),
+                                                              ),
+                                                              textAlign: TextAlign.center,
+                                                              style: TextStyle(
+                                                                color: difficulty == 0
+                                                                    ? Colors.white
+                                                                    : difficulty == 1
+                                                                        ? Colors.green
+                                                                        : difficulty == 2
+                                                                            ? Colors.lightGreen
+                                                                            : difficulty == 3
+                                                                                ? Colors.yellow
+                                                                                : difficulty == 4
+                                                                                    ? Colors.orange
+                                                                                    : ColorsProvider.color_9,
+                                                                fontWeight: FontWeight.bold,
+                                                                fontSize: 18,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Container(
+                                                        width: 70,
+                                                        child: DropdownButtonHideUnderline(
+                                                          child: DropdownButton2<int>(
+                                                            alignment: Alignment.center,
+                                                            style: TextStyle(
+                                                              // color: ColorsProvider.color_8,
+                                                              fontWeight: FontWeight.bold,
+                                                              fontSize: 5,
+                                                            ),
+                                                            isDense: true,
+                                                            menuItemStyleData: MenuItemStyleData(
+                                                              height: 37,
+                                                            ),
+                                                            isExpanded: true,
+                                                            dropdownStyleData: DropdownStyleData(
+                                                              offset: Offset(-0, -3),
+                                                              elevation: 2,
+                                                              // width: 90,
+                                                              decoration: BoxDecoration(
+                                                                borderRadius: BorderRadius.circular(12),
+                                                                color: Color.fromARGB(195, 0, 0, 0),
+                                                              ),
+                                                            ),
+                                                            buttonStyleData: ButtonStyleData(
+                                                              height: 38,
+                                                              decoration: BoxDecoration(
+                                                                borderRadius: BorderRadius.circular(12),
+                                                                border: Border.all(width: 0.5, color: ColorsProvider.color_2),
+                                                              ),
+                                                              overlayColor: MaterialStatePropertyAll(Colors.transparent),
+                                                            ),
+                                                            value: difficultyController[itemIndex] == 0 ? null : difficultyController[itemIndex],
+                                                            onChanged: (int? value) async {
+                                                              difficultyController[itemIndex] = value ?? 0;
+                                                              for (int i = 0; i < tempExerciseData.length; i++) {
+                                                                if (tempExerciseData[i].supabaseIdExData == finalExerciseData[itemIndex].supabaseIdExData) {
+                                                                  tempDifficultyController[i] = value ?? 0;
+                                                                }
+                                                              }
+                                                              await saveToDatabase();
+                                                              loadData();
+                                                              // setState(() {});
+                                                            },
+                                                            items: List.generate(
+                                                              5,
+                                                              (index) {
+                                                                int difficulty = index + 1; // Začíná od 1 místo 0
+                                                                return DropdownMenuItem<int>(
+                                                                  value: difficulty,
+                                                                  alignment: Alignment.center,
+                                                                  child: Text(
+                                                                    difficulty.toString(),
+                                                                    style: TextStyle(
+                                                                      fontSize: 16,
+                                                                      fontWeight: FontWeight.bold,
+                                                                      color: difficulty == 0
+                                                                          ? Colors.white
+                                                                          : difficulty == 1
+                                                                              ? Colors.green
+                                                                              : difficulty == 2
+                                                                                  ? Colors.lightGreen
+                                                                                  : difficulty == 3
+                                                                                      ? Colors.yellow
+                                                                                      : difficulty == 4
+                                                                                          ? Colors.orange
+                                                                                          : ColorsProvider.color_9,
+                                                                    ),
+                                                                    overflow: TextOverflow.ellipsis,
+                                                                  ),
+                                                                );
+                                                              },
+                                                            ).toList(),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      // Container(
+                                                      //   width: 50,
+                                                      //   child: Text("Normal"),
+                                                      // ),
+                                                    ],
                                                   ),
                                                 ),
-                                                // Container(
-                                                //   width: 50,
-                                                //   child: Text("Normal"),
-                                                // ),
-                                              ],
+                                              ),
                                             ),
                                           ),
-                                        ),
+
+                                          // Container(
+                                          //   color: Colors.blue,
+                                          //   height: 25,
+                                          // )
+                                        ],
                                       ),
-                                      SizedBox(
-                                        height: 7,
-                                      ),
-                                    ],
+                                    ),
                                   );
                                 },
                               ),

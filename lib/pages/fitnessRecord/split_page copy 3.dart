@@ -220,6 +220,7 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
                         indicatorColor: ColorsProvider.color_2,
                         dividerColor: ColorsProvider.color_4,
                         labelColor: ColorsProvider.color_2,
+                        unselectedLabelColor: Colors.white,
                         isScrollable: true,
                         tabs: splits.map((record) {
                           return Container(
@@ -229,20 +230,26 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 5.0), // 5px padding on each side
                                 child: Center(
-                                  child: TextField(
-                                    controller: splitTextEditingControllers[splits.indexOf(record)],
-                                    readOnly: true,
-                                    enabled: false,
-                                    textAlign: TextAlign.center,
-                                    decoration: InputDecoration(
-                                      border: InputBorder.none,
-                                    ),
-                                    style: TextStyle(
-                                      color: ColorsProvider.color_2, // Optional: Set the text color
-                                      fontSize: 19, // Optional: Set the text size
-                                    ),
+                                    child: Text(
+                                  record.nameSplit,
+                                  style: TextStyle(
+                                    fontSize: 19,
                                   ),
-                                ),
+                                )
+                                    // TextField(
+                                    //   controller: splitTextEditingControllers[splits.indexOf(record)],
+                                    //   readOnly: true,
+                                    //   enabled: false,
+                                    //   textAlign: TextAlign.center,
+                                    //   decoration: InputDecoration(
+                                    //     border: InputBorder.none,
+                                    //   ),
+                                    //   style: TextStyle(
+                                    //     color: splitTextEditingControllers[splits.indexOf(record)].text != record.nameSplit ? ColorsProvider.color_2 : Colors.white, // Optional: Set the text color
+                                    //     fontSize: 19, // Optional: Set the text size
+                                    //   ),
+                                    // ),
+                                    ),
                               ),
                             ),
                           );
@@ -280,6 +287,7 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
                                                   await dbFitness.UpdateSplit(value, record.supabaseIdSplit!);
                                                   print(clickedSplitTab);
                                                   widget.loadParent();
+                                                  record.nameSplit = value;
                                                 },
                                                 controller: splitTextEditingControllers[splits.indexOf(record)],
                                                 decoration: InputDecoration(
@@ -428,18 +436,24 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
                                                               String nameOfExercise = exercises[itemIndex].nameOfExercise!;
                                                               int supabaseIdExercise = exercises[itemIndex].supabaseIdExercise!;
                                                               late int order;
+
                                                               bool isChecked = false;
 
                                                               function:
                                                               for (var j = 0; j < selectedExercises.length; j++) {
                                                                 // print("${exercises[itemIndex].supabaseIdExercise} == ${selectedExercises[j].exercises!.supabaseIdExercise}");
-                                                                if (exercises[itemIndex].supabaseIdExercise == selectedExercises[j].exercises!.supabaseIdExercise) {
-                                                                  isChecked = true;
-                                                                  order = j + 1;
-                                                                  break function;
+                                                                print("-- ${selectedExercises[j].action} ${selectedExercises[j].exercises!.nameOfExercise!}");
+                                                                if (selectedExercises[j].action == 3) {
+                                                                  // selectedExercises.removeAt(j);
                                                                 } else {
-                                                                  // order = 1;
-                                                                  isChecked = false;
+                                                                  if (exercises[itemIndex].supabaseIdExercise == selectedExercises[j].exercises!.supabaseIdExercise) {
+                                                                    isChecked = true;
+                                                                    order = j + 1;
+                                                                    break function;
+                                                                  } else {
+                                                                    // order = 1;
+                                                                    isChecked = false;
+                                                                  }
                                                                 }
                                                               }
                                                               return Padding(
@@ -487,44 +501,59 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
                                                                         child: Center(
                                                                           child: GestureDetector(
                                                                             onTap: () async {
-                                                                              print("clickedSplitTab: $clickedSplitTab");
-                                                                              print(isChecked);
+                                                                              // print("clickedSplitTab: $clickedSplitTab");
+                                                                              // print(isChecked);
+                                                                              // print("action: ${exercises[itemIndex].action}");
+                                                                              // print("idSelectedMuscle: $idSelectedMuscle");
+                                                                              // print("exercise ${exercises[itemIndex].nameOfExercise}");
+                                                                              // print("selectedExercise: ${selectedExercises}");
+
                                                                               clickedSplitTab = _tabController.index;
-                                                                              print("idSelectedMuscle: $idSelectedMuscle");
-                                                                              print("exercise ${exercises[itemIndex].nameOfExercise}");
-                                                                              print("selectedExercise: ${selectedExercises}");
                                                                               if (isChecked == true) {
                                                                                 for (var i = 0; i < selectedExercises.length; i++) {
                                                                                   if (selectedExercises[i].idExercise == exercises[itemIndex].supabaseIdExercise) {
                                                                                     print("update item");
                                                                                     if (selectedExercises[i].action == 1) {
+                                                                                      print("delete ze sqflite");
                                                                                       //delete
                                                                                       await dbFitness.DeleteSelectedExercise(selectedExercises[i].idSelectedExercise!);
-                                                                                    } else {
+                                                                                    } else if (selectedExercises[i].action == 0) {
+                                                                                      print("delete ze supabase");
                                                                                       // action 3 protože to potřebuju smazat ze supabase
-                                                                                      await dbFitness.UpdateSelectedExercise(3, selectedExercises[i].idSelectedExercise!);
+                                                                                      print(selectedExercises[i].exercises!.nameOfExercise!);
+                                                                                      print(selectedExercises[i].supabaseIdSelectedExercise);
+                                                                                      await dbFitness.UpdateSelectedExercise(3, selectedExercises[i].supabaseIdSelectedExercise!);
                                                                                     }
                                                                                   }
                                                                                 }
                                                                               } else if (isChecked == false) {
-                                                                                for (var i = 0; i < selectedExercises.length; i++) {
-                                                                                  if (selectedExercises[i].idExercise == exercises[itemIndex].supabaseIdExercise) {
-                                                                                    print("update item na action 1");
-                                                                                    if (selectedExercises[i].action == 0) {
-                                                                                      await dbFitness.UpdateSelectedExercise(2, selectedExercises[i].idSelectedExercise!);
-                                                                                    } else if (selectedExercises[i].action == 2) {
-                                                                                      //action zpátky na 0
-                                                                                      await dbFitness.UpdateSelectedExercise(0, selectedExercises[i].idSelectedExercise!);
-                                                                                    } else if (selectedExercises[i].action == 3) {
-                                                                                      //
-                                                                                      await dbFitness.UpdateSelectedExercise(0, selectedExercises[i].idSelectedExercise!);
-                                                                                    }
-                                                                                  } else {}
-                                                                                }
-                                                                                int newSupabaseIdSelectedIdExercise = 1 + (selectedExercises.isNotEmpty ? selectedExercises.last.supabaseIdSelectedExercise! : 0);
-                                                                                await dbFitness.InsertSelectedExercise(newSupabaseIdSelectedIdExercise, exercises[itemIndex].supabaseIdExercise!, idSelectedMuscle, 1);
+                                                                                funkce:
+                                                                                {
+                                                                                  for (var i = 0; i < selectedExercises.length; i++) {
+                                                                                    if (selectedExercises[i].idExercise == exercises[itemIndex].supabaseIdExercise) {
+                                                                                      print("******************");
+                                                                                      print(selectedExercises[i].supabaseIdSelectedExercise);
+                                                                                      print(selectedExercises[i].action);
+                                                                                      print("update item na x");
+                                                                                      if (selectedExercises[i].action == 0) {
+                                                                                        await dbFitness.UpdateSelectedExercise(2, selectedExercises[i].supabaseIdSelectedExercise!);
+                                                                                        break funkce;
+                                                                                      } else if (selectedExercises[i].action == 2) {
+                                                                                        //action zpátky na 0
+                                                                                        await dbFitness.UpdateSelectedExercise(0, selectedExercises[i].supabaseIdSelectedExercise!);
+                                                                                        break funkce;
+                                                                                      } else if (selectedExercises[i].action == 3) {
+                                                                                        //
+                                                                                        await dbFitness.UpdateSelectedExercise(0, selectedExercises[i].supabaseIdSelectedExercise!);
+                                                                                        break funkce;
+                                                                                      }
+                                                                                    } else {}
+                                                                                  }
+                                                                                  int newSupabaseIdSelectedIdExercise = 1 + (selectedExercises.isNotEmpty ? selectedExercises.last.supabaseIdSelectedExercise! : 0);
+                                                                                  await dbFitness.InsertSelectedExercise(newSupabaseIdSelectedIdExercise, exercises[itemIndex].supabaseIdExercise!, idSelectedMuscle, 1);
 
-                                                                                print("newSupabaseIdSelectedExercise: $newSupabaseIdSelectedIdExercise");
+                                                                                  print("newSupabaseIdSelectedExercise: $newSupabaseIdSelectedIdExercise");
+                                                                                }
                                                                               }
 
                                                                               // await dbFitness.InsertSelectedExercise(2, 1, 1, 1);
