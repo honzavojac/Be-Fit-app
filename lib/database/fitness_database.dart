@@ -684,20 +684,6 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
       }
     }
 
-    // Debug výpisy
-    for (var split in splits) {
-      // print(split.nameSplit);
-      for (var selectedMuscle in split.selectedMuscle!) {
-        // print(selectedMuscle.muscles!.printMuscle());
-        for (var selectedExercise in selectedMuscle.selectedExercises!) {
-          // print(selectedExercise.exercises!.printExercise());
-        }
-      }
-      for (var element in split.selectedMuscle!) {
-        // print(element.muscles!.printMuscle());
-      }
-    }
-
     return splits;
   }
 

@@ -244,6 +244,7 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
   Widget build(BuildContext context) {
     var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
     DraggableScrollableController _controller = DraggableScrollableController();
+    final FocusNode _focusNode = FocusNode();
 
     final _sheet = GlobalKey();
 
@@ -689,6 +690,7 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
                                                             ),
                                                             value: difficultyController[itemIndex] == 0 ? null : difficultyController[itemIndex],
                                                             onChanged: (int? value) async {
+                                                              FocusScope.of(context).requestFocus(_focusNode);
                                                               difficultyController[itemIndex] = value ?? 0;
                                                               for (int i = 0; i < tempExerciseData.length; i++) {
                                                                 if (tempExerciseData[i].supabaseIdExData == finalExerciseData[itemIndex].supabaseIdExData) {
