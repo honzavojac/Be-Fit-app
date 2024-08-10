@@ -1,31 +1,13 @@
-import 'dart:math';
-
 import 'package:dropdown_button2/dropdown_button2.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/widgets.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
 import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
-import 'package:kaloricke_tabulky_02/providers/variables_provider.dart';
 import 'package:provider/provider.dart';
 
 class FitnessStatistic extends StatefulWidget {
   FitnessStatistic({super.key});
-
-  List<Color> get availableColors => const <Color>[
-        Colors.purple,
-        Colors.yellow,
-        Colors.blue,
-        Colors.orange,
-        Colors.pink,
-        Colors.red,
-      ];
-
-  final Color barBackgroundColor = Colors.white.withOpacity(0.2);
-  final Color barColor = ColorsProvider.color_2;
-  final Color touchedBarColor = ColorsProvider.color_1;
 
   @override
   State<FitnessStatistic> createState() => _FitnessStatisticState();
@@ -40,35 +22,31 @@ class _FitnessStatisticState extends State<FitnessStatistic> with TickerProvider
   int allPrePieData = 0;
 
   bool show = false;
+
+  late TabController _tabController = TabController(length: 0, vsync: this);
+
+  List<SplitStartedCompleted> dataAllSplits = [];
+
+  List<Muscle> muscleList = [];
+  List<Exercise> exerciseslist = [];
+  List<ExerciseData> exerciseDataList = [];
+
+  // Map to store selected exercise index for each muscle
+  Map<int, int> selectedExerciseIndexMap = {};
+
+  bool showAvgWorkVolume = false;
+  bool showAvg1RM = false;
+
   @override
   void initState() {
     super.initState();
     loadData();
   }
 
-  late TabController _tabController = TabController(length: 0, vsync: this);
-  List<int> temp = [];
-  List<Split> allData = [];
-  List<SplitStartedCompleted> data = [];
-  List<SplitStartedCompleted> dataAllSplits = [];
-  List<Split> splitList = [];
-  List<Muscle> muscleList = [];
-  List<Exercise> exerciseslist = [];
-  List<ExerciseData> exerciseDataList = [];
-  int mainChosedData = 0;
-  int chosedData1 = 0;
-  int chosedData2 = 0;
-  // Map to store selected exercise index for each muscle
-  Map<int, int> selectedExerciseIndexMap = {};
-
   Future<void> loadData() async {
     var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
-    allData = await dbFitness.SelectAllData();
-    data = await dbFitness.SelectAllHistoricalData(84);
-    data.sort((a, b) => a.supabaseIdStartedCompleted!.compareTo(b.supabaseIdStartedCompleted!));
     dataAllSplits = await dbFitness.SelectAllExData();
     dataAllSplits.sort((a, b) => a.supabaseIdStartedCompleted!.compareTo(b.supabaseIdStartedCompleted!));
-    splitList = await dbFitness.SelectSplit();
     muscleList = await dbFitness.SelectMuscles();
     exerciseslist = await dbFitness.SelectExercises();
     exerciseDataList = await dbFitness.SelectExerciseData();
@@ -154,12 +132,9 @@ class _FitnessStatisticState extends State<FitnessStatistic> with TickerProvider
     return pieData;
   }
 
-  bool showAvgWorkVolume = false;
-  bool showAvg1RM = false;
-
   @override
   Widget build(BuildContext context) {
-    var variablesProvider = Provider.of<VariablesProvider>(context);
+    // var variablesProvider = Provider.of<VariablesProvider>(context);
     return Scaffold(
       appBar: AppBar(title: const Text('Fitness Statistics')),
       body: show == true

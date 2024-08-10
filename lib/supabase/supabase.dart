@@ -722,5 +722,33 @@ class SupabaseProvider extends ChangeNotifier {
     return splitStartedCompletedDataList;
   }
 
+  BodyMeasurementsTable() async {
+    final uid = supabase.auth.currentUser!.id;
+
+    final response = await supabase.from('users').select('''
+    body_measurements(
+      id_body_measurements,
+      created_at,
+      weight,
+      height,
+      abdominal_circumference,
+      chest_circumference,
+      waist_circumference,
+      thigh_circumference,
+      neck_circumference,
+      biceps_circumference
+        
+    )
+    ''').eq('user_id', uid);
+
+    final List<dynamic> data = response[0]["body_measurements"];
+
+    List<Measurements> splits = data.map((json) => Measurements.fromJson(json as Map<String, dynamic>)).toList();
+    splits.sort(
+      (a, b) => a.idBodyMeasurements!.compareTo(b.idBodyMeasurements!),
+    );
+    return splits;
+  }
+
 //
 }

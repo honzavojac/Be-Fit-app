@@ -72,7 +72,7 @@ class _AddSplitBoxCopyState extends State<AddSplitBoxCopy> {
       content: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(25),
-          color: const Color.fromARGB(103, 33, 149, 243),
+          // color: const Color.fromARGB(103, 33, 149, 243),
         ),
         height: 350,
         width: 300,

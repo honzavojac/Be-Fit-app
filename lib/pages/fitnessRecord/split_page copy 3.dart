@@ -149,8 +149,8 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
             ),
           ),
           body: Container(
-            color: const Color.fromARGB(103, 33, 149, 243),
-          ),
+              // color: const Color.fromARGB(103, 33, 149, 243),
+              ),
         ),
       );
     } else {
@@ -204,7 +204,7 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
             ),
           ),
           body: Container(
-            color: const Color.fromARGB(103, 33, 149, 243),
+            // color: const Color.fromARGB(103, 33, 149, 243),
             child: Column(
               children: [
                 Container(

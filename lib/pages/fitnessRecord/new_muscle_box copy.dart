@@ -39,7 +39,7 @@ class _NewMuscleBoxCopyState extends State<NewMuscleBoxCopy> {
       content: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(25),
-          color: const Color.fromARGB(103, 33, 149, 243),
+          // color: const Color.fromARGB(103, 33, 149, 243),
         ),
         height: 170,
         width: 280,

@@ -24,6 +24,8 @@ import 'package:kaloricke_tabulky_02/init_page.dart';
 import 'package:kaloricke_tabulky_02/login_supabase/login_page.dart';
 import 'package:kaloricke_tabulky_02/login_supabase/splash_page.dart';
 
+import 'side_panel/body/measurements.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -95,6 +97,7 @@ class _MyAppState extends State<MyApp> {
         '/addFood': (context) => AddFood(),
         '/newFood': (context) => NewFood(),
         '/foodStatistic': (context) => foodStatistic(),
+        '/measurements': (context) => MeasurementsWidget(),
       },
     );
   }

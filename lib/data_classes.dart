@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:intl/intl.dart';
 
 class Muscle {
@@ -469,6 +471,69 @@ class UserSupabase {
       'email': email,
       'muscles': muscles,
       'split': split,
+    };
+  }
+}
+
+class Measurements {
+  int? idBodyMeasurements;
+  double? weight;
+  int? height;
+  double? abdominalCircumference;
+  double? chestCircumference;
+  double? waistCircumference;
+  double? thighCircumference;
+  double? neckCircumference;
+  double? bicepsCircumference;
+  String? createdAt;
+  int? supabaseIdBodyMeasurements;
+  int? action;
+
+  Measurements({
+    this.idBodyMeasurements,
+    this.weight,
+    this.height,
+    this.abdominalCircumference,
+    this.chestCircumference,
+    this.waistCircumference,
+    this.thighCircumference,
+    this.neckCircumference,
+    this.bicepsCircumference,
+    this.createdAt,
+    this.supabaseIdBodyMeasurements,
+    this.action,
+  });
+
+  factory Measurements.fromJson(Map<String, dynamic> json) {
+    return Measurements(
+      idBodyMeasurements: json['id_body_measurements'],
+      weight: double.tryParse(json['weight'].toString()),
+      height: json['height'],
+      abdominalCircumference: double.tryParse(json['abdominal_circumference'].toString()),
+      chestCircumference: double.tryParse(json['chest_circumference'].toString()),
+      waistCircumference: double.tryParse(json['waist_circumference'].toString()),
+      thighCircumference: double.tryParse(json['thigh_circumference'].toString()),
+      neckCircumference: double.tryParse(json['neck_circumference'].toString()),
+      bicepsCircumference: double.tryParse(json['biceps_circumference'].toString()),
+      createdAt: json['created_at'],
+      supabaseIdBodyMeasurements: json['supabase_id_body_measurements'],
+      action: json['action'],
+    );
+  }
+  Map<String, dynamic> toJson() {
+    return {
+      'id_body_measurements': idBodyMeasurements,
+      'weight': weight,
+      'height': height,
+      'abdominal_circumference': abdominalCircumference,
+      'chest_circumference': chestCircumference,
+      'waist_circumference': waistCircumference,
+      'thigh_circumference': thighCircumference,
+      'neck_circumference': neckCircumference,
+      'biceps_circumference': bicepsCircumference,
+      'created_at': createdAt,
+      'supabase_id_body_measurements': supabaseIdBodyMeasurements,
+      'action': action,
     };
   }
 }

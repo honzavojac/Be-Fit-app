@@ -15,6 +15,7 @@ import 'package:provider/provider.dart';
 import 'package:kaloricke_tabulky_02/pages/foodAdd/food_entry_page.dart';
 import 'package:kaloricke_tabulky_02/pages/homePage/home_page.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 
 class InitPage extends StatefulWidget {
   const InitPage({super.key});
@@ -66,6 +67,7 @@ class _InitPageState extends State<InitPage> {
     List<SelectedMuscle> supabaseSelectedMuscleList = [];
     List<SelectedExercise> supabaseSelectedExerciseList = [];
     List<SplitStartedCompleted> supabaseSplitStartedCompletedList = [];
+    List<Measurements> supabaseBodyMeasurementsList = [];
 
     if (loading) {
       // Načtení dat ze Sqflite
@@ -77,6 +79,7 @@ class _InitPageState extends State<InitPage> {
         dbFitness.SelectSelectedMuscles(),
         dbFitness.SelectSelectedExercises(),
         dbFitness.SelectSplitStartedCompleted(),
+        dbFitness.SelectMeasurements(),
       ]);
 
       List<Muscle> sqfliteMuscleList = result[0];
@@ -86,8 +89,9 @@ class _InitPageState extends State<InitPage> {
       List<SelectedMuscle> sqfliteSelectedMuscleList = result[4];
       List<SelectedExercise> sqfliteSelectedExerciseList = result[5];
       List<SplitStartedCompleted> sqfliteSplitStartedCompletedList = result[6];
+      List<Measurements> sqfliteBodyMeasurementsList = result[7];
 
-      if (sqfliteMuscleList.isEmpty || sqfliteExerciseList.isEmpty || sqfliteExerciseDataList.isEmpty || sqfliteSplitList.isEmpty || sqfliteSelectedMuscleList.isEmpty || sqfliteSelectedExerciseList.isEmpty || sqfliteSplitStartedCompletedList.isEmpty) {
+      if (sqfliteMuscleList.isEmpty || sqfliteExerciseList.isEmpty || sqfliteExerciseDataList.isEmpty || sqfliteSplitList.isEmpty || sqfliteSelectedMuscleList.isEmpty || sqfliteSelectedExerciseList.isEmpty || sqfliteSplitStartedCompletedList.isEmpty || sqfliteBodyMeasurementsList.isEmpty) {
         if (iconPage) {
           iconPage = false;
         } else {
@@ -99,7 +103,7 @@ class _InitPageState extends State<InitPage> {
           final SelectedMuscleLoading = dbSupabase.SelectedMuscleTable();
           final SelectedExerciseLoading = dbSupabase.SelectedExericseTable();
           final SplitStartedCompletedLoading = dbSupabase.SplitStartedCompletedTable();
-
+          final DataMeasurementsLoading = dbSupabase.BodyMeasurementsTable();
           supabaseMuscleList = await MuscleLoading;
           supabaseExerciseList = await ExerciseLoading;
           supabaseExerciseDataList = await ExerciseDataLoading;
@@ -107,6 +111,7 @@ class _InitPageState extends State<InitPage> {
           supabaseSelectedMuscleList = await SelectedMuscleLoading;
           supabaseSelectedExerciseList = await SelectedExerciseLoading;
           supabaseSplitStartedCompletedList = await SplitStartedCompletedLoading;
+          supabaseBodyMeasurementsList = await DataMeasurementsLoading;
 
           // Vložení dat ze Supabase do Sqflite
           if (sqfliteMuscleList.isEmpty) {
@@ -168,6 +173,11 @@ class _InitPageState extends State<InitPage> {
               );
             }
             loading = false;
+          }
+          if (sqfliteBodyMeasurementsList.isEmpty) {
+            for (var meacurement in supabaseBodyMeasurementsList) {
+              await dbFitness.insertMeasurements(meacurement, 0);
+            }
           }
         }
       } else {
@@ -312,6 +322,8 @@ class _InitPageState extends State<InitPage> {
               // _buttonWidget(dbSupabase, context, '/fitnessNames', 'Manage fitness names', Icons.text_fields_rounded),
               _buttonWidget(dbSupabase, context, '/editDeleteExerciseData', 'Edit/Delete exercise data', Icons.edit_rounded),
               _buttonWidget(dbSupabase, context, '/fitnessStatistic', 'Statistic', Icons.insights_rounded),
+              _categoryWidget('Body'),
+              _buttonWidget(dbSupabase, context, '/measurements', 'Measurements', Icons.straighten_outlined),
               Spacer(),
               _buttonWidget(dbSupabase, context, '/settings', 'Settings', Icons.settings_outlined, paddingLeft: 0),
               SizedBox(height: 10),

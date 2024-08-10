@@ -67,7 +67,7 @@ class _NewExerciseBoxCopyState extends State<NewExerciseBoxCopy> {
       contentPadding: EdgeInsets.zero,
       content: Container(
         decoration: BoxDecoration(
-          color: const Color.fromARGB(103, 33, 149, 243),
+          // color: const Color.fromARGB(103, 33, 149, 243),
           borderRadius: BorderRadius.circular(25),
         ),
         height: 250,

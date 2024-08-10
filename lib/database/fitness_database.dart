@@ -124,7 +124,21 @@ class FitnessProvider extends ChangeNotifier {
             action INTEGER,
             FOREIGN KEY (split_id) REFERENCES split (id_split)
         );
-
+        CREATE TABLE body_measurements (
+            id_body_measurements INTEGER PRIMARY KEY AUTOINCREMENT,
+            created_at TEXT NOT NULL,
+            weight NUMERIC,
+            height INTEGER,
+            age INTEGER,
+            abdominal_circumference NUMERIC,
+            chest_circumference NUMERIC,
+            waist_circumference NUMERIC,
+            thigh_circumference NUMERIC,
+            neck_circumference NUMERIC,
+            biceps_circumference NUMERIC,
+            supabase_id_body_measurements INTEGER,
+            action INTEGER
+        );
         ''');
       print("Databáze byly vytvořeny");
     });
@@ -145,6 +159,7 @@ class FitnessProvider extends ChangeNotifier {
       await txn.rawDelete('DELETE FROM split');
       await txn.rawDelete('DELETE FROM exercises');
       await txn.rawDelete('DELETE FROM muscles');
+      await txn.rawDelete('DELETE FROM body_measurements');
     });
     print("Delete all data hotový");
   }
@@ -252,6 +267,24 @@ class FitnessProvider extends ChangeNotifier {
         idItem = "id_started_completed";
         supabaseIdItem = data.supabaseIdStartedCompleted;
         updateDeleteColumn = "supabase_id_started_completed";
+        break;
+      case "body_measurements":
+        finalData = {
+          'id_user': idUser,
+          'created_at': data.createdAt,
+          'weight': data.weight,
+          'height': data.height,
+          'abdominal_circumference': data.abdominalCircumference,
+          'chest_circumference': data.chestCircumference,
+          'waist_circumference': data.waistCircumference,
+          'thigh_circumference': data.thighCircumference,
+          'neck_circumference': data.neckCircumference,
+          'biceps_circumference': data.bicepsCircumference,
+        };
+        idRecord = data.idBodyMeasurements;
+        idItem = "id_body_measurements";
+        supabaseIdItem = data.supabaseIdBodyMeasurements;
+        updateDeleteColumn = "supabase_id_body_measurements";
         break;
       default:
         //něco se pokazilo
@@ -366,9 +399,14 @@ class FitnessProvider extends ChangeNotifier {
     await _database.rawQuery('''UPDATE exercise_data SET id_started_completed = $newIdSplitStarted WHERE id_started_completed = $oldIdSplitStarted''');
   }
 
+  UpadateBodyMeasurements(int newIdBodyMeasurements, int oldIdBodyMeasurements) async {
+    await _database.rawQuery('''UPDATE body_measurements SET id_body_measurements = $newIdBodyMeasurements WHERE id_body_measurements = $oldIdBodyMeasurements''');
+  }
+
   SaveToSupabaseAndOrderSqlite(SupabaseProvider dbSupabase) async {
     List<Muscle> muscles = await SelectMuscles();
     List<Exercise> exercises = await SelectExercises();
+    List<Measurements> measurements = await SelectMeasurements();
 
     for (var muscle in muscles) {
       int muscleAction = muscle.action ?? 0;
@@ -440,6 +478,13 @@ class FitnessProvider extends ChangeNotifier {
         }
       }
     }
+    for (var measurement in measurements) {
+      int bodyMeasurementsAction = measurement.action ?? 0;
+      int? supabaseIdBodyMeasurements = await SyncSqfliteToSupabase(dbSupabase, "body_measurements", measurement, bodyMeasurementsAction);
+      if (supabaseIdBodyMeasurements != null) {
+        await UpadateBodyMeasurements(supabaseIdBodyMeasurements, measurement.idBodyMeasurements ?? 0);
+      }
+    }
   }
 
   UpdateSupabaseIdItemAndAction(String dbTable, int idRecord, int? supabaseIdItem, int action) async {
@@ -469,6 +514,10 @@ class FitnessProvider extends ChangeNotifier {
         break;
       case "split_started_completed":
         await _database.rawQuery('''UPDATE split_started_completed SET supabase_id_started_completed = $supabaseIdItem, action = $action WHERE id_started_completed = $idRecord''');
+
+        break;
+      case "body_measurements":
+        await _database.rawQuery('''UPDATE body_measurements SET supabase_id_body_measurements = $supabaseIdItem, action = $action WHERE id_body_measurements = $idRecord''');
 
         break;
       default:
@@ -1200,6 +1249,45 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
       await DeleteSplitStartedCompleted(element.idStartedCompleted!);
     }
     notifyListeners();
+  }
+
+  //Measurement
+  SelectMeasurements() async {
+    var data = await _database.rawQuery('''SELECT * FROM body_measurements''');
+    var finalData = data.map((e) => Measurements.fromJson(e)).toList();
+    return finalData;
+  }
+
+  Future<void> insertMeasurements(Measurements measurements, int action) async {
+    final db = await _database; // Získání instance databáze
+
+    await db.rawInsert('''
+    INSERT INTO body_measurements (
+      created_at,
+      weight,
+      height,
+      abdominal_circumference,
+      chest_circumference,
+      waist_circumference,
+      thigh_circumference,
+      neck_circumference,
+      biceps_circumference,
+      supabase_id_body_measurements,
+      action
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  ''', [
+      measurements.createdAt,
+      measurements.weight,
+      measurements.height,
+      measurements.abdominalCircumference,
+      measurements.chestCircumference,
+      measurements.waistCircumference,
+      measurements.thighCircumference,
+      measurements.neckCircumference,
+      measurements.bicepsCircumference,
+      measurements.supabaseIdBodyMeasurements,
+      action,
+    ]);
   }
 
   ///

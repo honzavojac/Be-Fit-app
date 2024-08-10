@@ -42,6 +42,7 @@ dependencies:
   loading_animation_widget: ^1.2.1
   fl_chart: ^0.68.0
   stroke_text: ^0.0.3
+  flutter_vector_icons: ^2.0.0
   
 
 dev_dependencies:
