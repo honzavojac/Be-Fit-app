@@ -1,12 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
+import 'package:kaloricke_tabulky_02/pages/foodAdd/newFood/food_add_page.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/database/database_provider.dart';
 import 'package:kaloricke_tabulky_02/pages/foodAdd/newFood/change_new_food_box_servingSize.dart';
 import 'package:provider/provider.dart';
 
 class foodMainAddBoxes extends StatefulWidget {
-  const foodMainAddBoxes({super.key});
+  final TextEditingController nameController;
+  final TextEditingController weightController;
+  final TextEditingController kcalController;
+  final TextEditingController proteinController;
+  final TextEditingController carbsController;
+  final TextEditingController fatsController;
+  final TextEditingController fiberController;
+  final List<String> quantity;
+  const foodMainAddBoxes({
+    super.key,
+    required this.nameController,
+    required this.weightController,
+    required this.kcalController,
+    required this.proteinController,
+    required this.carbsController,
+    required this.fatsController,
+    required this.fiberController,
+    required this.quantity,
+  });
 
   @override
   State<foodMainAddBoxes> createState() => _foodMainAddBoxesState();
@@ -14,371 +34,112 @@ class foodMainAddBoxes extends StatefulWidget {
 
 class _foodMainAddBoxesState extends State<foodMainAddBoxes> {
   @override
+  void initState() {
+    super.initState();
+    widget.nameController.clear();
+    widget.weightController.clear();
+    widget.kcalController.clear();
+    widget.proteinController.clear();
+    widget.carbsController.clear();
+    widget.fatsController.clear();
+    widget.fiberController.clear();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    var dbHelper = Provider.of<DBHelper>(context);
     return Column(children: [
-      const SizedBox(
-        height: 30,
-      ),
       SizedBox(
-        width: 250,
-        child: TextField(
-          inputFormatters: [
-            FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z0-9ěščřžýáíéóůú)(\-_\s]')),
-// povoluje zadat pouze string hodnotu => použiju pro vyhledávání v databázi
-            LengthLimitingTextInputFormatter(50)
-          ],
-          keyboardType: TextInputType.text,
-          decoration: const InputDecoration(
-            labelText: 'Food',
-            labelStyle: TextStyle(
-              color: ColorsProvider.color_1,
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.all(
-                Radius.circular(12),
-              ),
-              borderSide: BorderSide(
-                color: ColorsProvider.color_2,
-                width: 0.5,
-              ),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.all(
-                Radius.circular(12),
-              ),
-              borderSide: BorderSide(
-                color: ColorsProvider.color_2,
-                width: 3.0,
-              ),
-            ),
-            contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 15),
-            hintText: 'Enter name of food:',
-            hintStyle: TextStyle(color: ColorsProvider.color_1, fontSize: 15), // zobrazí se pokud je textové pole prázdné
-          ),
-          controller: dbHelper.textEditingController1,
-          onChanged: (input) {
-            if (input == "") {
-              dbHelper.newFoodNameOfFood = "";
-            } else {
-              var value = input;
-              dbHelper.newFoodNameOfFood = value;
-            }
-          },
-        ),
+        height: 50,
       ),
-      const SizedBox(
-        height: 20,
+      Center(child: inputFoodItems("Name of food", widget.nameController, 330, "text")),
+      SizedBox(
+        height: 40,
       ),
       Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          SizedBox(
-            width: 150,
-            child: TextField(
-              keyboardType: const TextInputType.numberWithOptions(signed: true, decimal: true),
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
-                LengthLimitingTextInputFormatter(4) // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
-              ],
-              decoration: const InputDecoration(
-                labelText: 'Serving size',
-                labelStyle: TextStyle(
-                  color: ColorsProvider.color_1,
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(12),
-                  ),
-                  borderSide: BorderSide(
-                    color: ColorsProvider.color_2,
-                    width: 0.5,
-                  ),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(12),
-                  ),
-                  borderSide: BorderSide(
-                    color: ColorsProvider.color_2,
-                    width: 3.0,
-                  ),
-                ),
-                contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 15),
-                hintText: 'Enter value:',
-                hintStyle: TextStyle(color: ColorsProvider.color_1, fontSize: 15), // zobrazí se pokud je textové pole prázdné
-              ),
-              controller: dbHelper.textEditingController2,
-              onChanged: (input) {
-                if (input == "") {
-                  dbHelper.newFoodGrams = 0;
-                } else {
-                  var value = double.parse(input);
-                  dbHelper.newFoodGrams = value;
-                }
-              },
-            ),
-          ),
-          changeNewFoodServingSize(),
-        ],
-      ),
-      const SizedBox(
-        height: 20,
-      ),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          SizedBox(
-            width: 120,
-            child: TextField(
-              keyboardType: const TextInputType.numberWithOptions(signed: true, decimal: true),
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
-                LengthLimitingTextInputFormatter(4) // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
-              ],
-              decoration: const InputDecoration(
-                labelText: 'Kcal',
-                labelStyle: TextStyle(
-                  color: ColorsProvider.color_1,
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(12),
-                  ),
-                  borderSide: BorderSide(
-                    color: ColorsProvider.color_2,
-                    width: 0.5,
-                  ),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(12),
-                  ),
-                  borderSide: BorderSide(
-                    color: ColorsProvider.color_2,
-                    width: 3.0,
-                  ),
-                ),
-                contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 15),
-                hintText: 'Enter value:',
-                hintStyle: TextStyle(color: ColorsProvider.color_1, fontSize: 15), // zobrazí se pokud je textové pole prázdné
-              ),
-              controller: dbHelper.textEditingController3,
-              onChanged: (input) {
-                if (input == "") {
-                  dbHelper.newFoodKcal = 0;
-                } else {
-                  var value = int.parse(input);
-                  dbHelper.newFoodKcal = value;
-                }
-              },
-            ),
+          inputFoodItems("Serving size", widget.weightController, 150, "numeric"),
+          changeNewFoodServingSize(
+            quantity: widget.quantity,
           ),
         ],
       ),
       const SizedBox(
-        height: 20,
+        height: 35,
       ),
       Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          SizedBox(
-            width: 120,
-            child: TextField(
-              keyboardType: const TextInputType.numberWithOptions(signed: true, decimal: true),
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')), // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
-                LengthLimitingTextInputFormatter(4) //omezí kolik znaků je možno zadat
-              ],
-              decoration: const InputDecoration(
-                labelText: 'Protein',
-                labelStyle: TextStyle(
-                  color: ColorsProvider.color_1,
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(12),
-                  ),
-                  borderSide: BorderSide(
-                    color: ColorsProvider.color_2,
-                    width: 0.5,
-                  ),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(12),
-                  ),
-                  borderSide: BorderSide(
-                    color: ColorsProvider.color_2,
-                    width: 3.0,
-                  ),
-                ),
-                contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 15),
-                hintText: 'Enter value:',
-                hintStyle: TextStyle(color: ColorsProvider.color_1, fontSize: 15), // zobrazí se pokud je textové pole prázdné
-              ),
-              controller: dbHelper.textEditingController4,
-              onChanged: (input) {
-                if (input == "") {
-                  dbHelper.newFoodProtein = 0;
-                } else {
-                  var value = double.parse(input);
-                  dbHelper.newFoodProtein = value;
-                }
-              },
-            ),
-          ),
-          SizedBox(
-            width: 120,
-            child: TextField(
-              keyboardType: const TextInputType.numberWithOptions(signed: true, decimal: true),
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')), // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
-                LengthLimitingTextInputFormatter(4)
-              ],
-              decoration: const InputDecoration(
-                labelText: 'Carbs',
-                labelStyle: TextStyle(
-                  color: ColorsProvider.color_1,
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(12),
-                  ),
-                  borderSide: BorderSide(
-                    color: ColorsProvider.color_2,
-                    width: 0.5,
-                  ),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(12),
-                  ),
-                  borderSide: BorderSide(
-                    color: ColorsProvider.color_2,
-                    width: 3.0,
-                  ),
-                ),
-                contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 15),
-                hintText: 'Enter value:',
-                hintStyle: TextStyle(color: ColorsProvider.color_1, fontSize: 15), // zobrazí se pokud je textové pole prázdné
-              ),
-              controller: dbHelper.textEditingController5,
-              onChanged: (input) {
-                if (input == "") {
-                  dbHelper.newFoodCarbs = 0;
-                } else {
-                  var value = double.parse(input);
-                  dbHelper.newFoodCarbs = value;
-                }
-              },
-            ),
-          ),
+          inputFoodItems("Kcal", widget.kcalController, 150, "numeric"),
         ],
       ),
       const SizedBox(
-        height: 20,
+        height: 35,
       ),
       Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          SizedBox(
-            width: 120,
-            child: TextField(
-              keyboardType: const TextInputType.numberWithOptions(signed: true, decimal: true),
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
-                LengthLimitingTextInputFormatter(4) // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
-              ],
-              decoration: const InputDecoration(
-                labelText: 'Fats',
-                labelStyle: TextStyle(
-                  color: ColorsProvider.color_1,
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(12),
-                  ),
-                  borderSide: BorderSide(
-                    color: ColorsProvider.color_2,
-                    width: 0.5,
-                  ),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(12),
-                  ),
-                  borderSide: BorderSide(
-                    color: ColorsProvider.color_2,
-                    width: 3.0,
-                  ),
-                ),
-                contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 15),
-                hintText: 'Enter value:',
-                hintStyle: TextStyle(color: ColorsProvider.color_1, fontSize: 15), // zobrazí se pokud je textové pole prázdné
-              ),
-              controller: dbHelper.textEditingController6,
-              onChanged: (input) {
-                if (input == "") {
-                  dbHelper.newFoodFat = 0;
-                } else {
-                  var value = double.parse(input);
-                  dbHelper.newFoodFat = value;
-                }
-              },
-            ),
-          ),
-          SizedBox(
-            width: 120,
-            child: TextField(
-              keyboardType: const TextInputType.numberWithOptions(
-                signed: true,
-                decimal: true,
-              ),
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
-                LengthLimitingTextInputFormatter(4),
-              ],
-              decoration: const InputDecoration(
-                labelText: 'Fiber',
-                labelStyle: TextStyle(
-                  color: ColorsProvider.color_1,
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(12),
-                  ),
-                  borderSide: BorderSide(
-                    color: ColorsProvider.color_2,
-                    width: 0.5,
-                  ),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(12),
-                  ),
-                  borderSide: BorderSide(
-                    color: ColorsProvider.color_2,
-                    width: 3.0,
-                  ),
-                ),
-                contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 15),
-                hintText: 'Enter value:',
-                hintStyle: TextStyle(color: ColorsProvider.color_1, fontSize: 15), // zobrazí se pokud je textové pole prázdné
-              ),
-              controller: dbHelper.textEditingController7,
-              onChanged: (input) {
-                if (input == "") {
-                  dbHelper.newFoodFiber = 0;
-                } else {
-                  var value = double.parse(input);
-                  dbHelper.newFoodFiber = value;
-                }
-              },
-            ),
-          )
+          inputFoodItems("Protein", widget.proteinController, 150, "numeric"),
+          inputFoodItems("Carbs", widget.carbsController, 150, "numeric"),
+        ],
+      ),
+      const SizedBox(
+        height: 35,
+      ),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          inputFoodItems("Fat", widget.fatsController, 150, "numeric"),
+          inputFoodItems("Fiber", widget.fiberController, 150, "numeric"),
         ],
       ),
     ]);
+  }
+
+  Widget inputFoodItems(String labelText, TextEditingController item, double size, String keyboard) {
+    return SizedBox(
+      width: size,
+      child: TextField(
+        inputFormatters: [
+// povoluje zadat pouze string hodnotu => použiju pro vyhledávání v databázi
+          keyboard == "text" ? LengthLimitingTextInputFormatter(50) : LengthLimitingTextInputFormatter(6)
+        ],
+        keyboardType: keyboard == "text" ? TextInputType.text : TextInputType.numberWithOptions(),
+        decoration: InputDecoration(
+          labelText: labelText,
+          labelStyle: const TextStyle(
+            color: ColorsProvider.color_1,
+          ),
+          enabledBorder: const OutlineInputBorder(
+            borderRadius: BorderRadius.all(
+              Radius.circular(12),
+            ),
+            borderSide: BorderSide(
+              color: ColorsProvider.color_2,
+              width: 0.5,
+            ),
+          ),
+          focusedBorder: const OutlineInputBorder(
+            borderRadius: BorderRadius.all(
+              Radius.circular(12),
+            ),
+            borderSide: BorderSide(
+              color: ColorsProvider.color_2,
+              width: 3.0,
+            ),
+          ),
+          contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+          // hintText: 'Enter name of $latelText:',
+          hintStyle: const TextStyle(color: ColorsProvider.color_1, fontSize: 15), // zobrazí se pokud je textové pole prázdné
+        ),
+        controller: item,
+        onChanged: (input) {
+          if (input == "") {
+          } else {
+            var value = input;
+          }
+        },
+      ),
+    );
   }
 }

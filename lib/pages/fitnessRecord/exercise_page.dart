@@ -134,7 +134,7 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
   loadOldData() async {
     oldDataFinal.clear();
     var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false);
-    List<Split> oldData = await dbSupabase.getOldExerciseData(widget.idExercise);
+    List<MySplit> oldData = await dbSupabase.getOldExerciseData(widget.idExercise);
     for (var element in oldData) {
       for (var splitStartedCompleted in element.splitStartedCompleted!) {
         for (var element in splitStartedCompleted.exerciseData!) {

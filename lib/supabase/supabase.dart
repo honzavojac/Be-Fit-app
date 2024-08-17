@@ -1,3 +1,4 @@
+import 'package:diacritic/diacritic.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
@@ -13,10 +14,10 @@ class SupabaseProvider extends ChangeNotifier {
   var uid;
   UserSupabase? user;
   String name = '';
-  List<Split> splits = List.empty();
-  List<Split> splitStartedCompleted = List.empty();
-  List<Split> fitnessData = List.empty();
-  List<Split> exerciseData = List.empty();
+  List<MySplit> splits = List.empty();
+  List<MySplit> splitStartedCompleted = List.empty();
+  List<MySplit> fitnessData = List.empty();
+  List<MySplit> exerciseData = List.empty();
   String? splitText;
   //pro jednotlivé stránky pro správu stavu
   //split_page
@@ -143,7 +144,7 @@ class SupabaseProvider extends ChangeNotifier {
   ''').eq('user_id', uid).order("created_at", ascending: true, referencedTable: 'split');
 
     final List<dynamic> data = response[0]['split'];
-    splits = data.map((json) => Split.fromJson(json as Map<String, dynamic>)).toList();
+    splits = data.map((json) => MySplit.fromJson(json as Map<String, dynamic>)).toList();
   }
 
   getCurrentFitness(int? idStartedCompleted) async {
@@ -204,7 +205,7 @@ class SupabaseProvider extends ChangeNotifier {
         );
 
     final List<dynamic> data = response[0]['split'];
-    exerciseData = data.map((json) => Split.fromJson(json as Map<String, dynamic>)).toList();
+    exerciseData = data.map((json) => MySplit.fromJson(json as Map<String, dynamic>)).toList();
   }
 
   getAllMuscles() async {
@@ -226,7 +227,7 @@ class SupabaseProvider extends ChangeNotifier {
     return muscles;
   }
 
-  Future<List<Split>> getOldExerciseData(int idExercise) async {
+  Future<List<MySplit>> getOldExerciseData(int idExercise) async {
     final uid = await supabase.auth.currentUser!.id;
 
     final response = await supabase
@@ -270,7 +271,7 @@ class SupabaseProvider extends ChangeNotifier {
 
     final List<dynamic> data = response[0]['split'];
 
-    splitStartedCompleted = data.map((json) => Split.fromJson(json as Map<String, dynamic>)).toList();
+    splitStartedCompleted = data.map((json) => MySplit.fromJson(json as Map<String, dynamic>)).toList();
     return splitStartedCompleted;
   }
 
@@ -589,7 +590,7 @@ class SupabaseProvider extends ChangeNotifier {
 
     final List<dynamic> data = response[0]["split"];
 
-    List<Split> splits = data.map((json) => Split.fromJson(json as Map<String, dynamic>)).toList();
+    List<MySplit> splits = data.map((json) => MySplit.fromJson(json as Map<String, dynamic>)).toList();
     // for (var element in splits) {
     //   print("idSplit: ${element.idSplit} nameSplit: ${element.nameSplit}");
     // }
@@ -748,6 +749,36 @@ class SupabaseProvider extends ChangeNotifier {
       (a, b) => a.idBodyMeasurements!.compareTo(b.idBodyMeasurements!),
     );
     return splits;
+  }
+
+  Future<List<Food>> FoodTable(String searchTerm) async {
+    String normalizedSearchTerm = removeDiacritics(searchTerm.trim());
+
+    // Dotaz do Supabase s použitím funkce unaccent
+    final response = await supabase.from('food').select().ilike('unaccent_name', '%${normalizedSearchTerm}%');
+    List<dynamic> data = response;
+
+    // Mapování JSON dat na objekty třídy Food
+    final List<Food> foods = data.map((json) => Food.fromJson(json as Map<String, dynamic>)).toList();
+
+    // Seřazení objektů podle názvu
+    foods.sort((a, b) => a.name!.compareTo(b.name!));
+
+    return foods;
+  }
+
+  Future<Food?> SelectSpecificFood(int idFood) async {
+    // Dotaz do Supabase, kde id_food se rovná idFood
+    final response = await supabase.from('food').select().eq('id_food', idFood).limit(1).single();
+
+    // Kontrola, zda byl vrácen nějaký záznam
+    if (response != null) {
+      // Převedení JSON dat na objekt třídy Food
+      return Food.fromJson(response as Map<String, dynamic>);
+    }
+
+    // Pokud žádný záznam nebyl nalezen, vrátit null
+    return null;
   }
 
 //

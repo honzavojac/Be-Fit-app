@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:diacritic/diacritic.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
@@ -139,6 +140,46 @@ class FitnessProvider extends ChangeNotifier {
             supabase_id_body_measurements INTEGER,
             action INTEGER
         );
+        CREATE TABLE food (
+            id_table INTEGER PRIMYRY KEY AUTORINCREMENT,
+            id_food INTEGER,
+            country TEXT,
+            name TEXT,
+            unaccent_name TEXT,
+            weight INTEGER,
+            quantity TEXT,
+            kcal NUMERIC,
+            protein NUMERIC,
+            carbs NUMERIC,
+            sugar NUMERIC,
+            fat NUMERIC,
+            fat_satureated NUMERIC,
+            fat_trans NUMERIC,
+            fat_monounsatureted NUMERIC,
+            fat_polyunsatureted NUMERIC,
+            fiber NUMERIC,
+            water NUMERIC,
+            cholesterol NUMERIC,
+            supabase_id_food INTEGER,
+            action INTEGER
+        );
+        CREATE TABLE nutri_intake (
+            id_nutri_intake INTEGER PRIMARY KEY AUTOINCREMENT,
+            created_at TEXT NOT NULL,
+            id_food INTEGER,
+            quantity TEXT,
+            weight INTEGER,
+            supabase_id_nutri_intake INTEGER,
+            action INTEGER,
+            FOREIGN KEY (id_food) REFERENCES food(id_food)
+        );
+       CREATE TABLE user (
+            id_user INTEGER PRIMARY KEY AUTOINCREMENT,
+            country TEXT, 
+            date_of_birth DATE, 
+            username TEXT,
+            email TEXT
+      );
         ''');
       print("Databáze byly vytvořeny");
     });
@@ -160,6 +201,8 @@ class FitnessProvider extends ChangeNotifier {
       await txn.rawDelete('DELETE FROM exercises');
       await txn.rawDelete('DELETE FROM muscles');
       await txn.rawDelete('DELETE FROM body_measurements');
+      await txn.rawDelete('DELETE FROM food');
+      await txn.rawDelete('DELETE FROM nutri_intake');
     });
     print("Delete all data hotový");
   }
@@ -255,7 +298,7 @@ class FitnessProvider extends ChangeNotifier {
         updateDeleteColumn = "supabase_id_selected_exercise";
         break;
       case "split_started_completed":
-        print("datum endedAt:${data.endedAt} ****************************");
+        // print("datum endedAt:${data.endedAt} ****************************");
         // print(data.endedAt != null ? parseDate(data.endedAt) : null);
         finalData = {
           'split_id': data.splitId,
@@ -303,7 +346,7 @@ class FitnessProvider extends ChangeNotifier {
         break;
       case 1:
         // funguje
-        print("insertuje se ${finalData}");
+        print("insertuje se do ${dbTable}: ${finalData}");
 
         // print(finalData);
         //insert do supabase
@@ -403,87 +446,106 @@ class FitnessProvider extends ChangeNotifier {
     await _database.rawQuery('''UPDATE body_measurements SET id_body_measurements = $newIdBodyMeasurements WHERE id_body_measurements = $oldIdBodyMeasurements''');
   }
 
+  bool beginSaveToSupabaseAndOrderSqlite = false;
   SaveToSupabaseAndOrderSqlite(SupabaseProvider dbSupabase) async {
-    List<Muscle> muscles = await SelectMuscles();
-    List<Exercise> exercises = await SelectExercises();
-    List<Measurements> measurements = await SelectMeasurements();
+    if (beginSaveToSupabaseAndOrderSqlite == false) {
+      beginSaveToSupabaseAndOrderSqlite = true;
+      List<Muscle> muscles = await SelectMuscles();
+      List<Exercise> exercises = await SelectExercises();
+      List<Measurements> measurements = await SelectMeasurements();
 
-    for (var muscle in muscles) {
-      int muscleAction = muscle.action ?? 0;
-      int? supabaseIdMuscle = await SyncSqfliteToSupabase(dbSupabase, "muscles", muscle, muscleAction);
-      if (supabaseIdMuscle != null) {
-        await UpdateSelectedMuscleMusclesIdMuscle(supabaseIdMuscle, muscle.supabaseIdMuscle ?? 0);
-        await UpadateExercisesMusclesIdMuscle(supabaseIdMuscle, muscle.supabaseIdMuscle ?? 0);
+      for (var muscle in muscles) {
+        int muscleAction = muscle.action ?? 0;
+        int? supabaseIdMuscle = await SyncSqfliteToSupabase(dbSupabase, "muscles", muscle, muscleAction);
+        if (supabaseIdMuscle != null) {
+          await UpdateSelectedMuscleMusclesIdMuscle(supabaseIdMuscle, muscle.supabaseIdMuscle ?? 0);
+          await UpadateExercisesMusclesIdMuscle(supabaseIdMuscle, muscle.supabaseIdMuscle ?? 0);
 
-        for (var exercise in exercises) {
-          if (muscle.supabaseIdMuscle == exercise.musclesIdMuscle) {
-            exercise.musclesIdMuscle = supabaseIdMuscle;
-            int exerciseAction = exercise.action ?? 0;
-            int? supabaseIdExercise = await SyncSqfliteToSupabase(dbSupabase, "exercises", exercise, exerciseAction);
-            if (supabaseIdExercise != null) {
-              await UpadateExerciseDataExercisesIdExercise(supabaseIdExercise, exercise.supabaseIdExercise ?? 0);
-              await UpadateSelectedExerciseIdExercise(supabaseIdExercise, exercise.supabaseIdExercise ?? 0);
-            }
-          }
-        }
-      }
-    }
-
-    List<Split> allData = await SelectAllData();
-    List<ExerciseData> exercisesData = await SelectExerciseData();
-
-    for (var split in allData) {
-      int splitAction = split.action ?? 0;
-      int? supabaseIdSplit = await SyncSqfliteToSupabase(dbSupabase, "split", split, splitAction);
-      if (supabaseIdSplit != null) {
-        await UpadateSelectedMusclesSplitIdSplit(supabaseIdSplit, split.supabaseIdSplit ?? 0);
-        await UpadateSplitStartedCompletedSplitId(supabaseIdSplit, split.supabaseIdSplit ?? 0);
-
-        for (var selectedMuscle in split.selectedMuscle ?? []) {
-          if (split.supabaseIdSplit == selectedMuscle.splitIdSplit) {
-            selectedMuscle.splitIdSplit = supabaseIdSplit;
-            int selectedMuscleAction = selectedMuscle.action ?? 0;
-            int? supabaseIdSelectedMuscle = await SyncSqfliteToSupabase(dbSupabase, "selected_muscles", selectedMuscle, selectedMuscleAction);
-            if (supabaseIdSelectedMuscle != null) {
-              await UpadateSelectedExerciseIdSelectedMuscle(supabaseIdSelectedMuscle, selectedMuscle.supabaseIdSelectedMuscle ?? 0);
-
-              for (var selectedExercise in selectedMuscle.selectedExercises ?? []) {
-                if (selectedMuscle.supabaseIdSelectedMuscle == selectedExercise.idSelectedMuscle) {
-                  selectedExercise.idSelectedMuscle = supabaseIdSelectedMuscle;
-                  int selectedExerciseAction = selectedExercise.action ?? 0;
-                  await SyncSqfliteToSupabase(dbSupabase, "selected_exercise", selectedExercise, selectedExerciseAction);
-                }
-              }
-            }
-          }
-        }
-
-        for (var splitStartedCompletedItem in split.splitStartedCompleted ?? []) {
-          if (split.supabaseIdSplit == splitStartedCompletedItem.splitId) {
-            splitStartedCompletedItem.splitId = supabaseIdSplit;
-            int splitStartedCompletedAction = splitStartedCompletedItem.action ?? 0;
-            int? supabaseIdStartedCompleted = await SyncSqfliteToSupabase(dbSupabase, "split_started_completed", splitStartedCompletedItem, splitStartedCompletedAction);
-            if (supabaseIdStartedCompleted != null) {
-              await UpadateExerciseDataIdStartedCompleted(supabaseIdStartedCompleted, splitStartedCompletedItem.supabaseIdStartedCompleted ?? 0);
-
-              for (var exerciseDataItem in exercisesData) {
-                if (splitStartedCompletedItem.supabaseIdStartedCompleted == exerciseDataItem.idStartedCompleted) {
-                  exerciseDataItem.idStartedCompleted = supabaseIdStartedCompleted;
-                  int exerciseDataAction = exerciseDataItem.action ?? 0;
-                  await SyncSqfliteToSupabase(dbSupabase, "exercise_data", exerciseDataItem, exerciseDataAction);
-                }
+          for (var exercise in exercises) {
+            if (muscle.supabaseIdMuscle == exercise.musclesIdMuscle) {
+              exercise.musclesIdMuscle = supabaseIdMuscle;
+              int exerciseAction = exercise.action ?? 0;
+              int? supabaseIdExercise = await SyncSqfliteToSupabase(dbSupabase, "exercises", exercise, exerciseAction);
+              if (supabaseIdExercise != null) {
+                await UpadateExerciseDataExercisesIdExercise(supabaseIdExercise, exercise.supabaseIdExercise ?? 0);
+                await UpadateSelectedExerciseIdExercise(supabaseIdExercise, exercise.supabaseIdExercise ?? 0);
               }
             }
           }
         }
       }
-    }
-    for (var measurement in measurements) {
-      int bodyMeasurementsAction = measurement.action ?? 0;
-      int? supabaseIdBodyMeasurements = await SyncSqfliteToSupabase(dbSupabase, "body_measurements", measurement, bodyMeasurementsAction);
-      if (supabaseIdBodyMeasurements != null) {
-        await UpadateBodyMeasurements(supabaseIdBodyMeasurements, measurement.idBodyMeasurements ?? 0);
+
+      List<MySplit> allData = await SelectAllData();
+      List<ExerciseData> exercisesData = await SelectExerciseData();
+
+      for (var split in allData) {
+        int splitAction = split.action ?? 0;
+        int? supabaseIdSplit = await SyncSqfliteToSupabase(dbSupabase, "split", split, splitAction);
+        if (supabaseIdSplit != null) {
+          await UpadateSelectedMusclesSplitIdSplit(supabaseIdSplit, split.supabaseIdSplit ?? 0);
+          await UpadateSplitStartedCompletedSplitId(supabaseIdSplit, split.supabaseIdSplit ?? 0);
+
+          for (var selectedMuscle in split.selectedMuscle ?? []) {
+            if (split.supabaseIdSplit == selectedMuscle.splitIdSplit) {
+              selectedMuscle.splitIdSplit = supabaseIdSplit;
+              int selectedMuscleAction = selectedMuscle.action ?? 0;
+              int? supabaseIdSelectedMuscle = await SyncSqfliteToSupabase(dbSupabase, "selected_muscles", selectedMuscle, selectedMuscleAction);
+              if (supabaseIdSelectedMuscle != null) {
+                await UpadateSelectedExerciseIdSelectedMuscle(supabaseIdSelectedMuscle, selectedMuscle.supabaseIdSelectedMuscle ?? 0);
+
+                for (var selectedExercise in selectedMuscle.selectedExercises ?? []) {
+                  if (selectedMuscle.supabaseIdSelectedMuscle == selectedExercise.idSelectedMuscle) {
+                    selectedExercise.idSelectedMuscle = supabaseIdSelectedMuscle;
+                    int selectedExerciseAction = selectedExercise.action ?? 0;
+                    await SyncSqfliteToSupabase(dbSupabase, "selected_exercise", selectedExercise, selectedExerciseAction);
+                  }
+                }
+              }
+            }
+          }
+
+          for (var splitStartedCompletedItem in split.splitStartedCompleted ?? []) {
+            print("začátek");
+            if (split.supabaseIdSplit == splitStartedCompletedItem.splitId) {
+              splitStartedCompletedItem.splitId = supabaseIdSplit;
+              int splitStartedCompletedAction = splitStartedCompletedItem.action ?? 0;
+              int? supabaseIdStartedCompleted = await SyncSqfliteToSupabase(dbSupabase, "split_started_completed", splitStartedCompletedItem, splitStartedCompletedAction);
+              if (supabaseIdStartedCompleted != null) {
+                print("splitstartedcompleted není null");
+                await UpadateExerciseDataIdStartedCompleted(supabaseIdStartedCompleted, splitStartedCompletedItem.supabaseIdStartedCompleted ?? 0);
+
+                for (var exerciseDataItem in exercisesData) {
+                  if (splitStartedCompletedItem.supabaseIdStartedCompleted == exerciseDataItem.idStartedCompleted) {
+                    exerciseDataItem.idStartedCompleted = supabaseIdStartedCompleted;
+                    int exerciseDataAction = exerciseDataItem.action ?? 0;
+                    await SyncSqfliteToSupabase(dbSupabase, "exercise_data", exerciseDataItem, exerciseDataAction);
+                  }
+                }
+              } else {
+                print("splitstartedcompleted je NULL !!!");
+                if (splitStartedCompletedItem.ended == true) {
+                  print("start exercisedata opravy");
+                  for (var exerciseDataItem in exercisesData) {
+                    if (splitStartedCompletedItem.supabaseIdStartedCompleted == exerciseDataItem.idStartedCompleted) {
+                      exerciseDataItem.idStartedCompleted = splitStartedCompletedItem.supabaseIdStartedCompleted;
+                      int exerciseDataAction = exerciseDataItem.action ?? 0;
+                      await SyncSqfliteToSupabase(dbSupabase, "exercise_data", exerciseDataItem, exerciseDataAction);
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
+      for (var measurement in measurements) {
+        int bodyMeasurementsAction = measurement.action ?? 0;
+        int? supabaseIdBodyMeasurements = await SyncSqfliteToSupabase(dbSupabase, "body_measurements", measurement, bodyMeasurementsAction);
+        if (supabaseIdBodyMeasurements != null) {
+          await UpadateBodyMeasurements(supabaseIdBodyMeasurements, measurement.idBodyMeasurements ?? 0);
+        }
+      }
+      beginSaveToSupabaseAndOrderSqlite = false;
     }
   }
 
@@ -630,8 +692,8 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     return muscles;
   }
 
-  Future<List<Split>> SelectAllData() async {
-    List<Split> splits = await SelectSplit();
+  Future<List<MySplit>> SelectAllData() async {
+    List<MySplit> splits = await SelectSplit();
     List<Muscle> muscles = await SelectMuscles();
     List<Exercise> exercises = await SelectExercises();
     List<SelectedMuscle> selectedMuscles = await SelectSelectedMuscles();
@@ -689,7 +751,7 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
 
   SelectAllHistoricalData(int supabaseIdExercise) async {
     List<SplitStartedCompleted> finalData = [];
-    List<Split> splits = [];
+    List<MySplit> splits = [];
     List<SplitStartedCompleted> splitStartedCompleteds = [];
     List<ExerciseData> exerciseData = [];
     splits = await SelectSplit();
@@ -730,7 +792,7 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
 
   SelectAllExData() async {
     List<SplitStartedCompleted> finalData = [];
-    List<Split> splits = [];
+    List<MySplit> splits = [];
     List<SplitStartedCompleted> splitStartedCompleteds = [];
     List<ExerciseData> exerciseData = [];
     splits = await SelectSplit();
@@ -991,10 +1053,10 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
   }
 
   //Split
-  Future<List<Split>> SelectSplit() async {
+  Future<List<MySplit>> SelectSplit() async {
     var data = await _database.rawQuery('''SELECT * FROM split''');
     // var data1 = data[0];
-    var finalData = data.map((e) => Split.fromJson(e)).toList();
+    var finalData = data.map((e) => MySplit.fromJson(e)).toList();
     // for (var i = 0; i < finalData.length; i++) {
     //   print("id: ${finalData[i].idSplit!} name: ${finalData[i].idSplit!} action: ${finalData[i].action}");
     // }
@@ -1039,7 +1101,7 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
   }
 
   DeleteAllSplits() async {
-    List<Split> splitsDelete = await SelectSplit();
+    List<MySplit> splitsDelete = await SelectSplit();
     for (var element in splitsDelete) {
       await DeleteSplit(element.idSplit!);
     }
@@ -1137,9 +1199,9 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     await _database.rawQuery('''UPDATE selected_exercise SET action = $action WHERE supabase_id_selected_exercise = $idSelectedExercise''');
   }
 
-  DeleteSelectedExercise(int id) async {
+  DeleteSelectedExercise(int idSelectedExercise) async {
     try {
-      await _database.rawQuery('''DELETE FROM selected_exercise WHERE id_selected_exercise = $id''');
+      await _database.rawQuery('''DELETE FROM selected_exercise WHERE id_selected_exercise = $idSelectedExercise''');
     } on Exception catch (e) {
       print(e);
     }
@@ -1276,6 +1338,234 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     ]);
   }
 
+  // food
+  SelectFood() async {
+    var data = await _database.rawQuery('''SELECT * FROM food ORDER BY name''');
+    var finalData = data.map((e) => Food.fromJson(e)).toList();
+    return finalData;
+  }
+
+  Future<List<Food>> FoodTable(String searchTerm) async {
+    // Normalizace vyhledávacího termínu
+    String normalizedSearchTerm = removeDiacritics(searchTerm.trim());
+
+    print("Normalized Search Term: $normalizedSearchTerm"); // Ladící výstup
+
+    // SQL dotaz na základě toho, zda je searchTerm prázdný
+    List<Map<String, dynamic>> data;
+    if (normalizedSearchTerm.isEmpty) {
+      // Když je searchTerm prázdný, vrátí celou databázi bez ORDER BY
+      data = await _database.rawQuery('SELECT * FROM food');
+    } else {
+      // Když searchTerm obsahuje hodnotu, vrátí filtrované a seřazené výsledky
+      data = await _database.rawQuery('''
+    SELECT * FROM food
+    WHERE unaccent_name LIKE '%' || ? || '%'
+    ORDER BY name;
+    ''', [normalizedSearchTerm]);
+    }
+    print("Query result: ${data}"); // Ladící výstup
+
+    // Mapování výsledků na objekty třídy Food
+    var finalData = data.map((e) => Food.fromJson(e)).toList();
+    // finalData.where(
+    //   (food) {
+    //     return !food.unaccentName!.contains(normalizedSearchTerm);
+    //   },
+    // ).toList();
+    return finalData;
+  }
+
+  Future<Food?> selectSpecificFood(int idFood) async {
+    // Dotaz do SQLite, kde id_food se rovná idFood
+    List<Map<String, dynamic>> data = await _database.rawQuery('''
+    SELECT * FROM food WHERE id_food = ? LIMIT 1
+  ''', [idFood]);
+
+    // Kontrola, zda byl vrácen nějaký záznam
+    if (data.isNotEmpty) {
+      // Převedení JSON dat na objekt třídy Food
+      return Food.fromJson(data.first);
+    }
+
+    // Pokud žádný záznam nebyl nalezen, vrátit null
+    return null;
+  }
+
+  Future<void> InsertOrUpdateFood(Food food, int action) async {
+    final db = await _database; // Získání instance databáze
+
+    // Nejprve zkontroluj, zda již záznam s konkrétním id_food existuje
+    var result = await db.rawQuery('SELECT id_food FROM food WHERE id_food = ?', [food.idFood]);
+
+    if (result.isNotEmpty) {
+      print("aktualizace food");
+      // Pokud záznam existuje, proveď aktualizaci
+      await db.rawUpdate('''
+    UPDATE food SET
+      id_food = ?,
+      country = ?,
+      name = ?,
+      unaccent_name = ?,  -- Oprava chyby
+      weight = ?,
+      quantity = ?,
+      kcal = ?,
+      protein = ?,
+      carbs = ?,
+      sugar = ?,
+      fat = ?,
+      fat_satureated = ?,
+      fat_trans = ?,
+      fat_monounsatureted = ?,
+      fat_polyunsatureted = ?,
+      fiber = ?,
+      water = ?,
+      cholesterol = ?,
+      action = ?
+    WHERE id_food = ?
+  ''', [
+        food.idFood,
+        food.country,
+        food.name,
+        food.unaccentName,
+        food.weight,
+        food.quantity,
+        food.kcal,
+        food.protein,
+        food.carbs,
+        food.sugar,
+        food.fat,
+        food.fatSatureated,
+        food.fatTrans,
+        food.fatMonounsatureted,
+        food.fatPolyunsatureted,
+        food.fiber,
+        food.water,
+        food.cholesterol,
+        action,
+        food.idFood // Přidání id_food do WHERE podmínky
+      ]);
+    } else {
+      print("insert sqflite food");
+      // Pokud záznam neexistuje, proveď vložení nového záznamu
+      await db.rawInsert('''
+    INSERT INTO food (
+      id_food,
+      country,
+      name,
+      unaccent_name,
+      weight,
+      quantity,
+      kcal,
+      protein,
+      carbs,
+      sugar,
+      fat,
+      fat_satureated,
+      fat_trans,
+      fat_monounsatureted,
+      fat_polyunsatureted,
+      fiber,
+      water,
+      cholesterol,
+      action
+    ) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  ''', [
+        food.idFood,
+        food.country,
+        food.name,
+        food.unaccentName,
+        food.weight,
+        food.quantity,
+        food.kcal,
+        food.protein,
+        food.carbs,
+        food.sugar,
+        food.fat,
+        food.fatSatureated,
+        food.fatTrans,
+        food.fatMonounsatureted,
+        food.fatPolyunsatureted,
+        food.fiber,
+        food.water,
+        food.cholesterol,
+        action,
+      ]);
+    }
+  }
+
+  //NutriIntake
+  Future<List<NutriIntake>> SelectNutriIntake(String date) async {
+    final db = await _database;
+
+    // Use the rawQuery method to filter by date
+    var data = await db.rawQuery('''
+    SELECT * FROM nutri_intake
+    WHERE DATE(created_at) = ?
+    ORDER BY created_at
+  ''', [date]);
+
+    // Map the data to a list of NutriIntake objects
+    var finalData = data.map((e) => NutriIntake.fromJson(e)).toList();
+    return finalData;
+  }
+
+  Future<void> InsertNutriIntake(NutriIntake nutriIntake, int action) async {
+    final db = await _database; // Získání instance databáze
+
+    await db.rawInsert('''
+    INSERT INTO nutri_intake (
+      created_at,
+      id_food,
+      quantity,
+      weight,
+      action
+    ) VALUES (?, ?, ?, ?, ?)
+  ''', [
+      nutriIntake.createdAt,
+      nutriIntake.idFood,
+      nutriIntake.quantity,
+      nutriIntake.weight,
+      action,
+    ]);
+    notifyListeners();
+  }
+
+  Future<void> DeleteNutriIntake(int idNutriIntake) async {
+    final db = await _database; // Získání instance databáze
+
+    await db.rawDelete('''
+    DELETE FROM nutri_intake
+    WHERE id_nutri_intake = ?
+  ''', [
+      idNutriIntake,
+    ]);
+
+    notifyListeners(); // Oznámení změny
+  }
+
+  Future<void> UpdateNutriIntake(int idNutriIntake, NutriIntake nutriIntake, int action) async {
+    final db = await _database; // Získání instance databáze
+
+    await db.rawUpdate('''
+    UPDATE nutri_intake SET
+      
+      id_food = ?,
+      quantity = ?,
+      weight = ?,
+      action = ?
+    WHERE id_nutri_intake = ?
+  ''', [
+      nutriIntake.idFood,
+      nutriIntake.quantity,
+      nutriIntake.weight,
+      action,
+      idNutriIntake,
+    ]);
+
+    notifyListeners();
+  }
+
   ///
   ///
   ///
@@ -1331,4 +1621,6 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     }
     return await SelectMuscles();
   }
+
+  int selectedQuantity = 0;
 }

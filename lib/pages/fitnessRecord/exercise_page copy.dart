@@ -81,10 +81,10 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
 
     WidgetsBinding.instance.addObserver(this);
     loadOldData();
-    loadData();
+    loadData(true);
   }
 
-  Future<void> loadData() async {
+  Future<void> loadData(bool notify) async {
     print("loadData");
     try {
       var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
@@ -124,12 +124,11 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
       }
 
       showWidget = true;
+      // notify == true ?
       setState(() {});
+      //  : null;
     } catch (e) {
       print("Error loading data: $e");
-    }
-    for (var element in finalExerciseData) {
-      print(element.printExerciseData());
     }
   }
 
@@ -234,17 +233,47 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
 
       await dbFitness.InsertExerciseData(newSupabaseIdExercise, null, null, 0, null, null, now, idExercise, newSupabaseIdSplitStartedCompleted, 1);
 
-      loadData();
+      loadData(true);
     } catch (e) {
       print("Error adding values: $e");
     }
   }
 
+  void _showDropdown() {
+    final List<int> _dropdownOptions = [1, 2, 3, 4, 5];
+    // Vytvoří nové klíčové hodnoty pro nový DropdownButton2
+    final RenderBox renderBox = context.findRenderObject() as RenderBox;
+    final Offset offset = renderBox.localToGlobal(Offset.zero);
+
+    showMenu<int>(
+      context: context,
+      position: RelativeRect.fromLTRB(
+        offset.dx,
+        offset.dy,
+        offset.dx + renderBox.size.width,
+        offset.dy + renderBox.size.height,
+      ),
+      items: _dropdownOptions.map((int value) {
+        return PopupMenuItem<int>(
+          value: value,
+          child: Text(value.toString()),
+        );
+      }).toList(),
+    ).then((int? newValue) {
+      if (newValue != null) {
+        setState(() {
+          // _selectedValue = newValue;
+        });
+      }
+    });
+  }
+
+  List<FocusNode> focusNodes = [FocusNode(), FocusNode()];
+
   @override
   Widget build(BuildContext context) {
     var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
     DraggableScrollableController _controller = DraggableScrollableController();
-    final FocusNode _focusNode = FocusNode();
 
     final _sheet = GlobalKey();
 
@@ -391,7 +420,9 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
     } else {
       return PopScope(
         onPopInvoked: (didPop) async {
+          print("onPopInvoked**********************");
           await saveToDatabase();
+          await loadData(true);
           await widget.onExerciseDataReturned(finalExerciseData);
         },
         child: Scaffold(
@@ -522,33 +553,40 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
                                                         child: Container(
                                                           height: 38,
                                                           child: Center(
-                                                            child: TextField(
-                                                              controller: weightController[itemIndex],
+                                                            child: TextFormField(
                                                               onTap: () {
-                                                                weightController[itemIndex].selectAll();
+                                                                // Select all text when tapped
+                                                                weightController[itemIndex].selection = TextSelection(
+                                                                  baseOffset: 0,
+                                                                  extentOffset: weightController[itemIndex].text.length,
+                                                                );
                                                               },
                                                               onTapOutside: (event) async {
                                                                 print("tapoutside*******************");
                                                                 await saveToDatabase();
-                                                                await loadData();
+                                                                await loadData(false);
+                                                                widget.loadData;
                                                               },
-                                                              onChanged: (value) async {},
-                                                              keyboardType: TextInputType.numberWithOptions(),
+                                                              onChanged: (value) {
+                                                                // Handle text changes here
+                                                              },
+                                                              controller: weightController[itemIndex],
+                                                              keyboardType: TextInputType.numberWithOptions(), // Ensure same keyboard type
+                                                              // textInputAction: TextInputAction.next, // Ensure consistent action
                                                               inputFormatters: [
-                                                                CustomInputFormatter(), // protože weight může být i expander který ubere váhu (např při shybech)
+                                                                LengthLimitingTextInputFormatter(3),
+                                                                FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
                                                               ],
-                                                              decoration: const InputDecoration(
-                                                                filled: false,
-                                                                fillColor: ColorsProvider.color_2,
+                                                              decoration: InputDecoration(
                                                                 labelStyle: TextStyle(
-                                                                  color: ColorsProvider.color_1,
+                                                                  color: ColorsProvider.color_2, // Replace with your color
                                                                 ),
                                                                 enabledBorder: OutlineInputBorder(
                                                                   borderRadius: BorderRadius.all(
                                                                     Radius.circular(12),
                                                                   ),
                                                                   borderSide: BorderSide(
-                                                                    color: ColorsProvider.color_2,
+                                                                    color: ColorsProvider.color_2, // Replace with your color
                                                                     width: 0.5,
                                                                   ),
                                                                 ),
@@ -557,7 +595,7 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
                                                                     Radius.circular(12),
                                                                   ),
                                                                   borderSide: BorderSide(
-                                                                    color: ColorsProvider.color_2,
+                                                                    color: ColorsProvider.color_2, // Replace with your color
                                                                     width: 2.0,
                                                                   ),
                                                                 ),
@@ -578,7 +616,9 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
                                                                                 ? Colors.yellow
                                                                                 : difficulty == 4
                                                                                     ? Colors.orange
-                                                                                    : ColorsProvider.color_9,
+                                                                                    : difficulty == 5
+                                                                                        ? Colors.red
+                                                                                        : null,
                                                                 fontWeight: FontWeight.bold,
                                                                 fontSize: 18,
                                                               ),
@@ -586,39 +626,47 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
                                                           ),
                                                         ),
                                                       ),
+
                                                       Container(
                                                         width: 70,
                                                         child: Container(
                                                           height: 38,
                                                           child: Center(
-                                                            child: TextField(
+                                                            child: TextFormField(
                                                               onTap: () {
+                                                                // Select all text when tapped
                                                                 repsController[itemIndex].selectAll();
+                                                                // repsController[itemIndex].selection = TextSelection(
+                                                                //   baseOffset: 0,
+                                                                //   extentOffset: repsController[itemIndex].text.length,
+                                                                // );
                                                               },
                                                               onTapOutside: (event) async {
                                                                 print("tapoutside*******************");
                                                                 await saveToDatabase();
-                                                                await loadData();
+                                                                // await loadData(false);
+                                                                widget.loadData();
                                                               },
-                                                              onChanged: (value) {},
+                                                              onChanged: (value) {
+                                                                // Handle text changes here
+                                                              },
                                                               controller: repsController[itemIndex],
-                                                              keyboardType: TextInputType.numberWithOptions(),
+                                                              keyboardType: TextInputType.numberWithOptions(), // Ensure same keyboard type
+                                                              // textInputAction: TextInputAction.next, // Ensure consistent action
                                                               inputFormatters: [
                                                                 LengthLimitingTextInputFormatter(3),
-                                                                FilteringTextInputFormatter.allow(
-                                                                  RegExp(r'[0-9]'),
-                                                                )
+                                                                FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
                                                               ],
-                                                              decoration: const InputDecoration(
+                                                              decoration: InputDecoration(
                                                                 labelStyle: TextStyle(
-                                                                  color: ColorsProvider.color_1,
+                                                                  color: ColorsProvider.color_2, // Replace with your color
                                                                 ),
                                                                 enabledBorder: OutlineInputBorder(
                                                                   borderRadius: BorderRadius.all(
                                                                     Radius.circular(12),
                                                                   ),
                                                                   borderSide: BorderSide(
-                                                                    color: ColorsProvider.color_2,
+                                                                    color: ColorsProvider.color_2, // Replace with your color
                                                                     width: 0.5,
                                                                   ),
                                                                 ),
@@ -627,7 +675,7 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
                                                                     Radius.circular(12),
                                                                   ),
                                                                   borderSide: BorderSide(
-                                                                    color: ColorsProvider.color_2,
+                                                                    color: ColorsProvider.color_2, // Replace with your color
                                                                     width: 2.0,
                                                                   ),
                                                                 ),
@@ -648,7 +696,9 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
                                                                                 ? Colors.yellow
                                                                                 : difficulty == 4
                                                                                     ? Colors.orange
-                                                                                    : ColorsProvider.color_9,
+                                                                                    : difficulty == 5
+                                                                                        ? Colors.red
+                                                                                        : null,
                                                                 fontWeight: FontWeight.bold,
                                                                 fontSize: 18,
                                                               ),
@@ -659,77 +709,81 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
                                                       Container(
                                                         width: 70,
                                                         child: DropdownButtonHideUnderline(
-                                                          child: DropdownButton2<int>(
-                                                            alignment: Alignment.center,
-                                                            style: TextStyle(
-                                                              // color: ColorsProvider.color_8,
-                                                              fontWeight: FontWeight.bold,
-                                                              fontSize: 5,
-                                                            ),
-                                                            isDense: true,
-                                                            menuItemStyleData: MenuItemStyleData(
-                                                              height: 37,
-                                                            ),
-                                                            isExpanded: true,
-                                                            dropdownStyleData: DropdownStyleData(
-                                                              offset: Offset(-0, -3),
-                                                              elevation: 2,
-                                                              // width: 90,
-                                                              decoration: BoxDecoration(
-                                                                borderRadius: BorderRadius.circular(12),
-                                                                color: Color.fromARGB(195, 0, 0, 0),
-                                                              ),
-                                                            ),
-                                                            buttonStyleData: ButtonStyleData(
-                                                              height: 38,
-                                                              decoration: BoxDecoration(
-                                                                borderRadius: BorderRadius.circular(12),
-                                                                border: Border.all(width: 0.5, color: ColorsProvider.color_2),
-                                                              ),
-                                                              overlayColor: MaterialStatePropertyAll(Colors.transparent),
-                                                            ),
-                                                            value: difficultyController[itemIndex] == 0 ? null : difficultyController[itemIndex],
-                                                            onChanged: (int? value) async {
-                                                              FocusScope.of(context).requestFocus(_focusNode);
-                                                              difficultyController[itemIndex] = value ?? 0;
-                                                              for (int i = 0; i < tempExerciseData.length; i++) {
-                                                                if (tempExerciseData[i].supabaseIdExData == finalExerciseData[itemIndex].supabaseIdExData) {
-                                                                  tempDifficultyController[i] = value ?? 0;
-                                                                }
-                                                              }
-                                                              await saveToDatabase();
-                                                              loadData();
-                                                              // setState(() {});
+                                                          child: GestureDetector(
+                                                            onTap: () {
+                                                              // _focusNode.unfocus(); // Close the keyboard
+                                                              // FocusScope.of(context).requestFocus(FocusNode());
                                                             },
-                                                            items: List.generate(
-                                                              5,
-                                                              (index) {
-                                                                int difficulty = index + 1; // Začíná od 1 místo 0
-                                                                return DropdownMenuItem<int>(
-                                                                  value: difficulty,
-                                                                  alignment: Alignment.center,
-                                                                  child: Text(
-                                                                    difficulty.toString(),
-                                                                    style: TextStyle(
-                                                                      fontSize: 16,
-                                                                      fontWeight: FontWeight.bold,
-                                                                      color: difficulty == 0
-                                                                          ? Colors.white
-                                                                          : difficulty == 1
-                                                                              ? Colors.green
-                                                                              : difficulty == 2
-                                                                                  ? Colors.lightGreen
-                                                                                  : difficulty == 3
-                                                                                      ? Colors.yellow
-                                                                                      : difficulty == 4
-                                                                                          ? Colors.orange
-                                                                                          : ColorsProvider.color_9,
-                                                                    ),
-                                                                    overflow: TextOverflow.ellipsis,
-                                                                  ),
-                                                                );
+                                                            child: DropdownButton2<int>(
+                                                              alignment: Alignment.center,
+                                                              style: TextStyle(
+                                                                // color: ColorsProvider.color_8,
+                                                                fontWeight: FontWeight.bold,
+                                                                fontSize: 5,
+                                                              ),
+                                                              isDense: true,
+                                                              menuItemStyleData: MenuItemStyleData(
+                                                                height: 37,
+                                                              ),
+                                                              isExpanded: true,
+                                                              dropdownStyleData: DropdownStyleData(
+                                                                offset: Offset(-0, -3),
+                                                                elevation: 2,
+                                                                // width: 90,
+                                                                decoration: BoxDecoration(
+                                                                  borderRadius: BorderRadius.circular(12),
+                                                                  color: Color.fromARGB(195, 0, 0, 0),
+                                                                ),
+                                                              ),
+                                                              buttonStyleData: ButtonStyleData(
+                                                                height: 38,
+                                                                decoration: BoxDecoration(
+                                                                  borderRadius: BorderRadius.circular(12),
+                                                                  border: Border.all(width: 0.5, color: ColorsProvider.color_2),
+                                                                ),
+                                                                overlayColor: WidgetStatePropertyAll(Colors.transparent),
+                                                              ),
+                                                              value: difficultyController[itemIndex] == 0 ? null : difficultyController[itemIndex],
+                                                              onChanged: (int? value) async {
+                                                                difficultyController[itemIndex] = value ?? 0;
+                                                                for (int i = 0; i < tempExerciseData.length; i++) {
+                                                                  if (tempExerciseData[i].supabaseIdExData == finalExerciseData[itemIndex].supabaseIdExData) {
+                                                                    tempDifficultyController[i] = value ?? 0;
+                                                                  }
+                                                                }
+                                                                await saveToDatabase();
+                                                                loadData(true);
                                                               },
-                                                            ).toList(),
+                                                              items: List.generate(
+                                                                5,
+                                                                (index) {
+                                                                  int difficulty = index + 1; // Začíná od 1 místo 0
+                                                                  return DropdownMenuItem<int>(
+                                                                    value: difficulty,
+                                                                    alignment: Alignment.center,
+                                                                    child: Text(
+                                                                      difficulty.toString(),
+                                                                      style: TextStyle(
+                                                                        fontSize: 16,
+                                                                        fontWeight: FontWeight.bold,
+                                                                        color: difficulty == 0
+                                                                            ? Colors.white
+                                                                            : difficulty == 1
+                                                                                ? Colors.green
+                                                                                : difficulty == 2
+                                                                                    ? Colors.lightGreen
+                                                                                    : difficulty == 3
+                                                                                        ? Colors.yellow
+                                                                                        : difficulty == 4
+                                                                                            ? Colors.orange
+                                                                                            : ColorsProvider.color_9,
+                                                                      ),
+                                                                      overflow: TextOverflow.ellipsis,
+                                                                    ),
+                                                                  );
+                                                                },
+                                                              ).toList(),
+                                                            ),
                                                           ),
                                                         ),
                                                       ),

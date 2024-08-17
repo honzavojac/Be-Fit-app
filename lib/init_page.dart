@@ -12,7 +12,7 @@ import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/settings.dart';
 import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:provider/provider.dart';
-import 'package:kaloricke_tabulky_02/pages/foodAdd/food_entry_page.dart';
+import 'package:kaloricke_tabulky_02/pages/foodAdd/food_page.dart';
 import 'package:kaloricke_tabulky_02/pages/homePage/home_page.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
@@ -63,7 +63,7 @@ class _InitPageState extends State<InitPage> {
     List<Muscle> supabaseMuscleList = [];
     List<Exercise> supabaseExerciseList = [];
     List<ExerciseData> supabaseExerciseDataList = [];
-    List<Split> supabaseSplitList = [];
+    List<MySplit> supabaseSplitList = [];
     List<SelectedMuscle> supabaseSelectedMuscleList = [];
     List<SelectedExercise> supabaseSelectedExerciseList = [];
     List<SplitStartedCompleted> supabaseSplitStartedCompletedList = [];
@@ -85,7 +85,7 @@ class _InitPageState extends State<InitPage> {
       List<Muscle> sqfliteMuscleList = result[0];
       List<Exercise> sqfliteExerciseList = result[1];
       List<ExerciseData> sqfliteExerciseDataList = result[2];
-      List<Split> sqfliteSplitList = result[3];
+      List<MySplit> sqfliteSplitList = result[3];
       List<SelectedMuscle> sqfliteSelectedMuscleList = result[4];
       List<SelectedExercise> sqfliteSelectedExerciseList = result[5];
       List<SplitStartedCompleted> sqfliteSplitStartedCompletedList = result[6];
@@ -172,13 +172,13 @@ class _InitPageState extends State<InitPage> {
                 0,
               );
             }
-            loading = false;
           }
           if (sqfliteBodyMeasurementsList.isEmpty) {
             for (var meacurement in supabaseBodyMeasurementsList) {
               await dbFitness.insertMeasurements(meacurement, 0);
             }
           }
+          loading = false;
         }
       } else {
         loading = false;
@@ -189,6 +189,7 @@ class _InitPageState extends State<InitPage> {
     } else {
       loading = false;
     }
+    // loading = false;
     setState(() {});
   }
 
@@ -313,19 +314,21 @@ class _InitPageState extends State<InitPage> {
                   ],
                 ),
               ),
-              _categoryWidget('Food'),
-              _buttonWidget(dbSupabase, context, '/scanFood', 'Scan food', Icons.fit_screen_rounded),
-              _buttonWidget(dbSupabase, context, '/addFood', 'Add food', Icons.search_rounded),
-              _buttonWidget(dbSupabase, context, '/newFood', 'New food', Icons.add_circle_outline_outlined),
-              _buttonWidget(dbSupabase, context, '/foodStatistic', 'Statistic', Icons.bar_chart_rounded),
+              Padding(
+                padding: const EdgeInsets.only(top: 20),
+                child: _categoryWidget('Food'),
+              ),
+              _buttonWidget(dbSupabase, context, '/scanFood', 'Scan food', Icons.fit_screen_rounded, false),
+              _buttonWidget(dbSupabase, context, '/newFood', 'New food', Icons.add_circle_outline_outlined, true),
+              _buttonWidget(dbSupabase, context, '/foodStatistic', 'Statistic', Icons.bar_chart_rounded, false),
               _categoryWidget('Workout'),
               // _buttonWidget(dbSupabase, context, '/fitnessNames', 'Manage fitness names', Icons.text_fields_rounded),
-              _buttonWidget(dbSupabase, context, '/editDeleteExerciseData', 'Edit/Delete exercise data', Icons.edit_rounded),
-              _buttonWidget(dbSupabase, context, '/fitnessStatistic', 'Statistic', Icons.insights_rounded),
+              // _buttonWidget(dbSupabase, context, '/editDeleteExerciseData', 'Edit/Delete exercise data', Icons.edit_rounded),
+              _buttonWidget(dbSupabase, context, '/fitnessStatistic', 'Statistic', Icons.insights_rounded, true),
               _categoryWidget('Body'),
-              _buttonWidget(dbSupabase, context, '/measurements', 'Measurements', Icons.straighten_outlined),
+              _buttonWidget(dbSupabase, context, '/measurements', 'Measurements', Icons.straighten_outlined, true),
               Spacer(),
-              _buttonWidget(dbSupabase, context, '/settings', 'Settings', Icons.settings_outlined, paddingLeft: 0),
+              _buttonWidget(dbSupabase, context, '/settings', 'Settings', Icons.settings_outlined, true, paddingLeft: 0),
               SizedBox(height: 10),
             ],
           ),
@@ -392,7 +395,7 @@ class _InitPageState extends State<InitPage> {
 
   Widget _categoryWidget(String category) {
     return Padding(
-      padding: const EdgeInsets.only(top: 15),
+      padding: const EdgeInsets.only(top: 0),
       child: Container(
         height: 35,
         color: Color.fromARGB(50, 0, 0, 0),
@@ -441,14 +444,17 @@ class _InitPageState extends State<InitPage> {
     );
   }
 
-  Widget _buttonWidget(SupabaseProvider dbSupabase, BuildContext context, String page, String name, IconData icon, {double paddingLeft = 20}) {
+  Widget _buttonWidget(SupabaseProvider dbSupabase, BuildContext context, String page, String name, IconData icon, bool show, {double paddingLeft = 20}) {
     return GestureDetector(
       onTap: () {
-        dbSupabase.getUser();
-        Navigator.pushNamed(context, page);
+        if (show == false) {
+        } else {
+          dbSupabase.getUser();
+          Navigator.pushNamed(context, page);
+        }
       },
       child: Container(
-        height: 55,
+        height: 65,
         color: ColorsProvider.color_2,
         child: Padding(
           padding: EdgeInsets.only(left: paddingLeft),
@@ -457,7 +463,7 @@ class _InitPageState extends State<InitPage> {
             children: [
               Icon(
                 icon,
-                color: ColorsProvider.color_8,
+                color: show == true ? ColorsProvider.color_8 : ColorsProvider.color_8.withAlpha(100),
               ),
               SizedBox(
                 width: 5,
@@ -466,7 +472,7 @@ class _InitPageState extends State<InitPage> {
                 '$name',
                 style: TextStyle(
                   fontSize: 18,
-                  color: ColorsProvider.color_8,
+                  color: show == true ? ColorsProvider.color_8 : ColorsProvider.color_8.withAlpha(100),
                   fontWeight: FontWeight.bold,
                 ),
               ),

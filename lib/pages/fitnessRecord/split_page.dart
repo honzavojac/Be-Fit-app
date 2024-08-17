@@ -43,7 +43,7 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
     setState(() {});
   }
 
-  late List<Split> splits;
+  late List<MySplit> splits;
   int a = 0;
   Map<String, List<bool>> isCheckedList = {};
   loadData(BuildContext context) async {
@@ -572,7 +572,7 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
 class _deleteSplit extends StatefulWidget {
   final BuildContext context;
   final SupabaseProvider dbSupabase;
-  final Split record;
+  final MySplit record;
   int a;
   final Function? notifyParent;
   final Function() onPressed;

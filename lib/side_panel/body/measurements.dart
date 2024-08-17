@@ -46,6 +46,9 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
   loadData() async {
     var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
     measurements = await dbFitness.SelectMeasurements();
+    measurements.sort(
+      (a, b) => b.createdAt!.compareTo(a.createdAt!),
+    );
     show = true;
     setState(() {});
   }

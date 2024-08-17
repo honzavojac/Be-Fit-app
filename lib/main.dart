@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
 import 'package:kaloricke_tabulky_02/login_supabase/auth_page.dart';
+import 'package:kaloricke_tabulky_02/pages/foodAdd/add_intake_page.dart';
+import 'package:kaloricke_tabulky_02/pages/foodAdd/newFood/food_add_page.dart';
 import 'package:kaloricke_tabulky_02/settings.dart';
 import 'package:kaloricke_tabulky_02/side_panel/fitness/edit_delete_exercise_data.dart';
 import 'package:kaloricke_tabulky_02/side_panel/fitness/fitness_names.dart';
 import 'package:kaloricke_tabulky_02/side_panel/fitness/fitness_statistic.dart';
 import 'package:kaloricke_tabulky_02/side_panel/food/add_food.dart';
 import 'package:kaloricke_tabulky_02/side_panel/food/food_statistic.dart';
-import 'package:kaloricke_tabulky_02/side_panel/food/new_food.dart';
 import 'package:kaloricke_tabulky_02/side_panel/food/scan_food.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -95,9 +96,15 @@ class _MyAppState extends State<MyApp> {
         '/fitnessStatistic': (context) => FitnessStatistic(),
         '/scanFood': (context) => ScanFood(),
         '/addFood': (context) => AddFood(),
-        '/newFood': (context) => NewFood(),
+        '/newFood': (context) => FoodAddPage(
+              quantity: <String>[
+                '1g',
+                '100g',
+              ],
+            ),
         '/foodStatistic': (context) => foodStatistic(),
         '/measurements': (context) => MeasurementsWidget(),
+        '/addIntakePage': (context) => AddIntakePage(),
       },
     );
   }

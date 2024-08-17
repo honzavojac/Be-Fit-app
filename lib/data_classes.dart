@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:intl/intl.dart';
 
 class Muscle {
@@ -197,7 +195,7 @@ class ExerciseData {
   }
 }
 
-class Split {
+class MySplit {
   int? idSplit;
   String nameSplit;
   String? createdAt;
@@ -207,7 +205,7 @@ class Split {
   List<SplitStartedCompleted>? splitStartedCompleted;
   int? idUser;
 
-  Split({
+  MySplit({
     this.idSplit,
     required this.nameSplit,
     this.createdAt,
@@ -218,7 +216,7 @@ class Split {
     this.idUser,
   });
 
-  factory Split.fromJson(Map<String, dynamic> json) {
+  factory MySplit.fromJson(Map<String, dynamic> json) {
     var selectedMuscleFromJson = json['selected_muscles'] as List<dynamic>? ?? [];
     List<SelectedMuscle> selectedMusclesList = selectedMuscleFromJson.map((e) => SelectedMuscle.fromJson(e)).toList();
 
@@ -229,7 +227,7 @@ class Split {
         )
         .toList();
 
-    return Split(
+    return MySplit(
       idSplit: json['id_split'],
       nameSplit: json['name_split'],
       createdAt: json['created_at'],
@@ -438,7 +436,7 @@ class UserSupabase {
   String name;
   String email;
   List<Muscle>? muscles;
-  List<Split>? split;
+  List<MySplit>? split;
 
   UserSupabase({
     required this.idUser,
@@ -453,7 +451,7 @@ class UserSupabase {
     List<Muscle>? musclesList = musclesFromJson?.map((e) => Muscle.fromJson(e)).toList();
 
     var splitsFromJson = json['split'] as List<dynamic>?; // Add null check
-    List<Split>? splitList = splitsFromJson?.map((e) => Split.fromJson(e)).toList();
+    List<MySplit>? splitList = splitsFromJson?.map((e) => MySplit.fromJson(e)).toList();
 
     return UserSupabase(
       idUser: json['id_user'],
@@ -535,5 +533,162 @@ class Measurements {
       'supabase_id_body_measurements': supabaseIdBodyMeasurements,
       'action': action,
     };
+  }
+}
+
+class Food {
+  int? idFood;
+  String? country;
+  String? name;
+  String? unaccentName; // Add this field
+  String? recentlyUsed;
+  int? weight;
+  String? quantity;
+  double? kcal;
+  double? protein;
+  double? carbs;
+  double? sugar;
+  double? fat;
+  double? fatSatureated;
+  double? fatTrans;
+  double? fatMonounsatureted;
+  double? fatPolyunsatureted;
+  double? fiber;
+  double? water;
+  double? cholesterol;
+  int? supabaseIdFood;
+  int? action;
+  String? createdAt;
+  int? idNutriIntake;
+
+  Food(
+      {this.idFood,
+      this.country,
+      this.name,
+      this.unaccentName, // Add this parameter
+      this.recentlyUsed,
+      this.weight,
+      this.quantity,
+      this.kcal,
+      this.protein,
+      this.carbs,
+      this.sugar,
+      this.fat,
+      this.fatSatureated,
+      this.fatTrans,
+      this.fatMonounsatureted,
+      this.fatPolyunsatureted,
+      this.fiber,
+      this.water,
+      this.cholesterol,
+      this.supabaseIdFood,
+      this.action,
+      this.createdAt,
+      this.idNutriIntake});
+
+  factory Food.fromJson(Map<String, dynamic> json) {
+    return Food(
+      idFood: json['id_food'],
+      country: json['country'],
+      name: json['name'],
+      unaccentName: json['unaccent_name'], // Add this line
+      weight: json['weight'],
+      quantity: json['quantity'],
+      kcal: double.tryParse(json['kcal'].toString()),
+      protein: double.tryParse(json['protein'].toString()),
+      carbs: double.tryParse(json['carbs'].toString()),
+      sugar: double.tryParse(json['sugar'].toString()),
+      fat: double.tryParse(json['fat'].toString()),
+      fatSatureated: double.tryParse(json['fat_saturated'].toString()),
+      fatTrans: double.tryParse(json['fat_trans'].toString()),
+      fatMonounsatureted: double.tryParse(json['fat_monounsaturated'].toString()),
+      fatPolyunsatureted: double.tryParse(json['fat_polyunsaturated'].toString()),
+      fiber: double.tryParse(json['fiber'].toString()),
+      water: double.tryParse(json['water'].toString()),
+      cholesterol: double.tryParse(json['cholesterol'].toString()),
+      supabaseIdFood: json['supabase_id_food'],
+      action: json['action'],
+      createdAt: json['created_at'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      // 'id_food': idFood,
+      'country': country,
+      'name': name,
+      'unaccent_name': unaccentName, // Add this line
+      'weight': weight,
+      'quantity': quantity,
+      'kcal': kcal,
+      'protein': protein,
+      'carbs': carbs,
+      'sugar': sugar,
+      'fat': fat,
+      'fat_saturated': fatSatureated,
+      'fat_trans': fatTrans,
+      'fat_monounsaturated': fatMonounsatureted,
+      'fat_polyunsaturated': fatPolyunsatureted,
+      'fiber': fiber,
+      'water': water,
+      'cholesterol': cholesterol,
+      'created_at': createdAt,
+    };
+  }
+
+  @override
+  String toString() {
+    return 'Food(idFood: $idFood, country: $country, name: $name, unaccentName: $unaccentName, weight: $weight, quantity: $quantity, kcal: $kcal, protein: $protein, carbs: $carbs, sugar: $sugar, fat: $fat, fatSatureated: $fatSatureated, fatTrans: $fatTrans, fatMonounsatureted: $fatMonounsatureted, fatPolyunsatureted: $fatPolyunsatureted, fiber: $fiber, water: $water, cholesterol: $cholesterol, supabaseIdFood: $supabaseIdFood, action: $action, createdAt: $createdAt)';
+  }
+}
+
+class NutriIntake {
+  int? idNutriIntake;
+  String? createdAt;
+  int? idFood;
+  String? quantity;
+  int? weight;
+  int? supabaseIdNutriIntake;
+  int? action;
+
+  NutriIntake({
+    this.idNutriIntake,
+    this.createdAt,
+    this.idFood,
+    this.quantity,
+    this.weight,
+    this.supabaseIdNutriIntake,
+    this.action,
+  });
+
+  // Convert from JSON
+  factory NutriIntake.fromJson(Map<String, dynamic> json) {
+    return NutriIntake(
+      idNutriIntake: json['id_nutri_intake'],
+      createdAt: json['created_at'],
+      idFood: json['id_food'],
+      quantity: json['quantity'],
+      weight: json['weight'],
+      supabaseIdNutriIntake: json['supabase_id_nutri_intake'],
+      action: json['action'],
+    );
+  }
+
+  // Convert to JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'id_nutri_intake': idNutriIntake,
+      'creatcreated_atedAt': createdAt,
+      'id_food': idFood,
+      'quantity': quantity,
+      'weight': weight,
+      'supabase_id_nutri_intake': supabaseIdNutriIntake,
+      'action': action,
+    };
+  }
+
+  @override
+  String toString() {
+    return 'NutriIntake(idNutriIntake: $idNutriIntake, createdAt: $createdAt, idFood: $idFood, quantity: $quantity, weight: $weight, supabaseIdNutriIntake: $supabaseIdNutriIntake, action: $action)';
   }
 }

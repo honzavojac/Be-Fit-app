@@ -85,13 +85,25 @@ class _SettingsState extends State<Settings> {
     });
   }
 
+  String? _selectedCountry;
+  final List<Map<String, String>> _countries = [
+    {'code': 'CZ', 'name': 'Czech Republic'},
+    {'code': 'DE', 'name': 'Germany'},
+    {'code': 'FR', 'name': 'France'},
+    {'code': 'HU', 'name': 'Hungary'},
+    {'code': 'IT', 'name': 'Italy'},
+    {'code': 'PL', 'name': 'Poland'},
+    {'code': 'UA', 'name': 'Ukraine'},
+    {'code': 'US', 'name': 'United States'},
+    {'code': 'EN', 'name': 'United Kingdom'}
+  ];
+
   List<Muscle> data3 = [];
   @override
   Widget build(BuildContext context) {
     var dbSupabase = Provider.of<SupabaseProvider>(context);
     var dbFitness = Provider.of<FitnessProvider>(context);
-    List<Muscle> data = data1;
-    TextEditingController textEditingController = TextEditingController(text: "ahoj");
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Settings"),
@@ -212,6 +224,27 @@ class _SettingsState extends State<Settings> {
                 ],
               ),
             ),
+            Container(
+              height: 100,
+              child: DropdownButton<String>(
+                value: _selectedCountry,
+                hint: Text('Select Country'),
+                items: _countries.map((country) {
+                  return DropdownMenuItem<String>(
+                    value: country['code'],
+                    child: Text(country['name']!),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _selectedCountry = value;
+                  });
+                  // Můžete zde přidat další logiku, například uložit vybranou zemi do databáze nebo změnit jazyk aplikace
+                  print('Selected Country Code: $_selectedCountry');
+                },
+                isExpanded: true,
+              ),
+            ),
             // TextField(
             //   // enabled: false,
             //   // readOnly: true,
@@ -239,7 +272,7 @@ class _SettingsState extends State<Settings> {
                 Stopwatch stopwatch = Stopwatch()..start();
                 await dbFitness.SaveToSupabaseAndOrderSqlite(dbSupabase);
                 stopwatch.stop();
-                print("SaveToSupabaseAndOrderSqlite trvalo: ${stopwatch.elapsedMilliseconds} ms");
+                // print("SaveToSupabaseAndOrderSqlite trvalo: ${stopwatch.elapsedMilliseconds} ms");
               },
               child: Text("save to supabase"),
             ),

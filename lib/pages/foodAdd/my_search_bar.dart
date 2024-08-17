@@ -1,116 +1,172 @@
+import 'package:diacritic/diacritic.dart';
 import 'package:flutter/material.dart';
-import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
+import 'package:kaloricke_tabulky_02/data_classes.dart';
+import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
+import 'package:kaloricke_tabulky_02/pages/foodAdd/food_page.dart';
 import 'package:provider/provider.dart';
+import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
+import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 
-import '../../database/database_provider.dart';
-
-class mySearchBar extends StatefulWidget {
-  const mySearchBar({Key? key}) : super(key: key);
+class MySearchBar extends StatefulWidget {
+  final Function notifyParent;
+  final SearchController searchController;
+  const MySearchBar({
+    Key? key,
+    required this.notifyParent,
+    required this.searchController,
+  }) : super(key: key);
 
   @override
-  State<mySearchBar> createState() => _mySearchBarState();
+  State<MySearchBar> createState() => _MySearchBarState();
 }
 
-class _mySearchBarState extends State<mySearchBar> {
+class _MySearchBarState extends State<MySearchBar> {
   @override
   Widget build(BuildContext context) {
-    var dbHelper = Provider.of<DBHelper>(context);
+    var supabaseProvider = Provider.of<SupabaseProvider>(context);
+    var dbFitness = Provider.of<FitnessProvider>(context);
+
     return Container(
       height: 90,
-      padding: EdgeInsets.all(25),
+      padding: EdgeInsets.fromLTRB(25, 20, 25, 20),
       child: SearchAnchor(
+        searchController: widget.searchController,
         builder: (BuildContext context, SearchController controller) {
           return SearchBar(
-            elevation: MaterialStateProperty.all(1),
-            shadowColor: MaterialStateProperty.all(ColorsProvider.color_4),
+            elevation: WidgetStateProperty.all(25),
+            shadowColor: WidgetStateProperty.all(ColorsProvider.color_4),
             controller: controller,
-            padding: MaterialStateProperty.all<EdgeInsets>(
+            padding: WidgetStateProperty.all<EdgeInsets>(
               EdgeInsets.symmetric(horizontal: 10.0),
             ),
             onTap: () {
               controller.openView();
             },
-            onChanged: (_) {
+            onChanged: (query) async {
+              // Aktualizujte výsledky na základě vyhledávacího dotazu
               controller.openView();
             },
             leading: const Icon(Icons.search, color: ColorsProvider.color_1),
-            hintText: 'Vyhledat jídlo...',
-            hintStyle: MaterialStatePropertyAll(TextStyle(
-              color: ColorsProvider.color_1,
-            )),
+            hintText: 'Search food...',
+            hintStyle: WidgetStatePropertyAll(
+              TextStyle(
+                color: ColorsProvider.color_1,
+              ),
+            ),
+          );
+        },
+        dividerColor: ColorsProvider.color_2,
+        headerTextStyle: TextStyle(color: ColorsProvider.color_2),
+        viewBuilder: (suggestions) {
+          final List<Widget> suggestionWidgets = suggestions.toList(); // Convert to List
+          return ListView.builder(
+            // scrollDirection: Axis.horizontal,
+            itemCount: suggestionWidgets.length,
+            itemBuilder: (context, index) {
+              final widget = suggestionWidgets[index];
+              return widget; // Access element using []
+            },
           );
         },
         suggestionsBuilder: (BuildContext context, SearchController controller) async {
-          final List<String> czFoodNames = await dbHelper.getCzFoodNames();
-          final normalizedQuery = _removeDiacritics(controller.text.toLowerCase());
+          // Získejte vyhledávací termín a odstraňte diakritiku
+          String searchTerm = removeDiacritics(controller.text.toLowerCase());
 
-          final filteredJidla = czFoodNames.where((food) {
-            final normalizedFood = _removeDiacritics(food.toLowerCase());
-            return normalizedFood.contains(normalizedQuery);
-          }).toList();
+          // Získejte výsledky ze Sqflite (offline data)
+          List<Food> dataSqflite = await dbFitness.FoodTable(searchTerm);
 
-          return filteredJidla.map((food) {
+          // Nastavte text "Recently used" pro položky ze Sqflite
+          dataSqflite.forEach((element) {
+            element.recentlyUsed = "Recently used";
+          });
+
+          List<Food> dataSupabase = [];
+          bool supabaseFailed = false;
+
+          try {
+            // Pokus o načtení výsledků ze Supabase
+            dataSupabase = await supabaseProvider.FoodTable(searchTerm);
+          } catch (e) {
+            // Pokud dojde k chybě (např. výpadek připojení), zpracuje se chyba a označí, že Supabase selhalo
+            supabaseFailed = true;
+            print("Supabase data could not be loaded: $e");
+          }
+
+          if (!supabaseFailed) {
+            // Pokud Supabase funguje, pokračujte s filtrováním dat
+
+            // Filtrace: Získání ID všech položek ze Sqflite
+            Set<int?> sqfliteIds = dataSqflite.map((food) => food.idFood).toSet();
+
+            // Filtrujte položky ze Supabase, které mají stejné idFood jako položky v Sqflite
+            List<Food> filteredSupabaseData = dataSupabase.where((food) {
+              return !sqfliteIds.contains(food.idFood);
+            }).toList();
+
+            // Rozdělení Supabase dat na položky, které začínají a nezačínají na hledaný výraz
+            List<Food> startingWithSearchTerm = filteredSupabaseData.where((food) {
+              return food.unaccentName?.toLowerCase().startsWith(searchTerm) ?? false;
+            }).toList();
+
+            List<Food> notStartingWithSearchTerm = filteredSupabaseData.where((food) {
+              return !(food.unaccentName?.toLowerCase().startsWith(searchTerm) ?? false);
+            }).toList();
+
+            // Seřazení obou částí podle názvu
+            startingWithSearchTerm.sort((a, b) => a.name!.toLowerCase().compareTo(b.name!.toLowerCase()));
+            notStartingWithSearchTerm.sort((a, b) => a.name!.toLowerCase().compareTo(b.name!.toLowerCase()));
+
+            // Spojení dat: dataSqflite jako první, pak sortedSupabaseData
+            dataSqflite.addAll([...startingWithSearchTerm, ...notStartingWithSearchTerm]);
+          }
+
+          print(dataSqflite.toString());
+
+          // Mapování výsledků na ListTile
+          List<Widget> suggestions = dataSqflite.map((food) {
             return ListTile(
-              title: Text(food),
+              title: Row(
+                children: [
+                  Text(
+                    "${food.name ?? 'Unknown'}",
+                    style: TextStyle(color: ColorsProvider.color_2.withAlpha(230)),
+                  ),
+                  if (food.recentlyUsed != null)
+                    Text(
+                      " ${food.recentlyUsed}",
+                      style: TextStyle(color: Colors.white30),
+                    ),
+                ],
+              ),
               onTap: () async {
-                // Získání hodnoty ENERGYKCAL ze stejného řádku jako food
-                int kcalValue = await dbHelper.getKcalForFood(food);
-                double proteinValue = await dbHelper.getProteinForFood(food);
-                double carbsValue = await dbHelper.getCarbsForFood(food);
-                double fatValue = await dbHelper.getFatForFood(food);
-                double fiberValue = await dbHelper.getFiberForFood(food);
-                // Vložit vybranou položku jídla do databáze s odpovídající hodnotou ENERGYKCAL
-                await dbHelper.NutritionsData(food, kcalValue, proteinValue, carbsValue, fatValue, fiberValue);
-
-                // Zavřít pohled na vyhledávání a nastavit vybraný text
-                controller.text = food;
-                controller.closeView(food);
-
+                controller.closeView(food.name ?? 'Unknown');
                 // Přidejte akce po výběru položky jídla
+                FocusScope.of(context).unfocus();
+                await Navigator.pushNamed(context, '/addIntakePage', arguments: [food, quantity, true]);
+                widget.notifyParent();
+                controller.text = "";
               },
             );
           }).toList();
+
+          double keyboardHeight = await MediaQuery.of(context).viewInsets.bottom;
+
+          // Vložení seznamu návrhů a ListView s pevnou výškou
+          return [
+            ...suggestions,
+            Container(
+              height: keyboardHeight + 20,
+              child: ListView(
+                children: [
+                  Center(
+                      // child: Text("There is nothing more"),
+                      )
+                ],
+              ),
+            ),
+          ];
         },
       ),
     );
   }
 }
-
-String _removeDiacritics(String input) {
-  return input.replaceAllMapped(
-    RegExp('[ÁáČčĎďÉéěÍíŇňÓóŘřŠšŤťÚúŮůÝýŽž]'),
-    (match) => _diacriticMap[match.group(0)] ?? match.group(0)!,
-  );
-}
-
-const Map<String, String> _diacriticMap = {
-  'Á': 'A',
-  'á': 'a',
-  'Č': 'C',
-  'č': 'c',
-  'Ď': 'D',
-  'ď': 'd',
-  'É': 'E',
-  'é': 'e',
-  'ě': 'e',
-  'Í': 'I',
-  'í': 'i',
-  'Ň': 'N',
-  'ň': 'n',
-  'Ó': 'O',
-  'ó': 'o',
-  'Ř': 'R',
-  'ř': 'r',
-  'Š': 'S',
-  'š': 's',
-  'Ť': 'T',
-  'ť': 't',
-  'Ú': 'U',
-  'ú': 'u',
-  'Ů': 'U',
-  'ů': 'u',
-  'Ý': 'Y',
-  'ý': 'y',
-  'Ž': 'Z',
-  'ž': 'z',
-};

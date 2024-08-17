@@ -13,7 +13,6 @@ import 'package:kaloricke_tabulky_02/providers/variables_provider.dart';
 import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:provider/provider.dart';
 
-import 'split_page copy 3.dart';
 import 'split_page.dart';
 
 class FitnessRecordAppBar extends StatelessWidget {
@@ -35,7 +34,7 @@ class FitnessRecordScreen extends StatefulWidget {
 }
 
 class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
-  StreamController<List<Split>> _streamController = StreamController<List<Split>>();
+  StreamController<List<MySplit>> _streamController = StreamController<List<MySplit>>();
 
   @override
   void initState() {
@@ -62,8 +61,8 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
       --> provede se select na (exercise_data) kde id_started_completed je id_started_completed 
         */
 //proměnná pro vykreslení žádného widgetu
-  List<Split> rawData = [];
-  List<Split> exerciseData = [];
+  List<MySplit> rawData = [];
+  List<MySplit> exerciseData = [];
   int? idStartedCompleted;
   late bool foundActiveSplit;
   Future<void> loadData() async {
@@ -151,7 +150,7 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
         stream: _streamController.stream,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            List<Split> exercisesData = snapshot.data!;
+            List<MySplit> exercisesData = snapshot.data!;
             if (exercisesData.isEmpty) {
               return Container();
             } else {
@@ -566,7 +565,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
 }
 
 class FitnessRecordDropdown extends StatefulWidget {
-  final List<Split> splits;
+  final List<MySplit> splits;
   final String? splitName;
   final int selectedSplit;
   final void Function() refresh;
@@ -588,7 +587,7 @@ class FitnessRecordDropdown extends StatefulWidget {
 class _FitnessRecordDropdownState extends State<FitnessRecordDropdown> {
   @override
   Widget build(BuildContext context) {
-    List<Split> splits = widget.splits;
+    List<MySplit> splits = widget.splits;
     var variablesProvider = Provider.of<VariablesProvider>(context);
     return Padding(
       padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),

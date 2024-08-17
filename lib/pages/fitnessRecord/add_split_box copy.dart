@@ -12,7 +12,7 @@ import 'new_muscle_box copy.dart';
 
 class AddSplitBoxCopy extends StatefulWidget {
   final Function() loadParent;
-  final List<Split> splits;
+  final List<MySplit> splits;
 
   const AddSplitBoxCopy({
     Key? key,
@@ -28,7 +28,7 @@ class _AddSplitBoxCopyState extends State<AddSplitBoxCopy> {
   var _textController = TextEditingController();
 
   List<Muscle> muscles = [];
-  List<Split> splits = [];
+  List<MySplit> splits = [];
   List<bool> isCheckedList = [];
 
   @override
@@ -86,44 +86,46 @@ class _AddSplitBoxCopyState extends State<AddSplitBoxCopy> {
                       SizedBox(
                         height: 50,
                       ),
-                      Container(
-                        height: 50,
-                        // color: ColorsProvider.color_8,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 15),
-                          child: TextField(
-                            decoration: InputDecoration(
-                              labelText: 'Name of Split:',
-                              labelStyle: TextStyle(
-                                color: ColorsProvider.color_1,
-                              ),
-                              enabledBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: ColorsProvider.color_2,
-                                  width: 0.5,
+                      muscles.length == 0
+                          ? Container()
+                          : Container(
+                              height: 50,
+                              // color: ColorsProvider.color_8,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 15),
+                                child: TextField(
+                                  decoration: InputDecoration(
+                                    labelText: 'Name of MySplit:',
+                                    labelStyle: TextStyle(
+                                      color: ColorsProvider.color_1,
+                                    ),
+                                    enabledBorder: UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: ColorsProvider.color_2,
+                                        width: 0.5,
+                                      ),
+                                    ),
+                                    focusedBorder: UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: ColorsProvider.color_2,
+                                        width: 3.0,
+                                      ),
+                                    ),
+                                    contentPadding: EdgeInsets.symmetric(
+                                      vertical: 0,
+                                      horizontal: 15,
+                                    ),
+                                    hintText: 'Enter name of split:',
+                                    hintStyle: TextStyle(
+                                      color: ColorsProvider.color_1,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                  controller: _textController,
+                                  style: TextStyle(color: ColorsProvider.color_1),
                                 ),
-                              ),
-                              focusedBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: ColorsProvider.color_2,
-                                  width: 3.0,
-                                ),
-                              ),
-                              contentPadding: EdgeInsets.symmetric(
-                                vertical: 0,
-                                horizontal: 15,
-                              ),
-                              hintText: 'Enter name of split:',
-                              hintStyle: TextStyle(
-                                color: ColorsProvider.color_1,
-                                fontSize: 15,
                               ),
                             ),
-                            controller: _textController,
-                            style: TextStyle(color: ColorsProvider.color_1),
-                          ),
-                        ),
-                      ),
                       Expanded(
                         child: Container(
                           child: ListView.builder(

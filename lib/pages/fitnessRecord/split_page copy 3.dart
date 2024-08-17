@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
 import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
@@ -59,7 +61,7 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
     setState(() {});
   }
 
-  List<Split> splits = [];
+  List<MySplit> splits = [];
   int a = 0;
   Map<String, List<bool>> isCheckedList = {};
   loadData() async {
@@ -75,6 +77,7 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
       a++;
     }
     _tabController = TabController(length: splits.length, vsync: this, initialIndex: clickedSplitTab);
+    widget.loadParent();
     setState(() {});
     // stopwatch.stop();
     // print("tvralo to: ${stopwatch.elapsed.inMilliseconds}");
@@ -97,6 +100,7 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
 
     if (splits.isEmpty) {
       return PopScope(
+        // ignore: deprecated_member_use
         onPopInvoked: (didPop) {
           widget.notifyParent;
         },
@@ -369,6 +373,11 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
                                                                         print(clickedSplitTab);
                                                                         widget.loadParent();
                                                                       },
+                                                                      onTapOutside: (event) async {
+                                                                        // await dbFitness.UpdateMuscle(, record.selectedMuscle![muscleIndex].muscles!.supabaseIdMuscle!);
+
+                                                                        widget.loadParent();
+                                                                      },
                                                                       controller: TextEditingController(text: record.selectedMuscle![muscleIndex].muscles!.nameOfMuscle),
                                                                       decoration: InputDecoration(
                                                                         filled: true,
@@ -442,7 +451,6 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
                                                               function:
                                                               for (var j = 0; j < selectedExercises.length; j++) {
                                                                 // print("${exercises[itemIndex].supabaseIdExercise} == ${selectedExercises[j].exercises!.supabaseIdExercise}");
-                                                                print("-- ${selectedExercises[j].action} ${selectedExercises[j].exercises!.nameOfExercise!}");
                                                                 if (selectedExercises[j].action == 3) {
                                                                   // selectedExercises.removeAt(j);
                                                                 } else {
@@ -501,28 +509,29 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
                                                                         child: Center(
                                                                           child: GestureDetector(
                                                                             onTap: () async {
-                                                                              // print("clickedSplitTab: $clickedSplitTab");
-                                                                              // print(isChecked);
-                                                                              // print("action: ${exercises[itemIndex].action}");
-                                                                              // print("idSelectedMuscle: $idSelectedMuscle");
-                                                                              // print("exercise ${exercises[itemIndex].nameOfExercise}");
-                                                                              // print("selectedExercise: ${selectedExercises}");
-
                                                                               clickedSplitTab = _tabController.index;
                                                                               if (isChecked == true) {
                                                                                 for (var i = 0; i < selectedExercises.length; i++) {
                                                                                   if (selectedExercises[i].idExercise == exercises[itemIndex].supabaseIdExercise) {
                                                                                     print("update item");
-                                                                                    if (selectedExercises[i].action == 1) {
-                                                                                      print("delete ze sqflite");
-                                                                                      //delete
-                                                                                      await dbFitness.DeleteSelectedExercise(selectedExercises[i].idSelectedExercise!);
-                                                                                    } else if (selectedExercises[i].action == 0) {
-                                                                                      print("delete ze supabase");
-                                                                                      // action 3 protože to potřebuju smazat ze supabase
-                                                                                      print(selectedExercises[i].exercises!.nameOfExercise!);
-                                                                                      print(selectedExercises[i].supabaseIdSelectedExercise);
-                                                                                      await dbFitness.UpdateSelectedExercise(3, selectedExercises[i].supabaseIdSelectedExercise!);
+                                                                                    switch (selectedExercises[i].action) {
+                                                                                      case 0:
+                                                                                        print("delete ze supabase");
+                                                                                        // action 3 protože to potřebuju smazat ze supabase
+                                                                                        print(selectedExercises[i].exercises!.nameOfExercise!);
+                                                                                        print(selectedExercises[i].supabaseIdSelectedExercise);
+                                                                                        await dbFitness.UpdateSelectedExercise(3, selectedExercises[i].supabaseIdSelectedExercise!);
+                                                                                        break;
+                                                                                      case 1:
+                                                                                        print("delete ze sqflite");
+                                                                                        //delete
+                                                                                        await dbFitness.DeleteSelectedExercise(selectedExercises[i].idSelectedExercise!);
+                                                                                        break;
+                                                                                      case 2:
+                                                                                        break;
+                                                                                      case 3:
+                                                                                        break;
+                                                                                      default:
                                                                                     }
                                                                                   }
                                                                                 }
@@ -531,23 +540,24 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
                                                                                 {
                                                                                   for (var i = 0; i < selectedExercises.length; i++) {
                                                                                     if (selectedExercises[i].idExercise == exercises[itemIndex].supabaseIdExercise) {
-                                                                                      print("******************");
-                                                                                      print(selectedExercises[i].supabaseIdSelectedExercise);
-                                                                                      print(selectedExercises[i].action);
-                                                                                      print("update item na x");
-                                                                                      if (selectedExercises[i].action == 0) {
-                                                                                        await dbFitness.UpdateSelectedExercise(2, selectedExercises[i].supabaseIdSelectedExercise!);
-                                                                                        break funkce;
-                                                                                      } else if (selectedExercises[i].action == 2) {
-                                                                                        //action zpátky na 0
-                                                                                        await dbFitness.UpdateSelectedExercise(0, selectedExercises[i].supabaseIdSelectedExercise!);
-                                                                                        break funkce;
-                                                                                      } else if (selectedExercises[i].action == 3) {
-                                                                                        //
-                                                                                        await dbFitness.UpdateSelectedExercise(0, selectedExercises[i].supabaseIdSelectedExercise!);
-                                                                                        break funkce;
+                                                                                      switch (selectedExercises[i].action) {
+                                                                                        case 0:
+                                                                                          await dbFitness.UpdateSelectedExercise(2, selectedExercises[i].supabaseIdSelectedExercise!);
+                                                                                          break funkce;
+
+                                                                                        case 1:
+                                                                                          // tento stav nenastane protože když je ischecked false tak nikdy se nebude isertovat ischecked false
+                                                                                          print("CHYBA !!! POZOR, NĚCO JE ŠPATNĚ");
+                                                                                          break;
+                                                                                        case 2:
+                                                                                          await dbFitness.UpdateSelectedExercise(0, selectedExercises[i].supabaseIdSelectedExercise!);
+                                                                                          break funkce;
+                                                                                        case 3:
+                                                                                          await dbFitness.UpdateSelectedExercise(0, selectedExercises[i].supabaseIdSelectedExercise!);
+                                                                                          break funkce;
+                                                                                        default:
                                                                                       }
-                                                                                    } else {}
+                                                                                    }
                                                                                   }
                                                                                   int newSupabaseIdSelectedIdExercise = 1 + (selectedExercises.isNotEmpty ? selectedExercises.last.supabaseIdSelectedExercise! : 0);
                                                                                   await dbFitness.InsertSelectedExercise(newSupabaseIdSelectedIdExercise, exercises[itemIndex].supabaseIdExercise!, idSelectedMuscle, 1);
@@ -650,7 +660,7 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
 
 class _deleteSplit extends StatefulWidget {
   final BuildContext context;
-  final Split record;
+  final MySplit record;
   int a;
   final Function? notifyParent;
   final bool foundActiveSplit;

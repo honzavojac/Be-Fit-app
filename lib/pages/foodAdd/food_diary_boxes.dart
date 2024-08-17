@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/database/database_provider.dart';
-import 'package:marquee/marquee.dart';
+// import 'package:marquee/marquee.dart';
 import 'package:provider/provider.dart';
 
 class foodDiaryBoxes extends StatefulWidget {
@@ -67,8 +67,8 @@ class _foodDiaryBoxesState extends State<foodDiaryBoxes> {
                               ),
                               ElevatedButton(
                                 style: ButtonStyle(
-                                  backgroundColor: MaterialStatePropertyAll(ColorsProvider.color_8),
-                                  foregroundColor: MaterialStatePropertyAll(
+                                  backgroundColor: WidgetStatePropertyAll(ColorsProvider.color_8),
+                                  foregroundColor: WidgetStatePropertyAll(
                                     ColorsProvider.color_1,
                                   ),
                                 ),
@@ -114,7 +114,7 @@ class _foodDiaryBoxesState extends State<foodDiaryBoxes> {
                                     Expanded(
                                       child: Container(
                                         height: 20,
-                                        child: buildAnimatedText("${notes[index].czfoodname}", textPainter.width, constraints.maxWidth),
+                                        // child: buildAnimatedText("${notes[index].czfoodname}", textPainter.width, constraints.maxWidth),
                                         //  Text(
                                         //     "description:${notes[index].czfoodname}")
                                         // Další informace, které chcete zobrazit
@@ -238,29 +238,29 @@ class _foodDiaryBoxesState extends State<foodDiaryBoxes> {
   }
 }
 
-Widget buildAnimatedText(String text, double textPainter, double boxConstraints) {
-  if (textPainter < boxConstraints) {
-    // print("${text.indexOf(text)} ${text.length}");
-    return Text(
-      text,
-      style: TextStyle(color: ColorsProvider.color_8, fontWeight: FontWeight.bold, fontSize: 15),
-    );
-  } else {
-    // print("${text.length}text je větší než widget");
-    return Marquee(
-      text: text,
-      style: TextStyle(color: ColorsProvider.color_8, fontWeight: FontWeight.bold, fontSize: 15),
-      scrollAxis: Axis.horizontal,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      blankSpace: 50.0,
-      // velocity: 100.0,
-      startAfter: Duration(seconds: 2),
-      pauseAfterRound: Duration(seconds: 2),
-      startPadding: 0.0,
-      // accelerationDuration: Duration(seconds: 1),
-      // accelerationCurve: Curves.linear,
-      // decelerationDuration: Duration(milliseconds: 500),
-      // decelerationCurve: Curves.easeOut,
-    );
-  }
-}
+// Widget buildAnimatedText(String text, double textPainter, double boxConstraints) {
+//   if (textPainter < boxConstraints) {
+//     // print("${text.indexOf(text)} ${text.length}");
+//     return Text(
+//       text,
+//       style: TextStyle(color: ColorsProvider.color_8, fontWeight: FontWeight.bold, fontSize: 15),
+//     );
+//   } else {
+//     // print("${text.length}text je větší než widget");
+//     return Marquee(
+//       text: text,
+//       style: TextStyle(color: ColorsProvider.color_8, fontWeight: FontWeight.bold, fontSize: 15),
+//       scrollAxis: Axis.horizontal,
+//       crossAxisAlignment: CrossAxisAlignment.start,
+//       blankSpace: 50.0,
+//       // velocity: 100.0,
+//       startAfter: Duration(seconds: 2),
+//       pauseAfterRound: Duration(seconds: 2),
+//       startPadding: 0.0,
+//       // accelerationDuration: Duration(seconds: 1),
+//       // accelerationCurve: Curves.linear,
+//       // decelerationDuration: Duration(milliseconds: 500),
+//       // decelerationCurve: Curves.easeOut,
+//     );
+//   }
+// }
