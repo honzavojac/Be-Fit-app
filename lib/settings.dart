@@ -259,9 +259,7 @@ class _SettingsState extends State<Settings> {
               height: 100,
             ),
             ElevatedButton(
-              onPressed: () async {
-                await dbFitness.SelectAllData();
-              },
+              onPressed: () async {},
               child: Text("select databáze"),
             ),
             SizedBox(

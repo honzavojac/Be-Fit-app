@@ -23,7 +23,7 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 class FitnessProvider extends ChangeNotifier {
   late Database _database;
   late String databasesPath;
-
+  Database get database => _database;
   bool switchButton = false;
   Future<void> deleteFile(String fileName) async {
     try {
@@ -169,6 +169,7 @@ class FitnessProvider extends ChangeNotifier {
             id_food INTEGER,
             quantity TEXT,
             weight INTEGER,
+            id_intake_category, INTEGER,
             supabase_id_nutri_intake INTEGER,
             action INTEGER,
             FOREIGN KEY (id_food) REFERENCES food(id_food)
@@ -179,6 +180,12 @@ class FitnessProvider extends ChangeNotifier {
             date_of_birth DATE, 
             username TEXT,
             email TEXT
+      );
+      CREATE TABLE intake_categories (
+          id_intake_category INTEGER PRIMARY KEY AUTOINCREMENT,
+          name TEXT,
+          action INTEGER,
+          supabase_id_intake_category INTEGER
       );
         ''');
       print("Databáze byly vytvořeny");
@@ -203,6 +210,10 @@ class FitnessProvider extends ChangeNotifier {
       await txn.rawDelete('DELETE FROM body_measurements');
       await txn.rawDelete('DELETE FROM food');
       await txn.rawDelete('DELETE FROM nutri_intake');
+      await txn.rawDelete('DELETE FROM intake_categories');
+      await txn.rawDelete('DELETE FROM user');
+
+      // await txn.rawDelete('DELETE FROM intake_categories');
     });
     print("Delete all data hotový");
   }
@@ -215,18 +226,6 @@ class FitnessProvider extends ChangeNotifier {
     String idItem = "";
     int? supabaseIdItem;
     String updateDeleteColumn = "";
-
-    DateTime? parseDate(String? date) {
-      if (date == null || date == "null" || date == Null || date == "Null") {
-        return null;
-      }
-      try {
-        return DateTime.parse(date);
-      } catch (e) {
-        print("Date parsing failed: $e");
-        return null;
-      }
-    }
 
     switch (dbTable) {
       case "muscles":
@@ -328,6 +327,30 @@ class FitnessProvider extends ChangeNotifier {
         idItem = "id_body_measurements";
         supabaseIdItem = data.supabaseIdBodyMeasurements;
         updateDeleteColumn = "supabase_id_body_measurements";
+        break;
+      case "intake_categories":
+        finalData = {
+          'id_user': idUser,
+          'name': data.name,
+        };
+        idRecord = data.idIntakeCategory;
+        idItem = "id_intake_category";
+        supabaseIdItem = data.supabaseIdIntakeCategory;
+        updateDeleteColumn = "supabase_id_intake_category";
+        break;
+      case "nutri_intake":
+        finalData = {
+          'id_user': idUser,
+          'id_food': data.idFood,
+          'created_at': data.createdAt,
+          'quantity': data.quantity,
+          'weight': data.weight,
+          'id_intake_category': data.intakeCategory,
+        };
+        idRecord = data.idNutriIntake;
+        idItem = "id_nutri_intake";
+        supabaseIdItem = data.supabaseIdNutriIntake;
+        updateDeleteColumn = "supabase_id_nutri_intake";
         break;
       default:
         //něco se pokazilo
@@ -446,6 +469,14 @@ class FitnessProvider extends ChangeNotifier {
     await _database.rawQuery('''UPDATE body_measurements SET id_body_measurements = $newIdBodyMeasurements WHERE id_body_measurements = $oldIdBodyMeasurements''');
   }
 
+  UpadateIntakeCategories(int newIdIntakeCategory, int oldIdIntakeCategory) async {
+    await _database.rawQuery('''UPDATE intake_categories SET id_intake_category = $newIdIntakeCategory WHERE id_intake_category = $oldIdIntakeCategory''');
+  }
+
+  UpadateNutriIntakes(int newIdNutriIntake, int oldIdNutriIntake) async {
+    await _database.rawQuery('''UPDATE nutri_intake SET id_nutri_intake = $newIdNutriIntake WHERE id_nutri_intake = $oldIdNutriIntake''');
+  }
+
   bool beginSaveToSupabaseAndOrderSqlite = false;
   SaveToSupabaseAndOrderSqlite(SupabaseProvider dbSupabase) async {
     if (beginSaveToSupabaseAndOrderSqlite == false) {
@@ -453,6 +484,8 @@ class FitnessProvider extends ChangeNotifier {
       List<Muscle> muscles = await SelectMuscles();
       List<Exercise> exercises = await SelectExercises();
       List<Measurements> measurements = await SelectMeasurements();
+      List<IntakeCategories> intakeCategories = await SelectIntakeCategories();
+      List<NutriIntake> nutriIntakes = await SelectNutriIntakes();
 
       for (var muscle in muscles) {
         int muscleAction = muscle.action ?? 0;
@@ -545,6 +578,21 @@ class FitnessProvider extends ChangeNotifier {
           await UpadateBodyMeasurements(supabaseIdBodyMeasurements, measurement.idBodyMeasurements ?? 0);
         }
       }
+      for (var intakeCategory in intakeCategories) {
+        int intakeCategoryAction = intakeCategory.action ?? 0;
+        int? supabaseIdIntakeCategory = await SyncSqfliteToSupabase(dbSupabase, "intake_categories", intakeCategory, intakeCategoryAction);
+        if (supabaseIdIntakeCategory != null) {
+          await UpadateIntakeCategories(supabaseIdIntakeCategory, intakeCategory.idIntakeCategory ?? 0);
+        }
+      }
+      for (var nutriIntake in nutriIntakes) {
+        int nutriIntakeAction = nutriIntake.action ?? 0;
+        int? supabaseIdNutriIntake = await SyncSqfliteToSupabase(dbSupabase, "nutri_intake", nutriIntake, nutriIntakeAction);
+        if (supabaseIdNutriIntake != null) {
+          await UpadateNutriIntakes(supabaseIdNutriIntake, nutriIntake.idNutriIntake ?? 0);
+        }
+      }
+
       beginSaveToSupabaseAndOrderSqlite = false;
     }
   }
@@ -580,6 +628,14 @@ class FitnessProvider extends ChangeNotifier {
         break;
       case "body_measurements":
         await _database.rawQuery('''UPDATE body_measurements SET supabase_id_body_measurements = $supabaseIdItem, action = $action WHERE id_body_measurements = $idRecord''');
+
+        break;
+      case "intake_categories":
+        await _database.rawQuery('''UPDATE intake_categories SET supabase_id_intake_category = $supabaseIdItem, action = $action WHERE id_intake_category = $idRecord''');
+
+        break;
+      case "nutri_intake":
+        await _database.rawQuery('''UPDATE nutri_intake SET supabase_id_nutri_intake = $supabaseIdItem, action = $action WHERE id_nutri_intake = $idRecord''');
 
         break;
       default:
@@ -923,6 +979,29 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     notifyListeners();
   }
 
+  TxnInsertExercise(
+    Transaction txn,
+    int? supabaseIdExercise,
+    String nameOfExercise,
+    int musclesIdMuscle,
+    int action,
+  ) async {
+    //action 1 == insert
+    await txn.rawQuery('''INSERT INTO exercises (
+      supabase_id_exercise, 
+      name_of_exercise, 
+      muscles_id_muscle,
+      action
+    ) 
+    VALUES(
+      $supabaseIdExercise,
+      '$nameOfExercise', 
+      $musclesIdMuscle, 
+      $action)
+    ''');
+    // notifyListeners();
+  }
+
   UpdateExercise(String nameOfExercise, int supabaseIdExercise) async {
     await _database.rawQuery('''UPDATE exercises SET name_of_exercise = '$nameOfExercise' WHERE supabase_id_exercise = $supabaseIdExercise''');
   }
@@ -1023,6 +1102,50 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     notifyListeners();
   }
 
+  TxnInsertExerciseData(
+    Transaction txn,
+    int? supabaseIdExerciseData,
+    int? weight,
+    int? reps,
+    int? difficulty,
+    String? technique,
+    String? comment,
+    String? time,
+    int exercisesIdExercise,
+    int idStartedCompleted,
+    int action,
+  ) async {
+    // Příprava hodnot pro vložení do dotazu SQL
+    //action 1 == insert
+    print(time);
+    await txn.rawQuery('''INSERT INTO exercise_data (
+      supabase_id_ex_data, 
+      weight, 
+      reps, 
+      difficulty, 
+      technique,
+      comment,
+      time,
+      exercises_id_exercise, 
+      id_started_completed, 
+      action
+    ) 
+    VALUES(
+      $supabaseIdExerciseData, 
+      $weight, 
+      $reps, 
+      $difficulty, 
+      '$technique',
+      '$comment',
+      '$time',
+      $exercisesIdExercise, 
+      $idStartedCompleted, 
+      $action
+    )
+    ''');
+    notifyListeners();
+  }
+
   UpdateExerciseData(int? weight, int? reps, int? difficulty, int supabaseIdExData, int action) async {
     await _database.rawQuery('''
     UPDATE exercise_data 
@@ -1073,6 +1196,31 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     DateTime date = DateTime.now();
     String formattedDate = DateFormat("yyyy-MM-ddTHH:mm:ss.SSS").format(date.toLocal());
     await _database.rawQuery('''INSERT INTO split (
+      supabase_id_split, 
+      name_split, 
+      created_at, 
+      action
+      ) 
+      VALUES(
+        $supabaseIdSplit,
+        '$nameOfSplit',
+        '${createdAt ?? formattedDate}', 
+        $action
+      )''');
+    notifyListeners();
+  }
+
+  TxnInsertSplit(
+    Transaction txn,
+    int? supabaseIdSplit,
+    String nameOfSplit,
+    String? createdAt,
+    int action,
+  ) async {
+    //action 1 == insert
+    DateTime date = DateTime.now();
+    String formattedDate = DateFormat("yyyy-MM-ddTHH:mm:ss.SSS").format(date.toLocal());
+    await txn.rawQuery('''INSERT INTO split (
       supabase_id_split, 
       name_split, 
       created_at, 
@@ -1141,6 +1289,29 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     notifyListeners();
   }
 
+  TxnInsertSelectedMuscle(
+    Transaction txn,
+    int? supabaseIdSelectedMuscle,
+    int splitIdSplit,
+    int musclesIdMuscle,
+    int action,
+  ) async {
+    //action 1 == insert
+    await txn.rawQuery('''INSERT INTO selected_muscles (
+      supabase_id_selected_muscle, 
+      split_id_split,
+      muscles_id_muscle, 
+      action
+    ) 
+    VALUES(
+      $supabaseIdSelectedMuscle,
+      $splitIdSplit,
+      $musclesIdMuscle,
+      $action  
+    )''');
+    notifyListeners();
+  }
+
   UpdateSelectedMuscle(String text, int id) async {
     await _database.rawQuery('''UPDATE selected_muscles SET name_of_muscle = '$text' WHERE id_muscle = $id''');
   }
@@ -1181,6 +1352,29 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
   ) async {
     //action 1 == insert
     await _database.rawQuery('''INSERT INTO selected_exercise (
+      supabase_id_selected_exercise, 
+      id_exercise,
+      id_selected_muscle,
+      action
+    ) 
+    VALUES(
+      $supabaseIdSelectedExercise,
+      $idExercise,
+      $idSelectedMuscle,
+      $action
+    )''');
+    notifyListeners();
+  }
+
+  TxnInsertSelectedExercise(
+    Transaction txn,
+    int? supabaseIdSelectedExercise,
+    int idExercise,
+    int idSelectedMuscle,
+    int action,
+  ) async {
+    //action 1 == insert
+    await txn.rawQuery('''INSERT INTO selected_exercise (
       supabase_id_selected_exercise, 
       id_exercise,
       id_selected_muscle,
@@ -1268,6 +1462,38 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     notifyListeners();
   }
 
+  TxnInsertSplitStartedCompleted(
+    Transaction txn,
+    int? supabaseIdSplitStartedCompleted,
+    String? createdAt,
+    String? endedAt,
+    int splitId,
+    bool ended,
+    int action,
+  ) async {
+    DateTime date = DateTime.now();
+    String formattedDate = DateFormat("yyyy-MM-ddTHH:mm:ss.SSS").format(date.toLocal());
+    //action 1 == insert
+    await txn.rawQuery('''INSERT INTO split_started_completed (
+      supabase_id_started_completed, 
+      created_at,
+      ended_at,
+      split_id,
+      ended,
+      action
+    ) 
+    VALUES(
+      $supabaseIdSplitStartedCompleted,
+      '${createdAt ?? formattedDate}',
+      '${endedAt}',
+      $splitId,
+      ${ended},
+      $action
+    )''');
+
+    notifyListeners();
+  }
+
   UpdateSplitStartedCompleted(bool ended, String endedAt, int idStartedCompleted) async {
     await _database.rawQuery('''
       UPDATE split_started_completed 
@@ -1310,6 +1536,42 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     final db = await _database; // Získání instance databáze
 
     await db.rawInsert('''
+    INSERT INTO body_measurements (
+      created_at,
+      weight,
+      height,
+      abdominal_circumference,
+      chest_circumference,
+      waist_circumference,
+      thigh_circumference,
+      neck_circumference,
+      biceps_circumference,
+      supabase_id_body_measurements,
+      action
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  ''', [
+      measurements.createdAt,
+      measurements.weight,
+      measurements.height,
+      measurements.abdominalCircumference,
+      measurements.chestCircumference,
+      measurements.waistCircumference,
+      measurements.thighCircumference,
+      measurements.neckCircumference,
+      measurements.bicepsCircumference,
+      measurements.supabaseIdBodyMeasurements,
+      action,
+    ]);
+  }
+
+  Future<void> TxninsertMeasurements(
+    Transaction txn,
+    Measurements measurements,
+    int action,
+  ) async {
+    final db = await _database; // Získání instance databáze
+
+    await txn.rawInsert('''
     INSERT INTO body_measurements (
       created_at,
       weight,
@@ -1406,7 +1668,7 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
       id_food = ?,
       country = ?,
       name = ?,
-      unaccent_name = ?,  -- Oprava chyby
+      unaccent_name = ?,  
       weight = ?,
       quantity = ?,
       kcal = ?,
@@ -1495,6 +1757,41 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
   }
 
   //NutriIntake
+  Future<List<NutriIntake>> SelectNutriIntakes() async {
+    final db = await _database;
+
+    // Use the rawQuery method to filter by date
+    var data = await db.rawQuery(
+      '''
+    SELECT * FROM nutri_intake ORDER BY id_nutri_intake
+  ''',
+    );
+
+    // Map the data to a list of NutriIntake objects
+    var finalData = data.map((e) => NutriIntake.fromJson(e)).toList();
+    return finalData;
+  }
+
+  Future<NutriIntake?> SelectLastNutriIntake() async {
+    final db = await _database;
+
+    // SQL dotaz pro výběr posledního záznamu podle nejvyšší hodnoty supabase_id_nutri_intake
+    var data = await db.rawQuery(
+      '''
+    SELECT * FROM nutri_intake 
+    ORDER BY supabase_id_nutri_intake DESC
+    LIMIT 1
+  ''',
+    );
+
+    // Zkontrolujte, zda data nejsou prázdná a poté vraťte záznam jako objekt NutriIntake
+    if (data.isNotEmpty) {
+      return NutriIntake.fromJson(data.first);
+    } else {
+      return null; // V případě, že není žádný záznam, vraťte null
+    }
+  }
+
   Future<List<NutriIntake>> SelectNutriIntake(String date) async {
     final db = await _database;
 
@@ -1510,7 +1807,7 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     return finalData;
   }
 
-  Future<void> InsertNutriIntake(NutriIntake nutriIntake, int action) async {
+  Future<void> InsertNutriIntake(NutriIntake nutriIntake, int supabaseIdNutriIntake, int action) async {
     final db = await _database; // Získání instance databáze
 
     await db.rawInsert('''
@@ -1519,13 +1816,42 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
       id_food,
       quantity,
       weight,
+      id_intake_category,
+      supabase_id_nutri_intake,
       action
-    ) VALUES (?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?,?,?)
   ''', [
       nutriIntake.createdAt,
       nutriIntake.idFood,
       nutriIntake.quantity,
       nutriIntake.weight,
+      nutriIntake.intakeCategory,
+      supabaseIdNutriIntake,
+      1,
+    ]);
+    notifyListeners();
+  }
+
+  Future<void> TxnInsertNutriIntake(Transaction txn, NutriIntake nutriIntake, int supabaseIdNutriIntake, int action) async {
+    final db = await _database; // Získání instance databáze
+
+    await txn.rawInsert('''
+    INSERT INTO nutri_intake (
+      created_at,
+      id_food,
+      quantity,
+      weight,
+      id_intake_category,
+      supabase_id_nutri_intake,
+      action
+    ) VALUES (?, ?, ?, ?, ?,?,?)
+  ''', [
+      nutriIntake.createdAt,
+      nutriIntake.idFood,
+      nutriIntake.quantity,
+      nutriIntake.weight,
+      nutriIntake.intakeCategory,
+      supabaseIdNutriIntake,
       action,
     ]);
     notifyListeners();
@@ -1553,17 +1879,61 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
       id_food = ?,
       quantity = ?,
       weight = ?,
+      id_intake_category = ?,
       action = ?
     WHERE id_nutri_intake = ?
   ''', [
       nutriIntake.idFood,
       nutriIntake.quantity,
       nutriIntake.weight,
+      nutriIntake.intakeCategory,
       action,
       idNutriIntake,
     ]);
 
     notifyListeners();
+  }
+
+// IntakeCategories
+  late int selectedIntakeCategoryValue;
+  Future<List<IntakeCategories>> SelectIntakeCategories() async {
+    final db = await _database;
+
+    // Use the rawQuery method to filter by date
+    var data = await db.rawQuery(
+      ''' SELECT * FROM intake_categories ORDER BY id_intake_category
+  ''',
+    );
+
+    // Map the data to a list of NutriIntake objects
+    var finalData = data.map((e) => IntakeCategories.fromJson(e)).toList();
+    return finalData;
+  }
+
+  Future<void> insertIntakeCategory(String nameOfIntakeCategory, int action, int supabaseIdIntakeCategory) async {
+    final db = await _database;
+
+    // Vložení dat do tabulky intake_categories
+    await db.rawInsert(
+      '''
+    INSERT INTO intake_categories (name,action,supabase_id_intake_category)
+    VALUES (?,?,?)
+    ''',
+      [nameOfIntakeCategory, action, supabaseIdIntakeCategory], // Parametr pro název kategorie
+    );
+  }
+
+  Future<void> TxninsertIntakeCategory(Transaction txn, String nameOfIntakeCategory, int action, int supabaseIdIntakeCategory) async {
+    final db = await _database;
+
+    // Vložení dat do tabulky intake_categories
+    await txn.rawInsert(
+      '''
+    INSERT INTO intake_categories (name,action,supabase_id_intake_category)
+    VALUES (?,?,?)
+    ''',
+      [nameOfIntakeCategory, action, supabaseIdIntakeCategory], // Parametr pro název kategorie
+    );
   }
 
   ///

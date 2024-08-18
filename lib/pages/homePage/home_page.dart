@@ -52,6 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
     nutriIntakes = await dbFitness.SelectNutriIntake("${selectedDate.toString().replaceRange(10, null, "")}");
     print(selectedDate.toString().replaceRange(10, null, ""));
     for (var nutriIntake in nutriIntakes) {
+      print(nutriIntake);
       int weight = nutriIntake.weight!;
       Food? food = await dbFitness.selectSpecificFood(nutriIntake.idFood!);
       food = Food(

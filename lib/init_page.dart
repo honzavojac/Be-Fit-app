@@ -68,6 +68,8 @@ class _InitPageState extends State<InitPage> {
     List<SelectedExercise> supabaseSelectedExerciseList = [];
     List<SplitStartedCompleted> supabaseSplitStartedCompletedList = [];
     List<Measurements> supabaseBodyMeasurementsList = [];
+    List<IntakeCategories> supabaseIntakeCategoriesList = [];
+    List<NutriIntake> supabaseNutriIntakeList = [];
 
     if (loading) {
       // Načtení dat ze Sqflite
@@ -80,6 +82,9 @@ class _InitPageState extends State<InitPage> {
         dbFitness.SelectSelectedExercises(),
         dbFitness.SelectSplitStartedCompleted(),
         dbFitness.SelectMeasurements(),
+        dbFitness.SelectIntakeCategories(),
+        dbFitness.SelectNutriIntakes(),
+        dbFitness.SelectFood(),
       ]);
 
       List<Muscle> sqfliteMuscleList = result[0];
@@ -90,94 +95,164 @@ class _InitPageState extends State<InitPage> {
       List<SelectedExercise> sqfliteSelectedExerciseList = result[5];
       List<SplitStartedCompleted> sqfliteSplitStartedCompletedList = result[6];
       List<Measurements> sqfliteBodyMeasurementsList = result[7];
+      List<IntakeCategories> sqfliteIntakeCategoriesList = result[8];
+      List<NutriIntake> sqfliteNutriIntakeList = result[9];
+      List<Food> sqfliteFoodList = result[10];
 
-      if (sqfliteMuscleList.isEmpty || sqfliteExerciseList.isEmpty || sqfliteExerciseDataList.isEmpty || sqfliteSplitList.isEmpty || sqfliteSelectedMuscleList.isEmpty || sqfliteSelectedExerciseList.isEmpty || sqfliteSplitStartedCompletedList.isEmpty || sqfliteBodyMeasurementsList.isEmpty) {
+      if (sqfliteMuscleList.isEmpty || sqfliteExerciseList.isEmpty || sqfliteExerciseDataList.isEmpty || sqfliteSplitList.isEmpty || sqfliteSelectedMuscleList.isEmpty || sqfliteSelectedExerciseList.isEmpty || sqfliteSplitStartedCompletedList.isEmpty || sqfliteBodyMeasurementsList.isEmpty || sqfliteIntakeCategoriesList.isEmpty || sqfliteNutriIntakeList.isEmpty || sqfliteFoodList.isEmpty) {
         if (iconPage) {
           iconPage = false;
         } else {
+          List result = await Future.wait([
+            dbSupabase.MuscleTable(),
+            dbSupabase.ExerciseTable(),
+            dbSupabase.ExerciseDataTable(),
+            dbSupabase.SplitTable(),
+            dbSupabase.SelectedMuscleTable(),
+            dbSupabase.SelectedExericseTable(),
+            dbSupabase.SplitStartedCompletedTable(),
+            dbSupabase.BodyMeasurementsTable(),
+            dbSupabase.IntakeCategoriesTable(),
+            dbSupabase.NutriIntakeTable(),
+          ]);
           // Načtení dat ze Supabase
-          final MuscleLoading = dbSupabase.MuscleTable();
-          final ExerciseLoading = dbSupabase.ExerciseTable();
-          final ExerciseDataLoading = dbSupabase.ExerciseDataTable();
-          final SplitLoading = dbSupabase.SplitTable();
-          final SelectedMuscleLoading = dbSupabase.SelectedMuscleTable();
-          final SelectedExerciseLoading = dbSupabase.SelectedExericseTable();
-          final SplitStartedCompletedLoading = dbSupabase.SplitStartedCompletedTable();
-          final DataMeasurementsLoading = dbSupabase.BodyMeasurementsTable();
-          supabaseMuscleList = await MuscleLoading;
-          supabaseExerciseList = await ExerciseLoading;
-          supabaseExerciseDataList = await ExerciseDataLoading;
-          supabaseSplitList = await SplitLoading;
-          supabaseSelectedMuscleList = await SelectedMuscleLoading;
-          supabaseSelectedExerciseList = await SelectedExerciseLoading;
-          supabaseSplitStartedCompletedList = await SplitStartedCompletedLoading;
-          supabaseBodyMeasurementsList = await DataMeasurementsLoading;
+          supabaseMuscleList = result[0];
+          supabaseExerciseList = result[1];
+          supabaseExerciseDataList = result[2];
+          supabaseSplitList = result[3];
+          supabaseSelectedMuscleList = result[4];
+          supabaseSelectedExerciseList = result[5];
+          supabaseSplitStartedCompletedList = result[6];
+          supabaseBodyMeasurementsList = result[7];
+          supabaseIntakeCategoriesList = result[8];
+          supabaseNutriIntakeList = result[9];
+          // final MuscleLoading = dbSupabase.MuscleTable();
+          // final ExerciseLoading = dbSupabase.ExerciseTable();
+          // final ExerciseDataLoading = dbSupabase.ExerciseDataTable();
+          // final SplitLoading = dbSupabase.SplitTable();
+          // final SelectedMuscleLoading = dbSupabase.SelectedMuscleTable();
+          // final SelectedExerciseLoading = dbSupabase.SelectedExericseTable();
+          // final SplitStartedCompletedLoading = dbSupabase.SplitStartedCompletedTable();
+          // final DataMeasurementsLoading = dbSupabase.BodyMeasurementsTable();
+          // final IntakeCategoriesLoading = dbSupabase.IntakeCategoriesTable();
+          // final NutriIntakeLoading = dbSupabase.NutriIntakeTable();
+
+          // supabaseMuscleList = await MuscleLoading;
+          // supabaseExerciseList = await ExerciseLoading;
+          // supabaseExerciseDataList = await ExerciseDataLoading;
+          // supabaseSplitList = await SplitLoading;
+          // supabaseSelectedMuscleList = await SelectedMuscleLoading;
+          // supabaseSelectedExerciseList = await SelectedExerciseLoading;
+          // supabaseSplitStartedCompletedList = await SplitStartedCompletedLoading;
+          // supabaseBodyMeasurementsList = await DataMeasurementsLoading;
+          // supabaseIntakeCategoriesList = await IntakeCategoriesLoading;
+          // supabaseNutriIntakeList = await NutriIntakeLoading;
 
           // Vložení dat ze Supabase do Sqflite
-          if (sqfliteMuscleList.isEmpty) {
-            for (var muscle in supabaseMuscleList) {
-              await dbFitness.InsertMuscle(muscle.idMuscle!, muscle.nameOfMuscle!, 0);
+          await dbFitness.database.transaction((txn) async {
+            if (sqfliteMuscleList.isEmpty) {
+              for (var muscle in supabaseMuscleList) {
+                try {
+                  await txn.rawInsert('''
+          INSERT INTO muscles (
+            supabase_id_muscle, 
+            name_of_muscle, 
+            action
+          ) 
+          VALUES (?, ?, ?)
+        ''', [muscle.idMuscle, muscle.nameOfMuscle, 0]);
+                } catch (e) {
+                  print("Error inserting muscle: $e");
+                }
+              }
+            }
+
+            if (sqfliteExerciseList.isEmpty) {
+              for (var exercise in supabaseExerciseList) {
+                dbFitness.TxnInsertExercise(txn, exercise.idExercise!, exercise.nameOfExercise!, exercise.musclesIdMuscle!, 0);
+              }
+            }
+
+            if (sqfliteExerciseDataList.isEmpty) {
+              for (var exerciseData in supabaseExerciseDataList) {
+                dbFitness.TxnInsertExerciseData(
+                  txn,
+                  exerciseData.idExData!,
+                  exerciseData.weight,
+                  exerciseData.reps,
+                  exerciseData.difficulty,
+                  exerciseData.technique,
+                  exerciseData.comment,
+                  exerciseData.time,
+                  exerciseData.exercisesIdExercise!,
+                  exerciseData.idStartedCompleted!,
+                  0,
+                );
+              }
+            }
+
+            if (sqfliteSplitList.isEmpty) {
+              for (var split in supabaseSplitList) {
+                dbFitness.TxnInsertSplit(txn, split.idSplit!, split.nameSplit, split.createdAt!, 0);
+              }
+            }
+
+            if (sqfliteSelectedMuscleList.isEmpty) {
+              for (var selectedMuscle in supabaseSelectedMuscleList) {
+                dbFitness.TxnInsertSelectedMuscle(txn, selectedMuscle.idSelectedMuscle!, selectedMuscle.splitIdSplit!, selectedMuscle.musclesIdMuscle!, 0);
+              }
+            }
+
+            if (sqfliteSelectedExerciseList.isEmpty) {
+              for (var selectedExercise in supabaseSelectedExerciseList) {
+                dbFitness.TxnInsertSelectedExercise(txn, selectedExercise.idSelectedExercise!, selectedExercise.idExercise!, selectedExercise.idSelectedMuscle!, 0);
+              }
+            }
+
+            if (sqfliteSplitStartedCompletedList.isEmpty) {
+              for (var splitStartedCompleted in supabaseSplitStartedCompletedList) {
+                dbFitness.TxnInsertSplitStartedCompleted(
+                  txn,
+                  splitStartedCompleted.idStartedCompleted!,
+                  splitStartedCompleted.createdAt!,
+                  splitStartedCompleted.endedAt,
+                  splitStartedCompleted.splitId!,
+                  splitStartedCompleted.ended!,
+                  0,
+                );
+              }
+            }
+
+            if (sqfliteBodyMeasurementsList.isEmpty) {
+              for (var measurement in supabaseBodyMeasurementsList) {
+                dbFitness.TxninsertMeasurements(txn, measurement, 0);
+              }
+            }
+
+            if (sqfliteIntakeCategoriesList.isEmpty) {
+              for (var intakeCategory in supabaseIntakeCategoriesList) {
+                dbFitness.TxninsertIntakeCategory(txn, intakeCategory.name!, 0, intakeCategory.idIntakeCategory!);
+              }
+            }
+
+            if (sqfliteNutriIntakeList.isEmpty) {
+              for (var nutriIntake in supabaseNutriIntakeList) {
+                sqfliteNutriIntakeList.add(nutriIntake);
+                dbFitness.TxnInsertNutriIntake(txn, nutriIntake, nutriIntake.idNutriIntake!, 0);
+              }
+            }
+          });
+          if (sqfliteFoodList.isEmpty) {
+            List<Food>? foodList = [];
+            for (var nutriIntake in sqfliteNutriIntakeList) {
+              Food? food = await dbSupabase.SelectSpecificFood(nutriIntake.idFood!);
+              foodList.add(food!);
+            }
+            for (var food in foodList) {
+              await dbFitness.InsertOrUpdateFood(food, 0);
             }
           }
 
-          if (sqfliteExerciseList.isEmpty) {
-            for (var exercise in supabaseExerciseList) {
-              await dbFitness.InsertExercise(exercise.idExercise!, exercise.nameOfExercise!, exercise.musclesIdMuscle!, 0);
-            }
-          }
-
-          if (sqfliteExerciseDataList.isEmpty) {
-            for (var exerciseData in supabaseExerciseDataList) {
-              await dbFitness.InsertExerciseData(
-                exerciseData.idExData!,
-                exerciseData.weight,
-                exerciseData.reps,
-                exerciseData.difficulty,
-                exerciseData.technique,
-                exerciseData.comment,
-                exerciseData.time,
-                exerciseData.exercisesIdExercise!,
-                exerciseData.idStartedCompleted!,
-                0,
-              );
-            }
-          }
-
-          if (sqfliteSplitList.isEmpty) {
-            for (var split in supabaseSplitList) {
-              await dbFitness.InsertSplit(split.idSplit!, split.nameSplit, split.createdAt!, 0);
-            }
-          }
-
-          if (sqfliteSelectedMuscleList.isEmpty) {
-            for (var selectedMuscle in supabaseSelectedMuscleList) {
-              await dbFitness.InsertSelectedMuscle(selectedMuscle.idSelectedMuscle!, selectedMuscle.splitIdSplit!, selectedMuscle.musclesIdMuscle!, 0);
-            }
-          }
-
-          if (sqfliteSelectedExerciseList.isEmpty) {
-            for (var selectedExercise in supabaseSelectedExerciseList) {
-              await dbFitness.InsertSelectedExercise(selectedExercise.idSelectedExercise!, selectedExercise.idExercise!, selectedExercise.idSelectedMuscle!, 0);
-            }
-          }
-
-          if (sqfliteSplitStartedCompletedList.isEmpty) {
-            for (var splitStartedCompleted in supabaseSplitStartedCompletedList) {
-              await dbFitness.InsertSplitStartedCompleted(
-                splitStartedCompleted.idStartedCompleted!,
-                splitStartedCompleted.createdAt!,
-                splitStartedCompleted.endedAt,
-                splitStartedCompleted.splitId!,
-                splitStartedCompleted.ended!,
-                0,
-              );
-            }
-          }
-          if (sqfliteBodyMeasurementsList.isEmpty) {
-            for (var meacurement in supabaseBodyMeasurementsList) {
-              await dbFitness.insertMeasurements(meacurement, 0);
-            }
-          }
           loading = false;
         }
       } else {

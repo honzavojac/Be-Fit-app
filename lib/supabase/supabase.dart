@@ -781,5 +781,46 @@ class SupabaseProvider extends ChangeNotifier {
     return null;
   }
 
+  IntakeCategoriesTable() async {
+    final uid = supabase.auth.currentUser!.id;
+
+    final response = await supabase.from('users').select('''
+    intake_categories(
+      id_intake_category,
+      name       
+    )
+    ''').eq('user_id', uid);
+
+    final List<dynamic> data = response[0]["intake_categories"];
+
+    List<IntakeCategories> splits = data.map((json) => IntakeCategories.fromJson(json as Map<String, dynamic>)).toList();
+    splits.sort(
+      (a, b) => a.idIntakeCategory!.compareTo(b.idIntakeCategory!),
+    );
+    return splits;
+  }
+
+  NutriIntakeTable() async {
+    final uid = supabase.auth.currentUser!.id;
+
+    final response = await supabase.from('users').select('''
+    nutri_intake(
+      id_nutri_intake,
+      id_food,
+      quantity,
+      weight,
+      created_at,
+      id_intake_category       
+    )
+    ''').eq('user_id', uid);
+
+    final List<dynamic> data = response[0]["nutri_intake"];
+
+    List<NutriIntake> nutriIntake = data.map((json) => NutriIntake.fromJson(json as Map<String, dynamic>)).toList();
+    nutriIntake.sort(
+      (a, b) => a.idNutriIntake!.compareTo(b.idNutriIntake!),
+    );
+    return nutriIntake;
+  }
 //
 }

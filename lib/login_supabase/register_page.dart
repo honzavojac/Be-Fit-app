@@ -1,7 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:kaloricke_tabulky_02/data_classes.dart';
+import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/login_supabase/splash_page.dart';
 import 'package:kaloricke_tabulky_02/main.dart';
+import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
+import 'package:provider/provider.dart';
 
 class RegisterPage extends StatefulWidget {
   final VoidCallback? showLoginPage;
@@ -53,9 +59,48 @@ class _RegisterPageState extends State<RegisterPage> {
         },
       );
       //vytvoření uživatele
-      await supabase.auth.signUp(email: _emailController.text.trim(), password: _passwordController.text.trim());
+      final response = await supabase.auth.signUp(email: _emailController.text.trim(), password: _passwordController.text.trim()).catchError(
+        (error, stackTrace) {
+          Navigator.pop(context);
+          showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                content: Text("sing-up failed ${error}"),
+              );
+            },
+          );
+        },
+      );
       //vložení záznamu do tabulky users
       await supabase.from("users").insert({'name': '${_nameController.text.trim()}', 'email': '${_emailController.text.trim()}'});
+      // vložení defaultních hodnot do intake_categories
+      // Získání ID nově registrovaného uživatele
+      // Zkontrolujte, zda registrace proběhla úspěšně
+      // Zkontrolujte, zda registrace proběhla úspěšně
+
+      var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false);
+      var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
+
+      UserSupabase? user = await dbSupabase.getUser();
+      // Získání ID nově registrovaného uživatele
+      print("id new user: ${user!.idUser}");
+      final categories = [
+        {'name': 'Meal 1', 'id_user': user.idUser},
+        {'name': 'Meal 2', 'id_user': user.idUser},
+        {'name': 'Meal 3', 'id_user': user.idUser},
+        {'name': 'Meal 4', 'id_user': user.idUser},
+        {'name': 'Meal 5', 'id_user': user.idUser},
+        {'name': 'Meal 6', 'id_user': user.idUser},
+      ];
+      await supabase.from("intake_categories").insert(categories);
+      var data = await supabase.from("intake_categories").select().eq("id_user", user.idUser);
+      List<dynamic> finalData = data;
+      final List<IntakeCategories> intakeCategories = finalData.map((e) => IntakeCategories.fromJson(e)).toList();
+      for (var intakeCategory in intakeCategories) {
+        print(intakeCategory.name);
+        await dbFitness.insertIntakeCategory(intakeCategory.name!, 0, intakeCategory.idIntakeCategory!);
+      }
       //odstranění minulých obrazovek z paměti
       Navigator.pushAndRemoveUntil(
         context,

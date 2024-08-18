@@ -18,7 +18,6 @@ import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/firestore/firestore.dart';
 import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:kaloricke_tabulky_02/providers/variables_provider.dart';
-import 'package:kaloricke_tabulky_02/database/database_provider.dart';
 import 'package:kaloricke_tabulky_02/login_firebase%20copy/firebase_options.dart';
 
 import 'package:kaloricke_tabulky_02/init_page.dart';
@@ -44,10 +43,10 @@ void main() async {
   SupabaseProvider dbSupabase = SupabaseProvider();
   await dbSupabase.initialize();
   dbSupabase.getUser();
-  dbSupabase.initFoodApi();
+  // dbSupabase.initFoodApi();
 
-  DBHelper dbHelper = DBHelper();
-  await dbHelper.initializeDB();
+  // DBHelper dbHelper = DBHelper();
+  // await dbHelper.initializeDB();
 
   FirestoreService dbFirebase = FirestoreService();
   ColorsProvider colorsProvider = ColorsProvider();
@@ -56,7 +55,7 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider.value(value: dbHelper),
+        // ChangeNotifierProvider.value(value: dbHelper),
         ChangeNotifierProvider.value(value: dbFirebase),
         ChangeNotifierProvider.value(value: dbSupabase),
         ChangeNotifierProvider.value(value: dbFitness),

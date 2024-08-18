@@ -217,7 +217,7 @@ class _NutriIntakeListviewState extends State<NutriIntakeListview> {
                                         },
                                         child: Container(
                                           height: 70,
-                                          // color: Colors.red,
+                                          color: Colors.red,
                                           width: 45,
                                           child: Center(
                                             child: Icon(

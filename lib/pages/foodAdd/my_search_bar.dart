@@ -10,10 +10,12 @@ import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 class MySearchBar extends StatefulWidget {
   final Function notifyParent;
   final SearchController searchController;
+  final List<IntakeCategories> intakeCategories;
   const MySearchBar({
     Key? key,
     required this.notifyParent,
     required this.searchController,
+    required this.intakeCategories,
   }) : super(key: key);
 
   @override
@@ -142,7 +144,7 @@ class _MySearchBarState extends State<MySearchBar> {
                 controller.closeView(food.name ?? 'Unknown');
                 // Přidejte akce po výběru položky jídla
                 FocusScope.of(context).unfocus();
-                await Navigator.pushNamed(context, '/addIntakePage', arguments: [food, quantity, true]);
+                await Navigator.pushNamed(context, '/addIntakePage', arguments: [food, quantity, true, widget.intakeCategories]);
                 widget.notifyParent();
                 controller.text = "";
               },

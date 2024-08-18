@@ -46,6 +46,13 @@ class Muscle {
     };
   }
 
+  Map<String, dynamic> toMap() {
+    return {
+      'id_muscle': idMuscle,
+      'name_of_muscle': nameOfMuscle,
+    };
+  }
+
   printMuscle() {
     print(
       "id_muscle: $idMuscle  *** supabase_id_muscle: $supabaseIdMuscle *** action: $action *** name_of_muscle: $nameOfMuscle",
@@ -95,6 +102,17 @@ class Exercise {
       // 'supabase_id_exercise': supabaseIdExercise,
       // 'action': action,
       'exercise_data': exerciseData?.map((e) => e.toJson()).toList(),
+      // 'users_id_user': idUser,
+    };
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id_exercise': idExercise,
+      'name_of_exercise': nameOfExercise,
+      'muscles_id_muscle': musclesIdMuscle,
+      // 'supabase_id_exercise': supabaseIdExercise,
+      // 'action': action,
       // 'users_id_user': idUser,
     };
   }
@@ -252,6 +270,21 @@ class MySplit {
     };
   }
 
+  Map<String, dynamic> toMap() {
+    DateTime date = DateTime.now();
+    String formattedDate = DateFormat('yyyy:MM:dd').format(date);
+
+    return {
+      'id_split': idSplit,
+      'name_split': nameSplit,
+      'created_at': createdAt ?? formattedDate,
+      // 'users_id_user': idUser,
+      // 'selected_muscles': selectedMuscle,
+      // 'action': action,
+      // 'supabase_id_split': supabaseIdSplit,
+    };
+  }
+
   printSplit() {
     print("id_split: $idSplit *** name_split: $nameSplit *** created_at: $createdAt ***  action: $action *** supabase_id_split: $supabaseIdSplit *** selected_muscles: $selectedMuscle");
   }
@@ -309,6 +342,19 @@ class SelectedMuscle {
     };
   }
 
+  Map<String, dynamic> toMap() {
+    return {
+      'id_selected_muscle': idSelectedMuscle,
+      'split_id_split': splitIdSplit,
+      'muscles_id_muscle': musclesIdMuscle,
+      // 'supabase_id_selected_muscle': supabaseIdSelectedMuscle,
+      // 'action': action,
+      // 'muscles': muscles?.toJson(),
+      // 'selected_exercises': selectedExercises?.map((e) => e.toJson()).toList(),
+      // 'users_id_user': idUser,
+    };
+  }
+
   printSelectedMuscle() {
     print("id_selected_muscle: $idSelectedMuscle *** split_id_split: $splitIdSplit *** muscles_id_muscle: $musclesIdMuscle *** supabase_id_muscle: $supabaseIdSelectedMuscle *** action: $action *** muscles: $muscles ");
   }
@@ -354,6 +400,18 @@ class SelectedExercise {
       // 'supabase_id_selected_exercise': supabaseIdSelectedExercise,
       // 'action': action,
       'exercises': exercises!.toJson(),
+      // 'users_id_user': idUser,
+    };
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id_selected_exercise': idSelectedExercise,
+      'id_exercise': idExercise,
+      'id_selected_muscle': idSelectedMuscle,
+      // 'supabase_id_selected_exercise': supabaseIdSelectedExercise,
+      // 'action': action,
+      // 'exercises': exercises!.toJson(),
       // 'users_id_user': idUser,
     };
   }
@@ -413,7 +471,7 @@ class SplitStartedCompleted {
   Map<String, dynamic> toJson() {
     return {
       'id_started_completed': idStartedCompleted,
-      'created_ad': createdAt,
+      'created_at': createdAt,
       'split_id': splitId,
       'ended_at': endedAt,
       'ended': ended,
@@ -421,6 +479,20 @@ class SplitStartedCompleted {
       // 'action': action,
       'exercise_data': exerciseData,
       'users_id_user': idUser,
+    };
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id_started_completed': idStartedCompleted,
+      'created_at': createdAt,
+      'split_id': splitId,
+      'ended_at': endedAt,
+      'ended': ended == true ? 1 : 0,
+      // 'supabase_id_started_completed': supabaseIdStartedCompleted,
+      // 'action': action,
+      // 'exercise_data': exerciseData,
+      // 'users_id_user': idUser,
     };
   }
 
@@ -534,6 +606,23 @@ class Measurements {
       'action': action,
     };
   }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id_body_measurements': idBodyMeasurements,
+      'weight': weight,
+      'height': height,
+      'abdominal_circumference': abdominalCircumference,
+      'chest_circumference': chestCircumference,
+      'waist_circumference': waistCircumference,
+      'thigh_circumference': thighCircumference,
+      'neck_circumference': neckCircumference,
+      'biceps_circumference': bicepsCircumference,
+      'created_at': createdAt,
+      'supabase_id_body_measurements': supabaseIdBodyMeasurements,
+      'action': action,
+    };
+  }
 }
 
 class Food {
@@ -556,6 +645,7 @@ class Food {
   double? fiber;
   double? water;
   double? cholesterol;
+  int? intakeCategory;
   int? supabaseIdFood;
   int? action;
   String? createdAt;
@@ -581,6 +671,7 @@ class Food {
       this.fiber,
       this.water,
       this.cholesterol,
+      this.intakeCategory,
       this.supabaseIdFood,
       this.action,
       this.createdAt,
@@ -648,6 +739,7 @@ class NutriIntake {
   int? idFood;
   String? quantity;
   int? weight;
+  int? intakeCategory; // Opraveno na intakeCategory
   int? supabaseIdNutriIntake;
   int? action;
 
@@ -657,6 +749,7 @@ class NutriIntake {
     this.idFood,
     this.quantity,
     this.weight,
+    this.intakeCategory, // Přidáno do konstruktoru
     this.supabaseIdNutriIntake,
     this.action,
   });
@@ -669,6 +762,7 @@ class NutriIntake {
       idFood: json['id_food'],
       quantity: json['quantity'],
       weight: json['weight'],
+      intakeCategory: json['id_intake_category'], // Přidáno pro intakeCategory
       supabaseIdNutriIntake: json['supabase_id_nutri_intake'],
       action: json['action'],
     );
@@ -678,10 +772,11 @@ class NutriIntake {
   Map<String, dynamic> toJson() {
     return {
       'id_nutri_intake': idNutriIntake,
-      'creatcreated_atedAt': createdAt,
+      'created_at': createdAt, // Opraveno 'creatcreated_atedAt' na 'created_at'
       'id_food': idFood,
       'quantity': quantity,
       'weight': weight,
+      'id_intake_category': intakeCategory, // Přidáno pro intakeCategory
       'supabase_id_nutri_intake': supabaseIdNutriIntake,
       'action': action,
     };
@@ -689,6 +784,46 @@ class NutriIntake {
 
   @override
   String toString() {
-    return 'NutriIntake(idNutriIntake: $idNutriIntake, createdAt: $createdAt, idFood: $idFood, quantity: $quantity, weight: $weight, supabaseIdNutriIntake: $supabaseIdNutriIntake, action: $action)';
+    return 'NutriIntake(idNutriIntake: $idNutriIntake, createdAt: $createdAt, idFood: $idFood, quantity: $quantity, weight: $weight, intakeCategory: $intakeCategory, supabaseIdNutriIntake: $supabaseIdNutriIntake, action: $action)';
+  }
+}
+
+class IntakeCategories {
+  int? idIntakeCategory;
+  String? name;
+  int? supabaseIdIntakeCategory;
+  int? action;
+
+  IntakeCategories({
+    this.idIntakeCategory,
+    this.name,
+    this.supabaseIdIntakeCategory,
+    this.action,
+  });
+
+  // Named constructor for creating an object from a JSON map
+  factory IntakeCategories.fromJson(Map<String, dynamic> json) {
+    return IntakeCategories(
+      idIntakeCategory: json['id_intake_category'],
+      name: json['name'],
+      supabaseIdIntakeCategory: json['supabase_id_intake_category'],
+      action: json['action'],
+    );
+  }
+
+  // Method to convert the object into a JSON map
+  Map<String, dynamic> toJson() {
+    return {
+      'id_intake_category': idIntakeCategory,
+      'name': name,
+      'supabase_id_intake_category': supabaseIdIntakeCategory,
+      'action': action,
+    };
+  }
+
+  // Overriding toString method for easier debugging
+  @override
+  String toString() {
+    return 'IntakeCategories(idIntakeCategory: $idIntakeCategory, name: $name, supabaseIdIntakeCategory: $supabaseIdIntakeCategory, action: $action)';
   }
 }

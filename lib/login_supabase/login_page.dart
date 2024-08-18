@@ -97,6 +97,44 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  Future<void> signIn3() async {
+    _emailController.text = "honzavojac@gmail.com";
+    _passwordController.text = "Davidsrubek2408";
+    try {
+      setState(() {});
+      await supabase.auth.signInWithPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+      if (mounted) {
+        _emailController.clear();
+        _passwordController.clear();
+      }
+    } on AuthException catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(error.message),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Unexpected error occurred'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {});
+      }
+    }
+  }
+
   @override
   void initState() {
     _authStateSubscription = supabase.auth.onAuthStateChange.listen((data) {
@@ -148,12 +186,24 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 ElevatedButton(
                   style: ButtonStyle(
-                    backgroundColor: MaterialStatePropertyAll(
+                    backgroundColor: WidgetStatePropertyAll(
                       ColorsProvider.color_4,
                     ),
                   ),
                   onPressed: () async {
                     await signIn2();
+                    await dbSupabase.getUser();
+                  },
+                  child: Text("sign in to test account"),
+                ),
+                ElevatedButton(
+                  style: ButtonStyle(
+                    backgroundColor: WidgetStatePropertyAll(
+                      ColorsProvider.color_4,
+                    ),
+                  ),
+                  onPressed: () async {
+                    await signIn3();
                     await dbSupabase.getUser();
                   },
                   child: Text("sign in to test account"),
