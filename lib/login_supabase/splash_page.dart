@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:kaloricke_tabulky_02/data_classes.dart';
 import 'package:kaloricke_tabulky_02/main.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
+import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
+import 'package:provider/provider.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -23,7 +26,16 @@ class _SplashPageState extends State<SplashPage> {
     final session = supabase.auth.currentSession;
 
     if (session != null) {
-      Navigator.of(context).pushReplacementNamed('/account');
+      var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false);
+      UserSupabase? userSupabase = await dbSupabase.getUser();
+
+      // Check if userSupabase is not null and if the dateOfBirth and country are not null or empty
+      if (userSupabase == null) {
+        print("initdata");
+        Navigator.of(context).pushReplacementNamed('/initData', arguments: [session.user.email]);
+      } else {
+        Navigator.of(context).pushReplacementNamed('/account');
+      }
     } else {
       Navigator.of(context).pushReplacementNamed('/auth');
     }
@@ -31,13 +43,42 @@ class _SplashPageState extends State<SplashPage> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: ColorsProvider.color_2,
-      body: Center(
-        child: CircularProgressIndicator(
-          color: ColorsProvider.color_8,
-        ),
-      ),
-    );
+    return Scaffold(
+        backgroundColor: ColorsProvider.color_2,
+        body: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset(
+                  'assets/gym.png',
+                  height: 300,
+                ),
+                SizedBox(
+                  height: 100,
+                ),
+                Container(
+                  height: 70,
+                  child: Text(
+                    "Welcome",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 35, color: ColorsProvider.color_8),
+                  ),
+                ),
+                // LoadingAnimationWidget.staggeredDotsWave(
+                //   color: ColorsProvider.color_8,
+                //   size: 100,
+                // ),
+                SizedBox(
+                  height: 110,
+                ),
+                // Text(
+                //   "Loading data",
+                //   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 35, color: ColorsProvider.color_8),
+                // ),
+              ],
+            ),
+          ],
+        ));
   }
 }

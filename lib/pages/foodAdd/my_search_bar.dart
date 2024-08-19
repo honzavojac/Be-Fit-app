@@ -35,6 +35,12 @@ class _MySearchBarState extends State<MySearchBar> {
         searchController: widget.searchController,
         builder: (BuildContext context, SearchController controller) {
           return SearchBar(
+            onSubmitted: (value) {
+              FocusScope.of(context).unfocus();
+            },
+            onTapOutside: (event) {
+              FocusScope.of(context).unfocus();
+            },
             elevation: WidgetStateProperty.all(25),
             shadowColor: WidgetStateProperty.all(ColorsProvider.color_4),
             controller: controller,
@@ -127,18 +133,28 @@ class _MySearchBarState extends State<MySearchBar> {
           // Mapování výsledků na ListTile
           List<Widget> suggestions = dataSqflite.map((food) {
             return ListTile(
-              title: Row(
-                children: [
-                  Text(
-                    "${food.name ?? 'Unknown'}",
-                    style: TextStyle(color: ColorsProvider.color_2.withAlpha(230)),
-                  ),
-                  if (food.recentlyUsed != null)
-                    Text(
-                      " ${food.recentlyUsed}",
-                      style: TextStyle(color: Colors.white30),
+              title: Container(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      flex: 5,
+                      child: Text(
+                        "${food.name ?? 'Unknown'}",
+                        style: TextStyle(color: ColorsProvider.color_2.withAlpha(230)),
+                      ),
                     ),
-                ],
+                    if (food.recentlyUsed != null)
+                      Expanded(
+                        flex: 0,
+                        child: Text(
+                          " ${food.recentlyUsed}",
+                          style: TextStyle(color: Colors.white30),
+                        ),
+                      ),
+                  ],
+                ),
               ),
               onTap: () async {
                 controller.closeView(food.name ?? 'Unknown');

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
 import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
-import 'package:kaloricke_tabulky_02/pages/fitnessRecord/new_muscle_box.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
-import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:provider/provider.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
@@ -190,7 +188,6 @@ class _AddSplitBoxCopyState extends State<AddSplitBoxCopy> {
                           }
                         } on Exception catch (e) {
                           print("chyba: $e");
-                          // TODO
                         }
 
                         List<SelectedMuscle> a = await dbFitness.SelectSelectedMuscles();

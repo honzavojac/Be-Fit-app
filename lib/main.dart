@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kaloricke_tabulky_02/chose_init_data_page.dart';
 import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
 import 'package:kaloricke_tabulky_02/login_supabase/auth_page.dart';
 import 'package:kaloricke_tabulky_02/pages/foodAdd/add_intake_page.dart';
@@ -86,6 +87,7 @@ class _MyAppState extends State<MyApp> {
       initialRoute: '/',
       routes: {
         '/account': (context) => InitPage(),
+        '/initData': (context) => ChoseInitDataPage(),
         '/login': (context) => LoginPage(),
         '/splash': (context) => SplashPage(),
         '/settings': (context) => Settings(),

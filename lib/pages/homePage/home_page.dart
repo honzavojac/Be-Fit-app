@@ -53,28 +53,34 @@ class _HomeScreenState extends State<HomeScreen> {
     print(selectedDate.toString().replaceRange(10, null, ""));
     for (var nutriIntake in nutriIntakes) {
       print(nutriIntake);
-      int weight = nutriIntake.weight!;
-      Food? food = await dbFitness.selectSpecificFood(nutriIntake.idFood!);
-      food = Food(
-        idFood: food!.idFood,
-        name: food.name,
-        weight: weight,
-        kcal: food.kcal != null ? (food.kcal! / 100 * weight).toDouble() : 0,
-        protein: food.protein != null ? (food.protein! / 100 * weight).toDouble() : 0,
-        carbs: food.carbs != null ? (food.carbs! / 100 * weight).toDouble() : 0,
-        fat: food.fat != null ? (food.fat! / 100 * weight).toDouble() : 0,
-        fiber: food.fiber != null ? (food.fiber! / 100 * weight).toDouble() : 0,
-        idNutriIntake: nutriIntake.idNutriIntake,
-        action: nutriIntake.action,
-        createdAt: nutriIntake.createdAt,
-      );
-      calories += food.kcal!;
-      protein += food.protein!;
-      carbs += food.carbs!;
-      fat += food.fat!;
-      fiber += food.fiber!;
-    }
+      if (nutriIntake.action == 3) {
+      } else {
+        print(nutriIntake.action);
 
+        int weight = nutriIntake.weight!;
+        Food? food = await dbFitness.selectSpecificFood(nutriIntake.idFood!);
+        food = Food(
+          idFood: food!.idFood,
+          name: food.name,
+          weight: weight,
+          kcal: food.kcal != null ? (food.kcal! / 100 * weight).toDouble() : 0,
+          protein: food.protein != null ? (food.protein! / 100 * weight).toDouble() : 0,
+          carbs: food.carbs != null ? (food.carbs! / 100 * weight).toDouble() : 0,
+          fat: food.fat != null ? (food.fat! / 100 * weight).toDouble() : 0,
+          fiber: food.fiber != null ? (food.fiber! / 100 * weight).toDouble() : 0,
+          idNutriIntake: nutriIntake.idNutriIntake,
+          intakeCategory: nutriIntake.intakeCategory,
+          action: nutriIntake.action,
+          createdAt: nutriIntake.createdAt,
+        );
+        print(food.action);
+        calories += food.kcal!;
+        protein += food.protein!;
+        carbs += food.carbs!;
+        fat += food.fat!;
+        fiber += food.fiber!;
+      }
+    }
     print("load***************");
     setState(() {});
   }
@@ -131,14 +137,12 @@ class _HomeScreenState extends State<HomeScreen> {
           dateRow(
             back: () {
               selectedDate = selectedDate.subtract(Duration(days: 1));
-
               load();
             },
             forward: () {
               if (selectedDate.toString().replaceRange(10, null, "") == now.toString().replaceRange(10, null, "")) {
               } else {
                 selectedDate = selectedDate.add(Duration(days: 1));
-
                 load();
               }
             },

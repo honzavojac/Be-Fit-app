@@ -1,3 +1,4 @@
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
@@ -12,6 +13,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'variables.dart';
 import 'data_classes.dart';
 
 class Settings extends StatefulWidget {
@@ -20,6 +22,8 @@ class Settings extends StatefulWidget {
   @override
   State<Settings> createState() => _SettingsState();
 }
+
+String? selectedCountry;
 
 class _SettingsState extends State<Settings> {
   final TextEditingController _nameController = TextEditingController();
@@ -78,25 +82,13 @@ class _SettingsState extends State<Settings> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false);
-      dbSupabase.getUser();
-      _nameController.text = dbSupabase.user?.name ?? '';
+      // var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false);
+      // dbSupabase.getUser();
+      // _nameController.text = dbSupabase.user?.name ?? '';
+      selectedCountry = user!.country;
       load();
     });
   }
-
-  String? _selectedCountry;
-  final List<Map<String, String>> _countries = [
-    {'code': 'CZ', 'name': 'Czech Republic'},
-    {'code': 'DE', 'name': 'Germany'},
-    {'code': 'FR', 'name': 'France'},
-    {'code': 'HU', 'name': 'Hungary'},
-    {'code': 'IT', 'name': 'Italy'},
-    {'code': 'PL', 'name': 'Poland'},
-    {'code': 'UA', 'name': 'Ukraine'},
-    {'code': 'US', 'name': 'United States'},
-    {'code': 'EN', 'name': 'United Kingdom'}
-  ];
 
   List<Muscle> data3 = [];
   @override
@@ -158,6 +150,7 @@ class _SettingsState extends State<Settings> {
               await _deleteCacheDir();
 
               await dbFitness.deleteAllData();
+              user = null;
               dbSupabase.clearUserData();
               _signOut();
             },
@@ -206,43 +199,87 @@ class _SettingsState extends State<Settings> {
               color: const Color.fromARGB(255, 1, 41, 73),
               child: Column(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Center(
-                      child: TextField(
-                        controller: _nameController,
-                      ),
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      dbSupabase.updateName(_nameController.text.trim());
-                      dbSupabase.user!.name = _nameController.text.trim();
-                    },
-                    child: Text("save your name"),
-                  )
+                  // Padding(
+                  //   padding: const EdgeInsets.all(8.0),
+                  //   child: Center(
+                  //     child: TextField(
+                  //       controller: _nameController,
+                  //     ),
+                  //   ),
+                  // ),
+                  // ElevatedButton(
+                  //   onPressed: () {
+                  //     dbSupabase.updateName(_nameController.text.trim());
+                  //     dbSupabase.user!.name = _nameController.text.trim();
+                  //   },
+                  //   child: Text("save your name"),
+                  // )
                 ],
               ),
             ),
-            Container(
-              height: 100,
-              child: DropdownButton<String>(
-                value: _selectedCountry,
-                hint: Text('Select Country'),
-                items: _countries.map((country) {
-                  return DropdownMenuItem<String>(
-                    value: country['code'],
-                    child: Text(country['name']!),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    _selectedCountry = value;
-                  });
-                  // Můžete zde přidat další logiku, například uložit vybranou zemi do databáze nebo změnit jazyk aplikace
-                  print('Selected Country Code: $_selectedCountry');
-                },
-                isExpanded: true,
+            Text("${selectedCountry}"),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 50),
+              child: Container(
+                // height: 55,
+                decoration: BoxDecoration(
+                  color: Colors.grey[800],
+                  border: Border.all(color: ColorsProvider.color_8, width: 4),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton2<String>(
+                    isExpanded: true,
+                    value: selectedCountry,
+                    items: languages.map((country) {
+                      return DropdownMenuItem<String>(
+                        value: country['code'],
+                        child: Text(
+                          country['name']!,
+                          style: TextStyle(color: ColorsProvider.color_2),
+                        ),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      selectedCountry = value;
+                      setState(() {});
+                    },
+                    buttonStyleData: ButtonStyleData(
+                      // width: 180,
+                      padding: const EdgeInsets.symmetric(horizontal: 14),
+                      // decoration: BoxDecoration(
+                      //   borderRadius: BorderRadius.circular(18),
+                      //   border: Border.all(
+                      //     color: ColorsProvider.color_8,
+                      //     width: 0.5,
+                      //   ),
+                      // ),
+                    ),
+                    iconStyleData: const IconStyleData(
+                      icon: Icon(Icons.keyboard_arrow_down_outlined),
+                      iconSize: 17,
+                      iconEnabledColor: ColorsProvider.color_1,
+                    ),
+                    dropdownStyleData: DropdownStyleData(
+                      maxHeight: 200,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(width: 2, color: ColorsProvider.color_8),
+                      ),
+                      offset: const Offset(0, -0),
+                      scrollbarTheme: ScrollbarThemeData(
+                        radius: const Radius.circular(40),
+                        interactive: true,
+                        thickness: WidgetStateProperty.all(6),
+                        thumbVisibility: WidgetStateProperty.all(true),
+                      ),
+                    ),
+                    menuItemStyleData: const MenuItemStyleData(
+                      // height: 40,
+                      padding: EdgeInsets.only(left: 10, right: 18),
+                    ),
+                  ),
+                ),
               ),
             ),
             // TextField(

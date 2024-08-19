@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
 import 'package:kaloricke_tabulky_02/main.dart';
+import 'package:kaloricke_tabulky_02/settings.dart';
 import 'package:openfoodfacts/openfoodfacts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -78,15 +79,30 @@ class SupabaseProvider extends ChangeNotifier {
   }
 
   Future<UserSupabase?> getUser() async {
-    final uid = supabase.auth.currentUser!.id;
+    try {
+      // Získání ID aktuálního uživatele
+      final tempUid = supabase.auth.currentUser?.id;
+      print("UID: ${tempUid}");
+      if (tempUid == null) {
+        print('User is not logged in.');
+        return null;
+      }
+      // Dotaz na Supabase pro získání uživatelských údajů
+      final response = await supabase.from('users').select('id_user, name, email, country, birth_date').eq('user_id', tempUid).single(); // Získat jeden výsledek
 
-    final response = await supabase.from('users').select('id_user, name, email').eq('user_id', uid);
-    // print(response);
-    UserSupabase localUser = UserSupabase.fromJson(response.first);
-    user = localUser;
-    name = localUser.name;
-    // print(localUser.name);
-    return localUser;
+      // Převod odpovědi na UserSupabase
+      UserSupabase localUser = UserSupabase.fromJson(response);
+
+      // Nastavení uživatelských dat
+      user = localUser;
+      name = localUser.name;
+
+      print('User data retrieved successfully.');
+      return localUser;
+    } catch (e) {
+      print('Error fetching user data: $e');
+      return null;
+    }
   }
 
   Map<String, String> getTodayDateRange() {
@@ -755,7 +771,7 @@ class SupabaseProvider extends ChangeNotifier {
     String normalizedSearchTerm = removeDiacritics(searchTerm.trim());
 
     // Dotaz do Supabase s použitím funkce unaccent
-    final response = await supabase.from('food').select().ilike('unaccent_name', '%${normalizedSearchTerm}%');
+    final response = await supabase.from('food').select().ilike('unaccent_name', '%${normalizedSearchTerm}%').eq('country', selectedCountry!);
     List<dynamic> data = response;
 
     // Mapování JSON dat na objekty třídy Food
@@ -779,6 +795,22 @@ class SupabaseProvider extends ChangeNotifier {
 
     // Pokud žádný záznam nebyl nalezen, vrátit null
     return null;
+  }
+
+  Future<List<Food?>> selectSpecificFoods(Set<int> idsFood) async {
+    // Convert Set<int> to a comma-separated string
+    String idsFoodStr = idsFood.join(',');
+
+    // Query Supabase for specific foods
+    final response = await supabase
+        .from('food') // Replace with your table name
+        .select()
+        .filter('id_food', 'in', '($idsFoodStr)');
+
+    // Convert response data to a list of Food objects
+    List<Food> foodList = (response as List<dynamic>).map((json) => Food.fromJson(json as Map<String, dynamic>)).toList();
+
+    return foodList;
   }
 
   IntakeCategoriesTable() async {

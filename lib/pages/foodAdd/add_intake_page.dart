@@ -6,6 +6,7 @@ import 'package:intl/date_time_patterns.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
 import 'package:kaloricke_tabulky_02/pages/foodAdd/food_page.dart';
 import 'package:kaloricke_tabulky_02/pages/foodAdd/newFood/change_new_food_box_servingSize.dart';
+import 'package:kaloricke_tabulky_02/pages/homePage/home_page.dart';
 
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:provider/provider.dart';
@@ -128,61 +129,79 @@ class _AddIntakePageState extends State<AddIntakePage> {
       appBar: AppBar(),
       body: show == false
           ? Placeholder()
-          : ListView(
+          : Column(
               children: [
-                Center(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                    child: Text(
-                      "${food.name}",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 25,
+                Expanded(
+                  child: ListView(
+                    children: [
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                          child: Text(
+                            "${food.name}",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 25,
+                            ),
+                            textAlign: TextAlign.center,
+                            softWrap: true,
+                            // overflow: TextOverflow.fade,
+                          ),
+                        ),
                       ),
-                      textAlign: TextAlign.center,
-                      softWrap: true,
-                      // overflow: TextOverflow.fade,
+                      !selectSecondInfoBox ? InfoBox(food, null) : InfoBox(recountedFood, grams.toString()),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 50, 0, 20),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SelectFoodCategory(
+                              intakeCategories: intakeCategories,
+                            ),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 10, 0, 20),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            inputFoodItems(
+                              "Serving size",
+                              weightController,
+                              130,
+                              "numeric",
+                              onChanged: (value) {
+                                if (value == "") {
+                                  selectSecondInfoBox = false;
+                                  setState(() {});
+                                } else {
+                                  recountFood();
+                                }
+                              },
+                            ),
+                            changeNewFoodServingSize(
+                              quantity: quantity,
+                              notifyParent: recountFood,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  child: Center(
+                    child: Text(
+                      newItem == true
+                          ? "${food.name} will be added to ${selectedDate.toString().replaceRange(0, 8, "").replaceRange(2, null, "")}.${selectedDate.toString().replaceRange(0, 5, "").replaceRange(2, null, "")}.${selectedDate.toString().replaceRange(4, null, "")}  "
+                          : "${food.name} will be updated to ${selectedDate.toString().replaceRange(0, 8, "").replaceRange(2, null, "")}.${selectedDate.toString().replaceRange(0, 5, "").replaceRange(2, null, "")}.${selectedDate.toString().replaceRange(4, null, "")}  ",
+                      style: TextStyle(
+                        color: Colors.white.withAlpha(100),
+                      ),
                     ),
                   ),
-                ),
-                !selectSecondInfoBox ? InfoBox(food, null) : InfoBox(recountedFood, grams.toString()),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 50, 0, 20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SelectFoodCategory(
-                        intakeCategories: intakeCategories,
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 10, 0, 20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      inputFoodItems(
-                        "Serving size",
-                        weightController,
-                        130,
-                        "numeric",
-                        onChanged: (value) {
-                          if (value == "") {
-                            selectSecondInfoBox = false;
-                            setState(() {});
-                          } else {
-                            recountFood();
-                          }
-                        },
-                      ),
-                      changeNewFoodServingSize(
-                        quantity: quantity,
-                        notifyParent: recountFood,
-                      ),
-                    ],
-                  ),
-                ),
+                )
               ],
             ),
       floatingActionButton: show == true
@@ -230,19 +249,28 @@ class _AddIntakePageState extends State<AddIntakePage> {
                     NutriIntake? lastSupabaseIdNutriIntake = await dbFitness.SelectLastNutriIntake();
                     int? temp = lastSupabaseIdNutriIntake?.supabaseIdNutriIntake ?? 0;
                     int newSupabaseIdNutriIntake = temp != null ? temp++ : 0;
-                    await dbFitness.InsertNutriIntake(nutriIntake, newSupabaseIdNutriIntake, 1);
+
+                    print(now.toString());
+                    print(selectedDate.toString());
+
+                    if (selectedDate.toString().replaceRange(10, null, "") == now.toString().replaceRange(10, null, "")) {
+                      await dbFitness.InsertNutriIntake(nutriIntake, newSupabaseIdNutriIntake, 1);
+                    } else {
+                      nutriIntake.createdAt = selectedDate.toString();
+                      await dbFitness.InsertNutriIntake(nutriIntake, newSupabaseIdNutriIntake, 1);
+                    }
                   } else {
                     print("UPDATE ITEM");
                     print(food.action);
                     switch (food.action) {
                       case 0 || null:
-                        await dbFitness.UpdateNutriIntake(food.idNutriIntake!, nutriIntake, 2);
+                        await dbFitness.UpdateNutriIntake(food.idNutriIntake!, nutriIntake, selectedDate.toString(), 2);
                         break;
                       case 1:
-                        await dbFitness.UpdateNutriIntake(food.idNutriIntake!, nutriIntake, 1);
+                        await dbFitness.UpdateNutriIntake(food.idNutriIntake!, nutriIntake, selectedDate.toString(), 1);
                         break;
                       case 2:
-                        await dbFitness.UpdateNutriIntake(food.idNutriIntake!, nutriIntake, 2);
+                        await dbFitness.UpdateNutriIntake(food.idNutriIntake!, nutriIntake, selectedDate.toString(), 2);
 
                         break;
                       case 3:

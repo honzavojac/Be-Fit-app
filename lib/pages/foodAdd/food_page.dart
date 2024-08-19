@@ -7,6 +7,7 @@ import 'package:kaloricke_tabulky_02/pages/foodAdd/my_search_bar.dart';
 import 'package:kaloricke_tabulky_02/pages/foodAdd/nutri_intake_listview.dart';
 import 'package:kaloricke_tabulky_02/pages/homePage/home_page.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
+import 'package:kaloricke_tabulky_02/providers/variables_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:text_scroll/text_scroll.dart';
 
@@ -89,6 +90,7 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
   Widget build(BuildContext context) {
     DateTime now = DateTime.now();
     var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
+    var variablesProvider = Provider.of<VariablesProvider>(context, listen: false);
 
     return Stack(
       children: [
@@ -448,8 +450,8 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                                                                 },
                                                                 child: Container(
                                                                   decoration: BoxDecoration(
-                                                                    color: ColorsProvider.color_8.withOpacity(0.3),
-                                                                    borderRadius: BorderRadius.circular(12),
+                                                                    color: Color.fromARGB(100, 0, 0, 0),
+                                                                    borderRadius: variablesProvider.zaobleni,
                                                                   ),
                                                                   // height: 80,
                                                                   child: Column(
@@ -558,7 +560,7 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                                                                                                     case 0:
                                                                                                       // nastavit 3 a pak se to odstraní ze supabase při sync
 
-                                                                                                      await dbFitness.UpdateNutriIntake(food.idNutriIntake!, nutriIntake, 3);
+                                                                                                      await dbFitness.UpdateNutriIntake(food.idNutriIntake!, nutriIntake, selectedDate.toString(), 3);
                                                                                                       break;
                                                                                                     case 1:
                                                                                                       // odstranit hned ze sqflite
@@ -569,7 +571,7 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                                                                                                       break;
                                                                                                     case 2:
                                                                                                       // nastavit 3 a pak se to odstraní ze supabase při sync
-                                                                                                      await dbFitness.UpdateNutriIntake(food.idNutriIntake!, nutriIntake, 3);
+                                                                                                      await dbFitness.UpdateNutriIntake(food.idNutriIntake!, nutriIntake, selectedDate.toString(), 3);
 
                                                                                                       break;
                                                                                                     case 3:

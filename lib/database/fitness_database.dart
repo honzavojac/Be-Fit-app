@@ -25,6 +25,7 @@ class FitnessProvider extends ChangeNotifier {
   late String databasesPath;
   Database get database => _database;
   bool switchButton = false;
+  late UserSupabase user;
   Future<void> deleteFile(String fileName) async {
     try {
       // Získání cesty k adresáři, kde jsou ukládány soubory
@@ -176,9 +177,9 @@ class FitnessProvider extends ChangeNotifier {
         );
        CREATE TABLE user (
             id_user INTEGER PRIMARY KEY AUTOINCREMENT,
+            name, TEXT,
             country TEXT, 
-            date_of_birth DATE, 
-            username TEXT,
+            birth_date DATE, 
             email TEXT
       );
       CREATE TABLE intake_categories (
@@ -1756,6 +1757,54 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     }
   }
 
+  Future<void> InsertFood(Transaction txn, Food food) async {
+    if (food != null) {
+      txn.rawInsert('''
+      INSERT INTO food (
+        id_food,
+        country,
+        name,
+        unaccent_name,
+        weight,
+        quantity,
+        kcal,
+        protein,
+        carbs,
+        sugar,
+        fat,
+        fat_satureated,
+        fat_trans,
+        fat_monounsatureted,
+        fat_polyunsatureted,
+        fiber,
+        water,
+        cholesterol,
+        action
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ''', [
+        food.idFood,
+        food.country,
+        food.name,
+        food.unaccentName,
+        food.weight,
+        food.quantity,
+        food.kcal,
+        food.protein,
+        food.carbs,
+        food.sugar,
+        food.fat,
+        food.fatSatureated,
+        food.fatTrans,
+        food.fatMonounsatureted,
+        food.fatPolyunsatureted,
+        food.fiber,
+        food.water,
+        food.cholesterol,
+        food.action,
+      ]);
+    }
+  }
+
   //NutriIntake
   Future<List<NutriIntake>> SelectNutriIntakes() async {
     final db = await _database;
@@ -1870,7 +1919,7 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     notifyListeners(); // Oznámení změny
   }
 
-  Future<void> UpdateNutriIntake(int idNutriIntake, NutriIntake nutriIntake, int action) async {
+  Future<void> UpdateNutriIntake(int idNutriIntake, NutriIntake nutriIntake, String createdAt, int action) async {
     final db = await _database; // Získání instance databáze
 
     await db.rawUpdate('''
@@ -1934,6 +1983,66 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     ''',
       [nameOfIntakeCategory, action, supabaseIdIntakeCategory], // Parametr pro název kategorie
     );
+  }
+
+// user
+  Future<UserSupabase?> SelectUser() async {
+    try {
+      // Získání instance databáze
+      final db = await database;
+
+      // Výběr uživatelských dat z tabulky
+      final List<Map<String, dynamic>> result = await db.transaction(
+        (txn) async {
+          return await txn.rawQuery('SELECT * FROM user');
+        },
+      );
+
+      // Zpracování výsledku
+      if (result.isNotEmpty) {
+        // Předpokládáme, že v tabulce je pouze jeden uživatel. Pokud je více, použijte vhodnou logiku pro výběr.
+        final Map<String, dynamic> userMap = result.first;
+        // Vytvoření instance UserSupabase
+        UserSupabase user = UserSupabase.fromJson(userMap);
+        print("*************${user}**************");
+        return user;
+      } else {
+        print('No user found.');
+        return null;
+      }
+    } catch (e) {
+      print('Error selecting user: $e');
+      return null;
+    }
+  }
+
+  Future<void> TxnInsertUser(Transaction txn, UserSupabase user) async {
+    try {
+      // Vložení uživatele do databáze
+
+      await txn.rawInsert(
+        '''
+        INSERT INTO user (
+          id_user, 
+          name, 
+          email, 
+          birth_date, 
+          country
+        ) VALUES (?, ?, ?, ?, ?)
+        ''',
+        [
+          user.idUser,
+          user.name,
+          user.email,
+          user.dateOfBirth,
+          user.country,
+        ],
+      );
+
+      print('User inserted successfully.');
+    } catch (e) {
+      print('Error inserting user: $e');
+    }
   }
 
   ///

@@ -8,6 +8,7 @@ import 'package:kaloricke_tabulky_02/main.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 
 import 'package:kaloricke_tabulky_02/pages/foodAdd/newFood/food_main_add_boxes.dart';
+import 'package:kaloricke_tabulky_02/settings.dart';
 import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:provider/provider.dart';
 import 'package:diacritic/diacritic.dart';
@@ -39,7 +40,7 @@ class _FoodAddPageState extends State<FoodAddPage> {
     DateTime dateTime = DateTime.now();
     String now = dateTime.toString().replaceRange(19, null, "");
 
-    String country = "CZ";
+    // String country = "CZ";
     String name = nameController.text.trim();
     int? weight = int.tryParse(weightController.text.trim());
     String? quantity = widget.quantity.isNotEmpty ? widget.quantity[selectedQuantity] : null;
@@ -49,7 +50,7 @@ class _FoodAddPageState extends State<FoodAddPage> {
     double? fat = double.tryParse(fatsController.text.trim()) ?? 0;
     double? fiber = double.tryParse(fiberController.text.trim()) ?? 0;
 
-    if (country.isNotEmpty && name.isNotEmpty && weight != null && now.isNotEmpty) {
+    if (selectedCountry != null && name.isNotEmpty && weight != null && now.isNotEmpty) {
       switch (selectedQuantity) {
         case 0:
           kcal = kcal > 0 ? (kcal / weight * 100).toDouble() : null;
@@ -78,7 +79,7 @@ class _FoodAddPageState extends State<FoodAddPage> {
       print('Fat per 100g: ${fat != null ? fat : "N/A"}');
       print('Fiber per 100g: ${fiber != null ? fiber : "N/A"}');
       Food record = Food(
-        country: country,
+        country: selectedCountry,
         name: name,
         unaccentName: removeDiacritics(name.toLowerCase()),
         weight: weight,

@@ -507,40 +507,50 @@ class UserSupabase {
   int idUser;
   String name;
   String email;
-  List<Muscle>? muscles;
-  List<MySplit>? split;
+  String? dateOfBirth; // Optional, can be null
+  String? country; // Optional, can be null
+  List<Muscle>? muscles; // Optional, can be null
+  List<MySplit>? split; // Optional, can be null
 
   UserSupabase({
     required this.idUser,
     required this.name,
     required this.email,
+    this.dateOfBirth,
+    this.country,
     this.muscles,
     this.split,
   });
 
+  // Factory constructor for creating a new UserSupabase instance from a map.
   factory UserSupabase.fromJson(Map<String, dynamic> json) {
-    var musclesFromJson = json['muscles'] as List<dynamic>?; // Add null check
+    var musclesFromJson = json['muscles'] as List<dynamic>?; // Check for null
     List<Muscle>? musclesList = musclesFromJson?.map((e) => Muscle.fromJson(e)).toList();
 
-    var splitsFromJson = json['split'] as List<dynamic>?; // Add null check
+    var splitsFromJson = json['split'] as List<dynamic>?; // Check for null
     List<MySplit>? splitList = splitsFromJson?.map((e) => MySplit.fromJson(e)).toList();
 
     return UserSupabase(
       idUser: json['id_user'],
       name: json['name'],
       email: json['email'],
+      dateOfBirth: json['birth_date'], // Null check not needed, it's optional
+      country: json['country'], // Optional field for country
       muscles: musclesList,
       split: splitList,
     );
   }
 
+  // Method for converting a UserSupabase instance to a map.
   Map<String, dynamic> toJson() {
     return {
       'id_user': idUser,
       'name': name,
       'email': email,
-      'muscles': muscles,
-      'split': split,
+      'birth_date': dateOfBirth, // Include date of birth if available
+      'country': country, // Include country if available
+      'muscles': muscles?.map((e) => e.toJson()).toList(), // Convert each Muscle to JSON
+      'split': split?.map((e) => e.toJson()).toList(), // Convert each MySplit to JSON
     };
   }
 }

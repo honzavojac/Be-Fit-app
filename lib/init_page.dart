@@ -24,6 +24,8 @@ class InitPage extends StatefulWidget {
   State<InitPage> createState() => _InitPageState();
 }
 
+UserSupabase? user;
+
 class _InitPageState extends State<InitPage> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   final controller = PageController(initialPage: 1);
@@ -70,6 +72,7 @@ class _InitPageState extends State<InitPage> {
     List<Measurements> supabaseBodyMeasurementsList = [];
     List<IntakeCategories> supabaseIntakeCategoriesList = [];
     List<NutriIntake> supabaseNutriIntakeList = [];
+    late UserSupabase supabaseUser;
 
     if (loading) {
       // Načtení dat ze Sqflite
@@ -85,6 +88,7 @@ class _InitPageState extends State<InitPage> {
         dbFitness.SelectIntakeCategories(),
         dbFitness.SelectNutriIntakes(),
         dbFitness.SelectFood(),
+        dbFitness.SelectUser(),
       ]);
 
       List<Muscle> sqfliteMuscleList = result[0];
@@ -98,8 +102,9 @@ class _InitPageState extends State<InitPage> {
       List<IntakeCategories> sqfliteIntakeCategoriesList = result[8];
       List<NutriIntake> sqfliteNutriIntakeList = result[9];
       List<Food> sqfliteFoodList = result[10];
+      UserSupabase? sqfliteUser = result[11];
 
-      if (sqfliteMuscleList.isEmpty || sqfliteExerciseList.isEmpty || sqfliteExerciseDataList.isEmpty || sqfliteSplitList.isEmpty || sqfliteSelectedMuscleList.isEmpty || sqfliteSelectedExerciseList.isEmpty || sqfliteSplitStartedCompletedList.isEmpty || sqfliteBodyMeasurementsList.isEmpty || sqfliteIntakeCategoriesList.isEmpty || sqfliteNutriIntakeList.isEmpty || sqfliteFoodList.isEmpty) {
+      if (sqfliteMuscleList.isEmpty || sqfliteExerciseList.isEmpty || sqfliteExerciseDataList.isEmpty || sqfliteSplitList.isEmpty || sqfliteSelectedMuscleList.isEmpty || sqfliteSelectedExerciseList.isEmpty || sqfliteSplitStartedCompletedList.isEmpty || sqfliteBodyMeasurementsList.isEmpty || sqfliteIntakeCategoriesList.isEmpty || sqfliteNutriIntakeList.isEmpty || sqfliteFoodList.isEmpty || sqfliteUser == null) {
         if (iconPage) {
           iconPage = false;
         } else {
@@ -114,6 +119,7 @@ class _InitPageState extends State<InitPage> {
             dbSupabase.BodyMeasurementsTable(),
             dbSupabase.IntakeCategoriesTable(),
             dbSupabase.NutriIntakeTable(),
+            dbSupabase.getUser(),
           ]);
           // Načtení dat ze Supabase
           supabaseMuscleList = result[0];
@@ -126,6 +132,7 @@ class _InitPageState extends State<InitPage> {
           supabaseBodyMeasurementsList = result[7];
           supabaseIntakeCategoriesList = result[8];
           supabaseNutriIntakeList = result[9];
+          supabaseUser = result[10];
           // final MuscleLoading = dbSupabase.MuscleTable();
           // final ExerciseLoading = dbSupabase.ExerciseTable();
           // final ExerciseDataLoading = dbSupabase.ExerciseDataTable();
@@ -241,28 +248,44 @@ class _InitPageState extends State<InitPage> {
                 dbFitness.TxnInsertNutriIntake(txn, nutriIntake, nutriIntake.idNutriIntake!, 0);
               }
             }
-          });
-          if (sqfliteFoodList.isEmpty) {
-            List<Food>? foodList = [];
-            for (var nutriIntake in sqfliteNutriIntakeList) {
-              Food? food = await dbSupabase.SelectSpecificFood(nutriIntake.idFood!);
-              foodList.add(food!);
+            if (sqfliteUser == null) {
+              dbFitness.TxnInsertUser(txn, supabaseUser);
             }
+          });
+          // if (sqfliteFoodList.isEmpty) {
+          //   List<Food>? foodList = [];
+          //   for (var nutriIntake in sqfliteNutriIntakeList) {
+          //     Food? food = await dbSupabase.SelectSpecificFood(nutriIntake.idFood!);
+          //     print(food!.name);
+          //     foodList.add(food!);
+          //   }
+          //   for (var food in foodList) {
+
+          //     await dbFitness.InsertOrUpdateFood(food, 0);
+          //   }
+          // }
+          if (sqfliteFoodList.isEmpty) {
+            Set<int> foodIds = sqfliteNutriIntakeList.map((e) => e.idFood!).toSet();
+            List<Food?> foodList = await dbSupabase.selectSpecificFoods(foodIds);
             for (var food in foodList) {
-              await dbFitness.InsertOrUpdateFood(food, 0);
+              dbFitness.InsertOrUpdateFood(food!, 0);
             }
           }
-
           loading = false;
         }
       } else {
         loading = false;
+
         await Future.delayed(Duration(seconds: 1));
       }
 
       // Nastavení stavu na false po dokončení načítání
     } else {
       loading = false;
+      if (user == null) {
+        user = (await dbFitness.SelectUser())!;
+        selectedCountry = user!.country;
+      }
     }
     // loading = false;
     setState(() {});
@@ -274,7 +297,7 @@ class _InitPageState extends State<InitPage> {
     loadDataFromSupabase();
     // loading == false;
     var dbSupabase = Provider.of<SupabaseProvider>(context);
-    dbSupabase.getUser();
+    // dbSupabase.getUser();
     if (loading == true) {
       return Scaffold(
         backgroundColor: ColorsProvider.color_2,
@@ -376,7 +399,7 @@ class _InitPageState extends State<InitPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          "${dbSupabase.name}",
+                          "${user != null ? user!.name : "null"}",
                           style: TextStyle(
                             color: ColorsProvider.color_8,
                             fontWeight: FontWeight.bold,

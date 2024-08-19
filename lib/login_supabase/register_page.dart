@@ -73,34 +73,12 @@ class _RegisterPageState extends State<RegisterPage> {
         },
       );
       //vložení záznamu do tabulky users
-      await supabase.from("users").insert({'name': '${_nameController.text.trim()}', 'email': '${_emailController.text.trim()}'});
+      // await supabase.from("users").insert({'name': '${_nameController.text.trim()}', 'email': '${_emailController.text.trim()}'});
       // vložení defaultních hodnot do intake_categories
       // Získání ID nově registrovaného uživatele
       // Zkontrolujte, zda registrace proběhla úspěšně
       // Zkontrolujte, zda registrace proběhla úspěšně
 
-      var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false);
-      var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
-
-      UserSupabase? user = await dbSupabase.getUser();
-      // Získání ID nově registrovaného uživatele
-      print("id new user: ${user!.idUser}");
-      final categories = [
-        {'name': 'Meal 1', 'id_user': user.idUser},
-        {'name': 'Meal 2', 'id_user': user.idUser},
-        {'name': 'Meal 3', 'id_user': user.idUser},
-        {'name': 'Meal 4', 'id_user': user.idUser},
-        {'name': 'Meal 5', 'id_user': user.idUser},
-        {'name': 'Meal 6', 'id_user': user.idUser},
-      ];
-      await supabase.from("intake_categories").insert(categories);
-      var data = await supabase.from("intake_categories").select().eq("id_user", user.idUser);
-      List<dynamic> finalData = data;
-      final List<IntakeCategories> intakeCategories = finalData.map((e) => IntakeCategories.fromJson(e)).toList();
-      for (var intakeCategory in intakeCategories) {
-        print(intakeCategory.name);
-        await dbFitness.insertIntakeCategory(intakeCategory.name!, 0, intakeCategory.idIntakeCategory!);
-      }
       //odstranění minulých obrazovek z paměti
       Navigator.pushAndRemoveUntil(
         context,
@@ -153,32 +131,6 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
                 SizedBox(
                   height: 30,
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 50),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.grey[800],
-                      border: Border.all(color: ColorsProvider.color_8, width: 4),
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 20),
-                      child: TextField(
-                        controller: _nameController,
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          hintText: "Name",
-                          hintStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: ColorsProvider.color_2),
-                        ),
-                        cursorColor: ColorsProvider.color_2,
-                        style: TextStyle(color: ColorsProvider.color_2),
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 5,
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 50),
