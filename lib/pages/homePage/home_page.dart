@@ -1,13 +1,19 @@
 // ignore_for_file: no_leading_underscores_for_local_identifiers, prefer_const_constructors, sort_child_properties_last, avoid_unnecessary_containers, avoid_print
 
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:intl/intl.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
 import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
+import 'package:kaloricke_tabulky_02/init_page.dart';
+import 'package:kaloricke_tabulky_02/pages/fitnessRecord/fitness_record_page%20copy.dart';
 import 'package:kaloricke_tabulky_02/pages/homePage/date_row.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
+import 'package:kaloricke_tabulky_02/variables.dart';
 import 'package:provider/provider.dart';
+import 'package:timelines/timelines.dart';
 
 import 'data_boxes.dart';
 
@@ -41,6 +47,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<NutriIntake> nutriIntakes = [];
+  Measurements? measurement = Measurements();
   load() async {
     calories = 0;
     protein = 0;
@@ -52,7 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
     nutriIntakes = await dbFitness.SelectNutriIntake("${selectedDate.toString().replaceRange(10, null, "")}");
     print(selectedDate.toString().replaceRange(10, null, ""));
     for (var nutriIntake in nutriIntakes) {
-      print(nutriIntake);
+      // print(nutriIntake);
       if (nutriIntake.action == 3) {
       } else {
         print(nutriIntake.action);
@@ -82,6 +89,9 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     }
     print("load***************");
+
+    await SplitStartedStatistic();
+    measurement = await dbFitness.selectOneMeasurement(selectedDate.toString().replaceRange(10, null, ""));
     setState(() {});
   }
 
@@ -92,11 +102,16 @@ class _HomeScreenState extends State<HomeScreen> {
     load();
   }
 
+  int _currentStep = 2;
   // void printNavigationStack(BuildContext context) {
   @override
   Widget build(BuildContext context) {
     DateTime now = DateTime.now();
-    Provider.of<SupabaseProvider>(context);
+    splitstartedcompleteds.sort(
+      (a, b) => b.createdAt!.compareTo(a.createdAt!),
+    );
+
+    // final visibleSplits = splitstartedcompleteds.skip(3).take(3).toList();
 
     return Container(
       child: Column(
@@ -153,12 +168,456 @@ class _HomeScreenState extends State<HomeScreen> {
               Navigator.of(context).pop();
             },
           ),
-          const SizedBox(
-            height: 20,
+          Spacer(),
+          Container(child: dataBoxes(calories, protein, carbs, fat, fiber)),
+          Spacer(),
+          Container(child: lastSplitWidget()),
+          Spacer(),
+          Container(
+            child: measurement != null ? measurentWidget() : Container(),
           ),
-          dataBoxes(calories, protein, carbs, fat, fiber),
+          Spacer(),
+          // Row(
+          //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          //   children: [
+          //     ElevatedButton(
+          //       onPressed: () {
+          //         controller.jumpTo(0);
+          //         hasToOpenDropdown = true;
+          //         print(hasToOpenDropdown);
+          //       },
+          //       child: Text("Start split"),
+          //     ),
+          //     ElevatedButton(
+          //       onPressed: () {
+          //         Navigator.pushNamed(context, '/measurements');
+          //       },
+          //       child: Text("Measurements"),
+          //     ),
+          //     // DemoDropdown(),
+          //   ],
+          // ),
+          // Spacer(),
         ],
       ),
     );
   }
+
+  Widget lastSplitWidget() {
+    return splitstartedcompleteds.isEmpty
+        ? Container()
+        : Column(
+            children: [
+              Stack(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 40),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Split",
+                          style: TextStyle(
+                            color: ColorsProvider.color_2,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 10, top: 10),
+                    child: Column(
+                      children: splitstartedcompleteds.asMap().entries.map((entry) {
+                        int index = entry.key;
+                        SplitStartedCompleted split = entry.value;
+                        DateTime parsedDate = DateTime.parse(split.createdAt.toString());
+                        final DateFormat formatter = DateFormat('dd.MM.yyyy');
+                        final String formattedDate = formatter.format(parsedDate);
+
+                        return Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(right: 50),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    "${formattedDate}",
+                                    style: TextStyle(
+                                      color: parsedDate.toString().replaceRange(10, null, "") == selectedDate.toString().replaceRange(10, null, "") ? ColorsProvider.color_2 : Colors.white.withAlpha(100),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Container(
+                                    margin: EdgeInsets.symmetric(vertical: 5.0, horizontal: 40.0),
+                                    padding: EdgeInsets.all(4.0),
+                                    decoration: BoxDecoration(
+                                      color: Colors.black38,
+                                      borderRadius: BorderRadius.circular(18.0),
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              split.name!,
+                                              style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold, fontSize: 20),
+                                            ),
+                                          ],
+                                        ),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  'Number of sets:',
+                                                  style: TextStyle(color: Colors.grey[400]),
+                                                ),
+                                                Text(
+                                                  'Total work volume:',
+                                                  style: TextStyle(color: Colors.grey[400]),
+                                                ),
+                                              ],
+                                            ),
+                                            SizedBox(
+                                              width: 30,
+                                            ),
+                                            Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  '${split.numberOfSets ?? "none"}',
+                                                  style: TextStyle(color: Colors.grey[400]),
+                                                ),
+                                                Text(
+                                                  formatWorkVolume(split.totalWorkVolume),
+                                                  style: TextStyle(color: Colors.grey[400]),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          );
+  }
+
+  Widget measurentWidget() {
+    if (measurement!.idBodyMeasurements == null) {
+      return Container();
+    } else {
+      DateTime parsedDate = DateTime.parse(measurement!.createdAt.toString());
+      final DateFormat formatter = DateFormat('dd.MM.yyyy');
+      final String formattedDate = formatter.format(parsedDate);
+      return Column(
+        children: [
+          Stack(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 40),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Measurement",
+                      style: TextStyle(
+                        color: ColorsProvider.color_2,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 10, top: 10),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(right: 50),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text(
+                            "${formattedDate}",
+                            style: TextStyle(
+                              color: parsedDate.toString().replaceRange(10, null, "") == selectedDate.toString().replaceRange(10, null, "") ? ColorsProvider.color_2 : Colors.white.withAlpha(100),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            margin: EdgeInsets.symmetric(vertical: 5.0, horizontal: 40.0),
+                            padding: EdgeInsets.all(4.0),
+                            decoration: BoxDecoration(
+                              color: Colors.black38,
+                              borderRadius: BorderRadius.circular(18.0),
+                            ),
+                            child: Column(
+                              children: [
+                                SizedBox(
+                                  height: 5,
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Column(
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Text(
+                                              'Weight:',
+                                              style: TextStyle(color: Colors.grey[400]),
+                                            ),
+                                            SizedBox(
+                                              width: 10,
+                                            ),
+                                            Text(
+                                              '${measurement!.weight ?? "-"}',
+                                              style: TextStyle(color: Colors.grey[400]),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      width: 30,
+                                    ),
+                                    Column(
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Text(
+                                              'Height:',
+                                              style: TextStyle(color: Colors.grey[400]),
+                                            ),
+                                            SizedBox(
+                                              width: 10,
+                                            ),
+                                            Text(
+                                              '${measurement!.height ?? "-"}',
+                                              style: TextStyle(color: Colors.grey[400]),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 5,
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'Circumference',
+                                      style: TextStyle(color: Colors.grey[400]),
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 35.0),
+                                      child: Row(
+                                        children: [
+                                          Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Abdominal:',
+                                                style: TextStyle(color: Colors.grey[400]),
+                                              ),
+                                              Text(
+                                                'Chest:',
+                                                style: TextStyle(color: Colors.grey[400]),
+                                              ),
+                                              Text(
+                                                'Waist:',
+                                                style: TextStyle(color: Colors.grey[400]),
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(
+                                            width: 10,
+                                          ),
+                                          Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                '${measurement!.abdominalCircumference ?? "-"}',
+                                                style: TextStyle(color: Colors.grey[400]),
+                                              ),
+                                              Text(
+                                                '${measurement!.chestCircumference ?? "-"}',
+                                                style: TextStyle(color: Colors.grey[400]),
+                                              ),
+                                              Text(
+                                                '${measurement!.waistCircumference ?? "-"}',
+                                                style: TextStyle(color: Colors.grey[400]),
+                                              ),
+                                              // Text(
+                                              //   '${measurement!.waistCircumference!.toInt()}',
+                                              //   style: TextStyle(color: Colors.grey[400]),
+                                              // ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: 10,
+                                    ),
+                                    Row(
+                                      children: [
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'Thingh:',
+                                              style: TextStyle(color: Colors.grey[400]),
+                                            ),
+                                            Text(
+                                              'Neck:',
+                                              style: TextStyle(color: Colors.grey[400]),
+                                            ),
+                                            Text(
+                                              'Biceps:',
+                                              style: TextStyle(color: Colors.grey[400]),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          width: 10,
+                                        ),
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              '${measurement!.thighCircumference ?? "-"}',
+                                              style: TextStyle(color: Colors.grey[400]),
+                                            ),
+                                            Text(
+                                              '${measurement!.neckCircumference ?? "-"}',
+                                              style: TextStyle(color: Colors.grey[400]),
+                                            ),
+                                            Text(
+                                              '${measurement!.bicepsCircumference ?? "-"}',
+                                              style: TextStyle(color: Colors.grey[400]),
+                                            ),
+                                            // Text(
+                                            //   '${measurement.waistCircumference!.toInt()}',
+                                            //   style: TextStyle(color: Colors.grey[400]),
+                                            // ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      width: 30,
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      );
+    }
+  }
+
+  String formatWorkVolume(int? totalWorkVolume) {
+    // Definování formátování s mezerou jako tisícovým oddělovačem
+    final formatter = NumberFormat('#,###.##', 'en_US');
+
+    // Pokud je totalWorkVolume null, vrátí 'none'
+    if (totalWorkVolume == null) {
+      return 'none';
+    }
+
+    // Naformátování čísla s tisícovým oddělovačem
+    final formattedNumber = formatter.format(totalWorkVolume).replaceAll(',', ' ');
+
+    return '$formattedNumber Kg';
+  }
+
+  List<SplitStartedCompleted> splitstartedcompleteds = [];
+
+  Future<void> SplitStartedStatistic() async {
+    var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
+    print("selecteddate: ${selectedDate.toString().replaceRange(10, null, "")}");
+    splitstartedcompleteds = await dbFitness.SelectLast5SplitStartedCompleted(selectedDate.toString().replaceRange(10, null, ""));
+    print(splitstartedcompleteds);
+  }
 }
+
+
+// class DemoDropdown extends StatefulWidget {
+//   @override
+//   State<DemoDropdown> createState() => DemoDropdownState();
+// }
+
+// class DemoDropdownState<T> extends State<DemoDropdown> {
+//   /// This is the global key, which will be used to traverse [DropdownButton]s widget tree
+
+//   @override
+//   Widget build(BuildContext context) {
+//     // openDropdown();
+//     final dropdown = DropdownButton<int>(
+//       key: _dropdownButtonKey,
+//       items: [
+//         DropdownMenuItem(value: 1, child: Text('1')),
+//         DropdownMenuItem(value: 2, child: Text('2')),
+//         DropdownMenuItem(value: 3, child: Text('3')),
+//       ],
+//       onChanged: (value) {},
+//     );
+
+//     return Column(
+//       mainAxisSize: MainAxisSize.min,
+//       children: <Widget>[
+//         Offstage(child: dropdown),
+//         ElevatedButton(onPressed: openDropdown, child: Text('CLICK ME')),
+//       ],
+//     );
+//   }
+// }

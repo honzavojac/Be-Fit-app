@@ -82,7 +82,7 @@ class _NewExerciseBoxCopyState extends State<NewExerciseBoxCopy> {
                   child: Container(
                     child: Text(
                       "New Exercise",
-                      style: TextStyle(color: ColorsProvider.color_1, fontSize: 20),
+                      style: TextStyle(color: ColorsProvider.color_2, fontSize: 20),
                     ),
                   ),
                 ),
@@ -111,7 +111,7 @@ class _NewExerciseBoxCopyState extends State<NewExerciseBoxCopy> {
                       decoration: const InputDecoration(
                         labelText: 'Name of Exercise:',
                         labelStyle: TextStyle(
-                          color: ColorsProvider.color_1,
+                          color: ColorsProvider.color_2,
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.all(
@@ -137,7 +137,7 @@ class _NewExerciseBoxCopyState extends State<NewExerciseBoxCopy> {
                         ),
                         hintText: 'Enter value:',
                         hintStyle: TextStyle(
-                          color: ColorsProvider.color_1,
+                          color: ColorsProvider.color_2,
                           fontSize: 15,
                         ),
                       ),
@@ -151,7 +151,7 @@ class _NewExerciseBoxCopyState extends State<NewExerciseBoxCopy> {
                   height: 20,
                   child: Text(
                     "Assign a Muscle",
-                    style: TextStyle(color: ColorsProvider.color_1),
+                    style: TextStyle(color: ColorsProvider.color_2),
                   ),
                 ),
                 DropdownButtonHideUnderline(
@@ -165,7 +165,7 @@ class _NewExerciseBoxCopyState extends State<NewExerciseBoxCopy> {
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
-                            color: ColorsProvider.color_1,
+                            color: ColorsProvider.color_2,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -194,7 +194,7 @@ class _NewExerciseBoxCopyState extends State<NewExerciseBoxCopy> {
                         Icons.keyboard_arrow_down_outlined,
                       ),
                       iconSize: 17,
-                      iconEnabledColor: ColorsProvider.color_1,
+                      iconEnabledColor: ColorsProvider.color_2,
                     ),
                     dropdownStyleData: DropdownStyleData(
                       maxHeight: 200,
@@ -249,7 +249,7 @@ class _NewExerciseBoxCopyState extends State<NewExerciseBoxCopy> {
                             child: Padding(
                               padding: const EdgeInsets.only(left: 25, right: 25),
                               child: CustomSnackBar.error(
-                                message: "Name of new exercise is empty",
+                                message: "The name of new exercise cannot be empty",
                               ),
                             ),
                           ),

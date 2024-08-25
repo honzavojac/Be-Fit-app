@@ -4,7 +4,9 @@ class ColorsProvider extends ChangeNotifier {
   //amber texty
   static const Color color_1 = Color(0xF9FFC107);
   //amber[800] tlačítka, obrysy,linie
-  static const Color color_2 = const Color.fromRGBO(255, 143, 0, 1);
+  static const Color color_2 = Color.fromRGBO(255, 143, 0, 1);
+  // static const Color color_2 = Color.fromARGB(255, 0, 30, 202);
+
   //white
   static const Color color_3 = Color(0xFFFFFFFF);
   //transparent

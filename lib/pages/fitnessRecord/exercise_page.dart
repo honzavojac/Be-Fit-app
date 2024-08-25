@@ -992,7 +992,7 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                                                           borderRadius: BorderRadius.circular(12),
                                                           border: Border.all(width: 0.5, color: ColorsProvider.color_2),
                                                         ),
-                                                        overlayColor: MaterialStatePropertyAll(Colors.transparent),
+                                                        overlayColor: WidgetStatePropertyAll(Colors.transparent),
                                                       ),
                                                       value: difficultyController[itemIndex] == 0 ? null : difficultyController[itemIndex],
                                                       onChanged: (int? value) async {

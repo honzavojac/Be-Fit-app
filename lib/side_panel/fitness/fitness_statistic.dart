@@ -220,6 +220,9 @@ class _FitnessStatisticState extends State<FitnessStatistic> with TickerProvider
                         }
                       }
                       for (var exData in exerciseDataList) {
+                        if (exData.reps == null) {
+                          exData.reps = 0;
+                        }
                         String lookedThisMonth = exData.time!.replaceRange(0, 5, "").replaceRange(2, null, "");
 
                         for (var i = 0; i < filteredExercises.length; i++) {
@@ -1042,6 +1045,7 @@ class _FitnessStatisticState extends State<FitnessStatistic> with TickerProvider
       addedIdStartedComplete.add(split.supabaseIdStartedCompleted!);
 
       for (var exData in split.exerciseData!) {
+        exData.reps == null ? exData.reps = 0 : null;
         if (exData.exercisesIdExercise == idExercise && addedIdStartedComplete.contains(exData.idStartedCompleted)) {
           sum = (exData.weight! * exData.reps!);
           spots.add(FlSpot(i.toDouble(), sum.toDouble()));
@@ -1341,8 +1345,8 @@ class _FitnessStatisticState extends State<FitnessStatistic> with TickerProvider
           offset: const Offset(0, 0),
           scrollbarTheme: ScrollbarThemeData(
             radius: const Radius.circular(40),
-            thickness: MaterialStateProperty.all(6),
-            thumbVisibility: MaterialStateProperty.all(true),
+            thickness: WidgetStateProperty.all(6),
+            thumbVisibility: WidgetStateProperty.all(true),
           ),
         ),
         menuItemStyleData: const MenuItemStyleData(

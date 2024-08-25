@@ -47,7 +47,7 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
     var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
     measurements = await dbFitness.SelectMeasurements();
     measurements.sort(
-      (a, b) => b.createdAt!.compareTo(a.createdAt!),
+      (a, b) => b.idBodyMeasurements!.compareTo(a.idBodyMeasurements!), // je to tak protože ukládám jen yyyy-MM-dd a tam neurčím přesnou pozici
     );
     show = true;
     setState(() {});
@@ -102,6 +102,7 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
       // Pokus o vložení měření do databáze
       try {
         await dbFitness.insertMeasurements(measurements, 1);
+        loadData();
         return true; // Úspěšně uloženo
       } on Exception catch (e) {
         print("Stala se chyba při vkládání hodnot do sqflite databáze, chyba: $e");
@@ -119,7 +120,13 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
     final _sheet = GlobalKey();
 
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text(
+          "Measurements",
+          style: TextStyle(color: ColorsProvider.color_2, fontWeight: FontWeight.bold),
+        ),
+      ),
       body: Stack(
         children: [
           show == true
@@ -182,48 +189,49 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
                       ),
                       Center(
                         child: Container(
-                            width: 200,
-                            height: 50,
-                            child: ElevatedButton(
-                              onPressed: () async {
-                                bool success = await processMeasurements();
+                          width: 200,
+                          height: 50,
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              bool success = await processMeasurements();
 
-                                if (success) {
-                                  weightTextEditingController.clear();
-                                  weightTextEditingController.clear();
-                                  heightTextEditingController.clear();
-                                  abdominalCircumferenceTextEditingController.clear();
-                                  chestCircumferenceTextEditingController.clear();
-                                  waistCircumferenceTextEditingController.clear();
-                                  thighCircumferenceTextEditingController.clear();
-                                  neckCircumferenceTextEditingController.clear();
-                                  bicepsCircumferenceTextEditingController.clear();
-                                } else {
-                                  AnimationController localAnimationController;
-                                  showTopSnackBar(
-                                    Overlay.of(context),
+                              if (success) {
+                                weightTextEditingController.clear();
+                                weightTextEditingController.clear();
+                                heightTextEditingController.clear();
+                                abdominalCircumferenceTextEditingController.clear();
+                                chestCircumferenceTextEditingController.clear();
+                                waistCircumferenceTextEditingController.clear();
+                                thighCircumferenceTextEditingController.clear();
+                                neckCircumferenceTextEditingController.clear();
+                                bicepsCircumferenceTextEditingController.clear();
+                              } else {
+                                AnimationController localAnimationController;
+                                showTopSnackBar(
+                                  Overlay.of(context),
 
-                                    animationDuration: Duration(milliseconds: 1500),
-                                    Container(
-                                      height: 50,
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(left: 25, right: 25),
-                                        child: CustomSnackBar.error(
-                                          message: "All boxes are empty",
-                                        ),
+                                  animationDuration: Duration(milliseconds: 1500),
+                                  Container(
+                                    height: 50,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(left: 25, right: 25),
+                                      child: CustomSnackBar.error(
+                                        message: "All boxes are empty",
                                       ),
                                     ),
-                                    // persistent: true,
-                                    onAnimationControllerInit: (controller) => localAnimationController = controller,
-                                    displayDuration: Duration(microseconds: 750),
-                                    dismissType: DismissType.onSwipe,
-                                    dismissDirection: [DismissDirection.endToStart],
-                                    reverseAnimationDuration: Duration(milliseconds: 250),
-                                  );
-                                }
-                              },
-                              child: Text("Save values"),
-                            )),
+                                  ),
+                                  // persistent: true,
+                                  onAnimationControllerInit: (controller) => localAnimationController = controller,
+                                  displayDuration: Duration(microseconds: 750),
+                                  dismissType: DismissType.onSwipe,
+                                  dismissDirection: [DismissDirection.endToStart],
+                                  reverseAnimationDuration: Duration(milliseconds: 250),
+                                );
+                              }
+                            },
+                            child: Text("Save values"),
+                          ),
+                        ),
                       ),
                       SizedBox(
                         height: 50,
@@ -232,8 +240,8 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
                   ),
                 )
               : Container(
-                  color: Colors.blue,
-                ),
+                  // color: Colors.blue,
+                  ),
           DraggableScrollableSheet(
             key: _sheet,
             // shouldCloseOnMinExtent: false,
@@ -274,7 +282,7 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
                                   Text(
                                     'Swipe up',
                                     style: TextStyle(
-                                      color: ColorsProvider.color_1,
+                                      color: ColorsProvider.color_2,
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -285,7 +293,7 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
                                   Icon(
                                     Icons.arrow_upward_rounded,
                                     size: 25,
-                                    color: ColorsProvider.color_1,
+                                    color: ColorsProvider.color_2,
                                   ),
                                 ],
                               ),

@@ -51,7 +51,7 @@ class _changeNewFoodServingSizeState extends State<changeNewFoodServingSize> {
                     value: item,
                     child: Text(
                       item,
-                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: ColorsProvider.color_1),
+                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: ColorsProvider.color_2),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ))

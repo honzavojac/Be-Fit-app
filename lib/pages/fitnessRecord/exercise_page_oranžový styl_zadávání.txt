@@ -257,7 +257,7 @@
                                                             borderRadius: BorderRadius.circular(12),
                                                             border: Border.all(width: 1.5, color: ColorsProvider.color_8),
                                                           ),
-                                                          overlayColor: MaterialStatePropertyAll(const Color.fromARGB(0, 148, 22, 22)),
+                                                          overlayColor: WidgetStatePropertyAll(const Color.fromARGB(0, 148, 22, 22)),
                                                         ),
                                                         value: difficultyController[itemIndex] == 0 ? null : difficultyController[itemIndex],
                                                         onChanged: (int? value) async {

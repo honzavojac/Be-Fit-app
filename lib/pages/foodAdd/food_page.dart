@@ -376,31 +376,34 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                                                   padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
                                                   child: Row(
                                                     children: [
+                                                      // Padding(
+                                                      //   padding: const EdgeInsets.only(left: 10),
+                                                      //   child: GestureDetector(
+                                                      //     onTap: () async {
+                                                      //       print("object");
+                                                      //       // await Navigator.of(context).push(route);
+                                                      //       load();
+                                                      //     },
+                                                      //     child: Container(
+                                                      //       // color: Colors.blue,
+                                                      //       width: 35,
+                                                      //       child: Icon(
+                                                      //         Icons.more_vert,
+                                                      //         size: 30,
+                                                      //         color: ColorsProvider.color_8,
+                                                      //       ),
+                                                      //     ),
+                                                      //   ),
+                                                      // ),
                                                       Padding(
                                                         padding: const EdgeInsets.only(left: 10),
-                                                        child: GestureDetector(
-                                                          onTap: () async {
-                                                            print("object");
-                                                            // await Navigator.of(context).push(route);
-                                                            load();
-                                                          },
-                                                          child: Container(
-                                                            // color: Colors.blue,
-                                                            width: 35,
-                                                            child: Icon(
-                                                              Icons.more_vert,
-                                                              size: 30,
-                                                              color: ColorsProvider.color_8,
-                                                            ),
+                                                        child: Text(
+                                                          '${category.name}',
+                                                          style: TextStyle(
+                                                            color: ColorsProvider.color_8,
+                                                            fontSize: 20,
+                                                            fontWeight: FontWeight.bold,
                                                           ),
-                                                        ),
-                                                      ),
-                                                      Text(
-                                                        '${category.name}',
-                                                        style: TextStyle(
-                                                          color: ColorsProvider.color_8,
-                                                          fontSize: 20,
-                                                          fontWeight: FontWeight.bold,
                                                         ),
                                                       ),
                                                       Expanded(

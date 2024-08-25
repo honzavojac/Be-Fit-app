@@ -551,8 +551,8 @@ class _CustomAppBarState extends State<CustomAppBar> {
               ),
             ),
             style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all(ColorsProvider.color_2),
-              foregroundColor: MaterialStateProperty.all(ColorsProvider.color_8),
+              backgroundColor: WidgetStateProperty.all(ColorsProvider.color_2),
+              foregroundColor: WidgetStateProperty.all(ColorsProvider.color_8),
             ),
           ),
         ),
@@ -647,8 +647,8 @@ class _FitnessRecordDropdownState extends State<FitnessRecordDropdown> {
                       offset: const Offset(0, -0),
                       scrollbarTheme: ScrollbarThemeData(
                         radius: const Radius.circular(40),
-                        thickness: MaterialStateProperty.all(6),
-                        thumbVisibility: MaterialStateProperty.all(true),
+                        thickness: WidgetStateProperty.all(6),
+                        thumbVisibility: WidgetStateProperty.all(true),
                       ),
                     ),
                     menuItemStyleData: const MenuItemStyleData(
@@ -770,8 +770,8 @@ class _FitnessRecordEndSplitState extends State<FitnessRecordEndSplit> {
                     );
                   },
                   style: ButtonStyle(
-                    backgroundColor: MaterialStatePropertyAll(ColorsProvider.color_5),
-                    overlayColor: MaterialStatePropertyAll(Colors.transparent),
+                    backgroundColor: WidgetStatePropertyAll(ColorsProvider.color_5),
+                    overlayColor: WidgetStatePropertyAll(Colors.transparent),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min, // Aby se řádek smrskl na minimální možnou šířku
@@ -814,8 +814,8 @@ class _FitnessRecordEndSplitState extends State<FitnessRecordEndSplit> {
           //       ),
           //     ),
           //     style: ButtonStyle(
-          //       backgroundColor: MaterialStateProperty.all(ColorsProvider.color_2),
-          //       foregroundColor: MaterialStateProperty.all(ColorsProvider.color_8),
+          //       backgroundColor: WidgetStateProperty.all(ColorsProvider.color_2),
+          //       foregroundColor: WidgetStateProperty.all(ColorsProvider.color_8),
           //     ),
           //   ),
           // ),

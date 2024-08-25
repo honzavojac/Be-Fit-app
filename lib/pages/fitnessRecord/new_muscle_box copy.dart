@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
 import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:provider/provider.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 import '../../data_classes.dart';
 import '../../providers/colors_provider.dart';
@@ -53,7 +55,7 @@ class _NewMuscleBoxCopyState extends State<NewMuscleBoxCopy> {
                   child: Container(
                     child: Text(
                       "New Muscle",
-                      style: TextStyle(color: ColorsProvider.color_1, fontSize: 20),
+                      style: TextStyle(color: ColorsProvider.color_2, fontSize: 20),
                     ),
                   ),
                 ),
@@ -82,7 +84,7 @@ class _NewMuscleBoxCopyState extends State<NewMuscleBoxCopy> {
                       decoration: const InputDecoration(
                         labelText: 'Name of Muscle:',
                         labelStyle: TextStyle(
-                          color: ColorsProvider.color_1,
+                          color: ColorsProvider.color_2,
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.all(
@@ -108,12 +110,12 @@ class _NewMuscleBoxCopyState extends State<NewMuscleBoxCopy> {
                         ),
                         hintText: 'Enter name of muscle:',
                         hintStyle: TextStyle(
-                          color: ColorsProvider.color_1,
+                          color: ColorsProvider.color_2,
                           fontSize: 15,
                         ),
                       ),
                       controller: textController,
-                      style: TextStyle(color: ColorsProvider.color_1),
+                      style: TextStyle(color: ColorsProvider.color_2),
                     ),
                   ),
                 ),
@@ -123,22 +125,47 @@ class _NewMuscleBoxCopyState extends State<NewMuscleBoxCopy> {
                   width: double.infinity,
                   child: TextButton(
                     onPressed: () async {
-                      List<Muscle> sortedMuscles = widget.muscles;
-                      sortedMuscles.sort(
-                        (a, b) => a.supabaseIdMuscle!.compareTo(b.supabaseIdMuscle!),
-                      );
+                      if (textController.text.isNotEmpty) {
+                        List<Muscle> sortedMuscles = widget.muscles;
+                        sortedMuscles.sort(
+                          (a, b) => a.supabaseIdMuscle!.compareTo(b.supabaseIdMuscle!),
+                        );
 
-                      int newIdMuscle = 1 + (sortedMuscles.isNotEmpty ? sortedMuscles.last.idMuscle! : 0);
-                      dbFitness.InsertMuscle(newIdMuscle, textController.text.trim(), 1);
-                      // for (var element in sortedMuscles) {
-                      //   if (element.supabaseIdMuscle == 224) {
-                      //     dbFitness.DeleteMuscle(element.idMuscle!);
-                      //   }
-                      // }
+                        int newIdMuscle = 1 + (sortedMuscles.isNotEmpty ? sortedMuscles.last.idMuscle! : 0);
+                        dbFitness.InsertMuscle(newIdMuscle, textController.text.trim(), 1);
+                        // for (var element in sortedMuscles) {
+                        //   if (element.supabaseIdMuscle == 224) {
+                        //     dbFitness.DeleteMuscle(element.idMuscle!);
+                        //   }
+                        // }
 
-                      widget.loadParent();
+                        widget.loadParent();
 
-                      Navigator.of(context).pop();
+                        Navigator.of(context).pop();
+                      } else {
+                        AnimationController localAnimationController;
+
+                        showTopSnackBar(
+                          Overlay.of(context),
+
+                          animationDuration: Duration(milliseconds: 1500),
+                          Container(
+                            height: 50,
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 25, right: 25),
+                              child: CustomSnackBar.error(
+                                message: "The name of the muscle cannot be empty",
+                              ),
+                            ),
+                          ),
+                          // persistent: true,
+                          onAnimationControllerInit: (controller) => localAnimationController = controller,
+                          displayDuration: Duration(microseconds: 750),
+                          dismissType: DismissType.onSwipe,
+                          dismissDirection: [DismissDirection.endToStart],
+                          reverseAnimationDuration: Duration(milliseconds: 250),
+                        );
+                      }
                     },
                     style: TextButton.styleFrom(
                       backgroundColor: ColorsProvider.color_2,

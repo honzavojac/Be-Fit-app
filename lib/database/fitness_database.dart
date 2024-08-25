@@ -93,7 +93,8 @@ class FitnessProvider extends ChangeNotifier {
             name_split TEXT NOT NULL,
             created_at TEXT NOT NULL,
             supabase_id_split INTEGER,
-            action INTEGER
+            action INTEGER,
+            is_active BOOLEAN NOT NULL DEFAULT 1
         );
 
         CREATE TABLE selected_muscles (
@@ -180,7 +181,9 @@ class FitnessProvider extends ChangeNotifier {
             name, TEXT,
             country TEXT, 
             birth_date DATE, 
-            email TEXT
+            email TEXT,
+            action INTEGER
+
       );
       CREATE TABLE intake_categories (
           id_intake_category INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -847,6 +850,40 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     return finalData.reversed.toList();
   }
 
+  SelectLast5SplitStartedCompleted(String createdAt) async {
+    List<SplitStartedCompleted> finalData = [];
+    List<MySplit> splits = [];
+    List<SplitStartedCompleted> splitStartedCompleteds = [];
+    List<ExerciseData> exerciseData = [];
+    splits = await SelectSplit();
+    splitStartedCompleteds = await SelectLast5StartedCompleted(createdAt);
+    exerciseData = await SelectExerciseData();
+
+    for (var split in splits) {
+      split.splitStartedCompleted = [];
+
+      for (var splitStartedCompleted in splitStartedCompleteds) {
+        int numberOfSets = 0;
+        int totalWorkVolume = 0;
+        if (split.supabaseIdSplit == splitStartedCompleted.splitId) {
+          for (var exercise in exerciseData) {
+            if (exercise.idStartedCompleted == splitStartedCompleted.supabaseIdStartedCompleted) {
+              numberOfSets += 1;
+              totalWorkVolume += ((exercise.weight ?? 0) * (exercise.reps ?? 0));
+            }
+          }
+
+          splitStartedCompleted.name = split.nameSplit;
+          splitStartedCompleted.numberOfSets = numberOfSets;
+          splitStartedCompleted.totalWorkVolume = totalWorkVolume;
+
+          finalData.add(splitStartedCompleted);
+        }
+      }
+    }
+    return finalData;
+  }
+
   SelectAllExData() async {
     List<SplitStartedCompleted> finalData = [];
     List<MySplit> splits = [];
@@ -1191,6 +1228,7 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     int? supabaseIdSplit,
     String nameOfSplit,
     String? createdAt,
+    bool isActive,
     int action,
   ) async {
     //action 1 == insert
@@ -1200,13 +1238,15 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
       supabase_id_split, 
       name_split, 
       created_at, 
-      action
+      action,
+      is_active
       ) 
       VALUES(
         $supabaseIdSplit,
         '$nameOfSplit',
         '${createdAt ?? formattedDate}', 
-        $action
+        $action,
+         $isActive
       )''');
     notifyListeners();
   }
@@ -1216,6 +1256,7 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     int? supabaseIdSplit,
     String nameOfSplit,
     String? createdAt,
+    bool isActive,
     int action,
   ) async {
     //action 1 == insert
@@ -1225,37 +1266,40 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
       supabase_id_split, 
       name_split, 
       created_at, 
-      action
+      action,
+      is_active
       ) 
       VALUES(
         $supabaseIdSplit,
         '$nameOfSplit',
         '${createdAt ?? formattedDate}', 
-        $action
+        $action, 
+        $isActive
+      
       )''');
     notifyListeners();
   }
 
   UpdateSplit(String nameOfSplit, int supabaseIdSplit) async {
-    await _database.rawQuery('''UPDATE split SET name_split = '$nameOfSplit' WHERE supabase_id_split = $supabaseIdSplit''');
+    await _database.rawQuery('''UPDATE split SET name_split = '$nameOfSplit'WHERE supabase_id_split = $supabaseIdSplit''');
   }
 
-  DeleteSplit(int id) async {
+  DeleteSplit(int id, int action) async {
     try {
-      await _database.rawQuery('''DELETE FROM split WHERE id_split = $id''');
+      await _database.rawQuery('''UPDATE split SET is_active = FALSE, action = $action  WHERE supabase_id_split = $id''');
     } on Exception catch (e) {
       print(e);
     }
     notifyListeners();
   }
 
-  DeleteAllSplits() async {
-    List<MySplit> splitsDelete = await SelectSplit();
-    for (var element in splitsDelete) {
-      await DeleteSplit(element.idSplit!);
-    }
-    notifyListeners();
-  }
+  // DeleteAllSplits() async {
+  //   List<MySplit> splitsDelete = await SelectSplit();
+  //   for (var element in splitsDelete) {
+  //     await DeleteSplit(element.idSplit!);
+  //   }
+  //   notifyListeners();
+  // }
 
 //SelectedMuscles
   Future<List<SelectedMuscle>> SelectSelectedMuscles() async {
@@ -1432,6 +1476,47 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     return finalData;
   }
 
+  Future<List<SplitStartedCompleted>> SelectLast5StartedCompleted(String createdAt) async {
+    print(createdAt);
+    var data = await _database.rawQuery('''
+    SELECT *
+    FROM split_started_completed
+    WHERE created_at < ? OR created_at LIKE ?
+    ORDER BY supabase_id_started_completed DESC
+    LIMIT 1;
+''', ['$createdAt', '$createdAt%']);
+
+    var data2 = await _database.rawQuery('''
+    SELECT *
+    FROM split_started_completed
+    WHERE created_at LIKE ?
+    ORDER BY supabase_id_started_completed DESC
+    LIMIT 2;
+''', ['$createdAt%']);
+    // print("data2: ${data2}");
+    if (data2.isNotEmpty && data2.length > 1) {
+      print(data2);
+      var finalData = data2.map((e) => SplitStartedCompleted.fromJson(e)).toList();
+      finalData.sort(
+        (a, b) => b.createdAt!.compareTo(a.createdAt!),
+      );
+      // for (var i = 0; i < finalData.length; i++) {
+      //   print("id: ${finalData[i].idStartedCompleted!} name: ${finalData[i].idStartedCompleted!} action: ${finalData[i].action}");
+      // }
+      return finalData;
+    } else {
+      print(data);
+      var finalData = data.map((e) => SplitStartedCompleted.fromJson(e)).toList();
+      finalData.sort(
+        (a, b) => b.createdAt!.compareTo(a.createdAt!),
+      );
+      // for (var i = 0; i < finalData.length; i++) {
+      //   print("id: ${finalData[i].idStartedCompleted!} name: ${finalData[i].idStartedCompleted!} action: ${finalData[i].action}");
+      // }
+      return finalData;
+    }
+  }
+
   InsertSplitStartedCompleted(
     int? supabaseIdSplitStartedCompleted,
     String? createdAt,
@@ -1531,6 +1616,23 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     var data = await _database.rawQuery('''SELECT * FROM body_measurements''');
     var finalData = data.map((e) => Measurements.fromJson(e)).toList();
     return finalData;
+  }
+
+  Future<Measurements?> selectOneMeasurement(String createdAt) async {
+    // První dotaz: hledání záznamu, kde createdAt je menší nebo se rovná specifikovanému datu
+    var data = await _database.rawQuery('''
+    SELECT *
+    FROM body_measurements
+    WHERE created_at < ? OR created_at LIKE ?
+    ORDER BY id_body_measurements DESC
+    LIMIT 1;
+  ''', [createdAt, '$createdAt%']);
+
+    // Pokud jsou záznamy nalezeny v data2, použijeme je
+
+    // Pokud nejsou nalezeny žádné záznamy v data2, použijeme data z prvního dotazu
+    var finalData = data.map((e) => Measurements.fromJson(e)).toList();
+    return finalData.isNotEmpty ? finalData.first : null;
   }
 
   Future<void> insertMeasurements(Measurements measurements, int action) async {
@@ -2016,7 +2118,7 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     }
   }
 
-  Future<void> TxnInsertUser(Transaction txn, UserSupabase user) async {
+  Future<void> TxnInsertUser(Transaction txn, UserSupabase user, int action) async {
     try {
       // Vložení uživatele do databáze
 
@@ -2027,8 +2129,9 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
           name, 
           email, 
           birth_date, 
-          country
-        ) VALUES (?, ?, ?, ?, ?)
+          country,
+          action
+        ) VALUES (?, ?, ?, ?, ?,?)
         ''',
         [
           user.idUser,
@@ -2036,6 +2139,7 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
           user.email,
           user.dateOfBirth,
           user.country,
+          action,
         ],
       );
 

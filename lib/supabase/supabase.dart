@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
 import 'package:kaloricke_tabulky_02/main.dart';
 import 'package:kaloricke_tabulky_02/settings.dart';
+import 'package:kaloricke_tabulky_02/variables.dart';
 import 'package:openfoodfacts/openfoodfacts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -600,7 +601,8 @@ class SupabaseProvider extends ChangeNotifier {
     split(
       id_split,
       name_split,
-      created_at
+      created_at,
+      is_active
     )
     ''').eq('user_id', uid);
 

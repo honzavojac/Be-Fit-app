@@ -419,7 +419,7 @@ Widget inputFoodItems(
       decoration: InputDecoration(
         labelText: labelText,
         labelStyle: const TextStyle(
-          color: ColorsProvider.color_1,
+          color: ColorsProvider.color_2,
         ),
         enabledBorder: const OutlineInputBorder(
           borderRadius: BorderRadius.all(
@@ -441,7 +441,7 @@ Widget inputFoodItems(
         ),
         contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 15),
         // hintText: 'Enter name of $latelText:',
-        hintStyle: const TextStyle(color: ColorsProvider.color_1, fontSize: 15), // zobrazí se pokud je textové pole prázdné
+        hintStyle: const TextStyle(color: ColorsProvider.color_2, fontSize: 15), // zobrazí se pokud je textové pole prázdné
       ),
       controller: item,
       onChanged: onChanged,
@@ -575,7 +575,7 @@ class _SelectFoodCategoryState extends State<SelectFoodCategory> {
                         value: item,
                         child: Text(
                           item,
-                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: ColorsProvider.color_1),
+                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: ColorsProvider.color_2),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),

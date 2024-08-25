@@ -54,11 +54,11 @@ class _MySearchBarState extends State<MySearchBar> {
               // Aktualizujte výsledky na základě vyhledávacího dotazu
               controller.openView();
             },
-            leading: const Icon(Icons.search, color: ColorsProvider.color_1),
+            leading: const Icon(Icons.search, color: ColorsProvider.color_2),
             hintText: 'Search food...',
             hintStyle: WidgetStatePropertyAll(
               TextStyle(
-                color: ColorsProvider.color_1,
+                color: ColorsProvider.color_2,
               ),
             ),
           );

@@ -11,8 +11,10 @@ import 'package:kaloricke_tabulky_02/side_panel/fitness/fitness_statistic.dart';
 import 'package:kaloricke_tabulky_02/side_panel/food/add_food.dart';
 import 'package:kaloricke_tabulky_02/side_panel/food/food_statistic.dart';
 import 'package:kaloricke_tabulky_02/side_panel/food/scan_food.dart';
+import 'package:kaloricke_tabulky_02/variables.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
@@ -78,11 +80,50 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  ThemeMode _themeMode = ThemeMode.system;
+  @override
+  void initState() {
+    super.initState();
+    _loadThemeMode();
+  }
+
+  void _loadThemeMode() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? themeModeString = prefs.getString('themeMode');
+    setState(() {
+      if (themeModeString == 'light') {
+        _themeMode = ThemeMode.light;
+        darkTheme = false;
+      } else if (themeModeString == 'dark') {
+        _themeMode = ThemeMode.dark;
+        darkTheme = true;
+      } else {
+        _themeMode = ThemeMode.system;
+        bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+        if (isDarkMode) {
+          darkTheme = true;
+        } else {
+          darkTheme = false;
+        }
+      }
+    });
+  }
+
+  notifyMyApp(ThemeMode themeMode) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _themeMode = themeMode;
+    });
+    prefs.setString('themeMode', themeMode.toString().split('.').last);
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark(useMaterial3: true),
+      theme: ThemeData.light(useMaterial3: true),
+      darkTheme: ThemeData.dark(useMaterial3: true),
+      themeMode: _themeMode, // Použití ThemeMode
       home: SplashPage(),
       initialRoute: '/',
       routes: {
@@ -90,7 +131,9 @@ class _MyAppState extends State<MyApp> {
         '/initData': (context) => ChoseInitDataPage(),
         '/login': (context) => LoginPage(),
         '/splash': (context) => SplashPage(),
-        '/settings': (context) => Settings(),
+        '/settings': (context) => Settings(
+              notifyMyApp: notifyMyApp,
+            ),
         '/auth': (context) => AuthPage(),
         '/fitnessNames': (context) => FitnessNames(),
         '/editDeleteExerciseData': (context) => EditDeleteExerciseData(),

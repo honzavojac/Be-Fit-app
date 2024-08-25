@@ -230,7 +230,7 @@ class _AddSplitBoxState extends State<AddSplitBox> {
                     height: 35,
                     child: ElevatedButton(
                       style: ButtonStyle(
-                        backgroundColor: MaterialStatePropertyAll(
+                        backgroundColor: WidgetStatePropertyAll(
                           ColorsProvider.color_2,
                         ),
                       ),

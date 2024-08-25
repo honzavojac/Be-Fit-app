@@ -11,19 +11,28 @@ import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'variables.dart';
 import 'data_classes.dart';
 
 class Settings extends StatefulWidget {
-  const Settings({super.key});
+  final Function(ThemeMode) notifyMyApp;
+  const Settings({super.key, required this.notifyMyApp});
 
   @override
   State<Settings> createState() => _SettingsState();
 }
+//TODO: odstranit sqflite / supabase přepínač
+// upravit select jazyků
+// dát tam color picker ale nebude zatím viditelný
+// dát tam změnu jména,( věku zatím ne ),
+// udělat odstranění učtu!!!
 
-String? selectedCountry;
+//
+//
+// String? selectedCountry;
 
 class _SettingsState extends State<Settings> {
   final TextEditingController _nameController = TextEditingController();
@@ -95,6 +104,7 @@ class _SettingsState extends State<Settings> {
   Widget build(BuildContext context) {
     var dbSupabase = Provider.of<SupabaseProvider>(context);
     var dbFitness = Provider.of<FitnessProvider>(context);
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(
@@ -123,20 +133,6 @@ class _SettingsState extends State<Settings> {
                         SizedBox(
                           height: 50,
                         ),
-                        // LoadingAnimationWidget.discreteCircle(
-                        //   secondRingColor: ColorsProvider.color_2,
-                        //   thirdRingColor: Colors.transparent,
-                        //   color: ColorsProvider.color_2,
-                        //   size: 100,
-                        // ),
-                        // LoadingAnimationWidget.stretchedDots(
-                        //   color: ColorsProvider.color_2,
-                        //   size: 100,
-                        // ),
-                        // LoadingAnimationWidget.inkDrop(
-                        //   color: ColorsProvider.color_2,
-                        //   size: 100,
-                        // ),
                         Center(
                             child: LoadingAnimationWidget.staggeredDotsWave(
                           color: ColorsProvider.color_2,
@@ -169,33 +165,83 @@ class _SettingsState extends State<Settings> {
         padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
-            Container(
-              height: 50,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Text("sqflite"),
-                  Switch(
-                    activeTrackColor: ColorsProvider.color_2, activeColor: Colors.black,
-                    // activeColor: ColorsProvider.color_2,
-                    inactiveTrackColor: ColorsProvider.color_8,
-                    value: dbFitness.switchButton,
-                    onChanged: (value) {
-                      dbFitness.switchButton = value;
-                      print(dbFitness.switchButton);
-                      // setState(() {});,
-                      Navigator.of(context).pushNamedAndRemoveUntil('/account', (Route<dynamic> route) => false);
-                    },
+            // Container(
+            //   height: 50,
+            //   child: Row(
+            //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            //     children: [
+            //       Text("sqflite"),
+            //       Switch(
+            //         activeTrackColor: ColorsProvider.color_2, activeColor: Colors.black,
+            //         // activeColor: ColorsProvider.color_2,
+            //         inactiveTrackColor: ColorsProvider.color_8,
+            //         value: dbFitness.switchButton,
+            //         onChanged: (value) {
+            //           dbFitness.switchButton = value;
+            //           print(dbFitness.switchButton);
+            //           // setState(() {});,
+            //           Navigator.of(context).pushNamedAndRemoveUntil('/account', (Route<dynamic> route) => false);
+            //         },
+            //       ),
+            //       Text("supabase"),
+            //     ],
+            //   ),
+            // ),
+            // SizedBox(
+            //   height: 20,
+            // ),
+            Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      Text(
+                        "Change theme",
+                        style: TextStyle(fontSize: 18),
+                      ),
+                    ],
                   ),
-                  Text("supabase"),
-                ],
-              ),
-            ),
-            SizedBox(
-              height: 20,
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(18),
+                    // color: ColorsProvider.color_8,
+                    border: Border.all(width: 2),
+                  ),
+                  height: 50,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Text("Light"),
+                      Switch(
+                        activeTrackColor: ColorsProvider.color_2,
+                        activeColor: Colors.black,
+                        // activeColor: ColorsProvider.color_2,
+                        inactiveTrackColor: ColorsProvider.color_8,
+                        value: isDarkMode,
+                        onChanged: (value) async {
+                          SharedPreferences prefs = await SharedPreferences.getInstance();
+                          String? themeModeString = prefs.getString('themeMode');
+                          // print(themeModeString);
+                          if (!isDarkMode) {
+                            widget.notifyMyApp(ThemeMode.dark);
+                            darkTheme = true;
+                          } else {
+                            widget.notifyMyApp(ThemeMode.light);
+                            darkTheme = false;
+                          }
+                        },
+                      ),
+                      Text("Dark"),
+                    ],
+                  ),
+                ),
+              ],
             ),
             Container(
               height: 150,
+              // width: 200,
               color: const Color.fromARGB(255, 1, 41, 73),
               child: Column(
                 children: [
@@ -217,69 +263,83 @@ class _SettingsState extends State<Settings> {
                 ],
               ),
             ),
-            Text("${selectedCountry}"),
+            Text(darkTheme.toString()),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 50),
-              child: Container(
-                // height: 55,
-                decoration: BoxDecoration(
-                  color: Colors.grey[800],
-                  border: Border.all(color: ColorsProvider.color_8, width: 4),
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton2<String>(
-                    isExpanded: true,
-                    value: selectedCountry,
-                    items: languages.map((country) {
-                      return DropdownMenuItem<String>(
-                        value: country['code'],
-                        child: Text(
-                          country['name']!,
-                          style: TextStyle(color: ColorsProvider.color_2),
-                        ),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      selectedCountry = value;
-                      setState(() {});
-                    },
-                    buttonStyleData: ButtonStyleData(
-                      // width: 180,
-                      padding: const EdgeInsets.symmetric(horizontal: 14),
-                      // decoration: BoxDecoration(
-                      //   borderRadius: BorderRadius.circular(18),
-                      //   border: Border.all(
-                      //     color: ColorsProvider.color_8,
-                      //     width: 0.5,
-                      //   ),
-                      // ),
-                    ),
-                    iconStyleData: const IconStyleData(
-                      icon: Icon(Icons.keyboard_arrow_down_outlined),
-                      iconSize: 17,
-                      iconEnabledColor: ColorsProvider.color_1,
-                    ),
-                    dropdownStyleData: DropdownStyleData(
-                      maxHeight: 200,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      // height: 55,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(18),
-                        border: Border.all(width: 2, color: ColorsProvider.color_8),
+                        // color: Colors.grey[800],
+                        border: Border.all(color: ColorsProvider.color_8, width: 2),
+                        borderRadius: BorderRadius.circular(15),
                       ),
-                      offset: const Offset(0, -0),
-                      scrollbarTheme: ScrollbarThemeData(
-                        radius: const Radius.circular(40),
-                        interactive: true,
-                        thickness: WidgetStateProperty.all(6),
-                        thumbVisibility: WidgetStateProperty.all(true),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton2<String>(
+                          isExpanded: true,
+                          value: selectedCountry,
+                          items: languages.map((country) {
+                            return DropdownMenuItem<String>(
+                              value: country['code'],
+                              child: Text(
+                                country['name']!,
+                                style: TextStyle(color: ColorsProvider.color_2),
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            selectedCountry = value;
+                            setState(() {});
+                          },
+                          buttonStyleData: ButtonStyleData(
+                            // width: 180,
+                            padding: const EdgeInsets.symmetric(horizontal: 14),
+                            // decoration: BoxDecoration(
+                            //   borderRadius: BorderRadius.circular(18),
+                            //   border: Border.all(
+                            //     color: ColorsProvider.color_8,
+                            //     width: 0.5,
+                            //   ),
+                            // ),
+                          ),
+                          iconStyleData: const IconStyleData(
+                            icon: Icon(Icons.keyboard_arrow_down_outlined),
+                            iconSize: 17,
+                            iconEnabledColor: ColorsProvider.color_2,
+                          ),
+                          dropdownStyleData: DropdownStyleData(
+                            maxHeight: 200,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(18),
+                              border: Border.all(width: 2, color: ColorsProvider.color_8),
+                            ),
+                            offset: const Offset(0, -0),
+                            scrollbarTheme: ScrollbarThemeData(
+                              radius: const Radius.circular(40),
+                              interactive: true,
+                              thickness: WidgetStateProperty.all(6),
+                              thumbVisibility: WidgetStateProperty.all(true),
+                            ),
+                          ),
+                          menuItemStyleData: const MenuItemStyleData(
+                            // height: 40,
+                            padding: EdgeInsets.only(left: 10, right: 18),
+                          ),
+                        ),
                       ),
-                    ),
-                    menuItemStyleData: const MenuItemStyleData(
-                      // height: 40,
-                      padding: EdgeInsets.only(left: 10, right: 18),
                     ),
                   ),
-                ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: HelpButton(
+                      helpText: "This button allows you to change the language of the app. "
+                          "Upon changing the language, the app will automatically adjust "
+                          "the database category to match the selected language.",
+                    ),
+                  ),
+                ],
               ),
             ),
             // TextField(
@@ -495,6 +555,69 @@ class _SettingsState extends State<Settings> {
             // )
           ],
         ),
+      ),
+    );
+  }
+}
+
+class HelpButton extends StatefulWidget {
+  final String helpText;
+  const HelpButton({Key? key, required this.helpText}) : super(key: key);
+
+  @override
+  _HelpButtonState createState() => _HelpButtonState();
+}
+
+class _HelpButtonState extends State<HelpButton> {
+  OverlayEntry? _overlayEntry;
+
+  void _showHelpOverlay(BuildContext context) {
+    _overlayEntry = _createOverlayEntry(context);
+    Overlay.of(context)!.insert(_overlayEntry!);
+  }
+
+  void _removeHelpOverlay() {
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+  }
+
+  OverlayEntry _createOverlayEntry(BuildContext context) {
+    RenderBox renderBox = context.findRenderObject() as RenderBox;
+    var size = renderBox.size;
+    var offset = renderBox.localToGlobal(Offset.zero);
+
+    return OverlayEntry(
+      builder: (context) => Positioned(
+        top: offset.dy - size.height - 60.0, // Text se zobrazí nad ikonou
+        left: offset.dx - 220, // Text se zobrazí vlevo od ikony
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            width: 200,
+            padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.5),
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: Text(
+              widget.helpText,
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onLongPress: () => _showHelpOverlay(context),
+      onLongPressUp: _removeHelpOverlay,
+      child: Icon(
+        Icons.help_outline,
+        color: Colors.white.withAlpha(100),
+        size: 28,
       ),
     );
   }

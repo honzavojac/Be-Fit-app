@@ -139,7 +139,7 @@ class _ChoseInitDataPageState extends State<ChoseInitDataPage> {
                                 iconStyleData: const IconStyleData(
                                   icon: Icon(Icons.keyboard_arrow_down_outlined),
                                   iconSize: 17,
-                                  iconEnabledColor: ColorsProvider.color_1,
+                                  iconEnabledColor: ColorsProvider.color_2,
                                 ),
                                 dropdownStyleData: DropdownStyleData(
                                   maxHeight: 200,

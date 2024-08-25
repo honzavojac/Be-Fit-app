@@ -192,7 +192,7 @@ class _AddExerciseBoxState extends State<AddExerciseBox> {
                     height: 35,
                     child: ElevatedButton(
                       style: ButtonStyle(
-                        backgroundColor: MaterialStatePropertyAll(
+                        backgroundColor: WidgetStatePropertyAll(
                           ColorsProvider.color_2,
                         ),
                       ),

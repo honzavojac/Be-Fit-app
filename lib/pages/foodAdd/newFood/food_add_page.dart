@@ -10,6 +10,7 @@ import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/pages/foodAdd/newFood/food_main_add_boxes.dart';
 import 'package:kaloricke_tabulky_02/settings.dart';
 import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
+import 'package:kaloricke_tabulky_02/variables.dart';
 import 'package:provider/provider.dart';
 import 'package:diacritic/diacritic.dart';
 
@@ -154,7 +155,7 @@ class _FoodAddPageState extends State<FoodAddPage> {
                 //   children: [
                 //     Text(
                 //       'Others values',
-                //       style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: ColorsProvider.color_1),
+                //       style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: ColorsProvider.color_2),
                 //     )
                 //   ],
                 // ),

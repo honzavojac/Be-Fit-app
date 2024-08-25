@@ -1,5 +1,8 @@
 // ignore_for_file: deprecated_member_use
 
+import 'dart:math';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
 import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
@@ -14,14 +17,14 @@ import 'add_split_box copy.dart';
 import 'new_exercise_box copy.dart';
 
 class SplitPageCopy extends StatefulWidget {
-  final Function()? notifyParent;
+  final Function() notifyParent;
   final Function() loadParent;
   final int clickedSplitTab;
   final bool foundActiveSplit;
 
   const SplitPageCopy({
     Key? key,
-    this.notifyParent,
+    required this.notifyParent,
     required this.loadParent,
     required this.clickedSplitTab,
     required this.foundActiveSplit,
@@ -33,9 +36,10 @@ class SplitPageCopy extends StatefulWidget {
 
 class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateMixin {
   late TabController _tabController = TabController(length: 0, vsync: this);
-  List<TextEditingController> splitTextEditingControllers = [];
+  // List<TextEditingController> splitTextEditingControllers = [];
   List<TextEditingController> muscleTextEditingControllers = [];
   List<TextEditingController> exerciseTextEditingControllers = [];
+  late Map<int, TextEditingController> splitIndexMap; // Mapa pro indexy
 
   @override
   void initState() {
@@ -61,31 +65,58 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
     setState(() {});
   }
 
+  bool loaded = false;
   List<MySplit> splits = [];
+  List<MySplit> allSplits = [];
+
   int a = 0;
-  Map<String, List<bool>> isCheckedList = {};
-  loadData() async {
-    // Stopwatch stopwatch = Stopwatch()..start();
+  Future<void> loadData() async {
     var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
 
+    // Vyčistěte staré kontrolery a mapu
+    // splitTextEditingControllers = [];
+    splitIndexMap = {}; // Nová mapa pro uložení indexů
+
+    // Načtěte data
     splits = await dbFitness.SelectAllData();
-    for (var split in splits) {
-      splitTextEditingControllers.add(TextEditingController(text: split.nameSplit));
+    allSplits = List.from(splits);
+
+    // Filtrujte neaktivní položky
+    splits.removeWhere((split) => !split.isActive);
+
+    // Naplňte mapu a seznam kontrolerů
+    for (int i = 0; i < splits.length; i++) {
+      var split = splits[i];
+
+      // Přidejte kontroler pouze pokud ještě neexistuje
+      if (splitIndexMap[split.supabaseIdSplit!] == null) {
+        // splitTextEditingControllers.add(TextEditingController(text: split.nameSplit));
+        splitIndexMap[split.supabaseIdSplit!] = TextEditingController(text: split.nameSplit); // Uložení indexu do mapy
+      }
+
+      for (var selectedMuscle in split.selectedMuscle!) {
+        selectedMuscle.selectedExercises!.removeWhere((selectedExercise) => selectedExercise.action == 3);
+      }
     }
+
     if (a == 0) {
       clickedSplitTab = widget.clickedSplitTab;
       a++;
     }
+
     _tabController = TabController(length: splits.length, vsync: this, initialIndex: clickedSplitTab);
     widget.loadParent();
     setState(() {});
-    // stopwatch.stop();
-    // print("tvralo to: ${stopwatch.elapsed.inMilliseconds}");
   }
 
-  Map<int, String> updateSplits = {};
-  Map<int, String> updateMuscles = {};
-  Map<int, String> updateExercises = {};
+  // TextEditingController getControllerForSplit(String splitId) {
+  //   final index = splitIndexMap[splitId];
+  //   if (index != null && index < splitTextEditingControllers.length) {
+  //     return splitTextEditingControllers[index];
+  //   } else {
+  //     return TextEditingController(); // Pokud neexistuje, vrátí nový
+  //   }
+  // }
 
   late int clickedSplitTab;
   @override
@@ -94,13 +125,12 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
 
     // loadData();
     // print(splits);
-
+    print(widget.clickedSplitTab);
     var dbSupabase = Provider.of<SupabaseProvider>(context);
     var dbFitness = Provider.of<FitnessProvider>(context);
 
     if (splits.isEmpty) {
       return PopScope(
-        // ignore: deprecated_member_use
         onPopInvoked: (didPop) {
           widget.notifyParent;
         },
@@ -141,7 +171,7 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
                           return Center(
                             child: AddSplitBoxCopy(
                               loadParent: loadData,
-                              splits: splits,
+                              splits: allSplits,
                             ),
                           );
                         },
@@ -160,7 +190,7 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
     } else {
       return PopScope(
         onPopInvoked: (didPop) {
-          widget.notifyParent;
+          widget.loadParent;
         },
         child: Scaffold(
           appBar: AppBar(
@@ -171,7 +201,7 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
               },
               icon: Icon(
                 Icons.arrow_back,
-                // color: Colors.amber,
+                color: ColorsProvider.color_2,
               ),
             ),
             title: Row(
@@ -179,11 +209,17 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
               children: [
                 Text(
                   'Edit your split',
-                  style: TextStyle(),
+                  style: TextStyle(
+                    color: ColorsProvider.color_2,
+                  ),
                 ),
                 Container(
                   child: IconButton(
-                    icon: Icon(Icons.add_circle_outline_outlined, color: ColorsProvider.color_2, size: 35),
+                    icon: Icon(
+                      Icons.add_circle_outline_outlined,
+                      color: ColorsProvider.color_2,
+                      size: 35,
+                    ),
                     onPressed: () async {
                       dbSupabase.generateFalseMuscleCheckbox();
                       dbSupabase.getAllMuscles();
@@ -195,7 +231,7 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
                           return Center(
                             child: AddSplitBoxCopy(
                               loadParent: loadData,
-                              splits: splits,
+                              splits: allSplits,
                             ),
                           );
                         },
@@ -235,7 +271,7 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
                                 padding: const EdgeInsets.symmetric(horizontal: 5.0), // 5px padding on each side
                                 child: Center(
                                     child: Text(
-                                  record.nameSplit,
+                                  record.nameSplit.toString(),
                                   style: TextStyle(
                                     fontSize: 19,
                                   ),
@@ -269,6 +305,8 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
                       (record) {
                         // dbSupabase.clickedSplitTab = splits.indexOf(record);
                         // splitTextEditingControllers[_tabController.index] = TextEditingController(text: record.nameSplit);
+                        int index = splits.indexOf(record);
+
                         return Column(
                           children: [
                             Expanded(
@@ -289,11 +327,11 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
                                                 onChanged: (value) async {
                                                   clickedSplitTab = await _tabController.index;
                                                   await dbFitness.UpdateSplit(value, record.supabaseIdSplit!);
-                                                  print(clickedSplitTab);
+                                                  // print(clickedSplitTab);
                                                   widget.loadParent();
                                                   record.nameSplit = value;
                                                 },
-                                                controller: splitTextEditingControllers[splits.indexOf(record)],
+                                                controller: splitIndexMap[record.supabaseIdSplit!],
                                                 decoration: InputDecoration(
                                                   filled: true,
                                                   fillColor: ColorsProvider.color_2,
@@ -444,24 +482,20 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
                                                               var selectedExercises = record.selectedMuscle![muscleIndex].selectedExercises!;
                                                               String nameOfExercise = exercises[itemIndex].nameOfExercise!;
                                                               int supabaseIdExercise = exercises[itemIndex].supabaseIdExercise!;
-                                                              late int order;
+                                                              int order = 0;
 
                                                               bool isChecked = false;
 
                                                               function:
                                                               for (var j = 0; j < selectedExercises.length; j++) {
-                                                                // print("${exercises[itemIndex].supabaseIdExercise} == ${selectedExercises[j].exercises!.supabaseIdExercise}");
-                                                                if (selectedExercises[j].action == 3) {
-                                                                  // selectedExercises.removeAt(j);
+                                                                // print(selectedExercises[j].action);
+                                                                if (exercises[itemIndex].supabaseIdExercise == selectedExercises[j].exercises!.supabaseIdExercise) {
+                                                                  isChecked = true;
+                                                                  order = j + 1;
+                                                                  break function;
                                                                 } else {
-                                                                  if (exercises[itemIndex].supabaseIdExercise == selectedExercises[j].exercises!.supabaseIdExercise) {
-                                                                    isChecked = true;
-                                                                    order = j + 1;
-                                                                    break function;
-                                                                  } else {
-                                                                    // order = 1;
-                                                                    isChecked = false;
-                                                                  }
+                                                                  // order = 1;
+                                                                  isChecked = false;
                                                                 }
                                                               }
                                                               return Padding(
@@ -510,6 +544,7 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
                                                                           child: GestureDetector(
                                                                             onTap: () async {
                                                                               clickedSplitTab = _tabController.index;
+
                                                                               if (isChecked == true) {
                                                                                 for (var i = 0; i < selectedExercises.length; i++) {
                                                                                   if (selectedExercises[i].idExercise == exercises[itemIndex].supabaseIdExercise) {
@@ -568,6 +603,7 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
 
                                                                               // await dbFitness.InsertSelectedExercise(2, 1, 1, 1);
                                                                               widget.loadParent();
+                                                                              print("load data");
                                                                               loadData();
                                                                             },
                                                                             child: Container(
@@ -596,7 +632,7 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
                                                                                       ),
                                                                                       child: Center(
                                                                                         child: Text(
-                                                                                          "$order",
+                                                                                          "${order}",
                                                                                           style: TextStyle(
                                                                                             fontSize: 15,
                                                                                             fontWeight: FontWeight.bold,
@@ -635,12 +671,36 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
                               context: context,
                               record: record,
                               a: a,
-                              notifyParent: widget.notifyParent,
+                              notifyParent: loadData,
                               foundActiveSplit: widget.foundActiveSplit,
                               onPressed: () async {
-                                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                                print("update is_active in split");
+                                switch (record.action) {
+                                  case 0:
+                                    await dbFitness.DeleteSplit(record.supabaseIdSplit!, 2);
+                                    break;
+                                  case 1:
+                                    await dbFitness.DeleteSplit(record.supabaseIdSplit!, 1);
 
-                                loadData();
+                                    break;
+                                  case 2:
+                                    await dbFitness.DeleteSplit(record.supabaseIdSplit!, 2);
+
+                                    break;
+                                  case 3:
+                                    break;
+                                  case 4:
+                                    break;
+                                  default:
+                                }
+
+                                // widget.loadParent;
+                                clickedSplitTab = 0;
+                                // splitTextEditingControllers.removeAt(splits.indexOf(record));
+                                // loadData();
+                                // ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+                                await loadData();
                               },
                             )
                           ],
@@ -665,6 +725,7 @@ class _deleteSplit extends StatefulWidget {
   final Function? notifyParent;
   final bool foundActiveSplit;
   final Function() onPressed;
+
   _deleteSplit({
     super.key,
     required this.context,
@@ -682,6 +743,8 @@ class _deleteSplit extends StatefulWidget {
 class __deleteSplitState extends State<_deleteSplit> {
   @override
   Widget build(BuildContext context) {
+    var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(25, 10, 25, 20),
       child: Container(
@@ -697,43 +760,45 @@ class __deleteSplitState extends State<_deleteSplit> {
                   foregroundColor: ColorsProvider.color_6,
                   backgroundColor: ColorsProvider.color_5,
                 ),
-                onPressed: () async {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      duration: Duration(seconds: 5),
-                      backgroundColor: ColorsProvider.color_2,
-                      content: Container(
-                        height: 50,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              children: [
-                                Text(
-                                  'Do you want delete this split?',
-                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
-                                ),
-                                Text('Data of exercises will stay save in app')
-                              ],
-                            ),
-                            ElevatedButton(
-                              style: ButtonStyle(
-                                backgroundColor: MaterialStatePropertyAll(ColorsProvider.color_8),
-                                foregroundColor: MaterialStatePropertyAll(
-                                  ColorsProvider.color_1,
-                                ),
-                              ),
-                              onPressed: () async {
-                                widget.onPressed();
-                              },
-                              child: Text("yes"),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                },
+                onPressed: widget.onPressed,
+
+                // ScaffoldMessenger.of(context).showSnackBar(
+                //   SnackBar(
+                //     duration: Duration(seconds: 5),
+                //     backgroundColor: ColorsProvider.color_2,
+                //     content: Container(
+                //       height: 50,
+                //       child: Row(
+                //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //         children: [
+                //           Column(
+                //             children: [
+                //               Text(
+                //                 'Do you want delete this split?',
+                //                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
+                //               ),
+                //               Text('Data of exercises will stay save in app')
+                //             ],
+                //           ),
+                //           ElevatedButton(
+                //             style: ButtonStyle(
+                //               backgroundColor: WidgetStatePropertyAll(ColorsProvider.color_8),
+                //               foregroundColor: WidgetStatePropertyAll(
+                //                 ColorsProvider.color_2,
+                //               ),
+                //             ),
+                //             onPressed: () async {
+                //               widget.onPressed();
+                //               print("object");
+                //             },
+                //             child: Text("yes"),
+                //           ),
+                //         ],
+                //       ),
+                //     ),
+                //   ),
+                // );
+
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -805,9 +870,9 @@ Widget _deleteSplit() {
                           ),
                           ElevatedButton(
                             style: ButtonStyle(
-                              backgroundColor: MaterialStatePropertyAll(ColorsProvider.color_8),
-                              foregroundColor: MaterialStatePropertyAll(
-                                ColorsProvider.color_1,
+                              backgroundColor: WidgetStatePropertyAll(ColorsProvider.color_8),
+                              foregroundColor: WidgetStatePropertyAll(
+                                ColorsProvider.color_2,
                               ),
                             ),
                             onPressed: () async {

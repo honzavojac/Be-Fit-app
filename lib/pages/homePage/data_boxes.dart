@@ -10,37 +10,18 @@ Widget dataBoxes(
   double fiber,
 ) {
   EdgeInsets globalPadding = const EdgeInsets.fromLTRB(25, 3, 25, 3);
-  BorderRadius globalRadius = BorderRadius.circular(20);
+  BorderRadius globalRadius = BorderRadius.circular(18);
   return Column(
     children: [
+      _categoryWidget(globalRadius, "Calories", calories.toStringAsFixed(0), 150),
+      const SizedBox(
+        height: 15,
+      ),
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Container(
-            width: 120,
-            decoration: BoxDecoration(
-              //   border: borderBorder,
-              color: ColorsProvider.color_10,
-              borderRadius: globalRadius, // Zaoblení rohů
-            ),
-            padding: const EdgeInsets.fromLTRB(20, 5, 20, 2),
-            child: Column(
-              children: [
-                Text(
-                  'Calories',
-                  style: TextStyle(fontSize: 15, color: ColorsProvider.color_1, fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  "${(calories * 10.round()) / 10}",
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: ColorsProvider.color_3,
-                    fontWeight: FontWeight.bold,
-                  ),
-                )
-              ],
-            ),
-          )
+          _categoryWidget(globalRadius, "Protein", ((protein * 10).round() / 10) % 1 == 0 ? protein.toStringAsFixed(0) : protein.toStringAsFixed(1), 130),
+          _categoryWidget(globalRadius, "Carbs", ((carbs * 10).round() / 10) % 1 == 0 ? carbs.toStringAsFixed(0) : carbs.toStringAsFixed(1), 130),
         ],
       ),
       const SizedBox(
@@ -49,116 +30,38 @@ Widget dataBoxes(
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Container(
-            width: 120,
-            decoration: BoxDecoration(
-              //   border: borderBorder,
-              color: ColorsProvider.color_10,
-              borderRadius: globalRadius, // Zaoblení rohů
-            ),
-            padding: globalPadding,
-            child: Column(
-              children: [
-                Text(
-                  'Protein',
-                  style: TextStyle(fontSize: 15, color: ColorsProvider.color_1, fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  '${(protein * 10).round() / 10}',
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: ColorsProvider.color_3,
-                    fontWeight: FontWeight.bold,
-                  ),
-                )
-              ],
-            ),
-          ),
-          Container(
-            width: 120,
-            decoration: BoxDecoration(
-              //   border: borderBorder,
-              color: ColorsProvider.color_10,
-              borderRadius: globalRadius, // Zaoblení rohů
-            ),
-            padding: globalPadding,
-            child: Column(
-              children: [
-                Text(
-                  'Carbs',
-                  style: TextStyle(fontSize: 15, color: ColorsProvider.color_1, fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  '${(carbs * 10).round() / 10}',
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: ColorsProvider.color_3,
-                    fontWeight: FontWeight.bold,
-                  ),
-                )
-              ],
-            ),
-          ),
-        ],
-      ),
-      const SizedBox(
-        height: 10,
-      ),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Container(
-            width: 120,
-            decoration: BoxDecoration(
-              //   border: borderBorder,
-              color: ColorsProvider.color_10,
-              borderRadius: globalRadius, // Zaoblení rohů
-            ),
-            padding: globalPadding,
-            child: Column(
-              children: [
-                Text(
-                  'Fat',
-                  style: TextStyle(fontSize: 15, color: ColorsProvider.color_1, fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  '${(fat * 10).round() / 10}',
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: ColorsProvider.color_3,
-                    fontWeight: FontWeight.bold,
-                  ),
-                )
-              ],
-            ),
-          ),
-          Container(
-            width: 120,
-            decoration: BoxDecoration(
-              //   border: borderBorder,
-              color: ColorsProvider.color_10,
-              borderRadius: globalRadius, // Zaoblení rohů
-            ),
-            padding: globalPadding,
-            child: Column(
-              children: [
-                Text(
-                  'Fiber',
-                  style: TextStyle(fontSize: 15, color: ColorsProvider.color_1, fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  '${(fiber * 10).round() / 10}',
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: ColorsProvider.color_3,
-                    fontWeight: FontWeight.bold,
-                  ),
-                )
-              ],
-            ),
-          ),
+          _categoryWidget(globalRadius, "Fat", ((fat * 10).round() / 10) % 1 == 0 ? fat.toStringAsFixed(0) : fat.toStringAsFixed(1), 130),
+          _categoryWidget(globalRadius, "Fiber", ((fiber * 10).round() / 10) % 1 == 0 ? fiber.toStringAsFixed(0) : fiber.toStringAsFixed(1), 130),
         ],
       ),
     ],
+  );
+}
+
+Widget _categoryWidget(BorderRadiusGeometry globalRadius, String categoryText, String categoryValue, double width) {
+  return Container(
+    width: width,
+    decoration: BoxDecoration(
+      //   border: borderBorder,
+      color: ColorsProvider.color_10,
+      borderRadius: globalRadius, // Zaoblení rohů
+    ),
+    padding: const EdgeInsets.fromLTRB(20, 7, 20, 7),
+    child: Column(
+      children: [
+        Text(
+          '$categoryText',
+          style: TextStyle(fontSize: 15, color: ColorsProvider.color_2, fontWeight: FontWeight.bold),
+        ),
+        Text(
+          "${categoryValue}",
+          style: TextStyle(
+            fontSize: 20,
+            color: ColorsProvider.color_3.withAlpha(200),
+            fontWeight: FontWeight.bold,
+          ),
+        )
+      ],
+    ),
   );
 }

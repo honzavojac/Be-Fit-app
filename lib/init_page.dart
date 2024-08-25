@@ -11,6 +11,7 @@ import 'package:kaloricke_tabulky_02/pages/fitnessRecord/fitness_record_page.dar
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/settings.dart';
 import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
+import 'package:kaloricke_tabulky_02/variables.dart';
 import 'package:provider/provider.dart';
 import 'package:kaloricke_tabulky_02/pages/foodAdd/food_page.dart';
 import 'package:kaloricke_tabulky_02/pages/homePage/home_page.dart';
@@ -25,11 +26,11 @@ class InitPage extends StatefulWidget {
 }
 
 UserSupabase? user;
+var controller = PageController(initialPage: 1);
+var pageProvider = 1;
 
 class _InitPageState extends State<InitPage> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  final controller = PageController(initialPage: 1);
-  var pageProvider = 1;
 
   // final List<Widget> _appBars = [
   //   FitnessRecordAppBarCopy(),
@@ -200,7 +201,7 @@ class _InitPageState extends State<InitPage> {
 
             if (sqfliteSplitList.isEmpty) {
               for (var split in supabaseSplitList) {
-                dbFitness.TxnInsertSplit(txn, split.idSplit!, split.nameSplit, split.createdAt!, 0);
+                dbFitness.TxnInsertSplit(txn, split.idSplit!, split.nameSplit, split.createdAt!, split.isActive, 0);
               }
             }
 
@@ -249,7 +250,7 @@ class _InitPageState extends State<InitPage> {
               }
             }
             if (sqfliteUser == null) {
-              dbFitness.TxnInsertUser(txn, supabaseUser);
+              dbFitness.TxnInsertUser(txn, supabaseUser, 0);
             }
           });
           // if (sqfliteFoodList.isEmpty) {
@@ -382,19 +383,20 @@ class _InitPageState extends State<InitPage> {
               Container(
                 height: 50,
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 15),
-                      child: Container(
-                        height: 45,
-                        width: 45,
-                        decoration: BoxDecoration(
-                          color: ColorsProvider.color_3,
-                          borderRadius: BorderRadius.circular(50),
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 8),
+                    // Padding(
+                    //   padding: const EdgeInsets.only(left: 15),
+                    //   child: Container(
+                    //     height: 45,
+                    //     width: 45,
+                    //     decoration: BoxDecoration(
+                    //       color: ColorsProvider.color_3,
+                    //       borderRadius: BorderRadius.circular(50),
+                    //     ),
+                    //   ),
+                    // ),
+                    // SizedBox(width: 8),
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -403,12 +405,12 @@ class _InitPageState extends State<InitPage> {
                           style: TextStyle(
                             color: ColorsProvider.color_8,
                             fontWeight: FontWeight.bold,
-                            fontSize: 20,
+                            fontSize: 25,
                           ),
                         ),
                       ],
                     ),
-                    SizedBox(width: 50),
+                    // SizedBox(width: 50),
                   ],
                 ),
               ),
@@ -441,10 +443,15 @@ class _InitPageState extends State<InitPage> {
               onPageChanged: (index) {
                 setState(() {
                   pageProvider = index;
+                  if (index != 0) {
+                    // Adjust the index if needed
+                  }
                 });
               },
               children: [
-                switchButton == true ? FitnessRecordScreen() : FitnessRecordScreenCopy(),
+                // switchButton == true ?
+                //  FitnessRecordScreen() :
+                FitnessRecordScreenCopy(),
                 HomeScreen(),
                 FoodRecordScreen(),
               ],

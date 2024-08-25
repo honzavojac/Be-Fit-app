@@ -53,6 +53,9 @@ class _AddSplitBoxCopyState extends State<AddSplitBoxCopy> {
 
     splits = widget.splits;
     splits.sort((a, b) => a.supabaseIdSplit!.compareTo(b.supabaseIdSplit!));
+    for (var element in splits) {
+      print(element.printSplit());
+    }
     setState(() {});
   }
 
@@ -93,9 +96,9 @@ class _AddSplitBoxCopyState extends State<AddSplitBoxCopy> {
                                 padding: const EdgeInsets.symmetric(horizontal: 15),
                                 child: TextField(
                                   decoration: InputDecoration(
-                                    labelText: 'Name of MySplit:',
+                                    labelText: 'Name of split:',
                                     labelStyle: TextStyle(
-                                      color: ColorsProvider.color_1,
+                                      color: ColorsProvider.color_2,
                                     ),
                                     enabledBorder: UnderlineInputBorder(
                                       borderSide: BorderSide(
@@ -115,12 +118,12 @@ class _AddSplitBoxCopyState extends State<AddSplitBoxCopy> {
                                     ),
                                     hintText: 'Enter name of split:',
                                     hintStyle: TextStyle(
-                                      color: ColorsProvider.color_1,
+                                      color: ColorsProvider.color_2,
                                       fontSize: 15,
                                     ),
                                   ),
                                   controller: _textController,
-                                  style: TextStyle(color: ColorsProvider.color_1),
+                                  style: TextStyle(color: ColorsProvider.color_2),
                                 ),
                               ),
                             ),
@@ -165,37 +168,68 @@ class _AddSplitBoxCopyState extends State<AddSplitBoxCopy> {
                   child: TextButton(
                     onPressed: () async {
                       if (_textController.text.trim().isNotEmpty) {
-                        try {
-                          DateTime now = DateTime.now();
-                          int newSupabaseIdSplit = 1 + (splits.isNotEmpty ? splits.last.supabaseIdSplit! : 0);
-                          List<SelectedMuscle> selectedMuscles = [];
-                          for (var element in splits) {
-                            for (var element in element.selectedMuscle!) {
-                              selectedMuscles.add(element);
-                            }
+                        int isCheckTrueLength = 0;
+                        for (var i = 0; i < isCheckedList.length; i++) {
+                          if (isCheckedList[i] == true) {
+                            isCheckTrueLength++;
                           }
-                          int newSupabaseIdSelectedIdMuscle = 1 + (selectedMuscles.isNotEmpty ? selectedMuscles.last.supabaseIdSelectedMuscle! : 0);
-
-                          await dbFitness.InsertSplit(newSupabaseIdSplit, _textController.text.trim(), now.toString(), 1);
-
-                          for (var i = 0; i < isCheckedList.length; i++) {
-                            if (isCheckedList[i] == true) {
-                              int supabaseIdMuscle = muscles[i].supabaseIdMuscle!;
-                              // print(supabaseIdMuscle);
-                              await dbFitness.InsertSelectedMuscle(newSupabaseIdSelectedIdMuscle, newSupabaseIdSplit, supabaseIdMuscle, 1);
-                              newSupabaseIdSelectedIdMuscle++;
+                        }
+                        if (isCheckTrueLength != 0) {
+                          try {
+                            DateTime now = DateTime.now();
+                            int newSupabaseIdSplit = 1 + (splits.isNotEmpty ? splits.last.supabaseIdSplit! : 0);
+                            List<SelectedMuscle> selectedMuscles = [];
+                            for (var element in splits) {
+                              for (var element in element.selectedMuscle!) {
+                                selectedMuscles.add(element);
+                              }
                             }
-                          }
-                        } on Exception catch (e) {
-                          print("chyba: $e");
-                        }
+                            int newSupabaseIdSelectedIdMuscle = 1 + (selectedMuscles.isNotEmpty ? selectedMuscles.last.supabaseIdSelectedMuscle! : 0);
 
-                        List<SelectedMuscle> a = await dbFitness.SelectSelectedMuscles();
-                        for (var element in a) {
-                          print(element.musclesIdMuscle);
+                            await dbFitness.InsertSplit(newSupabaseIdSplit, _textController.text.trim(), now.toString(), true, 1);
+
+                            for (var i = 0; i < isCheckedList.length; i++) {
+                              if (isCheckedList[i] == true) {
+                                int supabaseIdMuscle = muscles[i].supabaseIdMuscle!;
+                                // print(supabaseIdMuscle);
+                                await dbFitness.InsertSelectedMuscle(newSupabaseIdSelectedIdMuscle, newSupabaseIdSplit, supabaseIdMuscle, 1);
+                                newSupabaseIdSelectedIdMuscle++;
+                              }
+                            }
+                          } on Exception catch (e) {
+                            print("chyba: $e");
+                          }
+
+                          List<SelectedMuscle> a = await dbFitness.SelectSelectedMuscles();
+                          for (var element in a) {
+                            print(element.musclesIdMuscle);
+                          }
+                          widget.loadParent();
+                          Navigator.of(context).pop();
+                        } else {
+                          AnimationController localAnimationController;
+
+                          showTopSnackBar(
+                            Overlay.of(context),
+
+                            animationDuration: Duration(milliseconds: 1500),
+                            Container(
+                              height: 50,
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 25, right: 25),
+                                child: CustomSnackBar.error(
+                                  message: "You have not selected any muscle",
+                                ),
+                              ),
+                            ),
+                            // persistent: true,
+                            onAnimationControllerInit: (controller) => localAnimationController = controller,
+                            displayDuration: Duration(microseconds: 750),
+                            dismissType: DismissType.onSwipe,
+                            dismissDirection: [DismissDirection.endToStart],
+                            reverseAnimationDuration: Duration(milliseconds: 250),
+                          );
                         }
-                        widget.loadParent();
-                        Navigator.of(context).pop();
                       } else {
                         // ignore: unused_local_variable
                         AnimationController localAnimationController;
@@ -252,7 +286,7 @@ class _AddSplitBoxCopyState extends State<AddSplitBoxCopy> {
                     height: 35,
                     child: ElevatedButton(
                       style: ButtonStyle(
-                        backgroundColor: MaterialStatePropertyAll(
+                        backgroundColor: WidgetStatePropertyAll(
                           ColorsProvider.color_2,
                         ),
                       ),

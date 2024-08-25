@@ -222,6 +222,7 @@ class MySplit {
   List<SelectedMuscle>? selectedMuscle;
   List<SplitStartedCompleted>? splitStartedCompleted;
   int? idUser;
+  bool isActive;
 
   MySplit({
     this.idSplit,
@@ -232,6 +233,7 @@ class MySplit {
     this.selectedMuscle,
     this.splitStartedCompleted,
     this.idUser,
+    required this.isActive,
   });
 
   factory MySplit.fromJson(Map<String, dynamic> json) {
@@ -253,6 +255,7 @@ class MySplit {
       action: json['action'] ?? 0,
       selectedMuscle: selectedMusclesList,
       splitStartedCompleted: splitStartedCompletedList,
+      isActive: json['is_active'] is bool ? json['is_active'] : (json['is_active'] as int) != 0,
     );
   }
   Map<String, dynamic> toJson() {
@@ -265,6 +268,7 @@ class MySplit {
       'created_at': createdAt ?? formattedDate,
       'users_id_user': idUser,
       'selected_muscles': selectedMuscle,
+      'is_active': isActive,
       // 'action': action,
       // 'supabase_id_split': supabaseIdSplit,
     };
@@ -278,6 +282,7 @@ class MySplit {
       'id_split': idSplit,
       'name_split': nameSplit,
       'created_at': createdAt ?? formattedDate,
+      'is_active': isActive
       // 'users_id_user': idUser,
       // 'selected_muscles': selectedMuscle,
       // 'action': action,
@@ -286,7 +291,7 @@ class MySplit {
   }
 
   printSplit() {
-    print("id_split: $idSplit *** name_split: $nameSplit *** created_at: $createdAt ***  action: $action *** supabase_id_split: $supabaseIdSplit *** selected_muscles: $selectedMuscle");
+    print("id_split: $idSplit *** is_active: $isActive *** name_split: $nameSplit *** created_at: $createdAt ***  action: $action *** supabase_id_split: $supabaseIdSplit *** selected_muscles: $selectedMuscle");
   }
 }
 
@@ -434,6 +439,9 @@ class SplitStartedCompleted {
   int? action;
   List<ExerciseData>? exerciseData;
   int? idUser;
+  String? name;
+  int? numberOfSets = 0;
+  int? totalWorkVolume = 0;
 
   SplitStartedCompleted({
     this.idStartedCompleted,
@@ -445,6 +453,9 @@ class SplitStartedCompleted {
     this.action = 0,
     this.exerciseData,
     this.idUser,
+    this.name,
+    this.numberOfSets,
+    this.totalWorkVolume,
   });
 
   factory SplitStartedCompleted.fromJson(Map<String, dynamic> json) {
@@ -509,6 +520,7 @@ class UserSupabase {
   String email;
   String? dateOfBirth; // Optional, can be null
   String? country; // Optional, can be null
+  int? action;
   List<Muscle>? muscles; // Optional, can be null
   List<MySplit>? split; // Optional, can be null
 
@@ -518,6 +530,7 @@ class UserSupabase {
     required this.email,
     this.dateOfBirth,
     this.country,
+    this.action,
     this.muscles,
     this.split,
   });
@@ -536,6 +549,7 @@ class UserSupabase {
       email: json['email'],
       dateOfBirth: json['birth_date'], // Null check not needed, it's optional
       country: json['country'], // Optional field for country
+      action: json['action'],
       muscles: musclesList,
       split: splitList,
     );
@@ -549,6 +563,7 @@ class UserSupabase {
       'email': email,
       'birth_date': dateOfBirth, // Include date of birth if available
       'country': country, // Include country if available
+      'action': action,
       'muscles': muscles?.map((e) => e.toJson()).toList(), // Convert each Muscle to JSON
       'split': split?.map((e) => e.toJson()).toList(), // Convert each MySplit to JSON
     };

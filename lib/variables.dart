@@ -7,8 +7,9 @@ List<Map<String, String>> languages = [
   {'code': 'IT', 'name': 'Italian'},
   {'code': 'PL', 'name': 'Polish'},
   {'code': 'UA', 'name': 'Ukrainian'},
-  {'code': 'US', 'name': 'English (US)'},
   {'code': 'EN', 'name': 'English (UK)'},
 ];
 
 String? selectedCountry;
+// bool? hasToOpenDropdown = false;
+bool darkTheme = true;

@@ -31,7 +31,7 @@ class _myDataboxesState extends State<myDataboxes> {
             ],
             decoration: const InputDecoration(
                 labelText: 'Serving size',
-                labelStyle: TextStyle(color: ColorsProvider.color_1),
+                labelStyle: TextStyle(color: ColorsProvider.color_2),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.all(
                     Radius.circular(12),
@@ -52,7 +52,7 @@ class _myDataboxesState extends State<myDataboxes> {
                 ),
                 contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 15),
                 hintText: 'Enter value:',
-                hintStyle: TextStyle(color: ColorsProvider.color_1, fontSize: 15) // zobrazí se pokud je textové pole prázdné
+                hintStyle: TextStyle(color: ColorsProvider.color_2, fontSize: 15) // zobrazí se pokud je textové pole prázdné
                 //  icon: Icon(Icons.text_fields), //
                 ),
             onChanged: (input) {

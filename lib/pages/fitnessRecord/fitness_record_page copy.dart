@@ -52,7 +52,7 @@ class _FitnessRecordScreenCopyState extends State<FitnessRecordScreenCopy> {
       var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
       foundActiveSplit = false;
       exercisesData = await dbFitness.SelectAllData();
-
+      exercisesData.removeWhere((split) => !split.isActive);
       int i = 0;
       activeSplit:
       for (var split in exercisesData) {
@@ -91,11 +91,11 @@ class _FitnessRecordScreenCopyState extends State<FitnessRecordScreenCopy> {
       setState(() {});
     } on Exception catch (e) {
       print(e);
-      // TODO
     }
   }
 
   Future<void> refresh() async {
+    print("*******************************refresh*******************************");
     selectedSplit = 0;
     loadData();
     setState(() {});
@@ -109,6 +109,9 @@ class _FitnessRecordScreenCopyState extends State<FitnessRecordScreenCopy> {
   Widget build(BuildContext context) {
     var variablesProvider = Provider.of<VariablesProvider>(context);
     var dbFitness = Provider.of<FitnessProvider>(context);
+    if (selectedSplit > exercisesData.length) {
+      selectedSplit = 0;
+    }
     if (exercisesData.isNotEmpty) {
       supabaseIdSplit = exercisesData[selectedSplit].supabaseIdSplit!;
     }
@@ -478,6 +481,7 @@ class _FitnessRecordScreenCopyState extends State<FitnessRecordScreenCopy> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         CustomAppBar(
+                          refresh: refresh,
                           loadParent: loadData,
                           foundActiveSplit: foundActiveSplit,
                         )
@@ -493,6 +497,7 @@ class _FitnessRecordScreenCopyState extends State<FitnessRecordScreenCopy> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         CustomAppBar(
+                          refresh: refresh,
                           loadParent: loadData,
                           foundActiveSplit: foundActiveSplit,
                         ),
@@ -507,11 +512,11 @@ class _FitnessRecordScreenCopyState extends State<FitnessRecordScreenCopy> {
 }
 
 class CustomAppBar extends StatefulWidget {
-  final Function()? refresh;
+  final Function() refresh;
   final Function() loadParent;
   final bool foundActiveSplit;
   CustomAppBar({
-    this.refresh,
+    required this.refresh,
     required this.loadParent,
     required this.foundActiveSplit,
   });
@@ -620,7 +625,7 @@ class _FitnessRecordDropdownState extends State<FitnessRecordDropdown> {
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                color: ColorsProvider.color_1,
+                                color: ColorsProvider.color_2,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -645,7 +650,7 @@ class _FitnessRecordDropdownState extends State<FitnessRecordDropdown> {
                     iconStyleData: const IconStyleData(
                       icon: Icon(Icons.keyboard_arrow_down_outlined),
                       iconSize: 17,
-                      iconEnabledColor: ColorsProvider.color_1,
+                      iconEnabledColor: ColorsProvider.color_2,
                     ),
                     dropdownStyleData: DropdownStyleData(
                       maxHeight: 200,

@@ -621,8 +621,8 @@ class __deleteSplitState extends State<_deleteSplit> {
                             ),
                             ElevatedButton(
                               style: ButtonStyle(
-                                backgroundColor: MaterialStatePropertyAll(ColorsProvider.color_8),
-                                foregroundColor: MaterialStatePropertyAll(
+                                backgroundColor: WidgetStatePropertyAll(ColorsProvider.color_8),
+                                foregroundColor: WidgetStatePropertyAll(
                                   ColorsProvider.color_1,
                                 ),
                               ),
@@ -689,8 +689,8 @@ Widget _deleteSplit() {
                           ),
                           ElevatedButton(
                             style: ButtonStyle(
-                              backgroundColor: MaterialStatePropertyAll(ColorsProvider.color_8),
-                              foregroundColor: MaterialStatePropertyAll(
+                              backgroundColor: WidgetStatePropertyAll(ColorsProvider.color_8),
+                              foregroundColor: WidgetStatePropertyAll(
                                 ColorsProvider.color_1,
                               ),
                             ),

@@ -47,7 +47,7 @@ class _changeDataBoxServingSizeState extends State<changeDataBoxServingSize> {
                       value: item,
                       child: Text(
                         item,
-                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: ColorsProvider.color_1),
+                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: ColorsProvider.color_2),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ))
@@ -77,7 +77,7 @@ class _changeDataBoxServingSizeState extends State<changeDataBoxServingSize> {
                 Icons.keyboard_arrow_down_outlined,
               ),
               iconSize: 17,
-              iconEnabledColor: ColorsProvider.color_1,
+              iconEnabledColor: ColorsProvider.color_2,
             ),
             dropdownStyleData: DropdownStyleData(
               maxHeight: 200,

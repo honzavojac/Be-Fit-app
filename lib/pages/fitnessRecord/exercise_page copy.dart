@@ -286,7 +286,7 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
             children: [
               Text(
                 '${nameOfExercise}',
-                style: TextStyle(fontWeight: FontWeight.bold, color: ColorsProvider.color_1),
+                style: TextStyle(fontWeight: FontWeight.bold, color: ColorsProvider.color_2),
               ),
             ],
           ),
@@ -361,7 +361,7 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
                                       Text(
                                         'Swipe up',
                                         style: TextStyle(
-                                          color: ColorsProvider.color_1,
+                                          color: ColorsProvider.color_2,
                                           fontSize: 20,
                                           fontWeight: FontWeight.bold,
                                         ),
@@ -372,7 +372,7 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
                                       Icon(
                                         Icons.arrow_upward_rounded,
                                         size: 25,
-                                        color: ColorsProvider.color_1,
+                                        color: ColorsProvider.color_2,
                                       ),
                                     ],
                                   ),
@@ -433,7 +433,7 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
               children: [
                 Text(
                   '${nameOfExercise}',
-                  style: TextStyle(fontWeight: FontWeight.bold, color: ColorsProvider.color_1),
+                  style: TextStyle(fontWeight: FontWeight.bold, color: ColorsProvider.color_2),
                 ),
                 // ElevatedButton(
                 //   onPressed: () async {
@@ -858,7 +858,7 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
                                         Text(
                                           'Swipe up',
                                           style: TextStyle(
-                                            color: ColorsProvider.color_1,
+                                            color: ColorsProvider.color_2,
                                             fontSize: 20,
                                             fontWeight: FontWeight.bold,
                                           ),
@@ -869,7 +869,7 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
                                         Icon(
                                           Icons.arrow_upward_rounded,
                                           size: 25,
-                                          color: ColorsProvider.color_1,
+                                          color: ColorsProvider.color_2,
                                         ),
                                       ],
                                     ),
