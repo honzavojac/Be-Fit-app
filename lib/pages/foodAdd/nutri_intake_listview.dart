@@ -1,6 +1,8 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
 import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
+import 'package:kaloricke_tabulky_02/init_page.dart';
 import 'package:kaloricke_tabulky_02/pages/foodAdd/food_page.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
@@ -56,7 +58,7 @@ class _NutriIntakeListviewState extends State<NutriIntakeListview> {
                         },
                         child: Container(
                           decoration: BoxDecoration(
-                            color: ColorsProvider.color_2,
+                            color: ColorsProvider.getColor2(context),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           // height: 80,
@@ -68,7 +70,7 @@ class _NutriIntakeListviewState extends State<NutriIntakeListview> {
                                 children: [
                                   Text(
                                     food.name.toString(),
-                                    style: TextStyle(fontSize: 23, fontWeight: FontWeight.w500, color: ColorsProvider.color_8),
+                                    style: TextStyle(fontSize: 23, fontWeight: FontWeight.w500, color: ColorsProvider.getColor8(context)),
                                   )
                                 ],
                               ),
@@ -78,8 +80,8 @@ class _NutriIntakeListviewState extends State<NutriIntakeListview> {
                                   SizedBox(
                                     width: 60,
                                   ),
-                                  customText("Weight", food.weight!.toDouble()),
-                                  customText("Kcal", food.kcal),
+                                  customText("Weight", food.weight!.toDouble(), context),
+                                  customText("Kcal", food.kcal, context),
                                 ],
                               ),
                             ],
@@ -120,13 +122,13 @@ class _NutriIntakeListviewState extends State<NutriIntakeListview> {
                                                           height: 40,
                                                           width: 100,
                                                           decoration: BoxDecoration(
-                                                            color: ColorsProvider.color_2,
+                                                            color: ColorsProvider.getColor2(context),
                                                             borderRadius: BorderRadius.circular(15),
                                                           ),
                                                           child: Center(
                                                             child: Text(
                                                               'Cancel',
-                                                              style: TextStyle(color: ColorsProvider.color_8, fontWeight: FontWeight.bold),
+                                                              style: TextStyle(color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold),
                                                             ),
                                                           ),
                                                         ),
@@ -184,7 +186,7 @@ class _NutriIntakeListviewState extends State<NutriIntakeListview> {
                                           // ScaffoldMessenger.of(context).showSnackBar(
                                           //   SnackBar(
                                           //     duration: Duration(seconds: 5),
-                                          //     backgroundColor: ColorsProvider.color_2,
+                                          //     backgroundColor: ColorsProvider.getColor2(context),
                                           //     content: Container(
                                           //       height: 30,
                                           //       child: Row(
@@ -196,7 +198,7 @@ class _NutriIntakeListviewState extends State<NutriIntakeListview> {
                                           //           ),
                                           //           ElevatedButton(
                                           //             style: ButtonStyle(
-                                          //               backgroundColor: WidgetStatePropertyAll(ColorsProvider.color_8),
+                                          //               backgroundColor: WidgetStatePropertyAll(ColorsProvider.getColor8(context)),
                                           //               foregroundColor: WidgetStatePropertyAll(
                                           //                 ColorsProvider.color_1,
                                           //               ),
@@ -222,7 +224,7 @@ class _NutriIntakeListviewState extends State<NutriIntakeListview> {
                                           child: Center(
                                             child: Icon(
                                               Icons.close_rounded,
-                                              color: ColorsProvider.color_8,
+                                              color: ColorsProvider.getColor8(context),
                                               size: 30,
                                             ),
                                           ),
@@ -253,19 +255,23 @@ class _NutriIntakeListviewState extends State<NutriIntakeListview> {
   }
 }
 
-Widget customText(String itemString, double? itemValue) {
+Widget customText(
+  String itemString,
+  double? itemValue,
+  BuildContext context,
+) {
   itemValue = (itemValue! * 100).round() / 100;
-  TextStyle textStyle = TextStyle(fontSize: 19, fontWeight: FontWeight.w600, color: ColorsProvider.color_8);
-  TextStyle textStyleKcal = TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: ColorsProvider.color_8);
+  TextStyle textStyle = TextStyle(fontSize: 19, fontWeight: FontWeight.w600, color: ColorsProvider.getColor8(context));
+  TextStyle textStyleKcal = TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: ColorsProvider.getColor8(context));
 
-  TextStyle numberStyle = TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: ColorsProvider.color_8);
-  TextStyle gStyle = TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: ColorsProvider.color_8);
+  TextStyle numberStyle = TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: ColorsProvider.getColor8(context));
+  TextStyle gStyle = TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: ColorsProvider.getColor8(context));
   return Container(
     width: 150,
     child: Row(
       children: [
         Text(
-          "$itemString: ",
+          "${itemString == "Weight" ? itemString.toLowerCase().tr() : itemString}: ",
           style: itemString != "Kcal" ? textStyle : textStyleKcal,
         ),
         Text(

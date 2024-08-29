@@ -45,9 +45,9 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ColorsProvider.color_2,
+      backgroundColor: ColorsProvider.getColor2(context),
       appBar: AppBar(
-        backgroundColor: ColorsProvider.color_2,
+        backgroundColor: ColorsProvider.getColor2(context),
       ),
       body: SafeArea(
         child: Center(
@@ -63,7 +63,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                   height: 60,
                 ),
                 Container(
-                  // color: ColorsProvider.color_8,
+                  // color: ColorsProvider.getColor8(context),
                   child: Text(
                     "Resset your password",
                     style: TextStyle(
@@ -76,7 +76,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                   height: 30,
                 ),
                 Container(
-                  // color: ColorsProvider.color_8,
+                  // color: ColorsProvider.getColor8(context),
                   child: Text(
                     "Enter Yourt Email and we will send you a password reset link",
                     textAlign: TextAlign.center,
@@ -94,7 +94,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.grey[800],
-                      border: Border.all(color: ColorsProvider.color_8, width: 4),
+                      border: Border.all(color: ColorsProvider.getColor8(context), width: 4),
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: Padding(
@@ -104,10 +104,10 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                         decoration: InputDecoration(
                           border: InputBorder.none,
                           hintText: "Email",
-                          hintStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: ColorsProvider.color_2),
+                          hintStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: ColorsProvider.getColor2(context)),
                         ),
-                        cursorColor: ColorsProvider.color_2,
-                        style: TextStyle(color: ColorsProvider.color_2),
+                        cursorColor: ColorsProvider.getColor2(context),
+                        style: TextStyle(color: ColorsProvider.getColor2(context)),
                       ),
                     ),
                   ),
@@ -122,7 +122,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                     child: Container(
                       height: 55,
                       decoration: BoxDecoration(
-                        border: Border.all(color: ColorsProvider.color_8, width: 3),
+                        border: Border.all(color: ColorsProvider.getColor8(context), width: 3),
                         color: ColorsProvider.color_9,
                         borderRadius: BorderRadius.circular(15),
                       ),
@@ -130,7 +130,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                         child: Text(
                           "Reset password",
                           style: TextStyle(
-                            color: ColorsProvider.color_8,
+                            color: ColorsProvider.getColor8(context),
                             fontSize: 25,
                             fontWeight: FontWeight.bold,
                           ),

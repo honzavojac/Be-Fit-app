@@ -47,7 +47,7 @@ class _changeDataBoxServingSizeState extends State<changeDataBoxServingSize> {
                       value: item,
                       child: Text(
                         item,
-                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: ColorsProvider.color_2),
+                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: ColorsProvider.getColor2(context)),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ))
@@ -66,18 +66,18 @@ class _changeDataBoxServingSizeState extends State<changeDataBoxServingSize> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
-                  color: ColorsProvider.color_2,
+                  color: ColorsProvider.getColor2(context),
                   width: 0.5,
                 ),
               ),
               //elevation: 2,
             ),
-            iconStyleData: const IconStyleData(
+            iconStyleData: IconStyleData(
               icon: Icon(
                 Icons.keyboard_arrow_down_outlined,
               ),
               iconSize: 17,
-              iconEnabledColor: ColorsProvider.color_2,
+              iconEnabledColor: ColorsProvider.getColor2(context),
             ),
             dropdownStyleData: DropdownStyleData(
               maxHeight: 200,

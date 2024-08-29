@@ -1,10 +1,13 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
 import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
+import 'package:kaloricke_tabulky_02/init_page.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
+import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:provider/provider.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
@@ -47,7 +50,7 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
     var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
     measurements = await dbFitness.SelectMeasurements();
     measurements.sort(
-      (a, b) => b.idBodyMeasurements!.compareTo(a.idBodyMeasurements!), // je to tak protože ukládám jen yyyy-MM-dd a tam neurčím přesnou pozici
+      (a, b) => b.createdAt!.compareTo(a.createdAt!),
     );
     show = true;
     setState(() {});
@@ -123,8 +126,8 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
       appBar: AppBar(
         centerTitle: true,
         title: Text(
-          "Measurements",
-          style: TextStyle(color: ColorsProvider.color_2, fontWeight: FontWeight.bold),
+          "measurement".tr(),
+          style: TextStyle(color: ColorsProvider.getColor2(context), fontWeight: FontWeight.bold),
         ),
       ),
       body: Stack(
@@ -140,8 +143,8 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          TextFieldWidget("Weight", weightTextEditingController),
-                          TextFieldWidget("Height", heightTextEditingController),
+                          TextFieldWidget("weight".tr(), weightTextEditingController),
+                          TextFieldWidget("height".tr(), heightTextEditingController),
                         ],
                       ),
                       SizedBox(
@@ -151,11 +154,11 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
                         height: 40,
                         child: Center(
                           child: Text(
-                            "Circumference",
+                            "circumference".tr(),
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 23,
-                              color: ColorsProvider.color_2,
+                              color: ColorsProvider.getColor2(context),
                             ),
                           ),
                         ),
@@ -163,73 +166,95 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
                       SizedBox(
                         height: 30,
                       ),
-                      TextFieldWidget("Abdominal", abdominalCircumferenceTextEditingController),
+                      TextFieldWidget("abdominal".tr(), abdominalCircumferenceTextEditingController),
                       SizedBox(
                         height: 20,
                       ),
-                      TextFieldWidget("Chest", chestCircumferenceTextEditingController),
+                      TextFieldWidget("chest".tr(), chestCircumferenceTextEditingController),
                       SizedBox(
                         height: 20,
                       ),
-                      TextFieldWidget("Waist", waistCircumferenceTextEditingController),
+                      TextFieldWidget("waist".tr(), waistCircumferenceTextEditingController),
                       SizedBox(
                         height: 20,
                       ),
-                      TextFieldWidget("Thigh", thighCircumferenceTextEditingController),
+                      TextFieldWidget("thingh".tr(), thighCircumferenceTextEditingController),
                       SizedBox(
                         height: 20,
                       ),
-                      TextFieldWidget("Neck", neckCircumferenceTextEditingController),
+                      TextFieldWidget("neck".tr(), neckCircumferenceTextEditingController),
                       SizedBox(
                         height: 20,
                       ),
-                      TextFieldWidget("Biceps", bicepsCircumferenceTextEditingController),
+                      TextFieldWidget("biceps".tr(), bicepsCircumferenceTextEditingController),
                       SizedBox(
                         height: 50,
                       ),
                       Center(
-                        child: Container(
-                          width: 200,
-                          height: 50,
-                          child: ElevatedButton(
-                            onPressed: () async {
-                              bool success = await processMeasurements();
+                        child: GestureDetector(
+                          onTap: () async {
+                            var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
+                            var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false);
 
-                              if (success) {
-                                weightTextEditingController.clear();
-                                weightTextEditingController.clear();
-                                heightTextEditingController.clear();
-                                abdominalCircumferenceTextEditingController.clear();
-                                chestCircumferenceTextEditingController.clear();
-                                waistCircumferenceTextEditingController.clear();
-                                thighCircumferenceTextEditingController.clear();
-                                neckCircumferenceTextEditingController.clear();
-                                bicepsCircumferenceTextEditingController.clear();
-                              } else {
-                                AnimationController localAnimationController;
-                                showTopSnackBar(
-                                  Overlay.of(context),
+                            bool success = await processMeasurements();
 
-                                  animationDuration: Duration(milliseconds: 1500),
-                                  Container(
-                                    height: 50,
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(left: 25, right: 25),
-                                      child: CustomSnackBar.error(
-                                        message: "All boxes are empty",
-                                      ),
+                            if (success) {
+                              weightTextEditingController.clear();
+                              weightTextEditingController.clear();
+                              heightTextEditingController.clear();
+                              abdominalCircumferenceTextEditingController.clear();
+                              chestCircumferenceTextEditingController.clear();
+                              waistCircumferenceTextEditingController.clear();
+                              thighCircumferenceTextEditingController.clear();
+                              neckCircumferenceTextEditingController.clear();
+                              bicepsCircumferenceTextEditingController.clear();
+                              await dbFitness.SaveToSupabaseAndOrderSqlite(dbSupabase);
+                            } else {
+                              AnimationController localAnimationController;
+                              showTopSnackBar(
+                                Overlay.of(context),
+
+                                animationDuration: Duration(milliseconds: 1500),
+                                Container(
+                                  height: 50,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 25, right: 25),
+                                    child: CustomSnackBar.error(
+                                      message: "error_all_boxes_are_empty".tr(),
                                     ),
                                   ),
-                                  // persistent: true,
-                                  onAnimationControllerInit: (controller) => localAnimationController = controller,
-                                  displayDuration: Duration(microseconds: 750),
-                                  dismissType: DismissType.onSwipe,
-                                  dismissDirection: [DismissDirection.endToStart],
-                                  reverseAnimationDuration: Duration(milliseconds: 250),
-                                );
-                              }
-                            },
-                            child: Text("Save values"),
+                                ),
+                                // persistent: true,
+                                onAnimationControllerInit: (controller) => localAnimationController = controller,
+                                displayDuration: Duration(microseconds: 750),
+                                dismissType: DismissType.onSwipe,
+                                dismissDirection: [DismissDirection.endToStart],
+                                reverseAnimationDuration: Duration(milliseconds: 250),
+                              );
+                            }
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.only(bottom: 0),
+                            child: Container(
+                              width: 170,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                color: ColorsProvider.getColor2(context),
+                                borderRadius: BorderRadius.circular(
+                                  18,
+                                ),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  "save".tr(),
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                    color: ColorsProvider.getColor8(context),
+                                  ),
+                                ),
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -280,9 +305,9 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
-                                    'Swipe up',
+                                    'swipe_up'.tr(),
                                     style: TextStyle(
-                                      color: ColorsProvider.color_2,
+                                      color: ColorsProvider.getColor2(context),
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -293,7 +318,7 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
                                   Icon(
                                     Icons.arrow_upward_rounded,
                                     size: 25,
-                                    color: ColorsProvider.color_2,
+                                    color: ColorsProvider.getColor2(context),
                                   ),
                                 ],
                               ),
@@ -312,7 +337,7 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
                                   height: 180,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(10),
-                                    color: ColorsProvider.color_2,
+                                    color: ColorsProvider.getColor2(context),
                                   ),
                                   child: Column(
                                     children: [
@@ -325,7 +350,7 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
                                           children: [
                                             Text(
                                               "${now}",
-                                              style: TextStyle(color: ColorsProvider.color_8, fontWeight: FontWeight.bold, fontSize: 20),
+                                              style: TextStyle(color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold, fontSize: 20),
                                             )
                                           ],
                                         ),
@@ -346,11 +371,11 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
                                                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                                       children: [
                                                         Text(
-                                                          "Weight: ${measurement.weight ?? ""}",
+                                                          "${"weight".tr()}: ${measurement.weight ?? ""}",
                                                           style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
                                                         ),
                                                         Text(
-                                                          "Height: ${measurement.height ?? ""}",
+                                                          "${"height".tr()}: ${measurement.height ?? ""}",
                                                           style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
                                                         ),
                                                       ],
@@ -362,7 +387,7 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
                                                     Row(
                                                       children: [
                                                         Text(
-                                                          "Circumference",
+                                                          "circumference".tr(),
                                                           style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w400),
                                                         )
                                                       ],
@@ -378,15 +403,15 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
                                                                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                                                 children: [
                                                                   Text(
-                                                                    "Abdominal: ${measurement.abdominalCircumference ?? ""}",
+                                                                    "${"abdominal".tr()}: ${measurement.abdominalCircumference ?? ""}",
                                                                     style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
                                                                   ),
                                                                   Text(
-                                                                    "Chest: ${measurement.chestCircumference ?? ""}",
+                                                                    "${"chest".tr()}: ${measurement.chestCircumference ?? ""}",
                                                                     style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
                                                                   ),
                                                                   Text(
-                                                                    "Waist: ${measurement.waistCircumference ?? ""}",
+                                                                    "${"waist".tr()}: ${measurement.waistCircumference ?? ""}",
                                                                     style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
                                                                   ),
                                                                 ],
@@ -401,15 +426,15 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
                                                                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                                                 children: [
                                                                   Text(
-                                                                    "Thigh: ${measurement.thighCircumference ?? ""}",
+                                                                    "${"thigh".tr()}: ${measurement.thighCircumference ?? ""}",
                                                                     style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
                                                                   ),
                                                                   Text(
-                                                                    "Neck: ${measurement.neckCircumference ?? ""}",
+                                                                    "${"neck".tr()}: ${measurement.neckCircumference ?? ""}",
                                                                     style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
                                                                   ),
                                                                   Text(
-                                                                    "Biceps: ${measurement.bicepsCircumference ?? ""}",
+                                                                    "${"biceps".tr()}: ${measurement.bicepsCircumference ?? ""}",
                                                                     style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
                                                                   ),
                                                                 ],
@@ -451,11 +476,11 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
                   //           decoration: BoxDecoration(
                   //             // borderRadius: BorderRadius.circular(50),
                   //             shape: BoxShape.circle,
-                  //             color: ColorsProvider.color_8,
+                  //             color: ColorsProvider.getColor8(context),
                   //           ),
                   //           child: Icon(
                   //             Icons.add_circle_outline_outlined,
-                  //             color: ColorsProvider.color_2,
+                  //             color: ColorsProvider.getColor2(context),
                   //             size: 50,
                   //           ),
                   //         ),
@@ -485,7 +510,7 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 19,
-            color: ColorsProvider.color_2,
+            color: ColorsProvider.getColor2(context),
           ),
         ),
         category == "Weight" || category == "Height"
@@ -497,7 +522,7 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
                     width: 10,
                   )
                 : SizedBox(
-                    width: 50,
+                    width: 30,
                   ),
         Container(
           height: 50,
@@ -515,16 +540,16 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
                           )
                         : CustomTextInputFormatter(category: category),
               ],
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelStyle: TextStyle(
-                  color: ColorsProvider.color_2,
+                  color: ColorsProvider.getColor2(context),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.all(
                     Radius.circular(12),
                   ),
                   borderSide: BorderSide(
-                    color: ColorsProvider.color_2,
+                    color: ColorsProvider.getColor2(context),
                     width: 0.5,
                   ),
                 ),
@@ -533,7 +558,7 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
                     Radius.circular(12),
                   ),
                   borderSide: BorderSide(
-                    color: ColorsProvider.color_2,
+                    color: ColorsProvider.getColor2(context),
                     width: 2.0,
                   ),
                 ),

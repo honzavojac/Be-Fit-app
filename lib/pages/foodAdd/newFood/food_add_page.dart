@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print, avoid_unnecessary_containers
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
 import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
@@ -121,7 +122,7 @@ class _FoodAddPageState extends State<FoodAddPage> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text('Add new food'),
+            Text('header_new_food'.tr()),
             IconButton(
               onPressed: () {
                 clearControllers();
@@ -155,7 +156,7 @@ class _FoodAddPageState extends State<FoodAddPage> {
                 //   children: [
                 //     Text(
                 //       'Others values',
-                //       style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: ColorsProvider.color_2),
+                //       style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: ColorsProvider.getColor2(context)),
                 //     )
                 //   ],
                 // ),
@@ -182,16 +183,16 @@ class _FoodAddPageState extends State<FoodAddPage> {
                   children: [
                     Container(
                       height: 40,
-                      width: 150,
+                      // width: 150,
                       child: ElevatedButton.icon(
                         onPressed: () async {
                           bool inserted = await insertFood();
                           inserted ? clearControllers() : null;
                         },
                         icon: Icon(Icons.add, size: 30),
-                        label: Text('Add', style: TextStyle(fontWeight: FontWeight.bold)),
+                        label: Text('add_food'.tr(), style: TextStyle(fontWeight: FontWeight.bold)),
                         style: ButtonStyle(
-                          backgroundColor: WidgetStateProperty.all(ColorsProvider.color_2),
+                          backgroundColor: WidgetStateProperty.all(ColorsProvider.getColor2(context)),
                           foregroundColor: WidgetStateProperty.all(ColorsProvider.color_8),
                         ),
                       ),

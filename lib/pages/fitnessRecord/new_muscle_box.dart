@@ -71,7 +71,7 @@ class _NewMuscleBoxState extends State<NewMuscleBox> {
                   width: 220,
                   child: Center(
                     child: TextField(
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: 'Name of Muscle:',
                         labelStyle: TextStyle(
                           color: ColorsProvider.color_1,
@@ -81,7 +81,7 @@ class _NewMuscleBoxState extends State<NewMuscleBox> {
                             Radius.circular(12),
                           ),
                           borderSide: BorderSide(
-                            color: ColorsProvider.color_2,
+                            color: ColorsProvider.getColor2(context),
                             width: 0.5,
                           ),
                         ),
@@ -90,7 +90,7 @@ class _NewMuscleBoxState extends State<NewMuscleBox> {
                             Radius.circular(12),
                           ),
                           borderSide: BorderSide(
-                            color: ColorsProvider.color_2,
+                            color: ColorsProvider.getColor2(context),
                             width: 3.0,
                           ),
                         ),
@@ -123,7 +123,7 @@ class _NewMuscleBoxState extends State<NewMuscleBox> {
                       Navigator.of(context).pop();
                     },
                     style: TextButton.styleFrom(
-                      backgroundColor: ColorsProvider.color_2,
+                      backgroundColor: ColorsProvider.getColor2(context),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.vertical(
                           bottom: Radius.circular(25),
@@ -133,7 +133,7 @@ class _NewMuscleBoxState extends State<NewMuscleBox> {
                     child: Text(
                       'Save',
                       style: TextStyle(
-                        color: ColorsProvider.color_8,
+                        color: ColorsProvider.getColor8(context),
                         fontWeight: FontWeight.bold,
                         fontSize: 20,
                       ),

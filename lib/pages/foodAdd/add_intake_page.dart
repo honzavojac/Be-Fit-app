@@ -1,9 +1,11 @@
 import 'package:diacritic/diacritic.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/date_time_patterns.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
+import 'package:kaloricke_tabulky_02/init_page.dart';
 import 'package:kaloricke_tabulky_02/pages/foodAdd/food_page.dart';
 import 'package:kaloricke_tabulky_02/pages/foodAdd/newFood/change_new_food_box_servingSize.dart';
 import 'package:kaloricke_tabulky_02/pages/homePage/home_page.dart';
@@ -149,7 +151,17 @@ class _AddIntakePageState extends State<AddIntakePage> {
                           ),
                         ),
                       ),
-                      !selectSecondInfoBox ? InfoBox(food, null) : InfoBox(recountedFood, grams.toString()),
+                      !selectSecondInfoBox
+                          ? InfoBox(
+                              food,
+                              null,
+                              context,
+                            )
+                          : InfoBox(
+                              recountedFood,
+                              grams.toString(),
+                              context,
+                            ),
                       Padding(
                         padding: const EdgeInsets.fromLTRB(0, 50, 0, 20),
                         child: Row(
@@ -167,10 +179,11 @@ class _AddIntakePageState extends State<AddIntakePage> {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             inputFoodItems(
-                              "Serving size",
+                              "serving_size".tr(),
                               weightController,
                               130,
                               "numeric",
+                              context,
                               onChanged: (value) {
                                 if (value == "") {
                                   selectSecondInfoBox = false;
@@ -194,8 +207,8 @@ class _AddIntakePageState extends State<AddIntakePage> {
                   child: Center(
                     child: Text(
                       newItem == true
-                          ? "${food.name} will be added to ${selectedDate.toString().replaceRange(0, 8, "").replaceRange(2, null, "")}.${selectedDate.toString().replaceRange(0, 5, "").replaceRange(2, null, "")}.${selectedDate.toString().replaceRange(4, null, "")}  "
-                          : "${food.name} will be updated to ${selectedDate.toString().replaceRange(0, 8, "").replaceRange(2, null, "")}.${selectedDate.toString().replaceRange(0, 5, "").replaceRange(2, null, "")}.${selectedDate.toString().replaceRange(4, null, "")}  ",
+                          ? "${food.name} ${"insert_text".tr()} ${selectedDate.toString().replaceRange(0, 8, "").replaceRange(2, null, "")}.${selectedDate.toString().replaceRange(0, 5, "").replaceRange(2, null, "")}.${selectedDate.toString().replaceRange(4, null, "")}  "
+                          : "${food.name} ${"update_text".tr()} ${selectedDate.toString().replaceRange(0, 8, "").replaceRange(2, null, "")}.${selectedDate.toString().replaceRange(0, 5, "").replaceRange(2, null, "")}.${selectedDate.toString().replaceRange(4, null, "")}  ",
                       style: TextStyle(
                         color: Colors.white.withAlpha(100),
                       ),
@@ -291,7 +304,7 @@ class _AddIntakePageState extends State<AddIntakePage> {
                   width: 170,
                   height: 50,
                   decoration: BoxDecoration(
-                    color: ColorsProvider.color_2,
+                    color: ColorsProvider.getColor2(context),
                     borderRadius: BorderRadius.circular(
                       50,
                     ),
@@ -300,11 +313,11 @@ class _AddIntakePageState extends State<AddIntakePage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        newItem == true ? "Add" : "Update",
+                        newItem == true ? "add_nutri_intake".tr() : "update_nutri_intake".tr(),
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
-                          color: ColorsProvider.color_8,
+                          color: ColorsProvider.getColor8(context),
                         ),
                       ),
                       SizedBox(
@@ -313,7 +326,7 @@ class _AddIntakePageState extends State<AddIntakePage> {
                       newItem == true
                           ? Icon(
                               Icons.add_outlined,
-                              color: ColorsProvider.color_8,
+                              color: ColorsProvider.getColor8(context),
                               size: 35,
                             )
                           : Container(),
@@ -328,13 +341,17 @@ class _AddIntakePageState extends State<AddIntakePage> {
   }
 }
 
-Widget InfoBox(Food food, String? grams) {
+Widget InfoBox(
+  Food food,
+  String? grams,
+  BuildContext context,
+) {
   return Padding(
-    padding: const EdgeInsets.fromLTRB(15, 40, 15, 0),
+    padding: EdgeInsets.fromLTRB(15, 40, 15, 0),
     child: Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
-        color: ColorsProvider.color_2,
+        color: ColorsProvider.getColor2(context),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -344,7 +361,7 @@ Widget InfoBox(Food food, String? grams) {
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  FoodItem("", double.parse((grams ?? 100).toString()), 3),
+                  FoodItem("", double.parse((grams ?? 100).toString()), 3, context),
                 ],
               ),
               Column(
@@ -355,7 +372,7 @@ Widget InfoBox(Food food, String? grams) {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      FoodItem("Kcal", (food.kcal ?? 0), 2),
+                      FoodItem("Kcal", (food.kcal ?? 0), 2, context),
                     ],
                   ),
                 ],
@@ -370,20 +387,20 @@ Widget InfoBox(Food food, String? grams) {
             children: [
               Column(
                 children: [
-                  FoodItem("Protein", (food.protein ?? 0), 1),
+                  FoodItem("protein".tr(), (food.protein ?? 0), 1, context),
                   SizedBox(
                     height: 15,
                   ),
-                  FoodItem("Fat", (food.fat ?? 0), 1),
+                  FoodItem("fat".tr(), (food.fat ?? 0), 1, context),
                 ],
               ),
               Column(
                 children: [
-                  FoodItem("Carbs", (food.carbs ?? 0), 1),
+                  FoodItem("carbs".tr(), (food.carbs ?? 0), 1, context),
                   SizedBox(
                     height: 15,
                   ),
-                  FoodItem("Fiber", (food.fiber ?? 0), 1),
+                  FoodItem("fiber".tr(), (food.fiber ?? 0), 1, context),
                 ],
               ),
             ],
@@ -401,7 +418,8 @@ Widget inputFoodItems(
   String labelText,
   TextEditingController item,
   double size,
-  String keyboard, {
+  String keyboard,
+  BuildContext context, {
   Function(String)? onChanged, // Volitelný parametr
 }) {
   return SizedBox(
@@ -418,30 +436,30 @@ Widget inputFoodItems(
       keyboardType: keyboard == "text" ? TextInputType.text : TextInputType.number,
       decoration: InputDecoration(
         labelText: labelText,
-        labelStyle: const TextStyle(
-          color: ColorsProvider.color_2,
+        labelStyle: TextStyle(
+          color: ColorsProvider.getColor2(context),
         ),
-        enabledBorder: const OutlineInputBorder(
+        enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.all(
             Radius.circular(12),
           ),
           borderSide: BorderSide(
-            color: ColorsProvider.color_2,
+            color: ColorsProvider.getColor2(context),
             width: 0.5,
           ),
         ),
-        focusedBorder: const OutlineInputBorder(
+        focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.all(
             Radius.circular(12),
           ),
           borderSide: BorderSide(
-            color: ColorsProvider.color_2,
+            color: ColorsProvider.getColor2(context),
             width: 3.0,
           ),
         ),
-        contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+        contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 15),
         // hintText: 'Enter name of $latelText:',
-        hintStyle: const TextStyle(color: ColorsProvider.color_2, fontSize: 15), // zobrazí se pokud je textové pole prázdné
+        hintStyle: TextStyle(color: ColorsProvider.getColor2(context), fontSize: 15), // zobrazí se pokud je textové pole prázdné
       ),
       controller: item,
       onChanged: onChanged,
@@ -449,7 +467,7 @@ Widget inputFoodItems(
   );
 }
 
-Widget FoodItem(String category, double? value, int widget) {
+Widget FoodItem(String category, double? value, int widget, BuildContext context) {
   TextStyle textStyle = TextStyle(
     fontSize: widget == 1
         ? 20
@@ -457,7 +475,7 @@ Widget FoodItem(String category, double? value, int widget) {
             ? 25
             : 17,
     fontWeight: FontWeight.bold,
-    color: ColorsProvider.color_8,
+    color: ColorsProvider.getColor8(context),
   );
   return Padding(
     padding: const EdgeInsets.all(8.0),
@@ -472,7 +490,7 @@ Widget FoodItem(String category, double? value, int widget) {
                   style: textStyle,
                 ),
                 SizedBox(
-                  width: 10,
+                  width: 5,
                 ),
                 Text(
                   "${value! % 1 == 0 ? value.toInt() : ((value * 10).round() / 10) % 1 == 0 ? value.round() : value}",
@@ -494,7 +512,7 @@ Widget FoodItem(String category, double? value, int widget) {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                "for ${(value != null && value % 1 == 0) ? value.toInt() : value ?? 100} grams:",
+                "${"for_intake".tr()} ${(value != null && value % 1 == 0) ? value.toInt() : value ?? 100} ${"grams".tr()}:",
                 style: textStyle,
               ),
             ],
@@ -574,8 +592,8 @@ class _SelectFoodCategoryState extends State<SelectFoodCategory> {
                       (String item) => DropdownMenuItem<String>(
                         value: item,
                         child: Text(
-                          item,
-                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: ColorsProvider.color_2),
+                          item.tr(),
+                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: ColorsProvider.getColor2(context)),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
@@ -598,7 +616,7 @@ class _SelectFoodCategoryState extends State<SelectFoodCategory> {
                 },
                 alignment: Alignment.center,
                 style: TextStyle(
-                  // color: ColorsProvider.color_8,
+                  // color: ColorsProvider.getColor8(context),
                   fontWeight: FontWeight.bold,
                   fontSize: 5,
                 ),
@@ -620,7 +638,7 @@ class _SelectFoodCategoryState extends State<SelectFoodCategory> {
                   height: 38,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(width: 0.5, color: ColorsProvider.color_2),
+                    border: Border.all(width: 0.5, color: ColorsProvider.getColor2(context)),
                   ),
                   overlayColor: WidgetStatePropertyAll(Colors.transparent),
                 ),

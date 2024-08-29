@@ -1,6 +1,8 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
+import 'package:kaloricke_tabulky_02/main.dart';
 import 'package:kaloricke_tabulky_02/pages/foodAdd/newFood/food_add_page.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/database/database_provider.dart';
@@ -51,14 +53,14 @@ class _foodMainAddBoxesState extends State<foodMainAddBoxes> {
       SizedBox(
         height: 50,
       ),
-      Center(child: inputFoodItems("Name of food", widget.nameController, 330, "text")),
+      Center(child: inputFoodItems("name_of_food".tr(), widget.nameController, 330, "text")),
       SizedBox(
         height: 40,
       ),
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          inputFoodItems("Serving size", widget.weightController, 150, "numeric"),
+          inputFoodItems("serving_size".tr(), widget.weightController, 150, "numeric"),
           changeNewFoodServingSize(
             quantity: widget.quantity,
           ),
@@ -79,8 +81,8 @@ class _foodMainAddBoxesState extends State<foodMainAddBoxes> {
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          inputFoodItems("Protein", widget.proteinController, 150, "numeric"),
-          inputFoodItems("Carbs", widget.carbsController, 150, "numeric"),
+          inputFoodItems("protein".tr(), widget.proteinController, 150, "numeric"),
+          inputFoodItems("carbs".tr(), widget.carbsController, 150, "numeric"),
         ],
       ),
       const SizedBox(
@@ -89,8 +91,8 @@ class _foodMainAddBoxesState extends State<foodMainAddBoxes> {
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          inputFoodItems("Fat", widget.fatsController, 150, "numeric"),
-          inputFoodItems("Fiber", widget.fiberController, 150, "numeric"),
+          inputFoodItems("fat".tr(), widget.fatsController, 150, "numeric"),
+          inputFoodItems("fiber".tr(), widget.fiberController, 150, "numeric"),
         ],
       ),
     ]);
@@ -107,30 +109,30 @@ class _foodMainAddBoxesState extends State<foodMainAddBoxes> {
         keyboardType: keyboard == "text" ? TextInputType.text : TextInputType.numberWithOptions(),
         decoration: InputDecoration(
           labelText: labelText,
-          labelStyle: const TextStyle(
-            color: ColorsProvider.color_2,
+          labelStyle: TextStyle(
+            color: ColorsProvider.getColor2(context),
           ),
-          enabledBorder: const OutlineInputBorder(
+          enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.all(
               Radius.circular(12),
             ),
             borderSide: BorderSide(
-              color: ColorsProvider.color_2,
+              color: ColorsProvider.getColor2(context),
               width: 0.5,
             ),
           ),
-          focusedBorder: const OutlineInputBorder(
+          focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.all(
               Radius.circular(12),
             ),
             borderSide: BorderSide(
-              color: ColorsProvider.color_2,
+              color: ColorsProvider.getColor2(context),
               width: 3.0,
             ),
           ),
-          contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+          contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 15),
           // hintText: 'Enter name of $latelText:',
-          hintStyle: const TextStyle(color: ColorsProvider.color_2, fontSize: 15), // zobrazí se pokud je textové pole prázdné
+          hintStyle: TextStyle(color: ColorsProvider.getColor2(context), fontSize: 15), // zobrazí se pokud je textové pole prázdné
         ),
         controller: item,
         onChanged: (input) {

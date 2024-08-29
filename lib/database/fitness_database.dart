@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:diacritic/diacritic.dart';
 import 'package:flutter/material.dart';
@@ -1065,6 +1066,7 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
   Future<List<ExerciseData>> SelectExerciseData() async {
     var data = await _database.rawQuery('''SELECT * FROM exercise_data''');
     // var data1 = data[0];
+
     var finalData = data.map((e) => ExerciseData.fromJson(e)).toList();
     // for (var i = 0; i < finalData.length; i++) {
     //   print("id: ${finalData[i].idExData!} name: ${finalData[i].idExData!} action: ${finalData[i].action}");
@@ -2115,6 +2117,26 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     } catch (e) {
       print('Error selecting user: $e');
       return null;
+    }
+  }
+
+  updateUser(String name, int action) async {
+    final db = await database;
+    await db.rawUpdate(
+      '''UPDATE USER SET name = ?, action = ? ''', [name, action], // Make sure to provide the variables in the same order as the placeholders
+    );
+  }
+
+  updateUserFoodDatabaseLanguage(String countryCode) async {
+    try {
+      final db = await database;
+      await db.rawUpdate(
+        '''UPDATE USER SET country = ? ''', [countryCode], // Make sure to provide the variables in the same order as the placeholders
+      );
+
+      print("updated selected food country");
+    } on Exception catch (e) {
+      print(e);
     }
   }
 

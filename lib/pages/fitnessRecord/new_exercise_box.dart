@@ -108,7 +108,7 @@ class _NewExerciseBoxState extends State<NewExerciseBox> {
                     width: 200,
                     child: TextField(
                       controller: _textController,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: 'Name of Exercise:',
                         labelStyle: TextStyle(
                           color: ColorsProvider.color_1,
@@ -118,7 +118,7 @@ class _NewExerciseBoxState extends State<NewExerciseBox> {
                             Radius.circular(12),
                           ),
                           borderSide: BorderSide(
-                            color: ColorsProvider.color_2,
+                            color: ColorsProvider.getColor2(context),
                             width: 0.5,
                           ),
                         ),
@@ -127,7 +127,7 @@ class _NewExerciseBoxState extends State<NewExerciseBox> {
                             Radius.circular(12),
                           ),
                           borderSide: BorderSide(
-                            color: ColorsProvider.color_2,
+                            color: ColorsProvider.getColor2(context),
                             width: 3.0,
                           ),
                         ),
@@ -184,7 +184,7 @@ class _NewExerciseBoxState extends State<NewExerciseBox> {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
-                          color: ColorsProvider.color_2,
+                          color: ColorsProvider.getColor2(context),
                           width: 0.5,
                         ),
                       ),
@@ -259,7 +259,7 @@ class _NewExerciseBoxState extends State<NewExerciseBox> {
                       }
                     },
                     style: TextButton.styleFrom(
-                      backgroundColor: ColorsProvider.color_2,
+                      backgroundColor: ColorsProvider.getColor2(context),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.vertical(
                           bottom: Radius.circular(25),
@@ -269,7 +269,7 @@ class _NewExerciseBoxState extends State<NewExerciseBox> {
                     child: Text(
                       'Save',
                       style: TextStyle(
-                        color: ColorsProvider.color_8,
+                        color: ColorsProvider.getColor8(context),
                         fontWeight: FontWeight.bold,
                         fontSize: 20,
                       ),

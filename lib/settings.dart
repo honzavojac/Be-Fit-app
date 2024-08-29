@@ -1,11 +1,10 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
 import 'package:kaloricke_tabulky_02/init_page.dart';
 import 'package:kaloricke_tabulky_02/login_supabase/splash_page.dart';
 import 'package:kaloricke_tabulky_02/main.dart';
-import 'package:kaloricke_tabulky_02/pages/fitnessRecord/fitness_record_page%20copy.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -24,11 +23,11 @@ class Settings extends StatefulWidget {
   @override
   State<Settings> createState() => _SettingsState();
 }
-//TODO: odstranit sqflite / supabase přepínač
-// upravit select jazyků
+//! TODO: odstranit sqflite / supabase přepínač
+//! upravit select jazyků
 // dát tam color picker ale nebude zatím viditelný
-// dát tam změnu jména,( věku zatím ne ),
-// udělat odstranění učtu!!!
+//! dát tam změnu jména,( věku zatím ne ),
+//! udělat odstranění učtu!!!
 
 //
 //
@@ -83,19 +82,53 @@ class _SettingsState extends State<Settings> {
 
   Future<void> load() async {
     var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
+    var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false);
+
     data1 = await dbFitness.SyncFromSupabase(context);
+    language = await _getLanguage();
+    await dbFitness.SaveToSupabaseAndOrderSqlite(dbSupabase);
+    print(language);
+
     setState(() {});
   }
+
+  Future<void> _changeLanguage(BuildContext context, Locale locale) async {
+    // Změnit jazyk v aplikaci
+    context.setLocale(locale);
+
+    // Uložit volbu jazyka do SharedPreferences
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('selected_language_code', locale.languageCode);
+  }
+
+  Future<String> _getLanguage() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? languageCode = prefs.getString('selected_language_code');
+
+    if (languageCode != null) {
+      return languageCode;
+    } else {
+      return 'en'; // Defaultní jazyk, pokud žádný není uložen
+    }
+  }
+
+  String? language;
+  @override
+  // Future<void> didChangeDependencies() async {
+  //   super.didChangeDependencies();
+  //   language = await _getLanguage();
+  // }
 
   @override
   void initState() {
     super.initState();
+    load();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false);
       // dbSupabase.getUser();
       // _nameController.text = dbSupabase.user?.name ?? '';
       selectedCountry = user!.country;
-      load();
+      _nameController.text = user!.name;
     });
   }
 
@@ -108,7 +141,7 @@ class _SettingsState extends State<Settings> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Settings"),
+        title: Text("settings".tr()),
         actions: [
           IconButton(
             onPressed: () async {
@@ -135,7 +168,7 @@ class _SettingsState extends State<Settings> {
                         ),
                         Center(
                             child: LoadingAnimationWidget.staggeredDotsWave(
-                          color: ColorsProvider.color_2,
+                          color: ColorsProvider.getColor2(context),
                           size: 100,
                         )),
                       ],
@@ -161,38 +194,93 @@ class _SettingsState extends State<Settings> {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          children: [
-            // Container(
-            //   height: 50,
-            //   child: Row(
-            //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            //     children: [
-            //       Text("sqflite"),
-            //       Switch(
-            //         activeTrackColor: ColorsProvider.color_2, activeColor: Colors.black,
-            //         // activeColor: ColorsProvider.color_2,
-            //         inactiveTrackColor: ColorsProvider.color_8,
-            //         value: dbFitness.switchButton,
-            //         onChanged: (value) {
-            //           dbFitness.switchButton = value;
-            //           print(dbFitness.switchButton);
-            //           // setState(() {});,
-            //           Navigator.of(context).pushNamedAndRemoveUntil('/account', (Route<dynamic> route) => false);
-            //         },
-            //       ),
-            //       Text("supabase"),
-            //     ],
-            //   ),
-            // ),
-            // SizedBox(
-            //   height: 20,
-            // ),
-            Column(
-              children: [
-                Padding(
+      body: Column(
+        children: [
+          // Container(
+          //   height: 50,
+          //   child: Row(
+          //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          //     children: [
+          //       Text("sqflite"),
+          //       Switch(
+          //         activeTrackColor: ColorsProvider.getColor2(context), activeColor: Colors.black,
+          //         // activeColor: ColorsProvider.getColor2(context),
+          //         inactiveTrackColor: ColorsProvider.getColor8(context),
+          //         value: dbFitness.switchButton,
+          //         onChanged: (value) {
+          //           dbFitness.switchButton = value;
+          //           print(dbFitness.switchButton);
+          //           // setState(() {});,
+          //           Navigator.of(context).pushNamedAndRemoveUntil('/account', (Route<dynamic> route) => false);
+          //         },
+          //       ),
+          //       Text("supabase"),
+          //     ],
+          //   ),
+          // ),
+          // SizedBox(
+          //   height: 20,
+          // ),
+
+          Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      Text(
+                        "Change language",
+                        style: TextStyle(fontSize: 18),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Container(
+                height: 70,
+                child: ListView.builder(
+                  itemCount: flags.length,
+                  scrollDirection: Axis.horizontal,
+                  shrinkWrap: true,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 10),
+                      child: Container(
+                        // height: 20,
+                        width: 100,
+                        decoration: BoxDecoration(
+                          color: locales[index].languageCode.toString().toLowerCase() == language.toString().toLowerCase() ? ColorsProvider.getColor2(context) : Colors.transparent, // Výchozí barva nebo jiná barva
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(5.0),
+                          child: GestureDetector(
+                              onTap: () {
+                                language = locales[index].languageCode;
+                                _changeLanguage(context, locales[index]);
+                                load();
+
+                                // setState(() {});
+                              },
+                              child: flags[index]),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+          Spacer(
+            flex: 1,
+          ),
+          Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 25),
+                child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Row(
                     children: [
@@ -203,10 +291,13 @@ class _SettingsState extends State<Settings> {
                     ],
                   ),
                 ),
-                Container(
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 50),
+                child: Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(18),
-                    // color: ColorsProvider.color_8,
+                    // color: ColorsProvider.getColor8(context),
                     border: Border.all(width: 2),
                   ),
                   height: 50,
@@ -215,14 +306,14 @@ class _SettingsState extends State<Settings> {
                     children: [
                       Text("Light"),
                       Switch(
-                        activeTrackColor: ColorsProvider.color_2,
+                        activeTrackColor: ColorsProvider.getColor2(context),
                         activeColor: Colors.black,
-                        // activeColor: ColorsProvider.color_2,
-                        inactiveTrackColor: ColorsProvider.color_8,
+                        // activeColor: ColorsProvider.getColor2(context),
+                        inactiveTrackColor: ColorsProvider.getColor8(context),
                         value: isDarkMode,
                         onChanged: (value) async {
                           SharedPreferences prefs = await SharedPreferences.getInstance();
-                          String? themeModeString = prefs.getString('themeMode');
+                          prefs.getString('themeMode');
                           // print(themeModeString);
                           if (!isDarkMode) {
                             widget.notifyMyApp(ThemeMode.dark);
@@ -237,45 +328,104 @@ class _SettingsState extends State<Settings> {
                     ],
                   ),
                 ),
-              ],
-            ),
-            Container(
-              height: 150,
-              // width: 200,
-              color: const Color.fromARGB(255, 1, 41, 73),
-              child: Column(
-                children: [
-                  // Padding(
-                  //   padding: const EdgeInsets.all(8.0),
-                  //   child: Center(
-                  //     child: TextField(
-                  //       controller: _nameController,
-                  //     ),
-                  //   ),
-                  // ),
-                  // ElevatedButton(
-                  //   onPressed: () {
-                  //     dbSupabase.updateName(_nameController.text.trim());
-                  //     dbSupabase.user!.name = _nameController.text.trim();
-                  //   },
-                  //   child: Text("save your name"),
-                  // )
-                ],
               ),
-            ),
-            Text(darkTheme.toString()),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 50),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      // height: 55,
-                      decoration: BoxDecoration(
-                        // color: Colors.grey[800],
-                        border: Border.all(color: ColorsProvider.color_8, width: 2),
-                        borderRadius: BorderRadius.circular(15),
+            ],
+          ),
+          Spacer(
+            flex: 1,
+          ),
+
+          // Column(
+          //   children: [
+          //     Padding(
+          //       padding: const EdgeInsets.symmetric(horizontal: 25),
+          //       child: Padding(
+          //         padding: const EdgeInsets.all(8.0),
+          //         child: Row(
+          //           children: [
+          //             Text(
+          //               "Change your name",
+          //               style: TextStyle(fontSize: 18),
+          //             ),
+          //           ],
+          //         ),
+          //       ),
+          //     ),
+          //     Padding(
+          //       padding: const EdgeInsets.symmetric(horizontal: 50),
+          //       child: Container(
+          //         decoration: BoxDecoration(
+          //           // color: Colors.grey[800],
+          //           border: Border.all(color: ColorsProvider.getColor8(context), width: 2),
+          //           borderRadius: BorderRadius.circular(18),
+          //         ),
+          //         child: Padding(
+          //           padding: const EdgeInsets.only(left: 20),
+          //           child: TextField(
+          //             controller: _nameController,
+          //             onTapOutside: (event) {
+          //               setState(() {});
+          //               FocusScope.of(context).unfocus();
+          //             },
+          //             onTap: () {
+          //               _nameController.selection = TextSelection(
+          //                 baseOffset: 0,
+          //                 extentOffset: _nameController.text.length,
+          //               );
+          //             },
+          //             onChanged: (value) async {
+          //               print(value);
+          //               switch (user!.action) {
+          //                 case 0:
+          //                   await dbFitness.updateUser(value, 2);
+
+          //                   break;
+          //                 case 1:
+          //                   await dbFitness.updateUser(value, 1);
+
+          //                   break;
+          //                 case 2:
+          //                   await dbFitness.updateUser(value, 2);
+
+          //                   break;
+          //                 default:
+          //               }
+          //             },
+          //             decoration: InputDecoration(
+          //               border: InputBorder.none,
+          //               hintText: "Name",
+          //               hintStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: ColorsProvider.getColor2(context)),
+          //             ),
+          //             cursorColor: ColorsProvider.getColor2(context),
+          //             style: TextStyle(color: ColorsProvider.getColor2(context)),
+          //           ),
+          //         ),
+          //       ),
+          //     ),
+          //   ],
+          // ),
+
+          Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      Text(
+                        "Change food database",
+                        style: TextStyle(fontSize: 18),
                       ),
+                    ],
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 50),
+                child: Row(
+                  children: [
+                    Expanded(
                       child: DropdownButtonHideUnderline(
                         child: DropdownButton2<String>(
                           isExpanded: true,
@@ -285,35 +435,41 @@ class _SettingsState extends State<Settings> {
                               value: country['code'],
                               child: Text(
                                 country['name']!,
-                                style: TextStyle(color: ColorsProvider.color_2),
+                                style: TextStyle(color: ColorsProvider.getColor2(context)),
                               ),
                             );
                           }).toList(),
-                          onChanged: (value) {
+                          onChanged: (value) async {
                             selectedCountry = value;
+                            print(value);
+                            await dbFitness.updateUserFoodDatabaseLanguage(value!);
+                            user!.country = value;
                             setState(() {});
                           },
                           buttonStyleData: ButtonStyleData(
                             // width: 180,
                             padding: const EdgeInsets.symmetric(horizontal: 14),
-                            // decoration: BoxDecoration(
-                            //   borderRadius: BorderRadius.circular(18),
-                            //   border: Border.all(
-                            //     color: ColorsProvider.color_8,
-                            //     width: 0.5,
-                            //   ),
-                            // ),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(18),
+                              border: Border.all(
+                                color: Colors.black,
+                                width: 2,
+                              ),
+                            ),
                           ),
-                          iconStyleData: const IconStyleData(
+                          iconStyleData: IconStyleData(
                             icon: Icon(Icons.keyboard_arrow_down_outlined),
                             iconSize: 17,
-                            iconEnabledColor: ColorsProvider.color_2,
+                            iconEnabledColor: ColorsProvider.getColor2(context),
                           ),
                           dropdownStyleData: DropdownStyleData(
                             maxHeight: 200,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(18),
-                              border: Border.all(width: 2, color: ColorsProvider.color_8),
+                              border: Border.all(
+                                width: 2,
+                                color: ColorsProvider.getColor8(context),
+                              ),
                             ),
                             offset: const Offset(0, -0),
                             scrollbarTheme: ScrollbarThemeData(
@@ -330,231 +486,48 @@ class _SettingsState extends State<Settings> {
                         ),
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0),
-                    child: HelpButton(
-                      helpText: "This button allows you to change the language of the app. "
-                          "Upon changing the language, the app will automatically adjust "
-                          "the database category to match the selected language.",
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8.0),
+                      child: HelpButton(helpText: "This changes the food database. You can select a database from your country or one that you prefer. 'Undefined' includes all available food data."),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            // TextField(
-            //   // enabled: false,
-            //   // readOnly: true,
-            //   controller: textEditingController,
-            // ),
-            // TextField(
-            //   // enabled: false,
-            //   readOnly: true,
-            //   controller: textEditingController,
-            // ),
-            Container(
-              height: 100,
-            ),
-            ElevatedButton(
-              onPressed: () async {},
-              child: Text("select databáze"),
-            ),
-            SizedBox(
-              height: 40,
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                Stopwatch stopwatch = Stopwatch()..start();
-                await dbFitness.SaveToSupabaseAndOrderSqlite(dbSupabase);
-                stopwatch.stop();
-                // print("SaveToSupabaseAndOrderSqlite trvalo: ${stopwatch.elapsedMilliseconds} ms");
-              },
-              child: Text("save to supabase"),
-            ),
-            SizedBox(
-              height: 90,
-            ),
-            // ElevatedButton(
-            //   onPressed: () async {
-            //     data3 = await dbFitness.SelectAllMuscleAndExercises();
+            ],
+          ),
+          Spacer(
+            flex: 5,
+          ),
 
-            //     setState(() {});
-            //   },
-            //   child: Text("select databáze"),
-            // ),
-            // SizedBox(
-            //   height: 80,
-            // ),
-            // ElevatedButton(
-            //   onPressed: () async {
-            //     await dbFitness.SelectAllData();
-            //     setState(() {});
-            //   },
-            //   child: Text("select 2 databáze"),
-            // ),
-            // SizedBox(
-            //   height: 80,
-            // ),
+          // SizedBox(
+          //   height: 40,
+          // ),
+          // ElevatedButton(
+          //   onPressed: () async {
+          //     Stopwatch stopwatch = Stopwatch()..start();
+          //     await dbFitness.SaveToSupabaseAndOrderSqlite(dbSupabase);
+          //     stopwatch.stop();
+          //     // print("SaveToSupabaseAndOrderSqlite trvalo: ${stopwatch.elapsedMilliseconds} ms");
+          //   },
+          //   child: Text("save to supabase"),
+          // ),
+          // SizedBox(
+          //   height: 20,
+          // ),
+          // ElevatedButton(
+          //   onPressed: () async {
+          //     Stopwatch stopwatch = Stopwatch()..start();
+          //     await dbSupabase.deleteUserAccount();
+          //     stopwatch.stop();
+          //     // print("SaveToSupabaseAndOrderSqlite trvalo: ${stopwatch.elapsedMilliseconds} ms");
+          //   },
+          //   child: Text("delete user"),
+          // ),
 
-            // ElevatedButton(
-            //   onPressed: () async {
-            //     await dbFitness.DeleteAllSplitStartedCompleteds();
-            //     setState(() {});
-            //   },
-            //   child: Text("delete all splitStartedCompleted"),
-            // ),
-            // ElevatedButton(
-            //   onPressed: () async {
-            //     await dbFitness.DeleteAllExerciseDatas();
-            //     setState(() {});
-            //   },
-            //   child: Text("delete all exerciseData"),
-            // ),
-            SizedBox(
-              height: 40,
-            ),
-            // Expanded(
-            //   child: data3.isNotEmpty
-            //       ? Container(
-            //           color: Colors.brown,
-            //           child: SingleChildScrollView(
-            //             child: Column(
-            //               crossAxisAlignment: CrossAxisAlignment.start,
-            //               children: data3.map((muscle) {
-            //                 return Container(
-            //                   color: Colors.blue,
-            //                   child: Column(
-            //                     crossAxisAlignment: CrossAxisAlignment.start,
-            //                     children: [
-            //                       Text(muscle.nameOfMuscle!),
-            //                       Column(
-            //                         children: muscle.exercises!.map((exercise) {
-            //                           return Container(
-            //                             color: ColorsProvider.color_2,
-            //                             child: Column(
-            //                               crossAxisAlignment: CrossAxisAlignment.start,
-            //                               children: [
-            //                                 Text(exercise.nameOfExercise ?? ""),
-            //                                 Column(
-            //                                   children: exercise.exerciseData!.map((exerciseData) {
-            //                                     return Container(
-            //                                       height: 30, width: 500,
-            //                                       color: Colors.black,
-            //                                       // margin: const EdgeInsets.only(top: 4.0),
-            //                                       child: Text(
-            //                                         'Weight: ${exerciseData.weight}, '
-            //                                         'Reps: ${exerciseData.reps}, '
-            //                                         'Difficulty: ${exerciseData.difficulty}',
-            //                                         style: TextStyle(color: Colors.white),
-            //                                       ),
-            //                                     );
-            //                                   }).toList(),
-            //                                 ),
-            //                               ],
-            //                             ),
-            //                           );
-            //                         }).toList(),
-            //                       ),
-            //                     ],
-            //                   ),
-            //                 );
-            //               }).toList(),
-            //             ),
-            //           ),
-            //         )
-            //       : Container(
-            //           color: Colors.amber,
-            //         ),
-            // )
-
-            // ElevatedButton(
-            //   onPressed: () async {
-            //     await dbFitness.InsertSplitStartedCompleted(null, null, null, 86, true, 1);
-            //     List<SplitStartedCompleted> splits = await dbFitness.SelectSplitStartedCompleted();
-            //     for (var element in splits) {
-            //       element.printSplitStartedCompleted();
-            //     }
-
-            //     setState(() {});
-            //   },
-            //   child: Text("add item"),
-            // ),
-            // SizedBox(
-            //   height: 40,
-            // ),
-
-            // ElevatedButton(
-            //   onPressed: () async {
-            //     List<SplitStartedCompleted> splits = await dbFitness.SelectSplitStartedCompleted();
-            //     for (var element in splits) {
-            //       await dbFitness.SyncSqfliteToSupabase(dbSupabase, "split_started_completed", element, element.action!);
-            //     }
-            //     List<SplitStartedCompleted> a = await dbSupabase.SplitStartedCompletedTable();
-            //     for (var element in a) {
-            //       element.printSplitStartedCompleted();
-            //     }
-            //     setState(() {});
-            //   },
-            //   child: Text("to supabase"),
-            // ),
-            // Row(
-            //   children: [
-            //     ElevatedButton(
-            //       onPressed: () async {
-            //         await dbFitness.SyncFromSupabase(context);
-            //         await load();
-            //       },
-            //       child: Text("sync databáze"),
-            //     ),
-            //     ElevatedButton(
-            //       onPressed: () async {
-            //         List<Muscle> musclesDelete = await dbFitness.SelectMuscles();
-            //         for (var element in musclesDelete) {
-            //           element.action = 3;
-            //           await dbFitness.DeleteAction(3, element.idMuscle!);
-            //         }
-
-            //         // await load();
-            //       },
-            //       child: Text("delete all"),
-            //     ),
-            //     ElevatedButton(
-            //       onPressed: () async {
-            //         await dbFitness.InsertMuscle("biceps2");
-            //         await load();
-            //       },
-            //       child: Text("add item"),
-            //     ),
-            //   ],
-            // ),
-            // Expanded(
-            //   child: ListView.builder(
-            //     itemCount: data.length,
-            //     itemBuilder: (context, index) {
-            //       return Padding(
-            //         padding: const EdgeInsets.all(8.0),
-            //         child: Container(
-            //           color: Colors.brown,
-            //           child: Row(
-            //             mainAxisAlignment: MainAxisAlignment.spaceAround,
-            //             children: [
-            //               Text("id: ${data[index].idMuscle} "),
-            //               SizedBox(
-            //                 width: 30,
-            //               ),
-            //               Expanded(
-            //                 child: Text("name: ${data[index].nameOfMuscle}"),
-            //               ),
-            //               Text("supabaseId: ${data[index].supabaseIdMuscle}"),
-            //             ],
-            //           ),
-            //         ),
-            //       );
-            //     },
-            //   ),
-            // )
-          ],
-        ),
+          SizedBox(
+            height: 40,
+          ),
+        ],
       ),
     );
   }
@@ -573,7 +546,7 @@ class _HelpButtonState extends State<HelpButton> {
 
   void _showHelpOverlay(BuildContext context) {
     _overlayEntry = _createOverlayEntry(context);
-    Overlay.of(context)!.insert(_overlayEntry!);
+    Overlay.of(context).insert(_overlayEntry!);
   }
 
   void _removeHelpOverlay() {

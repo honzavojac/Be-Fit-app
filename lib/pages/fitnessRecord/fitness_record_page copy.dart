@@ -4,9 +4,11 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
 import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
+import 'package:kaloricke_tabulky_02/main.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/split_page%20copy%203.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/providers/variables_provider.dart';
@@ -179,7 +181,7 @@ class _FitnessRecordScreenCopyState extends State<FitnessRecordScreenCopy> {
                                     padding: const EdgeInsets.only(bottom: 15),
                                     child: Container(
                                       decoration: BoxDecoration(
-                                        color: ColorsProvider.color_2,
+                                        color: ColorsProvider.getColor2(context),
                                         borderRadius: BorderRadius.circular(20),
                                       ),
                                       child: Column(
@@ -189,14 +191,14 @@ class _FitnessRecordScreenCopyState extends State<FitnessRecordScreenCopy> {
                                             child: Container(
                                               height: 30,
                                               decoration: BoxDecoration(
-                                                // color: ColorsProvider.color_2,
+                                                // color: ColorsProvider.getColor2(context),
                                                 borderRadius: variablesProvider.zaobleni,
                                               ),
                                               child: Center(
                                                 child: Text(
                                                   "$muscle".toUpperCase(),
                                                   style: TextStyle(
-                                                    color: ColorsProvider.color_8,
+                                                    color: ColorsProvider.getColor8(context),
                                                     fontWeight: FontWeight.bold,
                                                     fontSize: 25,
                                                     // letterSpacing: 2,
@@ -214,7 +216,7 @@ class _FitnessRecordScreenCopyState extends State<FitnessRecordScreenCopy> {
                                             child: Container(
                                               child: Text(
                                                 "No exercises",
-                                                style: TextStyle(color: ColorsProvider.color_8, fontWeight: FontWeight.bold),
+                                                style: TextStyle(color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold),
                                               ),
                                             ),
                                           ),
@@ -229,7 +231,7 @@ class _FitnessRecordScreenCopyState extends State<FitnessRecordScreenCopy> {
                                   return Padding(
                                     padding: const EdgeInsets.only(bottom: 15),
                                     child: Container(
-                                      decoration: BoxDecoration(color: ColorsProvider.color_2, borderRadius: BorderRadius.circular(20)),
+                                      decoration: BoxDecoration(color: ColorsProvider.getColor2(context), borderRadius: BorderRadius.circular(20)),
                                       child: Column(
                                         children: [
                                           Padding(
@@ -237,14 +239,14 @@ class _FitnessRecordScreenCopyState extends State<FitnessRecordScreenCopy> {
                                             child: Container(
                                               height: 30,
                                               decoration: BoxDecoration(
-                                                // color: ColorsProvider.color_2,
+                                                // color: ColorsProvider.getColor2(context),
                                                 borderRadius: variablesProvider.zaobleni,
                                               ),
                                               child: Center(
                                                 child: Text(
                                                   "$muscle".toUpperCase(),
                                                   style: TextStyle(
-                                                    color: ColorsProvider.color_8,
+                                                    color: ColorsProvider.getColor8(context),
                                                     fontWeight: FontWeight.bold,
                                                     fontSize: 25,
                                                     letterSpacing: 2,
@@ -300,7 +302,7 @@ class _FitnessRecordScreenCopyState extends State<FitnessRecordScreenCopy> {
                                                         height: 105,
                                                         decoration: BoxDecoration(
                                                           borderRadius: BorderRadius.circular(10),
-                                                          color: ColorsProvider.color_2,
+                                                          color: ColorsProvider.getColor2(context),
                                                         ),
                                                         child: Column(
                                                           children: [
@@ -309,7 +311,7 @@ class _FitnessRecordScreenCopyState extends State<FitnessRecordScreenCopy> {
                                                               children: [
                                                                 Text(
                                                                   "$nameOfExercise".toUpperCase(),
-                                                                  style: TextStyle(color: ColorsProvider.color_8, fontWeight: FontWeight.bold, fontSize: 18),
+                                                                  style: TextStyle(color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold, fontSize: 18),
                                                                 ),
                                                               ],
                                                             ),
@@ -323,20 +325,20 @@ class _FitnessRecordScreenCopyState extends State<FitnessRecordScreenCopy> {
                                                                       Padding(
                                                                         padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
                                                                         child: Container(
-                                                                          width: 60,
+                                                                          width: 76,
                                                                           child: Column(
                                                                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                                                             children: [
                                                                               Text(
-                                                                                "Set",
+                                                                                "set".tr(),
                                                                                 style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
                                                                               ),
                                                                               Text(
-                                                                                "Weight",
+                                                                                "exercise_weight".tr(),
                                                                                 style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
                                                                               ),
                                                                               Text(
-                                                                                "Reps",
+                                                                                "reps".tr(),
                                                                                 style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
                                                                               ),
                                                                               SizedBox(
@@ -348,7 +350,7 @@ class _FitnessRecordScreenCopyState extends State<FitnessRecordScreenCopy> {
                                                                       ),
                                                                       Container(
                                                                         width: 1,
-                                                                        color: ColorsProvider.color_8,
+                                                                        color: ColorsProvider.getColor8(context),
                                                                       ),
                                                                       exerciseDataItem != null
                                                                           ? Expanded(
@@ -550,7 +552,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
             },
             icon: Icon(Icons.edit_outlined),
             label: Text(
-              'Edit split',
+              'edit_split'.tr(),
               style: TextStyle(
                 fontWeight: FontWeight.bold,
               ),
@@ -559,8 +561,8 @@ class _CustomAppBarState extends State<CustomAppBar> {
               elevation: WidgetStatePropertyAll(5),
               // overlayColor: WidgetStatePropertyAll(Colors.blue),
               shadowColor: WidgetStatePropertyAll(Colors.black),
-              backgroundColor: WidgetStateProperty.all(ColorsProvider.color_2),
-              foregroundColor: WidgetStateProperty.all(ColorsProvider.color_8),
+              backgroundColor: WidgetStateProperty.all(ColorsProvider.getColor2(context)),
+              foregroundColor: WidgetStateProperty.all(ColorsProvider.getColor8(context)),
             ),
           ),
         ),
@@ -622,10 +624,10 @@ class _FitnessRecordDropdownState extends State<FitnessRecordDropdown> {
                           child: Center(
                             child: Text(
                               split.nameSplit.toString().toUpperCase(),
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                color: ColorsProvider.color_2,
+                                color: ColorsProvider.getColor2(context),
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -642,21 +644,21 @@ class _FitnessRecordDropdownState extends State<FitnessRecordDropdown> {
                       decoration: BoxDecoration(
                         borderRadius: variablesProvider.zaobleni,
                         border: Border.all(
-                          color: ColorsProvider.color_2,
+                          color: ColorsProvider.getColor2(context),
                           width: 0.5,
                         ),
                       ),
                     ),
-                    iconStyleData: const IconStyleData(
+                    iconStyleData: IconStyleData(
                       icon: Icon(Icons.keyboard_arrow_down_outlined),
                       iconSize: 17,
-                      iconEnabledColor: ColorsProvider.color_2,
+                      iconEnabledColor: ColorsProvider.getColor2(context),
                     ),
                     dropdownStyleData: DropdownStyleData(
                       maxHeight: 200,
                       decoration: BoxDecoration(
                         borderRadius: variablesProvider.zaobleni,
-                        border: Border.all(width: 2, color: ColorsProvider.color_2),
+                        border: Border.all(width: 2, color: ColorsProvider.getColor2(context)),
                       ),
                       offset: const Offset(0, -0),
                       scrollbarTheme: ScrollbarThemeData(
@@ -738,13 +740,13 @@ class _FitnessRecordEndSplitState extends State<FitnessRecordEndSplit> {
                                     height: 40,
                                     width: 100,
                                     decoration: BoxDecoration(
-                                      color: ColorsProvider.color_2,
+                                      color: ColorsProvider.getColor2(context),
                                       borderRadius: BorderRadius.circular(15),
                                     ),
                                     child: Center(
                                       child: Text(
                                         'Cancel',
-                                        style: TextStyle(color: ColorsProvider.color_8, fontWeight: FontWeight.bold),
+                                        style: TextStyle(color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold),
                                       ),
                                     ),
                                   ),
@@ -791,7 +793,7 @@ class _FitnessRecordEndSplitState extends State<FitnessRecordEndSplit> {
                     mainAxisSize: MainAxisSize.min, // Aby se řádek smrskl na minimální možnou šířku
                     children: [
                       Text(
-                        "End this split",
+                        "end_this_split".tr(),
                         style: TextStyle(color: ColorsProvider.color_3, fontWeight: FontWeight.bold),
                       ),
                       SizedBox(width: 8), // Oddělovač mezi textem a ikonou
@@ -828,8 +830,8 @@ class _FitnessRecordEndSplitState extends State<FitnessRecordEndSplit> {
           //       ),
           //     ),
           //     style: ButtonStyle(
-          //       backgroundColor: WidgetStateProperty.all(ColorsProvider.color_2),
-          //       foregroundColor: WidgetStateProperty.all(ColorsProvider.color_8),
+          //       backgroundColor: WidgetStateProperty.all(ColorsProvider.getColor2(context)),
+          //       foregroundColor: WidgetStateProperty.all(ColorsProvider.getColor8(context)),
           //     ),
           //   ),
           // ),

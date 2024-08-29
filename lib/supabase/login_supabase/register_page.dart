@@ -78,7 +78,7 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ColorsProvider.color_2,
+      backgroundColor: ColorsProvider.getColor2(context),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -96,7 +96,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   height: 60,
                 ),
                 Container(
-                  // color: ColorsProvider.color_8,
+                  // color: ColorsProvider.getColor8(context),
                   child: Text(
                     "Sign Up",
                     style: TextStyle(
@@ -113,7 +113,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.grey[800],
-                      border: Border.all(color: ColorsProvider.color_8, width: 4),
+                      border: Border.all(color: ColorsProvider.getColor8(context), width: 4),
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: Padding(
@@ -123,10 +123,10 @@ class _RegisterPageState extends State<RegisterPage> {
                         decoration: InputDecoration(
                           border: InputBorder.none,
                           hintText: "Name",
-                          hintStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: ColorsProvider.color_2),
+                          hintStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: ColorsProvider.getColor2(context)),
                         ),
-                        cursorColor: ColorsProvider.color_2,
-                        style: TextStyle(color: ColorsProvider.color_2),
+                        cursorColor: ColorsProvider.getColor2(context),
+                        style: TextStyle(color: ColorsProvider.getColor2(context)),
                       ),
                     ),
                   ),
@@ -139,7 +139,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.grey[800],
-                      border: Border.all(color: ColorsProvider.color_8, width: 4),
+                      border: Border.all(color: ColorsProvider.getColor8(context), width: 4),
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: Padding(
@@ -149,10 +149,10 @@ class _RegisterPageState extends State<RegisterPage> {
                         decoration: InputDecoration(
                           border: InputBorder.none,
                           hintText: "Email",
-                          hintStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: ColorsProvider.color_2),
+                          hintStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: ColorsProvider.getColor2(context)),
                         ),
-                        cursorColor: ColorsProvider.color_2,
-                        style: TextStyle(color: ColorsProvider.color_2),
+                        cursorColor: ColorsProvider.getColor2(context),
+                        style: TextStyle(color: ColorsProvider.getColor2(context)),
                       ),
                     ),
                   ),
@@ -165,7 +165,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.grey[800],
-                      border: Border.all(color: ColorsProvider.color_8, width: 4),
+                      border: Border.all(color: ColorsProvider.getColor8(context), width: 4),
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: Padding(
@@ -176,10 +176,10 @@ class _RegisterPageState extends State<RegisterPage> {
                         decoration: InputDecoration(
                           border: InputBorder.none,
                           hintText: "Password",
-                          hintStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: ColorsProvider.color_2),
+                          hintStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: ColorsProvider.getColor2(context)),
                         ),
-                        cursorColor: ColorsProvider.color_2,
-                        style: TextStyle(color: ColorsProvider.color_2),
+                        cursorColor: ColorsProvider.getColor2(context),
+                        style: TextStyle(color: ColorsProvider.getColor2(context)),
                       ),
                     ),
                   ),
@@ -192,7 +192,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.grey[800],
-                      border: Border.all(color: ColorsProvider.color_8, width: 4),
+                      border: Border.all(color: ColorsProvider.getColor8(context), width: 4),
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: Padding(
@@ -203,10 +203,10 @@ class _RegisterPageState extends State<RegisterPage> {
                         decoration: InputDecoration(
                           border: InputBorder.none,
                           hintText: "Confirm Password",
-                          hintStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: ColorsProvider.color_2),
+                          hintStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: ColorsProvider.getColor2(context)),
                         ),
-                        cursorColor: ColorsProvider.color_2,
-                        style: TextStyle(color: ColorsProvider.color_2),
+                        cursorColor: ColorsProvider.getColor2(context),
+                        style: TextStyle(color: ColorsProvider.getColor2(context)),
                       ),
                     ),
                   ),
@@ -221,14 +221,14 @@ class _RegisterPageState extends State<RegisterPage> {
                     child: Container(
                       height: 55,
                       decoration: BoxDecoration(
-                        border: Border.all(color: ColorsProvider.color_8, width: 3),
+                        border: Border.all(color: ColorsProvider.getColor8(context), width: 3),
                         color: ColorsProvider.color_9,
                         borderRadius: BorderRadius.circular(15),
                       ),
                       child: Center(
                         child: Text(
                           "Sign up",
-                          style: TextStyle(color: ColorsProvider.color_8, fontSize: 25, fontWeight: FontWeight.bold),
+                          style: TextStyle(color: ColorsProvider.getColor8(context), fontSize: 25, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
@@ -248,7 +248,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         child: Text(
                           "Login",
                           style: TextStyle(
-                            color: ColorsProvider.color_8,
+                            color: ColorsProvider.getColor8(context),
                             fontWeight: FontWeight.bold,
                             fontSize: 14.5,
                           ),

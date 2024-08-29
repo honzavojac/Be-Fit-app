@@ -1,4 +1,6 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:kaloricke_tabulky_02/init_page.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 
 import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
@@ -163,7 +165,7 @@ class _AddExerciseBoxState extends State<AddExerciseBox> {
                       Navigator.of(context).pop();
                     },
                     style: TextButton.styleFrom(
-                      backgroundColor: ColorsProvider.color_2,
+                      backgroundColor: ColorsProvider.getColor2(context),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.vertical(
                           bottom: Radius.circular(25),
@@ -171,9 +173,9 @@ class _AddExerciseBoxState extends State<AddExerciseBox> {
                       ),
                     ),
                     child: Text(
-                      'Save',
+                      'save'.tr(),
                       style: TextStyle(
-                        color: ColorsProvider.color_8,
+                        color: ColorsProvider.getColor8(context),
                         fontWeight: FontWeight.bold,
                         fontSize: 20,
                       ),
@@ -193,7 +195,7 @@ class _AddExerciseBoxState extends State<AddExerciseBox> {
                     child: ElevatedButton(
                       style: ButtonStyle(
                         backgroundColor: WidgetStatePropertyAll(
-                          ColorsProvider.color_2,
+                          ColorsProvider.getColor2(context),
                         ),
                       ),
                       onPressed: () {
@@ -213,7 +215,7 @@ class _AddExerciseBoxState extends State<AddExerciseBox> {
                       child: Text(
                         "New Exercise",
                         style: TextStyle(
-                          color: ColorsProvider.color_8,
+                          color: ColorsProvider.getColor8(context),
                         ),
                       ),
                     ),

@@ -8,9 +8,12 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LoginPage extends StatefulWidget {
   final VoidCallback? showRegisterPage;
+  final VoidCallback? showResetPasswordPage;
+
   const LoginPage({
     Key? key,
     this.showRegisterPage,
+    this.showResetPasswordPage,
   }) : super(key: key);
 
   @override
@@ -98,8 +101,6 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> signIn3() async {
-    _emailController.text = "honzavojac@gmail.com";
-    _passwordController.text = "Davidsrubek2408";
     try {
       setState(() {});
       await supabase.auth.signInWithPassword(
@@ -161,7 +162,7 @@ class _LoginPageState extends State<LoginPage> {
     var dbSupabase = Provider.of<SupabaseProvider>(context);
 
     return Scaffold(
-      backgroundColor: ColorsProvider.color_2,
+      backgroundColor: ColorsProvider.getColor2(context),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -176,38 +177,38 @@ class _LoginPageState extends State<LoginPage> {
                   height: 250,
                 ),
                 const SizedBox(height: 40),
-                const Text(
+                Text(
                   "Login",
                   style: TextStyle(
                     fontSize: 40,
-                    color: ColorsProvider.color_8,
+                    color: ColorsProvider.getColor8(context),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                ElevatedButton(
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStatePropertyAll(
-                      ColorsProvider.color_4,
-                    ),
-                  ),
-                  onPressed: () async {
-                    await signIn2();
-                    await dbSupabase.getUser();
-                  },
-                  child: Text("sign in to test account"),
-                ),
-                ElevatedButton(
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStatePropertyAll(
-                      ColorsProvider.color_4,
-                    ),
-                  ),
-                  onPressed: () async {
-                    await signIn3();
-                    await dbSupabase.getUser();
-                  },
-                  child: Text("sign in to test account"),
-                ),
+                // ElevatedButton(
+                //   style: ButtonStyle(
+                //     backgroundColor: WidgetStatePropertyAll(
+                //       ColorsProvider.color_4,
+                //     ),
+                //   ),
+                //   onPressed: () async {
+                //     await signIn2();
+                //     await dbSupabase.getUser();
+                //   },
+                //   child: Text("sign in to test account"),
+                // ),
+                // ElevatedButton(
+                //   style: ButtonStyle(
+                //     backgroundColor: WidgetStatePropertyAll(
+                //       ColorsProvider.color_4,
+                //     ),
+                //   ),
+                //   onPressed: () async {
+                //     await signIn3();
+                //     await dbSupabase.getUser();
+                //   },
+                //   child: Text("sign in to test account"),
+                // ),
                 const SizedBox(height: 30),
                 _buildTextField(_emailController, "Email"),
                 const SizedBox(height: 5),
@@ -216,8 +217,8 @@ class _LoginPageState extends State<LoginPage> {
                 _buildSignInButton(),
                 const SizedBox(height: 5),
                 _buildSignUpOption(),
-                const SizedBox(height: 10),
-                _buildSignInWithGoogle(),
+                // const SizedBox(height: 10),
+                // _buildSignInWithGoogle(),
               ],
             ),
           ),
@@ -232,7 +233,7 @@ class _LoginPageState extends State<LoginPage> {
       child: Container(
         decoration: BoxDecoration(
           color: Colors.grey[800],
-          border: Border.all(color: ColorsProvider.color_8, width: 4),
+          border: Border.all(color: ColorsProvider.getColor8(context), width: 4),
           borderRadius: BorderRadius.circular(15),
         ),
         child: Padding(
@@ -243,10 +244,10 @@ class _LoginPageState extends State<LoginPage> {
             decoration: InputDecoration(
               border: InputBorder.none,
               hintText: hintText,
-              hintStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: ColorsProvider.color_2),
+              hintStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: ColorsProvider.getColor2(context)),
             ),
-            cursorColor: ColorsProvider.color_2,
-            style: TextStyle(color: ColorsProvider.color_2),
+            cursorColor: ColorsProvider.getColor2(context),
+            style: TextStyle(color: ColorsProvider.getColor2(context)),
           ),
         ),
       ),
@@ -266,15 +267,15 @@ class _LoginPageState extends State<LoginPage> {
         child: Container(
           height: 55,
           decoration: BoxDecoration(
-            border: Border.all(color: ColorsProvider.color_8, width: 3),
+            border: Border.all(color: ColorsProvider.getColor8(context), width: 3),
             color: ColorsProvider.color_9,
             borderRadius: BorderRadius.circular(15),
           ),
-          child: const Center(
+          child: Center(
             child: Text(
               "Sign in",
               style: TextStyle(
-                color: ColorsProvider.color_8,
+                color: ColorsProvider.getColor8(context),
                 fontSize: 25,
                 fontWeight: FontWeight.bold,
               ),
@@ -287,31 +288,62 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _buildSignUpOption() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 50),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+      padding: EdgeInsets.symmetric(horizontal: 50),
+      child: Column(
         children: [
-          const Text(
-            "Not a member? ",
-            style: TextStyle(
-              color: ColorsProvider.color_8,
-            ),
-          ),
-          if (widget.showRegisterPage != null) // Tady provádíme ověření, zda je showRegisterPage dostupné
-            GestureDetector(
-              onTap: () {
-                widget.showRegisterPage!();
-                print("object");
-              },
-              child: const Text(
-                "Register now",
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "Not a member? ",
                 style: TextStyle(
-                  color: ColorsProvider.color_8,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14.5,
+                  color: ColorsProvider.getColor8(context),
                 ),
               ),
-            )
+              if (widget.showRegisterPage != null) // Tady provádíme ověření, zda je showRegisterPage dostupné
+                GestureDetector(
+                  onTap: () {
+                    widget.showRegisterPage!();
+                    print("object");
+                  },
+                  child: Text(
+                    "Register now",
+                    style: TextStyle(
+                      color: ColorsProvider.getColor8(context),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                    ),
+                  ),
+                )
+            ],
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // if (widget.showResetPasswordPage != null) // Tady provádíme ověření, zda je showRegisterPage dostupné
+              GestureDetector(
+                onTap: () {
+                  if (widget.showResetPasswordPage != null) {
+                    print("showresetpasspage");
+                    widget.showResetPasswordPage!();
+                  } else {
+                    print("showResetPasswordPage is null");
+                  }
+                },
+                child: Text(
+                  "Reset password",
+                  style: TextStyle(
+                    color: ColorsProvider.getColor8(context),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
+                ),
+              )
+            ],
+          ),
         ],
       ),
     );
@@ -321,13 +353,13 @@ class _LoginPageState extends State<LoginPage> {
     var dbSupabase = Provider.of<SupabaseProvider>(context);
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 50),
+      padding: EdgeInsets.symmetric(horizontal: 50),
       child: Column(
         children: [
-          const Text(
+          Text(
             "or sign in with",
             style: TextStyle(
-              color: ColorsProvider.color_8,
+              color: ColorsProvider.getColor8(context),
             ),
           ),
           const SizedBox(height: 10),
@@ -337,7 +369,7 @@ class _LoginPageState extends State<LoginPage> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: ColorsProvider.color_8, width: 2),
+                border: Border.all(color: ColorsProvider.getColor8(context), width: 2),
               ),
               child: const Padding(
                 padding: EdgeInsets.all(2.0),

@@ -86,7 +86,7 @@
 //   @override
 //   Widget build(BuildContext context) {
 //     return Scaffold(
-//       backgroundColor: ColorsProvider.color_2,
+//       backgroundColor: ColorsProvider.getColor2(context),
 //       body: SafeArea(
 //         child: Center(
 //           child: SingleChildScrollView(
@@ -140,10 +140,10 @@
 //             decoration: InputDecoration(
 //               border: InputBorder.none,
 //               hintText: hintText,
-//               hintStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: ColorsProvider.color_2),
+//               hintStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: ColorsProvider.getColor2(context)),
 //             ),
-//             cursorColor: ColorsProvider.color_2,
-//             style: TextStyle(color: ColorsProvider.color_2),
+//             cursorColor: ColorsProvider.getColor2(context),
+//             style: TextStyle(color: ColorsProvider.getColor2(context)),
 //           ),
 //         ),
 //       ),
@@ -187,7 +187,7 @@
 //           child: const Text(
 //             "Register now",
 //             style: TextStyle(
-//               color: ColorsProvider.color_8,
+//               color: ColorsProvider.getColor8(context),
 //               fontWeight: FontWeight.bold,
 //               fontSize: 14.5,
 //             ),
@@ -237,6 +237,6 @@
 //                         },
 //                         child: Text(
 //                           "Reset password?",
-//                           style: TextStyle(color: ColorsProvider.color_8, fontWeight: FontWeight.bold),
+//                           style: TextStyle(color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold),
 //                         ),
 //                       ),

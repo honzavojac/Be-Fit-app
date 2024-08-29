@@ -117,7 +117,7 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
               },
               icon: Icon(
                 Icons.arrow_back,
-                color: ColorsProvider.color_2,
+                color: ColorsProvider.getColor2(context),
               ),
             ),
             title: Row(
@@ -131,7 +131,7 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                   child: IconButton(
                     icon: Icon(
                       Icons.add_circle_outline_outlined,
-                      color: ColorsProvider.color_2,
+                      color: ColorsProvider.getColor2(context),
                       size: 35,
                     ),
                     onPressed: () {
@@ -183,7 +183,7 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                 ),
                 Container(
                   child: IconButton(
-                    icon: Icon(Icons.add_circle_outline_outlined, color: ColorsProvider.color_2, size: 35),
+                    icon: Icon(Icons.add_circle_outline_outlined, color: ColorsProvider.getColor2(context), size: 35),
                     onPressed: () {
                       dbSupabase.generateFalseMuscleCheckbox();
                       dbSupabase.getAllMuscles();
@@ -217,9 +217,9 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                       splashFactory: NoSplash.splashFactory,
                       tabAlignment: TabAlignment.start,
                       controller: _tabController,
-                      indicatorColor: ColorsProvider.color_2,
+                      indicatorColor: ColorsProvider.getColor2(context),
                       dividerColor: ColorsProvider.color_4,
-                      labelColor: ColorsProvider.color_2,
+                      labelColor: ColorsProvider.getColor2(context),
                       isScrollable: true,
                       tabs: splits.map((record) {
                         return Container(
@@ -271,7 +271,7 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                                               controller: TextEditingController(text: record.nameSplit),
                                               decoration: InputDecoration(
                                                 filled: true,
-                                                fillColor: ColorsProvider.color_2,
+                                                fillColor: ColorsProvider.getColor2(context),
                                                 enabledBorder: OutlineInputBorder(
                                                   borderRadius: BorderRadius.circular(12),
                                                   borderSide: BorderSide(color: Colors.black, width: 2),
@@ -287,9 +287,9 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                                                   horizontal: 20.0,
                                                 ),
                                               ),
-                                              cursorColor: ColorsProvider.color_8,
+                                              cursorColor: ColorsProvider.getColor8(context),
                                               style: TextStyle(
-                                                color: ColorsProvider.color_8,
+                                                color: ColorsProvider.getColor8(context),
                                                 fontWeight: FontWeight.bold,
                                                 fontSize: 23,
                                               ),
@@ -302,7 +302,7 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                                         padding: const EdgeInsets.all(8.0),
                                         child: Container(
                                           height: 5,
-                                          decoration: BoxDecoration(color: ColorsProvider.color_2, borderRadius: BorderRadius.circular(50)),
+                                          decoration: BoxDecoration(color: ColorsProvider.getColor2(context), borderRadius: BorderRadius.circular(50)),
                                         ),
                                       ),
                                       SizedBox(
@@ -319,7 +319,7 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                                             return Padding(
                                               padding: const EdgeInsets.only(bottom: 15, left: 10, right: 10),
                                               child: Container(
-                                                decoration: BoxDecoration(color: ColorsProvider.color_2, borderRadius: BorderRadius.circular(20)),
+                                                decoration: BoxDecoration(color: ColorsProvider.getColor2(context), borderRadius: BorderRadius.circular(20)),
                                                 child: Column(
                                                   children: [
                                                     Padding(
@@ -327,7 +327,7 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                                                       child: Container(
                                                         height: 40,
                                                         decoration: BoxDecoration(
-                                                          // color: ColorsProvider.color_2,
+                                                          // color: ColorsProvider.getColor2(context),
                                                           borderRadius: variablesProvider.zaobleni,
                                                         ),
                                                         child: Row(
@@ -347,7 +347,7 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                                                                     controller: TextEditingController(text: record.selectedMuscle![muscleIndex].muscles!.nameOfMuscle),
                                                                     decoration: InputDecoration(
                                                                       filled: true,
-                                                                      fillColor: ColorsProvider.color_2,
+                                                                      fillColor: ColorsProvider.getColor2(context),
                                                                       enabledBorder: UnderlineInputBorder(
                                                                         borderSide: BorderSide(color: Colors.black, width: 2),
                                                                       ),
@@ -359,9 +359,9 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                                                                         horizontal: 20.0,
                                                                       ),
                                                                     ),
-                                                                    cursorColor: ColorsProvider.color_8,
+                                                                    cursorColor: ColorsProvider.getColor8(context),
                                                                     style: TextStyle(
-                                                                      color: ColorsProvider.color_8,
+                                                                      color: ColorsProvider.getColor8(context),
                                                                       fontWeight: FontWeight.bold,
                                                                       fontSize: 23,
                                                                     ),
@@ -436,7 +436,7 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                                                                         // controller: exercisesTextEditingControllers[itemIndex],
                                                                         decoration: InputDecoration(
                                                                           filled: true,
-                                                                          fillColor: ColorsProvider.color_2,
+                                                                          fillColor: ColorsProvider.getColor2(context),
                                                                           enabledBorder: OutlineInputBorder(
                                                                             borderRadius: BorderRadius.circular(12),
                                                                             borderSide: BorderSide(color: Colors.black, width: 2),
@@ -450,9 +450,9 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                                                                           ),
                                                                           contentPadding: EdgeInsets.symmetric(horizontal: 10.0),
                                                                         ),
-                                                                        cursorColor: ColorsProvider.color_8,
+                                                                        cursorColor: ColorsProvider.getColor8(context),
                                                                         style: TextStyle(
-                                                                          color: ColorsProvider.color_8,
+                                                                          color: ColorsProvider.getColor8(context),
                                                                           fontWeight: FontWeight.bold,
                                                                         ),
                                                                       ),
@@ -507,7 +507,7 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                                                                                         style: TextStyle(
                                                                                           fontSize: 15,
                                                                                           fontWeight: FontWeight.bold,
-                                                                                          color: ColorsProvider.color_2,
+                                                                                          color: ColorsProvider.getColor2(context),
                                                                                         ),
                                                                                       ),
                                                                                     ),
@@ -604,7 +604,7 @@ class __deleteSplitState extends State<_deleteSplit> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       duration: Duration(seconds: 5),
-                      backgroundColor: ColorsProvider.color_2,
+                      backgroundColor: ColorsProvider.getColor2(context),
                       content: Container(
                         height: 50,
                         child: Row(
@@ -621,7 +621,7 @@ class __deleteSplitState extends State<_deleteSplit> {
                             ),
                             ElevatedButton(
                               style: ButtonStyle(
-                                backgroundColor: WidgetStatePropertyAll(ColorsProvider.color_8),
+                                backgroundColor: WidgetStatePropertyAll(ColorsProvider.getColor8(context)),
                                 foregroundColor: WidgetStatePropertyAll(
                                   ColorsProvider.color_1,
                                 ),
@@ -672,7 +672,7 @@ Widget _deleteSplit() {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     duration: Duration(seconds: 5),
-                    backgroundColor: ColorsProvider.color_2,
+                    backgroundColor: ColorsProvider.getColor2(context),
                     content: Container(
                       height: 50,
                       child: Row(
@@ -689,7 +689,7 @@ Widget _deleteSplit() {
                           ),
                           ElevatedButton(
                             style: ButtonStyle(
-                              backgroundColor: WidgetStatePropertyAll(ColorsProvider.color_8),
+                              backgroundColor: WidgetStatePropertyAll(ColorsProvider.getColor8(context)),
                               foregroundColor: WidgetStatePropertyAll(
                                 ColorsProvider.color_1,
                               ),

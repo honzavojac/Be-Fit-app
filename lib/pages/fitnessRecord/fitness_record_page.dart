@@ -221,7 +221,7 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                                       padding: const EdgeInsets.only(bottom: 15),
                                       child: Container(
                                         decoration: BoxDecoration(
-                                          color: ColorsProvider.color_2,
+                                          color: ColorsProvider.getColor2(context),
                                           borderRadius: BorderRadius.circular(20),
                                         ),
                                         child: Column(
@@ -231,14 +231,14 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                                               child: Container(
                                                 height: 30,
                                                 decoration: BoxDecoration(
-                                                  // color: ColorsProvider.color_2,
+                                                  // color: ColorsProvider.getColor2(context),
                                                   borderRadius: variablesProvider.zaobleni,
                                                 ),
                                                 child: Center(
                                                   child: Text(
                                                     "$muscle".toUpperCase(),
                                                     style: TextStyle(
-                                                      color: ColorsProvider.color_8,
+                                                      color: ColorsProvider.getColor8(context),
                                                       fontWeight: FontWeight.bold,
                                                       fontSize: 25,
                                                       // letterSpacing: 2,
@@ -256,7 +256,7 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                                               child: Container(
                                                 child: Text(
                                                   "No exercises",
-                                                  style: TextStyle(color: ColorsProvider.color_8, fontWeight: FontWeight.bold),
+                                                  style: TextStyle(color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold),
                                                 ),
                                               ),
                                             ),
@@ -271,7 +271,7 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                                     return Padding(
                                       padding: const EdgeInsets.only(bottom: 15),
                                       child: Container(
-                                        decoration: BoxDecoration(color: ColorsProvider.color_2, borderRadius: BorderRadius.circular(20)),
+                                        decoration: BoxDecoration(color: ColorsProvider.getColor2(context), borderRadius: BorderRadius.circular(20)),
                                         child: Column(
                                           children: [
                                             Padding(
@@ -279,14 +279,14 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                                               child: Container(
                                                 height: 30,
                                                 decoration: BoxDecoration(
-                                                  // color: ColorsProvider.color_2,
+                                                  // color: ColorsProvider.getColor2(context),
                                                   borderRadius: variablesProvider.zaobleni,
                                                 ),
                                                 child: Center(
                                                   child: Text(
                                                     "$muscle".toUpperCase(),
                                                     style: TextStyle(
-                                                      color: ColorsProvider.color_8,
+                                                      color: ColorsProvider.getColor8(context),
                                                       fontWeight: FontWeight.bold,
                                                       fontSize: 25,
                                                       letterSpacing: 2,
@@ -343,7 +343,7 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                                                           height: 105,
                                                           decoration: BoxDecoration(
                                                             borderRadius: BorderRadius.circular(10),
-                                                            color: ColorsProvider.color_2,
+                                                            color: ColorsProvider.getColor2(context),
                                                           ),
                                                           child: Column(
                                                             children: [
@@ -352,7 +352,7 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                                                                 children: [
                                                                   Text(
                                                                     "$nameOfExercise".toUpperCase(),
-                                                                    style: TextStyle(color: ColorsProvider.color_8, fontWeight: FontWeight.bold, fontSize: 18),
+                                                                    style: TextStyle(color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold, fontSize: 18),
                                                                   ),
                                                                 ],
                                                               ),
@@ -391,7 +391,7 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                                                                         ),
                                                                         Container(
                                                                           width: 1,
-                                                                          color: ColorsProvider.color_8,
+                                                                          color: ColorsProvider.getColor8(context),
                                                                         ),
                                                                         exerciseData != null
                                                                             ? Expanded(
@@ -506,7 +506,7 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
             }
           } else {
             return Container(
-                // color: ColorsProvider.color_8,
+                // color: ColorsProvider.getColor8(context),
                 );
           }
         });
@@ -551,8 +551,8 @@ class _CustomAppBarState extends State<CustomAppBar> {
               ),
             ),
             style: ButtonStyle(
-              backgroundColor: WidgetStateProperty.all(ColorsProvider.color_2),
-              foregroundColor: WidgetStateProperty.all(ColorsProvider.color_8),
+              backgroundColor: WidgetStateProperty.all(ColorsProvider.getColor2(context)),
+              foregroundColor: WidgetStateProperty.all(ColorsProvider.getColor8(context)),
             ),
           ),
         ),
@@ -628,7 +628,7 @@ class _FitnessRecordDropdownState extends State<FitnessRecordDropdown> {
                       decoration: BoxDecoration(
                         borderRadius: variablesProvider.zaobleni,
                         border: Border.all(
-                          color: ColorsProvider.color_2,
+                          color: ColorsProvider.getColor2(context),
                           width: 0.5,
                         ),
                       ),
@@ -642,7 +642,7 @@ class _FitnessRecordDropdownState extends State<FitnessRecordDropdown> {
                       maxHeight: 200,
                       decoration: BoxDecoration(
                         borderRadius: variablesProvider.zaobleni,
-                        border: Border.all(width: 2, color: ColorsProvider.color_2),
+                        border: Border.all(width: 2, color: ColorsProvider.getColor2(context)),
                       ),
                       offset: const Offset(0, -0),
                       scrollbarTheme: ScrollbarThemeData(
@@ -723,13 +723,13 @@ class _FitnessRecordEndSplitState extends State<FitnessRecordEndSplit> {
                                     height: 40,
                                     width: 100,
                                     decoration: BoxDecoration(
-                                      color: ColorsProvider.color_2,
+                                      color: ColorsProvider.getColor2(context),
                                       borderRadius: BorderRadius.circular(15),
                                     ),
                                     child: Center(
                                       child: Text(
                                         'Cancel',
-                                        style: TextStyle(color: ColorsProvider.color_8, fontWeight: FontWeight.bold),
+                                        style: TextStyle(color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold),
                                       ),
                                     ),
                                   ),
@@ -814,8 +814,8 @@ class _FitnessRecordEndSplitState extends State<FitnessRecordEndSplit> {
           //       ),
           //     ),
           //     style: ButtonStyle(
-          //       backgroundColor: WidgetStateProperty.all(ColorsProvider.color_2),
-          //       foregroundColor: WidgetStateProperty.all(ColorsProvider.color_8),
+          //       backgroundColor: WidgetStateProperty.all(ColorsProvider.getColor2(context)),
+          //       foregroundColor: WidgetStateProperty.all(ColorsProvider.getColor8(context)),
           //     ),
           //   ),
           // ),

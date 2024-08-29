@@ -421,7 +421,7 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                             //                 Radius.circular(12),
                             //               ),
                             //               borderSide: BorderSide(
-                            //                 color: ColorsProvider.color_2,
+                            //                 color: ColorsProvider.getColor2(context),
                             //                 width: 0.5,
                             //               ),
                             //             ),
@@ -430,7 +430,7 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                             //                 Radius.circular(12),
                             //               ),
                             //               borderSide: BorderSide(
-                            //                 color: ColorsProvider.color_2,
+                            //                 color: ColorsProvider.getColor2(context),
                             //                 width: 2.0,
                             //               ),
                             //             ),
@@ -470,7 +470,7 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                             //           height: 135,
                             //           decoration: BoxDecoration(
                             //             borderRadius: BorderRadius.circular(10),
-                            //             color: ColorsProvider.color_2,
+                            //             color: ColorsProvider.getColor2(context),
                             //           ),
                             //           child: Column(
                             //             children: [
@@ -483,7 +483,7 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                             //                   children: [
                             //                     Text(
                             //                       "$date",
-                            //                       style: TextStyle(color: ColorsProvider.color_8, fontWeight: FontWeight.bold, fontSize: 20),
+                            //                       style: TextStyle(color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold, fontSize: 20),
                             //                     )
                             //                   ],
                             //                 ),
@@ -523,7 +523,7 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                             //                         ),
                             //                         Container(
                             //                           width: 1,
-                            //                           color: ColorsProvider.color_8,
+                            //                           color: ColorsProvider.getColor8(context),
                             //                         ),
                             //                         Expanded(
                             //                           child: Padding(
@@ -649,11 +649,11 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                                 decoration: BoxDecoration(
                                   // borderRadius: BorderRadius.circular(50),
                                   shape: BoxShape.circle,
-                                  color: ColorsProvider.color_8,
+                                  color: ColorsProvider.getColor8(context),
                                 ),
                                 child: Icon(
                                   Icons.add_circle_outline_outlined,
-                                  color: ColorsProvider.color_2,
+                                  color: ColorsProvider.getColor2(context),
                                   size: 50,
                                 ),
                               ),
@@ -684,7 +684,7 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
         },
         child: Scaffold(
           appBar: AppBar(
-            foregroundColor: ColorsProvider.color_2,
+            foregroundColor: ColorsProvider.getColor2(context),
             title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -845,9 +845,9 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                                                             RegExp(r'[0-9]'),
                                                           )
                                                         ],
-                                                        decoration: const InputDecoration(
+                                                        decoration: InputDecoration(
                                                           filled: false,
-                                                          fillColor: ColorsProvider.color_2,
+                                                          fillColor: ColorsProvider.getColor2(context),
                                                           labelStyle: TextStyle(
                                                             color: ColorsProvider.color_1,
                                                           ),
@@ -856,7 +856,7 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                                                               Radius.circular(12),
                                                             ),
                                                             borderSide: BorderSide(
-                                                              color: ColorsProvider.color_2,
+                                                              color: ColorsProvider.getColor2(context),
                                                               width: 0.5,
                                                             ),
                                                           ),
@@ -865,7 +865,7 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                                                               Radius.circular(12),
                                                             ),
                                                             borderSide: BorderSide(
-                                                              color: ColorsProvider.color_2,
+                                                              color: ColorsProvider.getColor2(context),
                                                               width: 2.0,
                                                             ),
                                                           ),
@@ -915,7 +915,7 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                                                             RegExp(r'[0-9]'),
                                                           )
                                                         ],
-                                                        decoration: const InputDecoration(
+                                                        decoration: InputDecoration(
                                                           labelStyle: TextStyle(
                                                             color: ColorsProvider.color_1,
                                                           ),
@@ -924,7 +924,7 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                                                               Radius.circular(12),
                                                             ),
                                                             borderSide: BorderSide(
-                                                              color: ColorsProvider.color_2,
+                                                              color: ColorsProvider.getColor2(context),
                                                               width: 0.5,
                                                             ),
                                                           ),
@@ -933,7 +933,7 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                                                               Radius.circular(12),
                                                             ),
                                                             borderSide: BorderSide(
-                                                              color: ColorsProvider.color_2,
+                                                              color: ColorsProvider.getColor2(context),
                                                               width: 2.0,
                                                             ),
                                                           ),
@@ -968,7 +968,7 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                                                     child: DropdownButton2<int>(
                                                       alignment: Alignment.center,
                                                       style: TextStyle(
-                                                        // color: ColorsProvider.color_8,
+                                                        // color: ColorsProvider.getColor8(context),
                                                         fontWeight: FontWeight.bold,
                                                         fontSize: 5,
                                                       ),
@@ -990,7 +990,7 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                                                         height: 38,
                                                         decoration: BoxDecoration(
                                                           borderRadius: BorderRadius.circular(12),
-                                                          border: Border.all(width: 0.5, color: ColorsProvider.color_2),
+                                                          border: Border.all(width: 0.5, color: ColorsProvider.getColor2(context)),
                                                         ),
                                                         overlayColor: WidgetStatePropertyAll(Colors.transparent),
                                                       ),
@@ -1143,7 +1143,7 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                               //                 Radius.circular(12),
                               //               ),
                               //               borderSide: BorderSide(
-                              //                 color: ColorsProvider.color_2,
+                              //                 color: ColorsProvider.getColor2(context),
                               //                 width: 0.5,
                               //               ),
                               //             ),
@@ -1152,7 +1152,7 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                               //                 Radius.circular(12),
                               //               ),
                               //               borderSide: BorderSide(
-                              //                 color: ColorsProvider.color_2,
+                              //                 color: ColorsProvider.getColor2(context),
                               //                 width: 2.0,
                               //               ),
                               //             ),
@@ -1192,7 +1192,7 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                                         height: 135,
                                         decoration: BoxDecoration(
                                           borderRadius: BorderRadius.circular(10),
-                                          color: ColorsProvider.color_2,
+                                          color: ColorsProvider.getColor2(context),
                                         ),
                                         child: Column(
                                           children: [
@@ -1205,7 +1205,7 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                                                 children: [
                                                   Text(
                                                     "$date",
-                                                    style: TextStyle(color: ColorsProvider.color_8, fontWeight: FontWeight.bold, fontSize: 20),
+                                                    style: TextStyle(color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold, fontSize: 20),
                                                   )
                                                 ],
                                               ),
@@ -1245,7 +1245,7 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                                                       ),
                                                       Container(
                                                         width: 1,
-                                                        color: ColorsProvider.color_8,
+                                                        color: ColorsProvider.getColor8(context),
                                                       ),
                                                       Expanded(
                                                         child: Padding(
@@ -1370,11 +1370,11 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
                                   decoration: BoxDecoration(
                                     // borderRadius: BorderRadius.circular(50),
                                     shape: BoxShape.circle,
-                                    color: ColorsProvider.color_8,
+                                    color: ColorsProvider.getColor8(context),
                                   ),
                                   child: Icon(
                                     Icons.add_circle_outline_outlined,
-                                    color: ColorsProvider.color_2,
+                                    color: ColorsProvider.getColor2(context),
                                     size: 50,
                                   ),
                                 ),

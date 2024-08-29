@@ -1,4 +1,6 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:kaloricke_tabulky_02/chose_init_data_page.dart';
 import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
 import 'package:kaloricke_tabulky_02/login_supabase/auth_page.dart';
@@ -27,10 +29,22 @@ import 'package:kaloricke_tabulky_02/init_page.dart';
 import 'package:kaloricke_tabulky_02/login_supabase/login_page.dart';
 import 'package:kaloricke_tabulky_02/login_supabase/splash_page.dart';
 
+import 'login_supabase/reset_password_get_token.dart';
 import 'side_panel/body/measurements.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await EasyLocalization.ensureInitialized();
+
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? languageCode = prefs.getString('selected_language_code');
+  Locale startLocale;
+
+  if (languageCode != null) {
+    startLocale = Locale(languageCode);
+  } else {
+    startLocale = Locale('en'); // Defaultní jazyk, pokud žádný není uložen
+  }
 
   FitnessProvider dbFitness = FitnessProvider();
   await dbFitness.initializeDB();
@@ -65,7 +79,13 @@ void main() async {
         ChangeNotifierProvider.value(value: colorsProvider),
         ChangeNotifierProvider.value(value: variablesProvider),
       ],
-      child: MyApp(),
+      child: EasyLocalization(
+        supportedLocales: locales,
+        path: 'assets/langs',
+        fallbackLocale: Locale('en'),
+        startLocale: startLocale,
+        child: MyApp(),
+      ),
     ),
   );
 }
@@ -120,6 +140,10 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: context.locale,
+
       debugShowCheckedModeBanner: false,
       theme: ThemeData.light(useMaterial3: true),
       darkTheme: ThemeData.dark(useMaterial3: true),
@@ -130,6 +154,7 @@ class _MyAppState extends State<MyApp> {
         '/account': (context) => InitPage(),
         '/initData': (context) => ChoseInitDataPage(),
         '/login': (context) => LoginPage(),
+        '/resetPassword': (context) => ResetPasswordGetToken(),
         '/splash': (context) => SplashPage(),
         '/settings': (context) => Settings(
               notifyMyApp: notifyMyApp,

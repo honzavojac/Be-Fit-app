@@ -33,7 +33,7 @@ class _dateRowState extends State<dateRow> {
             },
             child: Icon(
               Icons.arrow_back_ios_new_rounded,
-              color: ColorsProvider.color_2,
+              color: ColorsProvider.getColor2(context),
             ),
             style: ElevatedButton.styleFrom(
               fixedSize: Size(80, 30),
@@ -60,17 +60,17 @@ class _dateRowState extends State<dateRow> {
                           widget.onDateSelected(value); // Close the dialog when a date is selected
                         },
                         currentDateDecoration: BoxDecoration(
-                          border: Border.all(color: ColorsProvider.color_2),
+                          border: Border.all(color: ColorsProvider.getColor2(context)),
                           shape: BoxShape.circle,
                         ),
-                        daysOfTheWeekTextStyle: const TextStyle(color: ColorsProvider.color_2),
-                        enabledCellsDecoration: const BoxDecoration(),
+                        daysOfTheWeekTextStyle: TextStyle(color: ColorsProvider.getColor2(context)),
+                        enabledCellsDecoration: BoxDecoration(),
                         initialPickerType: PickerType.days,
-                        leadingDateTextStyle: const TextStyle(color: ColorsProvider.color_2),
-                        slidersColor: ColorsProvider.color_2,
+                        leadingDateTextStyle: TextStyle(color: ColorsProvider.getColor2(context)),
+                        slidersColor: ColorsProvider.getColor2(context),
                         slidersSize: 25,
                         selectedCellDecoration: BoxDecoration(
-                          color: ColorsProvider.color_2,
+                          color: ColorsProvider.getColor2(context),
                           shape: BoxShape.circle,
                         ),
                         selectedCellTextStyle: TextStyle(
@@ -106,7 +106,7 @@ class _dateRowState extends State<dateRow> {
                   "${selectedDate.day}.${selectedDate.month}.${selectedDate.year}",
                   style: TextStyle(
                     fontSize: 20,
-                    color: ColorsProvider.color_2,
+                    color: ColorsProvider.getColor2(context),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -119,7 +119,7 @@ class _dateRowState extends State<dateRow> {
             },
             child: Icon(
               Icons.arrow_forward_ios_rounded,
-              color: ColorsProvider.color_2,
+              color: ColorsProvider.getColor2(context),
             ),
             style: ElevatedButton.styleFrom(
               fixedSize: Size(80, 30),

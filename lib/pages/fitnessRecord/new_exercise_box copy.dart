@@ -1,6 +1,8 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
+import 'package:kaloricke_tabulky_02/main.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:provider/provider.dart';
@@ -81,8 +83,8 @@ class _NewExerciseBoxCopyState extends State<NewExerciseBoxCopy> {
                   padding: const EdgeInsets.only(left: 20),
                   child: Container(
                     child: Text(
-                      "New Exercise",
-                      style: TextStyle(color: ColorsProvider.color_2, fontSize: 20),
+                      "new_exercise".tr(),
+                      style: TextStyle(color: ColorsProvider.getColor2(context), fontSize: 20),
                     ),
                   ),
                 ),
@@ -108,17 +110,17 @@ class _NewExerciseBoxCopyState extends State<NewExerciseBoxCopy> {
                     width: 200,
                     child: TextField(
                       controller: _textController,
-                      decoration: const InputDecoration(
-                        labelText: 'Name of Exercise:',
+                      decoration: InputDecoration(
+                        labelText: '${"name_of_exercise".tr()}:',
                         labelStyle: TextStyle(
-                          color: ColorsProvider.color_2,
+                          color: ColorsProvider.getColor2(context),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.all(
                             Radius.circular(12),
                           ),
                           borderSide: BorderSide(
-                            color: ColorsProvider.color_2,
+                            color: ColorsProvider.getColor2(context),
                             width: 0.5,
                           ),
                         ),
@@ -127,7 +129,7 @@ class _NewExerciseBoxCopyState extends State<NewExerciseBoxCopy> {
                             Radius.circular(12),
                           ),
                           borderSide: BorderSide(
-                            color: ColorsProvider.color_2,
+                            color: ColorsProvider.getColor2(context),
                             width: 3.0,
                           ),
                         ),
@@ -135,9 +137,9 @@ class _NewExerciseBoxCopyState extends State<NewExerciseBoxCopy> {
                           vertical: 0,
                           horizontal: 15,
                         ),
-                        hintText: 'Enter value:',
+                        hintText: '${"enter_name_of_exercise".tr()}:',
                         hintStyle: TextStyle(
-                          color: ColorsProvider.color_2,
+                          color: ColorsProvider.getColor2(context),
                           fontSize: 15,
                         ),
                       ),
@@ -150,8 +152,8 @@ class _NewExerciseBoxCopyState extends State<NewExerciseBoxCopy> {
                 Container(
                   height: 20,
                   child: Text(
-                    "Assign a Muscle",
-                    style: TextStyle(color: ColorsProvider.color_2),
+                    "assign_a_muscle".tr(),
+                    style: TextStyle(color: ColorsProvider.getColor2(context)),
                   ),
                 ),
                 DropdownButtonHideUnderline(
@@ -162,10 +164,10 @@ class _NewExerciseBoxCopyState extends State<NewExerciseBoxCopy> {
                         value: muscle,
                         child: Text(
                           muscle.nameOfMuscle!,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
-                            color: ColorsProvider.color_2,
+                            color: ColorsProvider.getColor2(context),
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -184,17 +186,17 @@ class _NewExerciseBoxCopyState extends State<NewExerciseBoxCopy> {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
-                          color: ColorsProvider.color_2,
+                          color: ColorsProvider.getColor2(context),
                           width: 0.5,
                         ),
                       ),
                     ),
-                    iconStyleData: const IconStyleData(
+                    iconStyleData: IconStyleData(
                       icon: Icon(
                         Icons.keyboard_arrow_down_outlined,
                       ),
                       iconSize: 17,
-                      iconEnabledColor: ColorsProvider.color_2,
+                      iconEnabledColor: ColorsProvider.getColor2(context),
                     ),
                     dropdownStyleData: DropdownStyleData(
                       maxHeight: 200,
@@ -249,7 +251,7 @@ class _NewExerciseBoxCopyState extends State<NewExerciseBoxCopy> {
                             child: Padding(
                               padding: const EdgeInsets.only(left: 25, right: 25),
                               child: CustomSnackBar.error(
-                                message: "The name of new exercise cannot be empty",
+                                message: "error_the_name_of_new_exercise_cannot_be_empty".tr(),
                               ),
                             ),
                           ),
@@ -264,7 +266,7 @@ class _NewExerciseBoxCopyState extends State<NewExerciseBoxCopy> {
                       }
                     },
                     style: TextButton.styleFrom(
-                      backgroundColor: ColorsProvider.color_2,
+                      backgroundColor: ColorsProvider.getColor2(context),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.vertical(
                           bottom: Radius.circular(25),
@@ -272,9 +274,9 @@ class _NewExerciseBoxCopyState extends State<NewExerciseBoxCopy> {
                       ),
                     ),
                     child: Text(
-                      'Save',
+                      'save'.tr(),
                       style: TextStyle(
-                        color: ColorsProvider.color_8,
+                        color: ColorsProvider.getColor8(context),
                         fontWeight: FontWeight.bold,
                         fontSize: 20,
                       ),

@@ -70,7 +70,7 @@ class _choseYourSplitState extends State<choseYourSplit> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(14),
                           border: Border.all(
-                            color: ColorsProvider.color_2,
+                            color: ColorsProvider.getColor2(context),
                             width: 0.5,
                           ),
                         ),

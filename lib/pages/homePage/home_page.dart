@@ -1,19 +1,13 @@
 // ignore_for_file: no_leading_underscores_for_local_identifiers, prefer_const_constructors, sort_child_properties_last, avoid_unnecessary_containers, avoid_print
 
-import 'package:fl_chart/fl_chart.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:intl/intl.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
 import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
-import 'package:kaloricke_tabulky_02/init_page.dart';
-import 'package:kaloricke_tabulky_02/pages/fitnessRecord/fitness_record_page%20copy.dart';
 import 'package:kaloricke_tabulky_02/pages/homePage/date_row.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
-import 'package:kaloricke_tabulky_02/variables.dart';
 import 'package:provider/provider.dart';
-import 'package:timelines/timelines.dart';
 
 import 'data_boxes.dart';
 
@@ -97,8 +91,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+    var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
+    var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false);
+
+    dbFitness.SaveToSupabaseAndOrderSqlite(dbSupabase);
     load();
   }
 
@@ -133,14 +130,14 @@ class _HomeScreenState extends State<HomeScreen> {
                             },
                             // icon: Icon(Icons.add_circle_outline),
                             label: Text(
-                              'Now',
+                              'now'.tr(),
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             style: ButtonStyle(
-                              // backgroundColor: WidgetStateProperty.all(ColorsProvider.color_2.withAlpha(50)),
-                              foregroundColor: WidgetStateProperty.all(ColorsProvider.color_2),
+                              // backgroundColor: WidgetStateProperty.all(ColorsProvider.getColor2(context).withAlpha(50)),
+                              foregroundColor: WidgetStateProperty.all(ColorsProvider.getColor2(context)),
                             ),
                           ),
                         )
@@ -169,9 +166,13 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           ),
           Spacer(),
-          Container(child: dataBoxes(calories, protein, carbs, fat, fiber)),
+          Container(
+            child: dataBoxes(calories, protein, carbs, fat, fiber, context),
+          ),
           Spacer(),
-          Container(child: lastSplitWidget()),
+          Container(
+            child: lastSplitWidget(),
+          ),
           Spacer(),
           Container(
             child: measurement != null ? measurentWidget() : Container(),
@@ -216,9 +217,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Text(
-                          "Split",
+                          "split".tr(),
                           style: TextStyle(
-                            color: ColorsProvider.color_2,
+                            color: ColorsProvider.getColor2(context),
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
                           ),
@@ -246,7 +247,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   Text(
                                     "${formattedDate}",
                                     style: TextStyle(
-                                      color: parsedDate.toString().replaceRange(10, null, "") == selectedDate.toString().replaceRange(10, null, "") ? ColorsProvider.color_2 : Colors.white.withAlpha(100),
+                                      color: parsedDate.toString().replaceRange(10, null, "") == selectedDate.toString().replaceRange(10, null, "") ? ColorsProvider.getColor2(context) : Colors.white.withAlpha(100),
                                     ),
                                   ),
                                 ],
@@ -269,7 +270,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           children: [
                                             Text(
                                               split.name!,
-                                              style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold, fontSize: 20),
+                                              style: TextStyle(color: ColorsProvider.getColor2(context), fontWeight: FontWeight.bold, fontSize: 20),
                                             ),
                                           ],
                                         ),
@@ -280,11 +281,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                               crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  'Number of sets:',
+                                                  '${"number_of_sets".tr()}:',
                                                   style: TextStyle(color: Colors.grey[400]),
                                                 ),
                                                 Text(
-                                                  'Total work volume:',
+                                                  '${"total_work_volume".tr()}:',
                                                   style: TextStyle(color: Colors.grey[400]),
                                                 ),
                                               ],
@@ -341,9 +342,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Text(
-                      "Measurement",
+                      "measurement".tr(),
                       style: TextStyle(
-                        color: ColorsProvider.color_2,
+                        color: ColorsProvider.getColor2(context),
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
                       ),
@@ -363,7 +364,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           Text(
                             "${formattedDate}",
                             style: TextStyle(
-                              color: parsedDate.toString().replaceRange(10, null, "") == selectedDate.toString().replaceRange(10, null, "") ? ColorsProvider.color_2 : Colors.white.withAlpha(100),
+                              color: parsedDate.toString().replaceRange(10, null, "") == selectedDate.toString().replaceRange(10, null, "") ? ColorsProvider.getColor2(context) : Colors.white.withAlpha(100),
                             ),
                           ),
                         ],
@@ -392,7 +393,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         Row(
                                           children: [
                                             Text(
-                                              'Weight:',
+                                              '${"weight".tr()}:',
                                               style: TextStyle(color: Colors.grey[400]),
                                             ),
                                             SizedBox(
@@ -414,7 +415,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         Row(
                                           children: [
                                             Text(
-                                              'Height:',
+                                              '${"height".tr()}:',
                                               style: TextStyle(color: Colors.grey[400]),
                                             ),
                                             SizedBox(
@@ -437,7 +438,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Text(
-                                      'Circumference',
+                                      '${'circumference'.tr()} (cm)',
                                       style: TextStyle(color: Colors.grey[400]),
                                     ),
                                   ],
@@ -453,15 +454,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                'Abdominal:',
+                                                '${"abdominal".tr()}:',
                                                 style: TextStyle(color: Colors.grey[400]),
                                               ),
                                               Text(
-                                                'Chest:',
+                                                '${"chest".tr()}:',
                                                 style: TextStyle(color: Colors.grey[400]),
                                               ),
                                               Text(
-                                                'Waist:',
+                                                '${"waist".tr()}:',
                                                 style: TextStyle(color: Colors.grey[400]),
                                               ),
                                             ],
@@ -502,15 +503,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              'Thingh:',
+                                              '${"thingh".tr()}:',
                                               style: TextStyle(color: Colors.grey[400]),
                                             ),
                                             Text(
-                                              'Neck:',
+                                              '${"neck".tr()}:',
                                               style: TextStyle(color: Colors.grey[400]),
                                             ),
                                             Text(
-                                              'Biceps:',
+                                              '${"biceps".tr()}:',
                                               style: TextStyle(color: Colors.grey[400]),
                                             ),
                                           ],

@@ -1,5 +1,6 @@
 import 'package:date_picker_plus/date_picker_plus.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
@@ -7,6 +8,7 @@ import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'variables.dart';
 
 import 'login_supabase/splash_page.dart';
@@ -24,6 +26,7 @@ class _ChoseInitDataPageState extends State<ChoseInitDataPage> {
 
   TextEditingController _nameController = TextEditingController(text: "Username");
   DateTime? _selectedDateOfBirth;
+  String? language;
 
   @override
   void initState() {
@@ -38,6 +41,15 @@ class _ChoseInitDataPageState extends State<ChoseInitDataPage> {
     email = args[0];
   }
 
+  Future<void> _changeLanguage(BuildContext context, Locale locale) async {
+    // Změnit jazyk v aplikaci
+    context.setLocale(locale);
+
+    // Uložit volbu jazyka do SharedPreferences
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('selected_language_code', locale.languageCode);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,7 +57,7 @@ class _ChoseInitDataPageState extends State<ChoseInitDataPage> {
         children: [
           Expanded(
             child: Container(
-              color: ColorsProvider.color_2,
+              color: ColorsProvider.getColor2(context),
               child: Center(
                 child: Column(
                   children: [
@@ -67,7 +79,7 @@ class _ChoseInitDataPageState extends State<ChoseInitDataPage> {
                           child: Container(
                             decoration: BoxDecoration(
                               color: Colors.grey[800],
-                              border: Border.all(color: ColorsProvider.color_8, width: 4),
+                              border: Border.all(color: ColorsProvider.getColor8(context), width: 4),
                               borderRadius: BorderRadius.circular(15),
                             ),
                             child: Padding(
@@ -87,10 +99,10 @@ class _ChoseInitDataPageState extends State<ChoseInitDataPage> {
                                 decoration: InputDecoration(
                                   border: InputBorder.none,
                                   hintText: "Name",
-                                  hintStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: ColorsProvider.color_2),
+                                  hintStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: ColorsProvider.getColor2(context)),
                                 ),
-                                cursorColor: ColorsProvider.color_2,
-                                style: TextStyle(color: ColorsProvider.color_2),
+                                cursorColor: ColorsProvider.getColor2(context),
+                                style: TextStyle(color: ColorsProvider.getColor2(context)),
                               ),
                             ),
                           ),
@@ -99,69 +111,42 @@ class _ChoseInitDataPageState extends State<ChoseInitDataPage> {
                           height: 20,
                         ),
                         customText("Choose language"),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 50),
-                          child: Container(
-                            // height: 55,
-                            decoration: BoxDecoration(
-                              color: Colors.grey[800],
-                              border: Border.all(color: ColorsProvider.color_8, width: 4),
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            child: DropdownButtonHideUnderline(
-                              child: DropdownButton2<String>(
-                                isExpanded: true,
-                                value: selectedCountry,
-                                items: languages.map((country) {
-                                  return DropdownMenuItem<String>(
-                                    value: country['code'],
-                                    child: Text(
-                                      country['name']!,
-                                      style: TextStyle(color: ColorsProvider.color_2),
+                        Column(
+                          children: [
+                            Container(
+                              height: 70,
+                              child: ListView.builder(
+                                itemCount: flags.length,
+                                scrollDirection: Axis.horizontal,
+                                shrinkWrap: true,
+                                itemBuilder: (context, index) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(right: 10),
+                                    child: Container(
+                                      // height: 20,
+                                      width: 100,
+                                      decoration: BoxDecoration(
+                                        color: locales[index].languageCode.toString().toLowerCase() == language.toString().toLowerCase() ? ColorsProvider.getColor8(context) : Colors.transparent, // Výchozí barva nebo jiná barva
+                                        borderRadius: BorderRadius.circular(18),
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(5.0),
+                                        child: GestureDetector(
+                                            onTap: () {
+                                              language = locales[index].languageCode;
+                                              _changeLanguage(context, locales[index]);
+                                              setState(() {});
+
+                                              // setState(() {});
+                                            },
+                                            child: flags[index]),
+                                      ),
                                     ),
                                   );
-                                }).toList(),
-                                onChanged: (value) {
-                                  selectedCountry = value;
-                                  setState(() {});
                                 },
-                                buttonStyleData: ButtonStyleData(
-                                  // width: 180,
-                                  padding: const EdgeInsets.symmetric(horizontal: 14),
-                                  // decoration: BoxDecoration(
-                                  //   borderRadius: BorderRadius.circular(18),
-                                  //   border: Border.all(
-                                  //     color: ColorsProvider.color_8,
-                                  //     width: 0.5,
-                                  //   ),
-                                  // ),
-                                ),
-                                iconStyleData: const IconStyleData(
-                                  icon: Icon(Icons.keyboard_arrow_down_outlined),
-                                  iconSize: 17,
-                                  iconEnabledColor: ColorsProvider.color_2,
-                                ),
-                                dropdownStyleData: DropdownStyleData(
-                                  maxHeight: 200,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(18),
-                                    border: Border.all(width: 2, color: ColorsProvider.color_8),
-                                  ),
-                                  offset: const Offset(0, -0),
-                                  scrollbarTheme: ScrollbarThemeData(
-                                    radius: const Radius.circular(40),
-                                    interactive: true,
-                                    thickness: WidgetStateProperty.all(6),
-                                    thumbVisibility: WidgetStateProperty.all(true),
-                                  ),
-                                ),
-                                menuItemStyleData: const MenuItemStyleData(
-                                  // height: 40,
-                                  padding: EdgeInsets.only(left: 10, right: 18),
-                                ),
                               ),
                             ),
-                          ),
+                          ],
                         ),
                         SizedBox(
                           height: 20,
@@ -191,17 +176,17 @@ class _ChoseInitDataPageState extends State<ChoseInitDataPage> {
                                         Navigator.of(context).pop();
                                       },
                                       currentDateDecoration: BoxDecoration(
-                                        border: Border.all(color: ColorsProvider.color_2),
+                                        border: Border.all(color: ColorsProvider.getColor2(context)),
                                         shape: BoxShape.circle,
                                       ),
-                                      daysOfTheWeekTextStyle: const TextStyle(color: ColorsProvider.color_2),
-                                      enabledCellsDecoration: const BoxDecoration(),
+                                      daysOfTheWeekTextStyle: TextStyle(color: ColorsProvider.getColor2(context)),
+                                      enabledCellsDecoration: BoxDecoration(),
                                       initialPickerType: PickerType.days,
-                                      leadingDateTextStyle: const TextStyle(color: ColorsProvider.color_2),
-                                      slidersColor: ColorsProvider.color_2,
+                                      leadingDateTextStyle: TextStyle(color: ColorsProvider.getColor2(context)),
+                                      slidersColor: ColorsProvider.getColor2(context),
                                       slidersSize: 25,
                                       selectedCellDecoration: BoxDecoration(
-                                        color: ColorsProvider.color_2,
+                                        color: ColorsProvider.getColor2(context),
                                         shape: BoxShape.circle,
                                       ),
                                       selectedCellTextStyle: TextStyle(
@@ -234,7 +219,7 @@ class _ChoseInitDataPageState extends State<ChoseInitDataPage> {
                               height: 55,
                               decoration: BoxDecoration(
                                 color: Colors.grey[800],
-                                border: Border.all(color: ColorsProvider.color_8, width: 4),
+                                border: Border.all(color: ColorsProvider.getColor8(context), width: 4),
                                 borderRadius: BorderRadius.circular(15),
                               ),
                               child: Center(
@@ -242,7 +227,7 @@ class _ChoseInitDataPageState extends State<ChoseInitDataPage> {
                                   "${_selectedDateOfBirth != null ? (DateFormat('dd.MM.yyyy').format(_selectedDateOfBirth!)) : ""}",
                                   style: TextStyle(
                                     fontSize: 20,
-                                    color: ColorsProvider.color_2,
+                                    color: ColorsProvider.getColor2(context),
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -264,7 +249,7 @@ class _ChoseInitDataPageState extends State<ChoseInitDataPage> {
           var user = {
             'name': _nameController.text.trim(),
             'email': email,
-            'country': selectedCountry,
+            'country': "none",
             'birth_date': _selectedDateOfBirth.toString(),
           };
           await supabase.from("users").insert(user);
@@ -303,7 +288,7 @@ class _ChoseInitDataPageState extends State<ChoseInitDataPage> {
             width: 170,
             height: 50,
             decoration: BoxDecoration(
-              color: (_nameController.text != "" && selectedCountry != null && _selectedDateOfBirth != null) ? ColorsProvider.color_8 : ColorsProvider.color_8.withOpacity(0.5),
+              color: (_nameController.text != "" && _selectedDateOfBirth != null) ? ColorsProvider.getColor8(context) : ColorsProvider.getColor8(context).withOpacity(0.5),
               borderRadius: BorderRadius.circular(
                 50,
               ),
@@ -316,7 +301,7 @@ class _ChoseInitDataPageState extends State<ChoseInitDataPage> {
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: (_nameController.text != "" && selectedCountry != null && _selectedDateOfBirth != null) ? ColorsProvider.color_2 : ColorsProvider.color_2.withAlpha(100),
+                    color: (_nameController.text != "" && _selectedDateOfBirth != null) ? ColorsProvider.getColor2(context) : ColorsProvider.getColor2(context).withAlpha(100),
                   ),
                 ),
                 SizedBox(
@@ -343,7 +328,7 @@ class _ChoseInitDataPageState extends State<ChoseInitDataPage> {
                 "$text",
                 style: TextStyle(
                   fontSize: 17,
-                  color: ColorsProvider.color_8,
+                  color: ColorsProvider.getColor8(context),
                   fontWeight: FontWeight.bold,
                 ),
               ),

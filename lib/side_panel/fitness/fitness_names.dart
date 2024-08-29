@@ -240,7 +240,7 @@ class _CustomDropdownState extends State<CustomDropdown> {
             decoration: BoxDecoration(
               borderRadius: variablesProvider.zaobleni,
               border: Border.all(
-                color: ColorsProvider.color_2,
+                color: ColorsProvider.getColor2(context),
                 width: 0.5,
               ),
             ),
@@ -254,7 +254,7 @@ class _CustomDropdownState extends State<CustomDropdown> {
             maxHeight: 200,
             decoration: BoxDecoration(
               borderRadius: variablesProvider.zaobleni,
-              border: Border.all(width: 2, color: ColorsProvider.color_2),
+              border: Border.all(width: 2, color: ColorsProvider.getColor2(context)),
             ),
             offset: const Offset(0, -0),
             scrollbarTheme: ScrollbarThemeData(
@@ -303,7 +303,7 @@ Widget _myListViewBuilder(List<dynamic> data, int index, BuildContext context, L
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 15),
                     child: Container(
-                      decoration: BoxDecoration(color: ColorsProvider.color_2, borderRadius: BorderRadius.circular(20)),
+                      decoration: BoxDecoration(color: ColorsProvider.getColor2(context), borderRadius: BorderRadius.circular(20)),
                       child: Column(
                         children: [
                           Padding(
@@ -311,14 +311,14 @@ Widget _myListViewBuilder(List<dynamic> data, int index, BuildContext context, L
                             child: Container(
                               height: 30,
                               decoration: BoxDecoration(
-                                // color: ColorsProvider.color_2,
+                                // color: ColorsProvider.getColor2(context),
                                 borderRadius: variablesProvider.zaobleni,
                               ),
                               child: Center(
                                 child: Text(
                                   index == 1 ? "Splits".toUpperCase() : "Muscles".toUpperCase(),
                                   style: TextStyle(
-                                    color: ColorsProvider.color_8,
+                                    color: ColorsProvider.getColor8(context),
                                     fontWeight: FontWeight.bold,
                                     fontSize: 25,
                                     letterSpacing: 2,
@@ -359,7 +359,7 @@ Widget _myListViewBuilder(List<dynamic> data, int index, BuildContext context, L
                                                 : TextEditingController(),
                                         decoration: InputDecoration(
                                           filled: true,
-                                          fillColor: ColorsProvider.color_2,
+                                          fillColor: ColorsProvider.getColor2(context),
                                           enabledBorder: OutlineInputBorder(
                                             borderRadius: BorderRadius.circular(12),
                                             borderSide: BorderSide(color: Colors.black, width: 2),
@@ -373,9 +373,9 @@ Widget _myListViewBuilder(List<dynamic> data, int index, BuildContext context, L
                                           ),
                                           contentPadding: EdgeInsets.symmetric(horizontal: 10.0),
                                         ),
-                                        cursorColor: ColorsProvider.color_8,
+                                        cursorColor: ColorsProvider.getColor8(context),
                                         style: TextStyle(
-                                          color: ColorsProvider.color_8,
+                                          color: ColorsProvider.getColor8(context),
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
@@ -405,7 +405,7 @@ Widget _myListViewBuilder(List<dynamic> data, int index, BuildContext context, L
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 15),
                         child: Container(
-                          decoration: BoxDecoration(color: ColorsProvider.color_2, borderRadius: BorderRadius.circular(20)),
+                          decoration: BoxDecoration(color: ColorsProvider.getColor2(context), borderRadius: BorderRadius.circular(20)),
                           child: Column(
                             children: [
                               Padding(
@@ -413,14 +413,14 @@ Widget _myListViewBuilder(List<dynamic> data, int index, BuildContext context, L
                                 child: Container(
                                   height: 30,
                                   decoration: BoxDecoration(
-                                    // color: ColorsProvider.color_2,
+                                    // color: ColorsProvider.getColor2(context),
                                     borderRadius: variablesProvider.zaobleni,
                                   ),
                                   child: Center(
                                     child: Text(
                                       "$muscle".toUpperCase(),
                                       style: TextStyle(
-                                        color: ColorsProvider.color_8,
+                                        color: ColorsProvider.getColor8(context),
                                         fontWeight: FontWeight.bold,
                                         fontSize: 25,
                                         letterSpacing: 2,
@@ -448,7 +448,7 @@ Widget _myListViewBuilder(List<dynamic> data, int index, BuildContext context, L
                                             controller: exercisesTextEditingControllers[itemIndex],
                                             decoration: InputDecoration(
                                               filled: true,
-                                              fillColor: ColorsProvider.color_2,
+                                              fillColor: ColorsProvider.getColor2(context),
                                               enabledBorder: OutlineInputBorder(
                                                 borderRadius: BorderRadius.circular(12),
                                                 borderSide: BorderSide(color: Colors.black, width: 2),
@@ -462,9 +462,9 @@ Widget _myListViewBuilder(List<dynamic> data, int index, BuildContext context, L
                                               ),
                                               contentPadding: EdgeInsets.symmetric(horizontal: 10.0),
                                             ),
-                                            cursorColor: ColorsProvider.color_8,
+                                            cursorColor: ColorsProvider.getColor8(context),
                                             style: TextStyle(
-                                              color: ColorsProvider.color_8,
+                                              color: ColorsProvider.getColor8(context),
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
@@ -494,7 +494,7 @@ Widget _myListViewBuilder(List<dynamic> data, int index, BuildContext context, L
           //           Container(
           //             height: 40,
           //             decoration: BoxDecoration(
-          //               color: ColorsProvider.color_2,
+          //               color: ColorsProvider.getColor2(context),
           //               borderRadius: BorderRadius.circular(12),
           //             ),
           //             child: Center(
@@ -526,7 +526,7 @@ Widget _myListViewBuilder(List<dynamic> data, int index, BuildContext context, L
           //                       controller: TextEditingController(text: exercise.nameOfExercise),
           //                       decoration: InputDecoration(
           //                         filled: true,
-          //                         fillColor: ColorsProvider.color_2,
+          //                         fillColor: ColorsProvider.getColor2(context),
           //                         enabledBorder: OutlineInputBorder(
           //                           borderRadius: BorderRadius.circular(12),
           //                           borderSide: BorderSide(color: Colors.black, width: 3),
@@ -540,9 +540,9 @@ Widget _myListViewBuilder(List<dynamic> data, int index, BuildContext context, L
           //                         ),
           //                         contentPadding: EdgeInsets.symmetric(horizontal: 10.0),
           //                       ),
-          //                       cursorColor: ColorsProvider.color_8,
+          //                       cursorColor: ColorsProvider.getColor8(context),
           //                       style: TextStyle(
-          //                         color: ColorsProvider.color_8,
+          //                         color: ColorsProvider.getColor8(context),
           //                         fontWeight: FontWeight.bold,
           //                       ),
           //                     ),

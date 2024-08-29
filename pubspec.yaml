@@ -52,6 +52,9 @@ dependencies:
   text_scroll: ^0.2.0
   timelines: ^0.1.0
   shared_preferences: ^2.3.2
+  easy_localization: ^3.0.7
+  country_icons: ^3.0.0
+  email_validator: ^3.0.0
   # flutter_marquee: ^2.0.1
   # marquee: ^2.2.3
   # fading_edge_scrollview: ^4.1.1
@@ -85,3 +88,6 @@ flutter:
     - assets/icons/icon_biceps.png
     - assets/icons/icon_bodybuilder.png
     - assets/icons/icon_half_bodybuilder.png
+    - assets/langs/cs.json
+    - assets/langs/en.json
+    - assets/langs/de.json

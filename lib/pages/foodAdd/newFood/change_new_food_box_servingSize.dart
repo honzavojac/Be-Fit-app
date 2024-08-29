@@ -51,7 +51,7 @@ class _changeNewFoodServingSizeState extends State<changeNewFoodServingSize> {
                     value: item,
                     child: Text(
                       item,
-                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: ColorsProvider.color_2),
+                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: ColorsProvider.getColor2(context)),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ))
@@ -71,7 +71,7 @@ class _changeNewFoodServingSizeState extends State<changeNewFoodServingSize> {
           },
           alignment: Alignment.center,
           style: TextStyle(
-            // color: ColorsProvider.color_8,
+            // color: ColorsProvider.getColor8(context),
             fontWeight: FontWeight.bold,
             fontSize: 5,
           ),
@@ -93,7 +93,7 @@ class _changeNewFoodServingSizeState extends State<changeNewFoodServingSize> {
             height: 38,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(width: 0.5, color: ColorsProvider.color_2),
+              border: Border.all(width: 0.5, color: ColorsProvider.getColor2(context)),
             ),
             overlayColor: WidgetStatePropertyAll(Colors.transparent),
           ),

@@ -1,6 +1,8 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
 import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
+import 'package:kaloricke_tabulky_02/main.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
@@ -91,24 +93,24 @@ class _AddSplitBoxCopyState extends State<AddSplitBoxCopy> {
                           ? Container()
                           : Container(
                               height: 50,
-                              // color: ColorsProvider.color_8,
+                              // color: ColorsProvider.getColor8(context),
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 15),
                                 child: TextField(
                                   decoration: InputDecoration(
-                                    labelText: 'Name of split:',
+                                    labelText: '${"name_of_split".tr()}:',
                                     labelStyle: TextStyle(
-                                      color: ColorsProvider.color_2,
+                                      color: ColorsProvider.getColor2(context),
                                     ),
                                     enabledBorder: UnderlineInputBorder(
                                       borderSide: BorderSide(
-                                        color: ColorsProvider.color_2,
+                                        color: ColorsProvider.getColor2(context),
                                         width: 0.5,
                                       ),
                                     ),
                                     focusedBorder: UnderlineInputBorder(
                                       borderSide: BorderSide(
-                                        color: ColorsProvider.color_2,
+                                        color: ColorsProvider.getColor2(context),
                                         width: 3.0,
                                       ),
                                     ),
@@ -116,14 +118,14 @@ class _AddSplitBoxCopyState extends State<AddSplitBoxCopy> {
                                       vertical: 0,
                                       horizontal: 15,
                                     ),
-                                    hintText: 'Enter name of split:',
+                                    hintText: '${"enter_name_of_split".tr()}:',
                                     hintStyle: TextStyle(
-                                      color: ColorsProvider.color_2,
+                                      color: ColorsProvider.getColor2(context),
                                       fontSize: 15,
                                     ),
                                   ),
                                   controller: _textController,
-                                  style: TextStyle(color: ColorsProvider.color_2),
+                                  style: TextStyle(color: ColorsProvider.getColor2(context)),
                                 ),
                               ),
                             ),
@@ -218,7 +220,7 @@ class _AddSplitBoxCopyState extends State<AddSplitBoxCopy> {
                               child: Padding(
                                 padding: const EdgeInsets.only(left: 25, right: 25),
                                 child: CustomSnackBar.error(
-                                  message: "You have not selected any muscle",
+                                  message: "error_you_have_not_selected_any_muscle".tr(),
                                 ),
                               ),
                             ),
@@ -243,7 +245,7 @@ class _AddSplitBoxCopyState extends State<AddSplitBoxCopy> {
                             child: Padding(
                               padding: const EdgeInsets.only(left: 25, right: 25),
                               child: CustomSnackBar.error(
-                                message: "Name of split is empty",
+                                message: "error_name_of_split_is_empty".tr(),
                               ),
                             ),
                           ),
@@ -257,7 +259,7 @@ class _AddSplitBoxCopyState extends State<AddSplitBoxCopy> {
                       }
                     },
                     style: TextButton.styleFrom(
-                      backgroundColor: ColorsProvider.color_2,
+                      backgroundColor: ColorsProvider.getColor2(context),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.vertical(
                           bottom: Radius.circular(25),
@@ -265,9 +267,9 @@ class _AddSplitBoxCopyState extends State<AddSplitBoxCopy> {
                       ),
                     ),
                     child: Text(
-                      'Save',
+                      'save'.tr(),
                       style: TextStyle(
-                        color: ColorsProvider.color_8,
+                        color: ColorsProvider.getColor8(context),
                         fontWeight: FontWeight.bold,
                         fontSize: 20,
                       ),
@@ -287,7 +289,7 @@ class _AddSplitBoxCopyState extends State<AddSplitBoxCopy> {
                     child: ElevatedButton(
                       style: ButtonStyle(
                         backgroundColor: WidgetStatePropertyAll(
-                          ColorsProvider.color_2,
+                          ColorsProvider.getColor2(context),
                         ),
                       ),
                       onPressed: () {
@@ -305,8 +307,8 @@ class _AddSplitBoxCopyState extends State<AddSplitBoxCopy> {
                         );
                       },
                       child: Text(
-                        "New Muscle",
-                        style: TextStyle(color: ColorsProvider.color_8),
+                        "new_muscle".tr(),
+                        style: TextStyle(color: ColorsProvider.getColor8(context)),
                       ),
                     ),
                   ),

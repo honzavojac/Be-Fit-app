@@ -1,9 +1,11 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
 import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
+import 'package:kaloricke_tabulky_02/init_page.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -286,7 +288,7 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
             children: [
               Text(
                 '${nameOfExercise}',
-                style: TextStyle(fontWeight: FontWeight.bold, color: ColorsProvider.color_2),
+                style: TextStyle(fontWeight: FontWeight.bold, color: ColorsProvider.getColor2(context)),
               ),
             ],
           ),
@@ -359,9 +361,9 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
-                                        'Swipe up',
+                                        'swipe_up'.tr(),
                                         style: TextStyle(
-                                          color: ColorsProvider.color_2,
+                                          color: ColorsProvider.getColor2(context),
                                           fontSize: 20,
                                           fontWeight: FontWeight.bold,
                                         ),
@@ -372,7 +374,7 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
                                       Icon(
                                         Icons.arrow_upward_rounded,
                                         size: 25,
-                                        color: ColorsProvider.color_2,
+                                        color: ColorsProvider.getColor2(context),
                                       ),
                                     ],
                                   ),
@@ -397,11 +399,11 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
                                 decoration: BoxDecoration(
                                   // borderRadius: BorderRadius.circular(50),
                                   shape: BoxShape.circle,
-                                  color: ColorsProvider.color_8,
+                                  color: ColorsProvider.getColor8(context),
                                 ),
                                 child: Icon(
                                   Icons.add_circle_outline_outlined,
-                                  color: ColorsProvider.color_2,
+                                  color: ColorsProvider.getColor2(context),
                                   size: 50,
                                 ),
                               ),
@@ -427,13 +429,13 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
         },
         child: Scaffold(
           appBar: AppBar(
-            foregroundColor: ColorsProvider.color_2,
+            foregroundColor: ColorsProvider.getColor2(context),
             title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   '${nameOfExercise}',
-                  style: TextStyle(fontWeight: FontWeight.bold, color: ColorsProvider.color_2),
+                  style: TextStyle(fontWeight: FontWeight.bold, color: ColorsProvider.getColor2(context)),
                 ),
                 // ElevatedButton(
                 //   onPressed: () async {
@@ -537,7 +539,7 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
                                                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                                     children: [
                                                       Container(
-                                                        width: 22,
+                                                        width: 40,
                                                         child: Row(
                                                           mainAxisAlignment: MainAxisAlignment.center,
                                                           children: [
@@ -579,14 +581,14 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
                                                               ],
                                                               decoration: InputDecoration(
                                                                 labelStyle: TextStyle(
-                                                                  color: ColorsProvider.color_2, // Replace with your color
+                                                                  color: ColorsProvider.getColor2(context), // Replace with your color
                                                                 ),
                                                                 enabledBorder: OutlineInputBorder(
                                                                   borderRadius: BorderRadius.all(
                                                                     Radius.circular(12),
                                                                   ),
                                                                   borderSide: BorderSide(
-                                                                    color: ColorsProvider.color_2, // Replace with your color
+                                                                    color: ColorsProvider.getColor2(context), // Replace with your color
                                                                     width: 0.5,
                                                                   ),
                                                                 ),
@@ -595,7 +597,7 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
                                                                     Radius.circular(12),
                                                                   ),
                                                                   borderSide: BorderSide(
-                                                                    color: ColorsProvider.color_2, // Replace with your color
+                                                                    color: ColorsProvider.getColor2(context), // Replace with your color
                                                                     width: 2.0,
                                                                   ),
                                                                 ),
@@ -659,14 +661,14 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
                                                               ],
                                                               decoration: InputDecoration(
                                                                 labelStyle: TextStyle(
-                                                                  color: ColorsProvider.color_2, // Replace with your color
+                                                                  color: ColorsProvider.getColor2(context), // Replace with your color
                                                                 ),
                                                                 enabledBorder: OutlineInputBorder(
                                                                   borderRadius: BorderRadius.all(
                                                                     Radius.circular(12),
                                                                   ),
                                                                   borderSide: BorderSide(
-                                                                    color: ColorsProvider.color_2, // Replace with your color
+                                                                    color: ColorsProvider.getColor2(context), // Replace with your color
                                                                     width: 0.5,
                                                                   ),
                                                                 ),
@@ -675,7 +677,7 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
                                                                     Radius.circular(12),
                                                                   ),
                                                                   borderSide: BorderSide(
-                                                                    color: ColorsProvider.color_2, // Replace with your color
+                                                                    color: ColorsProvider.getColor2(context), // Replace with your color
                                                                     width: 2.0,
                                                                   ),
                                                                 ),
@@ -717,7 +719,7 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
                                                             child: DropdownButton2<int>(
                                                               alignment: Alignment.center,
                                                               style: TextStyle(
-                                                                // color: ColorsProvider.color_8,
+                                                                // color: ColorsProvider.getColor8(context),
                                                                 fontWeight: FontWeight.bold,
                                                                 fontSize: 5,
                                                               ),
@@ -739,7 +741,7 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
                                                                 height: 38,
                                                                 decoration: BoxDecoration(
                                                                   borderRadius: BorderRadius.circular(12),
-                                                                  border: Border.all(width: 0.5, color: ColorsProvider.color_2),
+                                                                  border: Border.all(width: 0.5, color: ColorsProvider.getColor2(context)),
                                                                 ),
                                                                 overlayColor: WidgetStatePropertyAll(Colors.transparent),
                                                               ),
@@ -856,9 +858,9 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         Text(
-                                          'Swipe up',
+                                          'swipe_up'.tr(),
                                           style: TextStyle(
-                                            color: ColorsProvider.color_2,
+                                            color: ColorsProvider.getColor2(context),
                                             fontSize: 20,
                                             fontWeight: FontWeight.bold,
                                           ),
@@ -869,7 +871,7 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
                                         Icon(
                                           Icons.arrow_upward_rounded,
                                           size: 25,
-                                          color: ColorsProvider.color_2,
+                                          color: ColorsProvider.getColor2(context),
                                         ),
                                       ],
                                     ),
@@ -900,7 +902,7 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
                               //                 Radius.circular(12),
                               //               ),
                               //               borderSide: BorderSide(
-                              //                 color: ColorsProvider.color_2,
+                              //                 color: ColorsProvider.getColor2(context),
                               //                 width: 0.5,
                               //               ),
                               //             ),
@@ -909,7 +911,7 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
                               //                 Radius.circular(12),
                               //               ),
                               //               borderSide: BorderSide(
-                              //                 color: ColorsProvider.color_2,
+                              //                 color: ColorsProvider.getColor2(context),
                               //                 width: 2.0,
                               //               ),
                               //             ),
@@ -949,7 +951,7 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
                                         height: 135,
                                         decoration: BoxDecoration(
                                           borderRadius: BorderRadius.circular(10),
-                                          color: ColorsProvider.color_2,
+                                          color: ColorsProvider.getColor2(context),
                                         ),
                                         child: Column(
                                           children: [
@@ -962,7 +964,7 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
                                                 children: [
                                                   Text(
                                                     "$date",
-                                                    style: TextStyle(color: ColorsProvider.color_8, fontWeight: FontWeight.bold, fontSize: 20),
+                                                    style: TextStyle(color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold, fontSize: 20),
                                                   )
                                                 ],
                                               ),
@@ -977,20 +979,20 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
                                                       Padding(
                                                         padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
                                                         child: Container(
-                                                          width: 60,
+                                                          width: 65,
                                                           child: Column(
                                                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                                             children: [
                                                               Text(
-                                                                "Set",
+                                                                "set".tr(),
                                                                 style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
                                                               ),
                                                               Text(
-                                                                "Weight",
+                                                                "exercise_weight".tr(),
                                                                 style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
                                                               ),
                                                               Text(
-                                                                "Reps",
+                                                                "reps".tr(),
                                                                 style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
                                                               ),
                                                               SizedBox(
@@ -1002,7 +1004,7 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
                                                       ),
                                                       Container(
                                                         width: 1,
-                                                        color: ColorsProvider.color_8,
+                                                        color: ColorsProvider.getColor8(context),
                                                       ),
                                                       Expanded(
                                                         child: Padding(
@@ -1112,11 +1114,11 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
                                   decoration: BoxDecoration(
                                     // borderRadius: BorderRadius.circular(50),
                                     shape: BoxShape.circle,
-                                    color: ColorsProvider.color_8,
+                                    color: ColorsProvider.getColor8(context),
                                   ),
                                   child: Icon(
                                     Icons.add_circle_outline_outlined,
-                                    color: ColorsProvider.color_2,
+                                    color: ColorsProvider.getColor2(context),
                                     size: 50,
                                   ),
                                 ),
@@ -1158,10 +1160,10 @@ Widget categoryRow() {
     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
     children: [
       Container(
-        width: 22,
+        width: 40,
         child: Center(
           child: Text(
-            "Set",
+            "set".tr(),
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
         ),
@@ -1170,7 +1172,7 @@ Widget categoryRow() {
         width: 70,
         child: Center(
           child: Text(
-            "Weight",
+            "exercise_weight".tr(),
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
         ),
@@ -1179,7 +1181,7 @@ Widget categoryRow() {
         width: 70,
         child: Center(
           child: Text(
-            "Reps",
+            "reps".tr(),
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
         ),

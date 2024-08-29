@@ -2,10 +2,12 @@
 
 import 'dart:async';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
 import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
+import 'package:kaloricke_tabulky_02/main.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/fitness_record_page%20copy.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/fitness_record_page.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
@@ -301,7 +303,7 @@ class _InitPageState extends State<InitPage> {
     // dbSupabase.getUser();
     if (loading == true) {
       return Scaffold(
-        backgroundColor: ColorsProvider.color_2,
+        backgroundColor: ColorsProvider.getColor2(context),
         body: iconPage == true
             ? Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -320,11 +322,11 @@ class _InitPageState extends State<InitPage> {
                         height: 70,
                         child: Text(
                           "Welcome",
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 35, color: ColorsProvider.color_8),
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 35, color: ColorsProvider.getColor8(context)),
                         ),
                       ),
                       // LoadingAnimationWidget.staggeredDotsWave(
-                      //   color: ColorsProvider.color_8,
+                      //   color: ColorsProvider.getColor8(context),
                       //   size: 100,
                       // ),
                       SizedBox(
@@ -332,7 +334,7 @@ class _InitPageState extends State<InitPage> {
                       ),
                       // Text(
                       //   "Loading data",
-                      //   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 35, color: ColorsProvider.color_8),
+                      //   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 35, color: ColorsProvider.getColor8(context)),
                       // ),
                     ],
                   ),
@@ -352,7 +354,7 @@ class _InitPageState extends State<InitPage> {
                         height: 100,
                       ),
                       LoadingAnimationWidget.staggeredDotsWave(
-                        color: ColorsProvider.color_8,
+                        color: ColorsProvider.getColor8(context),
                         size: 100,
                       ),
                       SizedBox(
@@ -362,7 +364,7 @@ class _InitPageState extends State<InitPage> {
                         height: 50,
                         child: Text(
                           "Loading data",
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 35, color: ColorsProvider.color_8),
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 35, color: ColorsProvider.getColor8(context)),
                         ),
                       ),
                     ],
@@ -375,7 +377,7 @@ class _InitPageState extends State<InitPage> {
       return Scaffold(
         key: _scaffoldKey, drawerEnableOpenDragGesture: false,
         drawer: Drawer(
-          backgroundColor: ColorsProvider.color_2,
+          backgroundColor: ColorsProvider.getColor2(context),
           width: MediaQuery.of(context).size.width / 1.50,
           child: Column(
             children: [
@@ -403,7 +405,7 @@ class _InitPageState extends State<InitPage> {
                         Text(
                           "${user != null ? user!.name : "null"}",
                           style: TextStyle(
-                            color: ColorsProvider.color_8,
+                            color: ColorsProvider.getColor8(context),
                             fontWeight: FontWeight.bold,
                             fontSize: 25,
                           ),
@@ -416,19 +418,19 @@ class _InitPageState extends State<InitPage> {
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 20),
-                child: _categoryWidget('Food'),
+                child: _categoryWidget('Food'.tr()),
               ),
-              _buttonWidget(dbSupabase, context, '/scanFood', 'Scan food', Icons.fit_screen_rounded, false),
-              _buttonWidget(dbSupabase, context, '/newFood', 'New food', Icons.add_circle_outline_outlined, true),
-              _buttonWidget(dbSupabase, context, '/foodStatistic', 'Statistic', Icons.bar_chart_rounded, false),
-              _categoryWidget('Workout'),
+              _buttonWidget(dbSupabase, context, '/scanFood', 'scan_food'.tr(), Icons.fit_screen_rounded, false),
+              _buttonWidget(dbSupabase, context, '/newFood', 'new_food'.tr(), Icons.add_circle_outline_outlined, true),
+              _buttonWidget(dbSupabase, context, '/foodStatistic', 'statistic'.tr(), Icons.bar_chart_rounded, false),
+              _categoryWidget('workout'.tr()),
               // _buttonWidget(dbSupabase, context, '/fitnessNames', 'Manage fitness names', Icons.text_fields_rounded),
               // _buttonWidget(dbSupabase, context, '/editDeleteExerciseData', 'Edit/Delete exercise data', Icons.edit_rounded),
-              _buttonWidget(dbSupabase, context, '/fitnessStatistic', 'Statistic', Icons.insights_rounded, true),
-              _categoryWidget('Body'),
-              _buttonWidget(dbSupabase, context, '/measurements', 'Measurements', Icons.straighten_outlined, true),
+              _buttonWidget(dbSupabase, context, '/fitnessStatistic', 'statistic'.tr(), Icons.insights_rounded, true),
+              _categoryWidget('body'.tr()),
+              _buttonWidget(dbSupabase, context, '/measurements', 'measurement'.tr(), Icons.straighten_outlined, true),
               Spacer(),
-              _buttonWidget(dbSupabase, context, '/settings', 'Settings', Icons.settings_outlined, true, paddingLeft: 0),
+              _buttonWidget(dbSupabase, context, '/settings', 'settings'.tr(), Icons.settings_outlined, true, paddingLeft: 0),
               SizedBox(height: 10),
             ],
           ),
@@ -485,13 +487,13 @@ class _InitPageState extends State<InitPage> {
               controller.jumpToPage(pageProvider);
             });
           },
-          indicatorColor: ColorsProvider.color_2,
+          indicatorColor: ColorsProvider.getColor2(context),
           selectedIndex: pageProvider,
           animationDuration: const Duration(milliseconds: 1000),
           destinations: [
-            _navigation(null, null, "Fitness"),
-            _navigation(Icons.home, Icons.home_outlined, "Home"),
-            _navigation(Icons.fastfood_rounded, Icons.fastfood, "Food"),
+            _navigation(null, null, "Fitness".tr()),
+            _navigation(Icons.home, Icons.home_outlined, "Home".tr()),
+            _navigation(Icons.fastfood_rounded, Icons.fastfood, "Food".tr()),
           ],
         ),
       );
@@ -510,7 +512,7 @@ class _InitPageState extends State<InitPage> {
             Text(
               "$category",
               style: TextStyle(
-                color: ColorsProvider.color_8,
+                color: ColorsProvider.getColor8(context),
                 fontWeight: FontWeight.bold,
                 fontSize: 20,
               ),
@@ -526,24 +528,24 @@ class _InitPageState extends State<InitPage> {
       selectedIcon: primaryIconData != null
           ? Icon(
               primaryIconData,
-              color: ColorsProvider.color_8,
+              color: ColorsProvider.getColor8(context),
             )
           : Image.asset(
               'assets/icons/icon_half_bodybuilder.png', // Cesta k vašemu obrázku
               // width: 24,
               height: 32,
-              color: ColorsProvider.color_8, // Volitelně můžete nastavit barvu obrázku
+              color: ColorsProvider.getColor8(context), // Volitelně můžete nastavit barvu obrázku
             ),
       icon: secondaryIconDaty != null
           ? Icon(
               secondaryIconDaty,
-              color: Colors.white.withAlpha(170),
+              color: ColorsProvider.getColor2(context),
             )
           : Image.asset(
               'assets/icons/icon_half_bodybuilder.png', // Cesta k vašemu obrázku
               // width: 25,
               height: 32,
-              color: Colors.white.withAlpha(170),
+              color: ColorsProvider.getColor2(context),
             ),
       label: '$name',
     );
@@ -560,7 +562,7 @@ class _InitPageState extends State<InitPage> {
       },
       child: Container(
         height: 65,
-        color: ColorsProvider.color_2,
+        color: ColorsProvider.getColor2(context),
         child: Padding(
           padding: EdgeInsets.only(left: paddingLeft),
           child: Row(
@@ -568,7 +570,7 @@ class _InitPageState extends State<InitPage> {
             children: [
               Icon(
                 icon,
-                color: show == true ? ColorsProvider.color_8 : ColorsProvider.color_8.withAlpha(100),
+                color: show == true ? ColorsProvider.getColor8(context) : ColorsProvider.getColor8(context).withAlpha(100),
               ),
               SizedBox(
                 width: 5,
@@ -577,7 +579,7 @@ class _InitPageState extends State<InitPage> {
                 '$name',
                 style: TextStyle(
                   fontSize: 18,
-                  color: show == true ? ColorsProvider.color_8 : ColorsProvider.color_8.withAlpha(100),
+                  color: show == true ? ColorsProvider.getColor8(context) : ColorsProvider.getColor8(context).withAlpha(100),
                   fontWeight: FontWeight.bold,
                 ),
               ),

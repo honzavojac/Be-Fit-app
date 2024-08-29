@@ -29,15 +29,15 @@ class _myDataboxesState extends State<myDataboxes> {
               FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
               LengthLimitingTextInputFormatter(4) // povoluje zadat pouze číselnou hodnotu => použiju pro vyhledávání v databázi
             ],
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
                 labelText: 'Serving size',
-                labelStyle: TextStyle(color: ColorsProvider.color_2),
+                labelStyle: TextStyle(color: ColorsProvider.getColor2(context)),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.all(
                     Radius.circular(12),
                   ),
                   borderSide: BorderSide(
-                    color: ColorsProvider.color_2,
+                    color: ColorsProvider.getColor2(context),
                     width: 0.5,
                   ),
                 ),
@@ -46,13 +46,13 @@ class _myDataboxesState extends State<myDataboxes> {
                     Radius.circular(12),
                   ),
                   borderSide: BorderSide(
-                    color: ColorsProvider.color_2,
+                    color: ColorsProvider.getColor2(context),
                     width: 3.0,
                   ),
                 ),
                 contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 15),
                 hintText: 'Enter value:',
-                hintStyle: TextStyle(color: ColorsProvider.color_2, fontSize: 15) // zobrazí se pokud je textové pole prázdné
+                hintStyle: TextStyle(color: ColorsProvider.getColor2(context), fontSize: 15) // zobrazí se pokud je textové pole prázdné
                 //  icon: Icon(Icons.text_fields), //
                 ),
             onChanged: (input) {

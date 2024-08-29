@@ -79,7 +79,7 @@ class _AddSplitBoxState extends State<AddSplitBox> {
                       ),
                       Container(
                         height: 50,
-                        // color: ColorsProvider.color_8,
+                        // color: ColorsProvider.getColor8(context),
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 15),
                           child: TextField(
@@ -90,13 +90,13 @@ class _AddSplitBoxState extends State<AddSplitBox> {
                               ),
                               enabledBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(
-                                  color: ColorsProvider.color_2,
+                                  color: ColorsProvider.getColor2(context),
                                   width: 0.5,
                                 ),
                               ),
                               focusedBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(
-                                  color: ColorsProvider.color_2,
+                                  color: ColorsProvider.getColor2(context),
                                   width: 3.0,
                                 ),
                               ),
@@ -201,7 +201,7 @@ class _AddSplitBoxState extends State<AddSplitBox> {
                       }
                     },
                     style: TextButton.styleFrom(
-                      backgroundColor: ColorsProvider.color_2,
+                      backgroundColor: ColorsProvider.getColor2(context),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.vertical(
                           bottom: Radius.circular(25),
@@ -211,7 +211,7 @@ class _AddSplitBoxState extends State<AddSplitBox> {
                     child: Text(
                       'Save',
                       style: TextStyle(
-                        color: ColorsProvider.color_8,
+                        color: ColorsProvider.getColor8(context),
                         fontWeight: FontWeight.bold,
                         fontSize: 20,
                       ),
@@ -231,7 +231,7 @@ class _AddSplitBoxState extends State<AddSplitBox> {
                     child: ElevatedButton(
                       style: ButtonStyle(
                         backgroundColor: WidgetStatePropertyAll(
-                          ColorsProvider.color_2,
+                          ColorsProvider.getColor2(context),
                         ),
                       ),
                       onPressed: () {
@@ -248,7 +248,7 @@ class _AddSplitBoxState extends State<AddSplitBox> {
                       },
                       child: Text(
                         "New Muscle",
-                        style: TextStyle(color: ColorsProvider.color_8),
+                        style: TextStyle(color: ColorsProvider.getColor8(context)),
                       ),
                     ),
                   ),

@@ -1,4 +1,5 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
@@ -73,17 +74,18 @@ class _FitnessStatisticState extends State<FitnessStatistic> with TickerProvider
     }
 
     // Generování dat pro PieChart
-    pieData = generatePieChartData(prePieData, muscleList);
-    print(pieData.length);
-    for (var pieData in pieData) {
-      print(pieData.title);
-      if (pieData.value == 0) {
-        zeroPieData.add(pieData.title.split('\n').first);
+    if (muscleList.isNotEmpty) {
+      pieData = generatePieChartData(prePieData, muscleList);
+      print(pieData.length);
+      for (var pieData in pieData) {
+        print(pieData.title);
+        if (pieData.value == 0) {
+          zeroPieData.add(pieData.title.split('\n').first);
 
-        // print(pieData.title);
+          // print(pieData.title);
+        }
       }
     }
-
     show = true;
     setState(() {});
   }
@@ -102,33 +104,33 @@ class _FitnessStatisticState extends State<FitnessStatistic> with TickerProvider
     List<PieChartDataModel> pieData = [];
     int colorIndex = 0;
     Color? lastColor;
+    if (prePieData.isNotEmpty) {
+      // Calculate the total count
+      int total = prePieData.values.fold(0, (sum, count) => sum + count);
 
-    // Calculate the total count
-    int total = prePieData.values.fold(0, (sum, count) => sum + count);
+      prePieData.forEach((muscleId, count) {
+        String muscleName = muscles.firstWhere((muscle) => muscle.supabaseIdMuscle == muscleId).nameOfMuscle!;
 
-    prePieData.forEach((muscleId, count) {
-      String muscleName = muscles.firstWhere((muscle) => muscle.supabaseIdMuscle == muscleId).nameOfMuscle!;
+        // Ensure the current color is not the same as the last used color
+        while (predefinedColors[colorIndex % predefinedColors.length] == lastColor) {
+          colorIndex++;
+        }
 
-      // Ensure the current color is not the same as the last used color
-      while (predefinedColors[colorIndex % predefinedColors.length] == lastColor) {
+        // Get the color and increment the index
+        Color color = predefinedColors[colorIndex % predefinedColors.length];
         colorIndex++;
-      }
+        lastColor = color;
 
-      // Get the color and increment the index
-      Color color = predefinedColors[colorIndex % predefinedColors.length];
-      colorIndex++;
-      lastColor = color;
+        // Calculate the percentage and round it
+        int percentage = ((count / total) * 100).round();
 
-      // Calculate the percentage and round it
-      int percentage = ((count / total) * 100).round();
-
-      pieData.add(PieChartDataModel(
-        value: count.toDouble(),
-        color: color,
-        title: "$muscleName\n$percentage%",
-      ));
-    });
-
+        pieData.add(PieChartDataModel(
+          value: count.toDouble(),
+          color: color,
+          title: "$muscleName\n$percentage%",
+        ));
+      });
+    }
     return pieData;
   }
 
@@ -136,591 +138,603 @@ class _FitnessStatisticState extends State<FitnessStatistic> with TickerProvider
   Widget build(BuildContext context) {
     // var variablesProvider = Provider.of<VariablesProvider>(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Fitness Statistics')),
+      appBar: AppBar(
+        title: Text(
+          'fitness_statistic'.tr(),
+          style: TextStyle(color: ColorsProvider.getColor2(context)),
+        ),
+        centerTitle: true,
+      ),
       body: show == true
-          ? Column(
-              children: [
-                DefaultTabController(
-                  length: muscleList.length,
-                  initialIndex: 0,
-                  child: Container(
-                    child: TabBar(
-                      splashFactory: NoSplash.splashFactory,
-                      tabAlignment: TabAlignment.start,
-                      controller: _tabController,
-                      indicatorColor: ColorsProvider.color_2,
-                      dividerColor: ColorsProvider.color_4,
-                      labelColor: ColorsProvider.color_2,
-                      unselectedLabelColor: Colors.white,
-                      isScrollable: true,
-                      tabs: muscleList.map((record) {
-                        return Container(
-                          height: 35,
-                          constraints: BoxConstraints(minWidth: 80),
-                          child: IntrinsicWidth(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 5.0), // 5px padding on each side
-                              child: Center(
-                                  child: Text(
-                                record.nameOfMuscle!,
-                                style: TextStyle(
-                                  fontSize: 19,
+          ? muscleList.isEmpty
+              ? Container()
+              : Column(
+                  children: [
+                    DefaultTabController(
+                      length: muscleList.length,
+                      initialIndex: 0,
+                      child: Container(
+                        child: TabBar(
+                          splashFactory: NoSplash.splashFactory,
+                          tabAlignment: TabAlignment.start,
+                          controller: _tabController,
+                          indicatorColor: ColorsProvider.getColor2(context),
+                          dividerColor: ColorsProvider.color_4,
+                          labelColor: ColorsProvider.getColor2(context),
+                          // unselectedLabelColor: Colors.white,
+                          isScrollable: true,
+                          tabs: muscleList.map((record) {
+                            return Container(
+                              height: 35,
+                              constraints: BoxConstraints(minWidth: 80),
+                              child: IntrinsicWidth(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 5.0), // 5px padding on each side
+                                  child: Center(
+                                      child: Text(
+                                    record.nameOfMuscle!,
+                                    style: TextStyle(
+                                      fontSize: 19,
+                                    ),
+                                  )),
                                 ),
-                              )),
-                            ),
-                          ),
-                        );
-                      }).toList(),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-                Expanded(
-                  child: TabBarView(
-                    controller: _tabController,
-                    children: muscleList.map((record) {
-                      List<Exercise> filteredExercises = exerciseslist.where((exercise) => exercise.musclesIdMuscle == record.supabaseIdMuscle).toList();
-                      int item = selectedExerciseIndexMap[record.supabaseIdMuscle] ?? 0;
-                      int tempIdExercise = -1; // Změněno na int
-                      int numberOfEndedSplitStartedCompleted = 0;
-                      int numberOfEndedSplitStartedCompletedThisMonth = 0;
-                      int numberOfEndedExercise = 0;
-                      int numberOfSeries = 0;
-                      int numberOfSeriesThisMonth = 0;
-                      List<int> exDataEnded = [];
-                      List<int> ended = [];
-                      DateTime now = DateTime.now();
-                      String thisMonth = now.toString().replaceRange(0, 5, "").replaceRange(2, null, "");
+                    Expanded(
+                      child: TabBarView(
+                        controller: _tabController,
+                        children: muscleList.map((record) {
+                          List<Exercise> filteredExercises = exerciseslist.where((exercise) => exercise.musclesIdMuscle == record.supabaseIdMuscle).toList();
+                          int item = selectedExerciseIndexMap[record.supabaseIdMuscle] ?? 0;
+                          int tempIdExercise = -1; // Změněno na int
+                          int numberOfEndedSplitStartedCompleted = 0;
+                          int numberOfEndedSplitStartedCompletedThisMonth = 0;
+                          int numberOfEndedExercise = 0;
+                          int numberOfSeries = 0;
+                          int numberOfSeriesThisMonth = 0;
+                          List<int> exDataEnded = [];
+                          List<int> ended = [];
+                          DateTime now = DateTime.now();
+                          String thisMonth = now.toString().replaceRange(0, 5, "").replaceRange(2, null, "");
 
-                      for (var splitStartedCompleted in dataAllSplits) {
-                        String lookedThisMonth = splitStartedCompleted.createdAt!.replaceRange(0, 5, "").replaceRange(2, null, "");
+                          for (var splitStartedCompleted in dataAllSplits) {
+                            String lookedThisMonth = splitStartedCompleted.createdAt!.replaceRange(0, 5, "").replaceRange(2, null, "");
 
-                        for (var exData in splitStartedCompleted.exerciseData!) {
-                          for (var i = 0; i < filteredExercises.length; i++) {
-                            var exercise = filteredExercises[i];
+                            for (var exData in splitStartedCompleted.exerciseData!) {
+                              for (var i = 0; i < filteredExercises.length; i++) {
+                                var exercise = filteredExercises[i];
 
-                            if (exData.exercisesIdExercise == exercise.supabaseIdExercise && record.supabaseIdMuscle == exercise.musclesIdMuscle && !ended.contains(splitStartedCompleted.supabaseIdStartedCompleted)) {
-                              numberOfEndedSplitStartedCompleted++;
-                              ended.add(splitStartedCompleted.supabaseIdStartedCompleted!);
+                                if (exData.exercisesIdExercise == exercise.supabaseIdExercise && record.supabaseIdMuscle == exercise.musclesIdMuscle && !ended.contains(splitStartedCompleted.supabaseIdStartedCompleted)) {
+                                  numberOfEndedSplitStartedCompleted++;
+                                  ended.add(splitStartedCompleted.supabaseIdStartedCompleted!);
 
-                              if (thisMonth == lookedThisMonth) {
-                                numberOfEndedSplitStartedCompletedThisMonth++;
-                              }
-                            }
-                          }
-                        }
-                      }
-                      int maxWeight = 0;
-                      int maxWeightReps = 0;
-                      bool setIdExercise = false;
-                      Map<int, int> exerciseOccurrences = {};
-
-                      for (var element in exerciseslist) {
-                        if (element.musclesIdMuscle == record.supabaseIdMuscle) {
-                          exerciseOccurrences[element.supabaseIdExercise!] = 0;
-                        }
-                      }
-                      for (var exData in exerciseDataList) {
-                        if (exData.reps == null) {
-                          exData.reps = 0;
-                        }
-                        String lookedThisMonth = exData.time!.replaceRange(0, 5, "").replaceRange(2, null, "");
-
-                        for (var i = 0; i < filteredExercises.length; i++) {
-                          var exercise = filteredExercises[i];
-
-                          // Kontrola shody idExercise
-                          if (exData.exercisesIdExercise == exercise.supabaseIdExercise && record.supabaseIdMuscle == exercise.musclesIdMuscle) {
-                            // Zvýšení počtu výskytů pro dané idExercise
-                            if (exerciseOccurrences.containsKey(exData.exercisesIdExercise!)) {
-                              exerciseOccurrences[exData.exercisesIdExercise!] = exerciseOccurrences[exData.exercisesIdExercise!]! + 1;
-                            } else {
-                              exerciseOccurrences[exData.exercisesIdExercise!] = 1;
-                            }
-
-                            // Další výpočty, jako v původním kódu
-                            if (item == i && !exDataEnded.contains(exData.idStartedCompleted)) {
-                              exDataEnded.add(exData.idStartedCompleted!);
-                              numberOfEndedExercise++;
-                            }
-                            if (item == i) {
-                              numberOfSeries++;
-                              if (thisMonth == lookedThisMonth) {
-                                numberOfSeriesThisMonth++;
-                              }
-                              if (maxWeight <= exData.weight!) {
-                                maxWeight = exData.weight!;
-                                if (maxWeightReps <= exData.reps!) {
-                                  maxWeightReps = exData.reps!;
+                                  if (thisMonth == lookedThisMonth) {
+                                    numberOfEndedSplitStartedCompletedThisMonth++;
+                                  }
                                 }
-                                // maxWeightReps = exData.reps!;
-                                print(maxWeightReps);
-                              }
-                              if (!setIdExercise) {
-                                tempIdExercise = exercise.supabaseIdExercise!; // Přiřazení hodnoty přímo jako int
-                                setIdExercise = true;
                               }
                             }
                           }
-                        }
-                      }
-                      int totalOccurrences = 0;
-                      if (exerciseOccurrences.isNotEmpty) {
-                        totalOccurrences = exerciseOccurrences.values.reduce((a, b) => a + b);
-                      }
+                          int maxWeight = 0;
+                          int maxWeightReps = 0;
+                          bool setIdExercise = false;
+                          Map<int, int> exerciseOccurrences = {};
 
-                      Map<int, double> exercisePercentages = exerciseOccurrences.map((id, count) {
-                        double percentage = (totalOccurrences > 0) ? (count / totalOccurrences) * 100 : 0.0;
-                        return MapEntry(id, percentage);
-                      });
+                          for (var element in exerciseslist) {
+                            if (element.musclesIdMuscle == record.supabaseIdMuscle) {
+                              exerciseOccurrences[element.supabaseIdExercise!] = 0;
+                            }
+                          }
+                          for (var exData in exerciseDataList) {
+                            if (exData.reps == null) {
+                              exData.reps = 0;
+                            }
+                            String lookedThisMonth = exData.time!.replaceRange(0, 5, "").replaceRange(2, null, "");
+
+                            for (var i = 0; i < filteredExercises.length; i++) {
+                              var exercise = filteredExercises[i];
+
+                              // Kontrola shody idExercise
+                              if (exData.exercisesIdExercise == exercise.supabaseIdExercise && record.supabaseIdMuscle == exercise.musclesIdMuscle) {
+                                // Zvýšení počtu výskytů pro dané idExercise
+                                if (exerciseOccurrences.containsKey(exData.exercisesIdExercise!)) {
+                                  exerciseOccurrences[exData.exercisesIdExercise!] = exerciseOccurrences[exData.exercisesIdExercise!]! + 1;
+                                } else {
+                                  exerciseOccurrences[exData.exercisesIdExercise!] = 1;
+                                }
+
+                                // Další výpočty, jako v původním kódu
+                                if (item == i && !exDataEnded.contains(exData.idStartedCompleted)) {
+                                  exDataEnded.add(exData.idStartedCompleted!);
+                                  numberOfEndedExercise++;
+                                }
+                                if (item == i) {
+                                  numberOfSeries++;
+                                  if (thisMonth == lookedThisMonth) {
+                                    numberOfSeriesThisMonth++;
+                                  }
+                                  if (maxWeight <= exData.weight!) {
+                                    maxWeight = exData.weight!;
+                                    if (maxWeightReps <= exData.reps!) {
+                                      maxWeightReps = exData.reps!;
+                                    }
+                                    // maxWeightReps = exData.reps!;
+                                    print(maxWeightReps);
+                                  }
+                                  if (!setIdExercise) {
+                                    tempIdExercise = exercise.supabaseIdExercise!; // Přiřazení hodnoty přímo jako int
+                                    setIdExercise = true;
+                                  }
+                                }
+                              }
+                            }
+                          }
+                          int totalOccurrences = 0;
+                          if (exerciseOccurrences.isNotEmpty) {
+                            totalOccurrences = exerciseOccurrences.values.reduce((a, b) => a + b);
+                          }
+
+                          Map<int, double> exercisePercentages = exerciseOccurrences.map((id, count) {
+                            double percentage = (totalOccurrences > 0) ? (count / totalOccurrences) * 100 : 0.0;
+                            return MapEntry(id, percentage);
+                          });
 
 // Výpis procent pro kontrolu
-                      // print(exercisePercentages.length);
-                      // exercisePercentages.forEach((id, percentage) {
-                      //   print("Exercise ID: $id, Percentage: ${percentage.toStringAsFixed(2)}%");
-                      // });
+                          // print(exercisePercentages.length);
+                          // exercisePercentages.forEach((id, percentage) {
+                          //   print("Exercise ID: $id, Percentage: ${percentage.toStringAsFixed(2)}%");
+                          // });
 
-                      List<FlSpot> spots = [];
-                      List<String> date = [];
-                      List<FlSpot> spots2 = [];
-                      List<String> date2 = [];
-                      List<FlSpot> spots3 = [];
-                      List<String> date3 = [];
-                      List<FlSpot> spots4 = [];
-                      List<String> date4 = [];
-                      List<FlSpot> spots5 = [];
-                      List<String> date5 = [];
-                      exerciseStatistic(tempIdExercise, spots, date);
-                      avgExerciseStatistic(tempIdExercise, spots3, date3);
+                          List<FlSpot> spots = [];
+                          List<String> date = [];
+                          List<FlSpot> spots2 = [];
+                          List<String> date2 = [];
+                          List<FlSpot> spots3 = [];
+                          List<String> date3 = [];
+                          List<FlSpot> spots4 = [];
+                          List<String> date4 = [];
+                          List<FlSpot> spots5 = [];
+                          List<String> date5 = [];
+                          exerciseStatistic(tempIdExercise, spots, date);
+                          avgExerciseStatistic(tempIdExercise, spots3, date3);
 
-                      sumOfWeightReps(spots2, date2, tempIdExercise);
-                      statistic1RM(tempIdExercise, spots4, date4);
-                      avgStatistic1RM(tempIdExercise, spots5, date5);
-                      // int idExercise = int.parse(tempIdExercise.trim());
-                      return ListView(
-                        children: [
-                          const SizedBox(height: 20),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          sumOfWeightReps(spots2, date2, tempIdExercise);
+                          statistic1RM(tempIdExercise, spots4, date4);
+                          avgStatistic1RM(tempIdExercise, spots5, date5);
+                          // int idExercise = int.parse(tempIdExercise.trim());
+                          return ListView(
                             children: [
-                              Container(
-                                width: 150,
-                                child: Column(
-                                  children: [
-                                    Text("total workouts"),
-                                    SumaryText(numberOfEndedSplitStartedCompleted.toString(), true),
-                                  ],
-                                ),
-                              ),
-                              Container(
-                                width: 150,
-                                child: Column(
-                                  children: [
-                                    Text("workouts this month"),
-                                    SumaryText(numberOfEndedSplitStartedCompletedThisMonth.toString(), true),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 30),
-                          filteredExercises.isEmpty
-                              ? Center(
-                                  child: Container(
-                                    child: Text(
-                                      "no exercises",
-                                      style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold),
-                                    ),
-                                  ),
-                                )
-                              : Column(
-                                  children: [
-                                    CustomDropdown(filteredExercises, record.supabaseIdMuscle!, item),
-                                  ],
-                                ),
-                          const SizedBox(height: 20),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Container(
-                                width: 150,
-                                child: Column(
-                                  children: [
-                                    Text("total workouts"),
-                                    SumaryText(numberOfEndedExercise.toString(), true),
-                                  ],
-                                ),
-                              ),
-                              Container(
-                                width: 150,
-                                child: Column(
-                                  children: [
-                                    Text("series this month"),
-                                    SumaryText(numberOfSeriesThisMonth.toString(), true),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(
-                            height: 5,
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Container(
-                                width: 150,
-                                child: Column(
-                                  children: [
-                                    Text("total series"),
-                                    SumaryText(numberOfSeries.toString(), true),
-                                  ],
-                                ),
-                              ),
-                              Container(
-                                width: 150,
-                                child: Column(
-                                  children: [
-                                    Text("avg. series"),
-                                    SumaryText("${(numberOfSeries / numberOfEndedExercise).isNaN ? 0 : numberOfSeries / numberOfEndedExercise}", true),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Container(
-                                width: 150,
-                                child: Column(
-                                  children: [
-                                    Text("max weight"),
-                                    SumaryText("${maxWeight}Kg × ${maxWeightReps.toString()}", false),
-                                  ],
-                                ),
-                              ),
-                              // Container(
-                              //   width: 150,
-                              //   child: Column(
-                              //     children: [
-                              //       Text("avg. series"),
-                              //       SumaryText("${(numberOfSeries / numberOfEndedExercise).isNaN ? 0 : numberOfSeries / numberOfEndedExercise}"),
-                              //     ],
-                              //   ),
-                              // ),
-                            ],
-                          ),
-                          const SizedBox(height: 30),
-                          Center(
-                            child: Text(
-                              "Work volume",
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: ColorsProvider.color_2,
-                                letterSpacing: 1.5,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                          spots.isNotEmpty
-                              ? Column(
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
+                              const SizedBox(height: 20),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Container(
+                                    width: 150,
+                                    child: Column(
                                       children: [
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                            right: 35.0,
-                                            bottom: 10,
-                                          ),
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              showAvgWorkVolume = !showAvgWorkVolume;
-                                              setState(() {});
-                                            },
-                                            child: Container(
-                                              width: 50,
-                                              // height: 27,
-                                              decoration: BoxDecoration(
-                                                color: !showAvgWorkVolume ? Colors.transparent : ColorsProvider.color_2,
-                                                border: Border.all(
-                                                  color: ColorsProvider.color_2,
-                                                ),
-                                                borderRadius: BorderRadius.circular(12),
-                                              ),
-                                              child: Padding(
-                                                padding: const EdgeInsets.fromLTRB(0, 1, 0, 3),
-                                                child: Center(
-                                                  child: Text(
-                                                    "avg",
-                                                    style: TextStyle(
-                                                      color: showAvgWorkVolume ? ColorsProvider.color_8 : ColorsProvider.color_2,
-                                                      fontSize: 15,
-                                                      fontWeight: FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
+                                        Text("total_workouts".tr()),
+                                        SumaryText(numberOfEndedSplitStartedCompleted.toString(), true),
                                       ],
                                     ),
-                                    AspectRatio(
-                                      aspectRatio: 2.2,
-                                      child: Padding(
-                                        padding: EdgeInsets.only(
-                                          right: 30,
-                                          left: 30,
-                                          top: 0,
-                                          bottom: 0,
-                                        ),
-                                        child: spots.isNotEmpty
-                                            ? !showAvgWorkVolume
-                                                ? graph1(spots, date)
-                                                : graph3(spots3, date3)
-                                            : Row(
-                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                children: [
-                                                  Text("no data"),
-                                                ],
-                                              ),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 20),
-                                  ],
-                                )
-                              : Container(
-                                  height: 50,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text("no data"),
-                                    ],
                                   ),
-                                ),
-                          // const SizedBox(height: 40),
-
-                          Center(
-                            child: Text(
-                              "1 Rep max (1RM)",
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: ColorsProvider.color_2,
-                                letterSpacing: 1.5,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                          spots.isNotEmpty
-                              ? Column(
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
+                                  Container(
+                                    width: 150,
+                                    child: Column(
                                       children: [
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                            right: 35.0,
-                                            bottom: 10,
-                                          ),
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              showAvg1RM = !showAvg1RM;
-                                              setState(() {});
-                                            },
-                                            child: Container(
-                                              width: 50,
-                                              // height: 27,
-                                              decoration: BoxDecoration(
-                                                color: !showAvg1RM ? Colors.transparent : ColorsProvider.color_2,
-                                                border: Border.all(
-                                                  color: ColorsProvider.color_2,
-                                                ),
-                                                borderRadius: BorderRadius.circular(12),
-                                              ),
-                                              child: Padding(
-                                                padding: const EdgeInsets.fromLTRB(0, 1, 0, 3),
-                                                child: Center(
-                                                  child: Text(
-                                                    "avg",
-                                                    style: TextStyle(
-                                                      color: showAvg1RM ? ColorsProvider.color_8 : ColorsProvider.color_2,
-                                                      fontSize: 15,
-                                                      fontWeight: FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
+                                        Text("workouts_this_month".tr()),
+                                        SumaryText(numberOfEndedSplitStartedCompletedThisMonth.toString(), true),
                                       ],
                                     ),
-                                    AspectRatio(
-                                      aspectRatio: 2.2,
-                                      child: Padding(
-                                        padding: EdgeInsets.only(
-                                          right: 30,
-                                          left: 20,
-                                          top: 0,
-                                          bottom: 0,
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 30),
+                              filteredExercises.isEmpty
+                                  ? Center(
+                                      child: Container(
+                                        child: Text(
+                                          "no_exercises".tr(),
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            // color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
-                                        child: spots2.isNotEmpty
-                                            ? !showAvg1RM
-                                                ? graph4(spots4, date4)
-                                                : graph5(spots5, date5)
-                                            : Row(
-                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                children: [
-                                                  Text("no data"),
-                                                ],
+                                      ),
+                                    )
+                                  : Column(
+                                      children: [
+                                        CustomDropdown(filteredExercises, record.supabaseIdMuscle!, item),
+                                      ],
+                                    ),
+                              const SizedBox(height: 20),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Container(
+                                    width: 150,
+                                    child: Column(
+                                      children: [
+                                        Text("total_workouts".tr()),
+                                        SumaryText(numberOfEndedExercise.toString(), true),
+                                      ],
+                                    ),
+                                  ),
+                                  Container(
+                                    width: 150,
+                                    child: Column(
+                                      children: [
+                                        Text("series_this_month".tr()),
+                                        SumaryText(numberOfSeriesThisMonth.toString(), true),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(
+                                height: 5,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Container(
+                                    width: 150,
+                                    child: Column(
+                                      children: [
+                                        Text("total_series".tr()),
+                                        SumaryText(numberOfSeries.toString(), true),
+                                      ],
+                                    ),
+                                  ),
+                                  Container(
+                                    width: 150,
+                                    child: Column(
+                                      children: [
+                                        Text("avg_series".tr()),
+                                        SumaryText("${(numberOfSeries / numberOfEndedExercise).isNaN ? 0 : numberOfSeries / numberOfEndedExercise}", true),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Container(
+                                    width: 150,
+                                    child: Column(
+                                      children: [
+                                        Text("max_weight".tr()),
+                                        SumaryText("${maxWeight}Kg × ${maxWeightReps.toString()}", false),
+                                      ],
+                                    ),
+                                  ),
+                                  // Container(
+                                  //   width: 150,
+                                  //   child: Column(
+                                  //     children: [
+                                  //       Text("avg. series"),
+                                  //       SumaryText("${(numberOfSeries / numberOfEndedExercise).isNaN ? 0 : numberOfSeries / numberOfEndedExercise}"),
+                                  //     ],
+                                  //   ),
+                                  // ),
+                                ],
+                              ),
+                              const SizedBox(height: 30),
+                              Center(
+                                child: Text(
+                                  "work_volume".tr(),
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: ColorsProvider.getColor2(context),
+                                    letterSpacing: 1.5,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 5),
+                              spots.isNotEmpty
+                                  ? Column(
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.end,
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                right: 35.0,
+                                                bottom: 10,
                                               ),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 20),
-                                  ],
-                                )
-                              : Container(
-                                  height: 50,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text("no data"),
-                                    ],
-                                  ),
-                                ),
-
-                          Center(
-                            child: Text(
-                              "Exercises usage percentage",
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: ColorsProvider.color_2,
-                                letterSpacing: 1.5,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                          filteredExercises.isNotEmpty
-                              ? Column(
-                                  children: [
-                                    Container(
-                                      height: 300,
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(20),
-                                        child: BarChartWidget(
-                                          exerciseData: exercisePercentages,
-                                          exercises: filteredExercises,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 10),
-                                  ],
-                                )
-                              : Container(
-                                  height: 50,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text("no data"),
-                                    ],
-                                  ),
-                                ),
-                          Center(
-                            child: Text(
-                              "Muscles usage percentage",
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: ColorsProvider.color_2,
-                                letterSpacing: 1.5,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                          Column(
-                            children: [
-                              Container(
-                                height: 250,
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: PieChart(
-                                        PieChartData(
-                                          pieTouchData: PieTouchData(
-                                            touchCallback: (FlTouchEvent event, pieTouchResponse) {
-                                              setState(() {
-                                                if (!event.isInterestedForInteractions || pieTouchResponse == null || pieTouchResponse.touchedSection == null) {
-                                                  touchedIndex = -1;
-                                                  return;
-                                                }
-                                                touchedIndex = pieTouchResponse.touchedSection!.touchedSectionIndex;
-                                              });
-                                            },
-                                          ),
-                                          borderData: FlBorderData(
-                                            show: false,
-                                          ),
-
-                                          sectionsSpace: 2,
-                                          centerSpaceRadius: 40,
-                                          sections: showingSections(pieData), // Vaše metoda pro první graf
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Container(
-                                height: 50,
-                                child: Column(
-                                  children: [
-                                    Center(
-                                      child: Text(
-                                        "unused muscles:",
-                                        style: TextStyle(
-                                          color: ColorsProvider.color_2,
-                                        ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: Center(
-                                        child: ListView.builder(
-                                          itemCount: zeroPieData.length,
-                                          itemBuilder: (context, index) {
-                                            print(zeroPieData[index]);
-                                            return Row(
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              children: [
-                                                Text(
-                                                  "${zeroPieData[index]} 0%",
-                                                  style: TextStyle(
-                                                      // color: ColorsProvider.color_2,
+                                              child: GestureDetector(
+                                                onTap: () {
+                                                  showAvgWorkVolume = !showAvgWorkVolume;
+                                                  setState(() {});
+                                                },
+                                                child: Container(
+                                                  width: 50,
+                                                  // height: 27,
+                                                  decoration: BoxDecoration(
+                                                    color: !showAvgWorkVolume ? Colors.transparent : ColorsProvider.getColor2(context),
+                                                    border: Border.all(
+                                                      color: ColorsProvider.getColor2(context),
+                                                    ),
+                                                    borderRadius: BorderRadius.circular(12),
+                                                  ),
+                                                  child: Padding(
+                                                    padding: const EdgeInsets.fromLTRB(0, 1, 0, 3),
+                                                    child: Center(
+                                                      child: Text(
+                                                        "avg",
+                                                        style: TextStyle(
+                                                          color: showAvgWorkVolume ? ColorsProvider.getColor8(context) : ColorsProvider.getColor2(context),
+                                                          fontSize: 15,
+                                                          fontWeight: FontWeight.bold,
+                                                        ),
                                                       ),
+                                                    ),
+                                                  ),
                                                 ),
-                                              ],
-                                            );
-                                          },
+                                              ),
+                                            ),
+                                          ],
                                         ),
+                                        AspectRatio(
+                                          aspectRatio: 2.2,
+                                          child: Padding(
+                                            padding: EdgeInsets.only(
+                                              right: 30,
+                                              left: 30,
+                                              top: 0,
+                                              bottom: 0,
+                                            ),
+                                            child: spots.isNotEmpty
+                                                ? !showAvgWorkVolume
+                                                    ? graph1(spots, date)
+                                                    : graph3(spots3, date3)
+                                                : Row(
+                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                    children: [
+                                                      Text("no_data".tr()),
+                                                    ],
+                                                  ),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 20),
+                                      ],
+                                    )
+                                  : Container(
+                                      height: 50,
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Text("no_data".tr()),
+                                        ],
                                       ),
                                     ),
-                                  ],
+                              // const SizedBox(height: 40),
+
+                              Center(
+                                child: Text(
+                                  "${"1_rep_max".tr()} (1RM)",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: ColorsProvider.getColor2(context),
+                                    letterSpacing: 1.5,
+                                  ),
                                 ),
-                              )
+                              ),
+                              const SizedBox(height: 5),
+                              spots.isNotEmpty
+                                  ? Column(
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.end,
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                right: 35.0,
+                                                bottom: 10,
+                                              ),
+                                              child: GestureDetector(
+                                                onTap: () {
+                                                  showAvg1RM = !showAvg1RM;
+                                                  setState(() {});
+                                                },
+                                                child: Container(
+                                                  width: 50,
+                                                  // height: 27,
+                                                  decoration: BoxDecoration(
+                                                    color: !showAvg1RM ? Colors.transparent : ColorsProvider.getColor2(context),
+                                                    border: Border.all(
+                                                      color: ColorsProvider.getColor2(context),
+                                                    ),
+                                                    borderRadius: BorderRadius.circular(12),
+                                                  ),
+                                                  child: Padding(
+                                                    padding: const EdgeInsets.fromLTRB(0, 1, 0, 3),
+                                                    child: Center(
+                                                      child: Text(
+                                                        "avg",
+                                                        style: TextStyle(
+                                                          color: showAvg1RM ? ColorsProvider.getColor8(context) : ColorsProvider.getColor2(context),
+                                                          fontSize: 15,
+                                                          fontWeight: FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        AspectRatio(
+                                          aspectRatio: 2.2,
+                                          child: Padding(
+                                            padding: EdgeInsets.only(
+                                              right: 30,
+                                              left: 20,
+                                              top: 0,
+                                              bottom: 0,
+                                            ),
+                                            child: spots2.isNotEmpty
+                                                ? !showAvg1RM
+                                                    ? graph4(spots4, date4)
+                                                    : graph5(spots5, date5)
+                                                : Row(
+                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                    children: [
+                                                      Text("no_data".tr()),
+                                                    ],
+                                                  ),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 20),
+                                      ],
+                                    )
+                                  : Container(
+                                      height: 50,
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Text("no_data".tr()),
+                                        ],
+                                      ),
+                                    ),
+
+                              Center(
+                                child: Text(
+                                  "exercise_usage_percentage".tr(),
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: ColorsProvider.getColor2(context),
+                                    letterSpacing: 1.5,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 5),
+                              filteredExercises.isNotEmpty
+                                  ? Column(
+                                      children: [
+                                        Container(
+                                          height: 300,
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(20),
+                                            child: BarChartWidget(
+                                              exerciseData: exercisePercentages,
+                                              exercises: filteredExercises,
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 10),
+                                      ],
+                                    )
+                                  : Container(
+                                      height: 50,
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Text("no_data".tr()),
+                                        ],
+                                      ),
+                                    ),
+                              Center(
+                                child: Text(
+                                  "muscle_usage_percentage".tr(),
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: ColorsProvider.getColor2(context),
+                                    letterSpacing: 1.5,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 5),
+                              Column(
+                                children: [
+                                  Container(
+                                    height: 250,
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: PieChart(
+                                            PieChartData(
+                                              pieTouchData: PieTouchData(
+                                                touchCallback: (FlTouchEvent event, pieTouchResponse) {
+                                                  setState(() {
+                                                    if (!event.isInterestedForInteractions || pieTouchResponse == null || pieTouchResponse.touchedSection == null) {
+                                                      touchedIndex = -1;
+                                                      return;
+                                                    }
+                                                    touchedIndex = pieTouchResponse.touchedSection!.touchedSectionIndex;
+                                                  });
+                                                },
+                                              ),
+                                              borderData: FlBorderData(
+                                                show: false,
+                                              ),
+
+                                              sectionsSpace: 2,
+                                              centerSpaceRadius: 40,
+                                              sections: showingSections(pieData), // Vaše metoda pro první graf
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Container(
+                                    height: 50,
+                                    child: Column(
+                                      children: [
+                                        Center(
+                                          child: Text(
+                                            "${"unused_muscles".tr()}:",
+                                            style: TextStyle(
+                                              color: ColorsProvider.getColor2(context),
+                                            ),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Center(
+                                            child: ListView.builder(
+                                              itemCount: zeroPieData.length,
+                                              itemBuilder: (context, index) {
+                                                print(zeroPieData[index]);
+                                                return Row(
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  children: [
+                                                    Text(
+                                                      "${zeroPieData[index]} 0%",
+                                                      style: TextStyle(
+                                                          // color: ColorsProvider.getColor2(context),
+                                                          ),
+                                                    ),
+                                                  ],
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                ],
+                              ),
+                              const SizedBox(height: 50),
                             ],
-                          ),
-                          const SizedBox(height: 50),
-                        ],
-                      );
-                    }).toList(),
-                  ),
-                ),
-                // mainChosedData == 0 ? Text("Each split has multiplied their weight and reps") : Text("This graph shows every record (weight * reps) in exercise "),
-              ],
-            )
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                    // mainChosedData == 0 ? Text("Each split has multiplied their weight and reps") : Text("This graph shows every record (weight * reps) in exercise "),
+                  ],
+                )
           : Container(),
     );
   }
@@ -754,7 +768,7 @@ class _FitnessStatisticState extends State<FitnessStatistic> with TickerProvider
         clipData: FlClipData(top: false, bottom: false, left: true, right: true),
         lineBarsData: [
           LineChartBarData(
-            color: ColorsProvider.color_2,
+            color: ColorsProvider.getColor2(context),
             isCurved: true,
             spots: spots,
             barWidth: 3,
@@ -762,10 +776,10 @@ class _FitnessStatisticState extends State<FitnessStatistic> with TickerProvider
               show: true,
               getDotPainter: (spot, percent, barData, index) {
                 return FlDotCirclePainter(
-                  color: ColorsProvider.color_8,
+                  color: ColorsProvider.getColor8(context),
                   radius: 3,
                   strokeWidth: 1,
-                  strokeColor: ColorsProvider.color_2,
+                  strokeColor: ColorsProvider.getColor2(context),
                 );
               },
             ),
@@ -774,7 +788,7 @@ class _FitnessStatisticState extends State<FitnessStatistic> with TickerProvider
         borderData: FlBorderData(
           border: Border.all(
             width: 2,
-            color: ColorsProvider.color_2,
+            color: ColorsProvider.getColor2(context),
           ),
         ),
         // gridData: FlGridData(
@@ -814,7 +828,7 @@ class _FitnessStatisticState extends State<FitnessStatistic> with TickerProvider
         clipData: FlClipData(top: false, bottom: true, left: true, right: true),
         lineBarsData: [
           LineChartBarData(
-            color: ColorsProvider.color_2,
+            color: ColorsProvider.getColor2(context),
             isCurved: true,
             spots: spots,
             barWidth: 3,
@@ -822,10 +836,10 @@ class _FitnessStatisticState extends State<FitnessStatistic> with TickerProvider
               show: true,
               getDotPainter: (spot, percent, barData, index) {
                 return FlDotCirclePainter(
-                  color: ColorsProvider.color_8,
+                  color: ColorsProvider.getColor8(context),
                   radius: 3,
                   strokeWidth: 1,
-                  strokeColor: ColorsProvider.color_2,
+                  strokeColor: ColorsProvider.getColor2(context),
                 );
               },
             ),
@@ -834,7 +848,7 @@ class _FitnessStatisticState extends State<FitnessStatistic> with TickerProvider
         borderData: FlBorderData(
           border: Border.all(
             width: 2,
-            color: ColorsProvider.color_2,
+            color: ColorsProvider.getColor2(context),
           ),
         ),
         // gridData: FlGridData(
@@ -874,7 +888,7 @@ class _FitnessStatisticState extends State<FitnessStatistic> with TickerProvider
         clipData: FlClipData(top: false, bottom: false, left: true, right: true),
         lineBarsData: [
           LineChartBarData(
-            color: ColorsProvider.color_2,
+            color: ColorsProvider.getColor2(context),
             isCurved: true,
             spots: spots,
             barWidth: 3,
@@ -882,10 +896,10 @@ class _FitnessStatisticState extends State<FitnessStatistic> with TickerProvider
               show: true,
               getDotPainter: (spot, percent, barData, index) {
                 return FlDotCirclePainter(
-                  color: ColorsProvider.color_8,
+                  color: ColorsProvider.getColor8(context),
                   radius: 3,
                   strokeWidth: 1,
-                  strokeColor: ColorsProvider.color_2,
+                  strokeColor: ColorsProvider.getColor2(context),
                 );
               },
             ),
@@ -894,7 +908,7 @@ class _FitnessStatisticState extends State<FitnessStatistic> with TickerProvider
         borderData: FlBorderData(
           border: Border.all(
             width: 2,
-            color: ColorsProvider.color_2,
+            color: ColorsProvider.getColor2(context),
           ),
         ),
         // gridData: FlGridData(
@@ -934,7 +948,7 @@ class _FitnessStatisticState extends State<FitnessStatistic> with TickerProvider
         clipData: FlClipData(top: false, bottom: false, left: true, right: true),
         lineBarsData: [
           LineChartBarData(
-            color: ColorsProvider.color_2,
+            color: ColorsProvider.getColor2(context),
             isCurved: true,
             spots: spots,
             barWidth: 3,
@@ -942,10 +956,10 @@ class _FitnessStatisticState extends State<FitnessStatistic> with TickerProvider
               show: true,
               getDotPainter: (spot, percent, barData, index) {
                 return FlDotCirclePainter(
-                  color: ColorsProvider.color_8,
+                  color: ColorsProvider.getColor8(context),
                   radius: 3,
                   strokeWidth: 1,
-                  strokeColor: ColorsProvider.color_2,
+                  strokeColor: ColorsProvider.getColor2(context),
                 );
               },
             ),
@@ -954,7 +968,7 @@ class _FitnessStatisticState extends State<FitnessStatistic> with TickerProvider
         borderData: FlBorderData(
           border: Border.all(
             width: 2,
-            color: ColorsProvider.color_2,
+            color: ColorsProvider.getColor2(context),
           ),
         ),
         // gridData: FlGridData(
@@ -994,7 +1008,7 @@ class _FitnessStatisticState extends State<FitnessStatistic> with TickerProvider
         clipData: FlClipData(top: false, bottom: false, left: true, right: true),
         lineBarsData: [
           LineChartBarData(
-            color: ColorsProvider.color_2,
+            color: ColorsProvider.getColor2(context),
             isCurved: true,
             spots: spots,
             barWidth: 3,
@@ -1002,10 +1016,10 @@ class _FitnessStatisticState extends State<FitnessStatistic> with TickerProvider
               show: true,
               getDotPainter: (spot, percent, barData, index) {
                 return FlDotCirclePainter(
-                  color: ColorsProvider.color_8,
+                  color: ColorsProvider.getColor8(context),
                   radius: 3,
                   strokeWidth: 1,
-                  strokeColor: ColorsProvider.color_2,
+                  strokeColor: ColorsProvider.getColor2(context),
                 );
               },
             ),
@@ -1014,7 +1028,7 @@ class _FitnessStatisticState extends State<FitnessStatistic> with TickerProvider
         borderData: FlBorderData(
           border: Border.all(
             width: 2,
-            color: ColorsProvider.color_2,
+            color: ColorsProvider.getColor2(context),
           ),
         ),
         // gridData: FlGridData(
@@ -1295,7 +1309,7 @@ class _FitnessStatisticState extends State<FitnessStatistic> with TickerProvider
     return Text(
       trimText == true ? "${data.length >= 4 ? data.replaceRange(4, null, "") : data}" : data,
       style: TextStyle(
-        color: ColorsProvider.color_2,
+        color: ColorsProvider.getColor2(context),
         fontWeight: FontWeight.bold,
         fontSize: 16,
       ),
@@ -1326,21 +1340,21 @@ class _FitnessStatisticState extends State<FitnessStatistic> with TickerProvider
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: ColorsProvider.color_2, // Example color
+              color: ColorsProvider.getColor2(context), // Example color
               width: 0.5,
             ),
           ),
         ),
-        iconStyleData: const IconStyleData(
+        iconStyleData: IconStyleData(
           icon: Icon(Icons.keyboard_arrow_down_outlined),
           iconSize: 17,
-          iconEnabledColor: ColorsProvider.color_2, // Example color
+          iconEnabledColor: ColorsProvider.getColor2(context), // Example color
         ),
         dropdownStyleData: DropdownStyleData(
           maxHeight: 200,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(width: 2, color: ColorsProvider.color_2), // Example color
+            border: Border.all(width: 2, color: ColorsProvider.getColor2(context)), // Example color
           ),
           offset: const Offset(0, 0),
           scrollbarTheme: ScrollbarThemeData(
@@ -1466,7 +1480,7 @@ class _BarChartWidgetState extends State<BarChartWidget> {
                 return BarTooltipItem(
                   customText,
                   TextStyle(
-                    color: Colors.white,
+                    // color: Colors.white,
                     fontWeight: FontWeight.bold,
                     fontSize: 15,
                   ),
@@ -1492,7 +1506,7 @@ class _BarChartWidgetState extends State<BarChartWidget> {
 
   Widget _getBottomTitles(double value, TitleMeta meta) {
     const style = TextStyle(
-      color: Colors.white,
+      // color: Colors.white,
       fontWeight: FontWeight.bold,
       fontSize: 12,
     );
@@ -1525,13 +1539,18 @@ class _BarChartWidgetState extends State<BarChartWidget> {
         barRods: [
           BarChartRodData(
             toY: isTouched ? entry.value.toDouble() + 2 : entry.value.toDouble(),
-            color: isTouched ? ColorsProvider.color_1 : ColorsProvider.color_2,
+            color: isTouched ? ColorsProvider.color_1 : ColorsProvider.getColor2(context),
             width: 15,
-            borderSide: isTouched ? BorderSide(color: Colors.green.withOpacity(0.7)) : BorderSide(color: Colors.white, width: 0),
+            borderSide: isTouched
+                ? BorderSide(color: Colors.green.withOpacity(0.7))
+                : BorderSide(
+                    // color: Colors.white,
+                    width: 0,
+                  ),
             backDrawRodData: BackgroundBarChartRodData(
               show: true,
               toY: maxY,
-              color: Colors.white.withOpacity(0.3),
+              // color: Colors.white.withOpacity(0.3),
             ),
           ),
         ],
@@ -1542,7 +1561,7 @@ class _BarChartWidgetState extends State<BarChartWidget> {
 
   Widget _getLeftTitles(double value, TitleMeta meta) {
     final style = TextStyle(
-      color: Colors.white,
+      // color: Colors.white,
       fontWeight: FontWeight.bold,
       fontSize: 14,
     );

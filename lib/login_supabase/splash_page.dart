@@ -44,7 +44,7 @@ class _SplashPageState extends State<SplashPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: ColorsProvider.color_2,
+        backgroundColor: ColorsProvider.getColor2(context),
         body: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -62,11 +62,11 @@ class _SplashPageState extends State<SplashPage> {
                   height: 70,
                   child: Text(
                     "Welcome",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 35, color: ColorsProvider.color_8),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 35, color: ColorsProvider.getColor8(context)),
                   ),
                 ),
                 // LoadingAnimationWidget.staggeredDotsWave(
-                //   color: ColorsProvider.color_8,
+                //   color: ColorsProvider.getColor8(context),
                 //   size: 100,
                 // ),
                 SizedBox(
@@ -74,7 +74,7 @@ class _SplashPageState extends State<SplashPage> {
                 ),
                 // Text(
                 //   "Loading data",
-                //   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 35, color: ColorsProvider.color_8),
+                //   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 35, color: ColorsProvider.getColor8(context)),
                 // ),
               ],
             ),

@@ -1,7 +1,9 @@
 // ignore_for_file: prefer_const_constructors, avoid_print, avoid_unnecessary_containers
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
+import 'package:kaloricke_tabulky_02/init_page.dart';
 import 'package:kaloricke_tabulky_02/pages/foodAdd/newFood/food_add_page.dart';
 import 'package:kaloricke_tabulky_02/pages/foodAdd/my_search_bar.dart';
 import 'package:kaloricke_tabulky_02/pages/foodAdd/nutri_intake_listview.dart';
@@ -133,21 +135,21 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                                       },
                                       // icon: Icon(Icons.add_circle_outline),
                                       label: Text(
-                                        'Now',
+                                        'now'.tr(),
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
                                       style: ButtonStyle(
-                                        // backgroundColor: WidgetStateProperty.all(ColorsProvider.color_2.withAlpha(50)),
-                                        foregroundColor: WidgetStateProperty.all(ColorsProvider.color_2),
+                                        // backgroundColor: WidgetStateProperty.all(ColorsProvider.getColor2(context).withAlpha(50)),
+                                        foregroundColor: WidgetStateProperty.all(ColorsProvider.getColor2(context)),
                                       ),
                                     ),
                                   )
                                 : Container(),
                             Container(
                               height: 35,
-                              width: 135,
+                              // width: 145,
                               child: ElevatedButton.icon(
                                 onPressed: () async {
                                   await Navigator.push(
@@ -162,14 +164,14 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                                 },
                                 icon: Icon(Icons.add_circle_outline),
                                 label: Text(
-                                  'New food',
+                                  'new_food'.tr(),
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
                                 style: ButtonStyle(
-                                  backgroundColor: WidgetStateProperty.all(ColorsProvider.color_2),
-                                  foregroundColor: WidgetStateProperty.all(ColorsProvider.color_8),
+                                  backgroundColor: WidgetStateProperty.all(ColorsProvider.getColor2(context)),
+                                  foregroundColor: WidgetStateProperty.all(ColorsProvider.getColor8(context)),
                                 ),
                               ),
                             ),
@@ -199,7 +201,7 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                   },
                   child: Icon(
                     Icons.arrow_back_ios_new_rounded,
-                    color: ColorsProvider.color_2,
+                    color: ColorsProvider.getColor2(context),
                   ),
                   style: ElevatedButton.styleFrom(
                     fixedSize: Size(80, 30),
@@ -228,17 +230,17 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                                 Navigator.of(context).pop(); // Close the dialog when a date is selected
                               },
                               currentDateDecoration: BoxDecoration(
-                                border: Border.all(color: ColorsProvider.color_2),
+                                border: Border.all(color: ColorsProvider.getColor2(context)),
                                 shape: BoxShape.circle,
                               ),
-                              daysOfTheWeekTextStyle: const TextStyle(color: ColorsProvider.color_2),
-                              enabledCellsDecoration: const BoxDecoration(),
+                              daysOfTheWeekTextStyle: TextStyle(color: ColorsProvider.getColor2(context)),
+                              enabledCellsDecoration: BoxDecoration(),
                               initialPickerType: PickerType.days,
-                              leadingDateTextStyle: const TextStyle(color: ColorsProvider.color_2),
-                              slidersColor: ColorsProvider.color_2,
+                              leadingDateTextStyle: TextStyle(color: ColorsProvider.getColor2(context)),
+                              slidersColor: ColorsProvider.getColor2(context),
                               slidersSize: 25,
                               selectedCellDecoration: BoxDecoration(
-                                color: ColorsProvider.color_2,
+                                color: ColorsProvider.getColor2(context),
                                 shape: BoxShape.circle,
                               ),
                               selectedCellTextStyle: TextStyle(
@@ -274,7 +276,7 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                         "${selectedDate.day}.${selectedDate.month}.${selectedDate.year}",
                         style: TextStyle(
                           fontSize: 20,
-                          color: ColorsProvider.color_2,
+                          color: ColorsProvider.getColor2(context),
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -291,7 +293,7 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                   },
                   child: Icon(
                     Icons.arrow_forward_ios_rounded,
-                    color: ColorsProvider.color_2,
+                    color: ColorsProvider.getColor2(context),
                   ),
                   style: ElevatedButton.styleFrom(
                     fixedSize: Size(80, 30),
@@ -321,19 +323,19 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                                   //         child: Container(
                                   //           height: 35,
                                   //           width: 170,
-                                  //           decoration: BoxDecoration(color: ColorsProvider.color_2, borderRadius: BorderRadius.circular(50)),
+                                  //           decoration: BoxDecoration(color: ColorsProvider.getColor2(context), borderRadius: BorderRadius.circular(50)),
                                   //           child: Row(
                                   //             mainAxisAlignment: MainAxisAlignment.center,
                                   //             children: [
                                   //               Icon(
                                   //                 Icons.more_vert,
-                                  //                 color: ColorsProvider.color_8,
+                                  //                 color: ColorsProvider.getColor8(context),
                                   //               ),
                                   //               Text(
                                   //                 "Manage categories",
                                   //                 style: TextStyle(
                                   //                   fontWeight: FontWeight.bold,
-                                  //                   color: ColorsProvider.color_8,
+                                  //                   color: ColorsProvider.getColor8(context),
                                   //                 ),
                                   //               )
                                   //             ],
@@ -362,7 +364,7 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                                         padding: const EdgeInsets.only(bottom: 15),
                                         child: Container(
                                           decoration: BoxDecoration(
-                                            color: ColorsProvider.color_2,
+                                            color: ColorsProvider.getColor2(context),
                                             borderRadius: BorderRadius.circular(12),
                                           ),
                                           child: SingleChildScrollView(
@@ -390,7 +392,7 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                                                       //       child: Icon(
                                                       //         Icons.more_vert,
                                                       //         size: 30,
-                                                      //         color: ColorsProvider.color_8,
+                                                      //         color: ColorsProvider.getColor8(context),
                                                       //       ),
                                                       //     ),
                                                       //   ),
@@ -398,9 +400,9 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                                                       Padding(
                                                         padding: const EdgeInsets.only(left: 10),
                                                         child: Text(
-                                                          '${category.name}',
+                                                          '${category.name}'.tr(),
                                                           style: TextStyle(
-                                                            color: ColorsProvider.color_8,
+                                                            color: ColorsProvider.getColor8(context),
                                                             fontSize: 20,
                                                             fontWeight: FontWeight.bold,
                                                           ),
@@ -415,7 +417,7 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                                                                 : Text(
                                                                     '${sumOfKcal.round()} Kcal',
                                                                     style: TextStyle(
-                                                                      color: ColorsProvider.color_8,
+                                                                      color: ColorsProvider.getColor8(context),
                                                                       fontSize: 20,
                                                                       fontWeight: FontWeight.bold,
                                                                     ),
@@ -467,7 +469,7 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                                                                             child: Container(
                                                                               alignment: Alignment.center, // Center the container content
                                                                               child: Padding(
-                                                                                padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                                                                                padding: EdgeInsets.symmetric(horizontal: 2.0),
                                                                                 child: TextScroll(
                                                                                   "${food.name.toString()}",
                                                                                   mode: TextScrollMode.endless,
@@ -477,10 +479,10 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                                                                                   style: TextStyle(
                                                                                     fontSize: 22,
                                                                                     fontWeight: FontWeight.w500,
-                                                                                    color: ColorsProvider.color_8,
+                                                                                    color: ColorsProvider.getColor8(context),
                                                                                   ),
                                                                                   textAlign: TextAlign.center,
-                                                                                  textDirection: TextDirection.ltr,
+                                                                                  // textDirection: TextDirection.LTR,
                                                                                   selectable: false,
                                                                                 ),
                                                                               ),
@@ -494,8 +496,8 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                                                                           SizedBox(
                                                                             width: 60,
                                                                           ),
-                                                                          customText("Weight", food.weight!.toDouble()),
-                                                                          customText("Kcal", food.kcal),
+                                                                          customText("Weight", food.weight!.toDouble(), context),
+                                                                          customText("Kcal", food.kcal, context),
                                                                         ],
                                                                       ),
                                                                     ],
@@ -522,8 +524,8 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                                                                                   context: context,
                                                                                   builder: (BuildContext context) {
                                                                                     return AlertDialog(
-                                                                                      title: Text('Confirm delete'),
-                                                                                      content: Text(' Do you want delete ${food.weight}g ${food.name}?'),
+                                                                                      title: Text('confirm_delete'.tr()),
+                                                                                      content: Text('${"delete_nutri_intake_question".tr()} ${food.weight}g ${food.name}?'),
                                                                                       actions: [
                                                                                         Row(
                                                                                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -536,13 +538,13 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                                                                                                 height: 40,
                                                                                                 width: 100,
                                                                                                 decoration: BoxDecoration(
-                                                                                                  color: ColorsProvider.color_2,
+                                                                                                  color: ColorsProvider.getColor2(context),
                                                                                                   borderRadius: BorderRadius.circular(15),
                                                                                                 ),
                                                                                                 child: Center(
                                                                                                   child: Text(
-                                                                                                    'Cancel',
-                                                                                                    style: TextStyle(color: ColorsProvider.color_8, fontWeight: FontWeight.bold),
+                                                                                                    'cancel'.tr(),
+                                                                                                    style: TextStyle(color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold),
                                                                                                   ),
                                                                                                 ),
                                                                                               ),
@@ -614,7 +616,7 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                                                                                                 ),
                                                                                                 child: Center(
                                                                                                   child: Text(
-                                                                                                    'Yes',
+                                                                                                    'yes_delete'.tr(),
                                                                                                     style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                                                                                                   ),
                                                                                                 ),
@@ -633,7 +635,7 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                                                                                 child: Center(
                                                                                   child: Icon(
                                                                                     Icons.close_rounded,
-                                                                                    color: ColorsProvider.color_8,
+                                                                                    color: ColorsProvider.getColor8(context),
                                                                                     size: 30,
                                                                                   ),
                                                                                 ),
@@ -682,12 +684,12 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
       child: Container(
         height: 40,
         width: 40,
-        decoration: BoxDecoration(borderRadius: BorderRadius.circular(18), color: ColorsProvider.color_8),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(18), color: ColorsProvider.getColor8(context)),
         child: Center(
           child: Icon(
             Icons.add,
             size: 30,
-            color: ColorsProvider.color_2,
+            color: ColorsProvider.getColor2(context),
           ),
         ),
       ),
@@ -772,7 +774,7 @@ class _MarqueeTextState extends State<MarqueeText> with SingleTickerProviderStat
     final textSpan = TextSpan(text: text, style: style);
     final textPainter = TextPainter(
       text: textSpan,
-      textDirection: TextDirection.ltr,
+      // textDirection: TextDirection.ltr,
     )..layout();
     return textPainter.size.width;
   }

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
 import 'package:kaloricke_tabulky_02/main.dart';
-import 'package:kaloricke_tabulky_02/settings.dart';
 import 'package:kaloricke_tabulky_02/variables.dart';
 import 'package:openfoodfacts/openfoodfacts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -77,6 +76,19 @@ class SupabaseProvider extends ChangeNotifier {
     try {
       uid = supabase.auth.currentUser!.id;
     } catch (e) {}
+  }
+
+  Future<void> deleteUserAccount() async {
+    final user = supabase.auth.currentUser;
+
+    if (user == null) {
+      print('User not logged in');
+      return;
+    }
+    print(user.id);
+    //  await supabase.auth.admin.deleteUser(user.id);
+
+    print('User successfully deleted');
   }
 
   Future<UserSupabase?> getUser() async {
@@ -771,9 +783,15 @@ class SupabaseProvider extends ChangeNotifier {
 
   Future<List<Food>> FoodTable(String searchTerm) async {
     String normalizedSearchTerm = removeDiacritics(searchTerm.trim());
-
+    var response;
     // Dotaz do Supabase s použitím funkce unaccent
-    final response = await supabase.from('food').select().ilike('unaccent_name', '%${normalizedSearchTerm}%').eq('country', selectedCountry!);
+    if (selectedCountry == null || selectedCountry == "none") {
+      print("undefined");
+      response = await supabase.from('food').select().ilike('unaccent_name', '%${normalizedSearchTerm}%');
+    } else {
+      print("$selectedCountry");
+      response = await supabase.from('food').select().ilike('unaccent_name', '%${normalizedSearchTerm}%').eq('country', selectedCountry!);
+    }
     List<dynamic> data = response;
 
     // Mapování JSON dat na objekty třídy Food

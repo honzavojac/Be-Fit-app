@@ -1,5 +1,7 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
+import 'package:kaloricke_tabulky_02/main.dart';
 import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:provider/provider.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
@@ -54,8 +56,8 @@ class _NewMuscleBoxCopyState extends State<NewMuscleBoxCopy> {
                   padding: const EdgeInsets.only(left: 20),
                   child: Container(
                     child: Text(
-                      "New Muscle",
-                      style: TextStyle(color: ColorsProvider.color_2, fontSize: 20),
+                      "new_muscle".tr(),
+                      style: TextStyle(color: ColorsProvider.getColor2(context), fontSize: 20),
                     ),
                   ),
                 ),
@@ -81,17 +83,17 @@ class _NewMuscleBoxCopyState extends State<NewMuscleBoxCopy> {
                   width: 220,
                   child: Center(
                     child: TextField(
-                      decoration: const InputDecoration(
-                        labelText: 'Name of Muscle:',
+                      decoration: InputDecoration(
+                        labelText: '${"name_of_muscle".tr()}:',
                         labelStyle: TextStyle(
-                          color: ColorsProvider.color_2,
+                          color: ColorsProvider.getColor2(context),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.all(
                             Radius.circular(12),
                           ),
                           borderSide: BorderSide(
-                            color: ColorsProvider.color_2,
+                            color: ColorsProvider.getColor2(context),
                             width: 0.5,
                           ),
                         ),
@@ -100,7 +102,7 @@ class _NewMuscleBoxCopyState extends State<NewMuscleBoxCopy> {
                             Radius.circular(12),
                           ),
                           borderSide: BorderSide(
-                            color: ColorsProvider.color_2,
+                            color: ColorsProvider.getColor2(context),
                             width: 3.0,
                           ),
                         ),
@@ -108,14 +110,14 @@ class _NewMuscleBoxCopyState extends State<NewMuscleBoxCopy> {
                           vertical: 0,
                           horizontal: 15,
                         ),
-                        hintText: 'Enter name of muscle:',
+                        hintText: '${"enter_name_of_muscle".tr()}:',
                         hintStyle: TextStyle(
-                          color: ColorsProvider.color_2,
+                          color: ColorsProvider.getColor2(context),
                           fontSize: 15,
                         ),
                       ),
                       controller: textController,
-                      style: TextStyle(color: ColorsProvider.color_2),
+                      style: TextStyle(color: ColorsProvider.getColor2(context)),
                     ),
                   ),
                 ),
@@ -154,7 +156,7 @@ class _NewMuscleBoxCopyState extends State<NewMuscleBoxCopy> {
                             child: Padding(
                               padding: const EdgeInsets.only(left: 25, right: 25),
                               child: CustomSnackBar.error(
-                                message: "The name of the muscle cannot be empty",
+                                message: "error_the_name_of_new_muscle_cannot_be_empty".tr(),
                               ),
                             ),
                           ),
@@ -168,7 +170,7 @@ class _NewMuscleBoxCopyState extends State<NewMuscleBoxCopy> {
                       }
                     },
                     style: TextButton.styleFrom(
-                      backgroundColor: ColorsProvider.color_2,
+                      backgroundColor: ColorsProvider.getColor2(context),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.vertical(
                           bottom: Radius.circular(25),
@@ -176,9 +178,9 @@ class _NewMuscleBoxCopyState extends State<NewMuscleBoxCopy> {
                       ),
                     ),
                     child: Text(
-                      'Save',
+                      'save'.tr(),
                       style: TextStyle(
-                        color: ColorsProvider.color_8,
+                        color: ColorsProvider.getColor8(context),
                         fontWeight: FontWeight.bold,
                         fontSize: 20,
                       ),

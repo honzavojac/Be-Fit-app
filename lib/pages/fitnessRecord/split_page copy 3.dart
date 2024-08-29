@@ -3,9 +3,11 @@
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
 import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
+import 'package:kaloricke_tabulky_02/main.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/add_split_box.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/new_exercise_box.dart';
 import 'package:kaloricke_tabulky_02/providers/variables_provider.dart';
@@ -143,21 +145,21 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
               },
               icon: Icon(
                 Icons.arrow_back,
-                color: ColorsProvider.color_2,
+                color: ColorsProvider.getColor2(context),
               ),
             ),
             title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Edit your split',
+                  'header_edit_your_split'.tr(),
                   style: TextStyle(),
                 ),
                 Container(
                   child: IconButton(
                     icon: Icon(
                       Icons.add_circle_outline_outlined,
-                      color: ColorsProvider.color_2,
+                      color: ColorsProvider.getColor2(context),
                       size: 35,
                     ),
                     onPressed: () {
@@ -201,23 +203,23 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
               },
               icon: Icon(
                 Icons.arrow_back,
-                color: ColorsProvider.color_2,
+                color: ColorsProvider.getColor2(context),
               ),
             ),
             title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Edit your split',
+                  'header_edit_your_split'.tr(),
                   style: TextStyle(
-                    color: ColorsProvider.color_2,
+                    color: ColorsProvider.getColor2(context),
                   ),
                 ),
                 Container(
                   child: IconButton(
                     icon: Icon(
                       Icons.add_circle_outline_outlined,
-                      color: ColorsProvider.color_2,
+                      color: ColorsProvider.getColor2(context),
                       size: 35,
                     ),
                     onPressed: () async {
@@ -257,10 +259,10 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
                         splashFactory: NoSplash.splashFactory,
                         tabAlignment: TabAlignment.start,
                         controller: _tabController,
-                        indicatorColor: ColorsProvider.color_2,
+                        indicatorColor: ColorsProvider.getColor2(context),
                         dividerColor: ColorsProvider.color_4,
-                        labelColor: ColorsProvider.color_2,
-                        unselectedLabelColor: Colors.white,
+                        labelColor: ColorsProvider.getColor2(context),
+                        // unselectedLabelColor: Colors.white,
                         isScrollable: true,
                         tabs: splits.map((record) {
                           return Container(
@@ -285,7 +287,7 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
                                     //     border: InputBorder.none,
                                     //   ),
                                     //   style: TextStyle(
-                                    //     color: splitTextEditingControllers[splits.indexOf(record)].text != record.nameSplit ? ColorsProvider.color_2 : Colors.white, // Optional: Set the text color
+                                    //     color: splitTextEditingControllers[splits.indexOf(record)].text != record.nameSplit ? ColorsProvider.getColor2(context) : Colors.white, // Optional: Set the text color
                                     //     fontSize: 19, // Optional: Set the text size
                                     //   ),
                                     // ),
@@ -334,7 +336,7 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
                                                 controller: splitIndexMap[record.supabaseIdSplit!],
                                                 decoration: InputDecoration(
                                                   filled: true,
-                                                  fillColor: ColorsProvider.color_2,
+                                                  fillColor: ColorsProvider.getColor2(context),
                                                   enabledBorder: OutlineInputBorder(
                                                     borderRadius: BorderRadius.circular(12),
                                                     borderSide: BorderSide(color: Colors.black, width: 2),
@@ -350,9 +352,9 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
                                                     horizontal: 20.0,
                                                   ),
                                                 ),
-                                                cursorColor: ColorsProvider.color_8,
+                                                cursorColor: ColorsProvider.getColor8(context),
                                                 style: TextStyle(
-                                                  color: ColorsProvider.color_8,
+                                                  color: ColorsProvider.getColor8(context),
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: 23,
                                                 ),
@@ -365,7 +367,7 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
                                           padding: const EdgeInsets.all(8.0),
                                           child: Container(
                                             height: 5,
-                                            decoration: BoxDecoration(color: ColorsProvider.color_2, borderRadius: BorderRadius.circular(50)),
+                                            decoration: BoxDecoration(color: ColorsProvider.getColor2(context), borderRadius: BorderRadius.circular(50)),
                                           ),
                                         ),
                                         SizedBox(
@@ -383,7 +385,7 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
                                               return Padding(
                                                 padding: const EdgeInsets.only(bottom: 15, left: 10, right: 10),
                                                 child: Container(
-                                                  decoration: BoxDecoration(color: ColorsProvider.color_2, borderRadius: BorderRadius.circular(20)),
+                                                  decoration: BoxDecoration(color: ColorsProvider.getColor2(context), borderRadius: BorderRadius.circular(20)),
                                                   child: Column(
                                                     children: [
                                                       Padding(
@@ -391,7 +393,7 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
                                                         child: Container(
                                                           height: 40,
                                                           decoration: BoxDecoration(
-                                                            // color: ColorsProvider.color_2,
+                                                            // color: ColorsProvider.getColor2(context),
                                                             borderRadius: variablesProvider.zaobleni,
                                                           ),
                                                           child: Row(
@@ -419,7 +421,7 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
                                                                       controller: TextEditingController(text: record.selectedMuscle![muscleIndex].muscles!.nameOfMuscle),
                                                                       decoration: InputDecoration(
                                                                         filled: true,
-                                                                        fillColor: ColorsProvider.color_2,
+                                                                        fillColor: ColorsProvider.getColor2(context),
                                                                         enabledBorder: UnderlineInputBorder(
                                                                           borderSide: BorderSide(color: Colors.black, width: 2),
                                                                         ),
@@ -431,9 +433,9 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
                                                                           horizontal: 20.0,
                                                                         ),
                                                                       ),
-                                                                      cursorColor: ColorsProvider.color_8,
+                                                                      cursorColor: ColorsProvider.getColor8(context),
                                                                       style: TextStyle(
-                                                                        color: ColorsProvider.color_8,
+                                                                        color: ColorsProvider.getColor8(context),
                                                                         fontWeight: FontWeight.bold,
                                                                         fontSize: 23,
                                                                       ),
@@ -517,7 +519,7 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
                                                                           // controller: exercisesTextEditingControllers[itemIndex],
                                                                           decoration: InputDecoration(
                                                                             filled: true,
-                                                                            fillColor: ColorsProvider.color_2,
+                                                                            fillColor: ColorsProvider.getColor2(context),
                                                                             enabledBorder: OutlineInputBorder(
                                                                               borderRadius: BorderRadius.circular(12),
                                                                               borderSide: BorderSide(color: Colors.black, width: 2),
@@ -531,9 +533,9 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
                                                                             ),
                                                                             contentPadding: EdgeInsets.symmetric(horizontal: 10.0),
                                                                           ),
-                                                                          cursorColor: ColorsProvider.color_8,
+                                                                          cursorColor: ColorsProvider.getColor8(context),
                                                                           style: TextStyle(
-                                                                            color: ColorsProvider.color_8,
+                                                                            color: ColorsProvider.getColor8(context),
                                                                             fontWeight: FontWeight.bold,
                                                                           ),
                                                                         ),
@@ -636,7 +638,7 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
                                                                                           style: TextStyle(
                                                                                             fontSize: 15,
                                                                                             fontWeight: FontWeight.bold,
-                                                                                            color: ColorsProvider.color_2,
+                                                                                            color: ColorsProvider.getColor2(context),
                                                                                           ),
                                                                                         ),
                                                                                       ),
@@ -765,7 +767,7 @@ class __deleteSplitState extends State<_deleteSplit> {
                 // ScaffoldMessenger.of(context).showSnackBar(
                 //   SnackBar(
                 //     duration: Duration(seconds: 5),
-                //     backgroundColor: ColorsProvider.color_2,
+                //     backgroundColor: ColorsProvider.getColor2(context),
                 //     content: Container(
                 //       height: 50,
                 //       child: Row(
@@ -782,9 +784,9 @@ class __deleteSplitState extends State<_deleteSplit> {
                 //           ),
                 //           ElevatedButton(
                 //             style: ButtonStyle(
-                //               backgroundColor: WidgetStatePropertyAll(ColorsProvider.color_8),
+                //               backgroundColor: WidgetStatePropertyAll(ColorsProvider.getColor8(context)),
                 //               foregroundColor: WidgetStatePropertyAll(
-                //                 ColorsProvider.color_2,
+                //                 ColorsProvider.getColor2(context),
                 //               ),
                 //             ),
                 //             onPressed: () async {
@@ -802,7 +804,7 @@ class __deleteSplitState extends State<_deleteSplit> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("Delete ${widget.record.nameSplit} split"),
+                    Text("${"delete".tr()} ${widget.record.nameSplit} ${"split_delete".tr()}"),
                     SizedBox(width: 20),
                     Icon(Icons.delete),
                   ],
@@ -853,7 +855,7 @@ Widget _deleteSplit() {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     duration: Duration(seconds: 5),
-                    backgroundColor: ColorsProvider.color_2,
+                    backgroundColor: ColorsProvider.getColor2(context),
                     content: Container(
                       height: 50,
                       child: Row(
@@ -870,9 +872,9 @@ Widget _deleteSplit() {
                           ),
                           ElevatedButton(
                             style: ButtonStyle(
-                              backgroundColor: WidgetStatePropertyAll(ColorsProvider.color_8),
+                              backgroundColor: WidgetStatePropertyAll(ColorsProvider.getColor8(context)),
                               foregroundColor: WidgetStatePropertyAll(
-                                ColorsProvider.color_2,
+                                ColorsProvider.getColor2(context),
                               ),
                             ),
                             onPressed: () async {

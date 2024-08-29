@@ -1,4 +1,5 @@
 import 'package:diacritic/diacritic.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
 import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
@@ -29,7 +30,7 @@ class _MySearchBarState extends State<MySearchBar> {
     var dbFitness = Provider.of<FitnessProvider>(context);
 
     return Container(
-      height: 90,
+      height: 85,
       padding: EdgeInsets.fromLTRB(25, 20, 25, 20),
       child: SearchAnchor(
         searchController: widget.searchController,
@@ -54,17 +55,17 @@ class _MySearchBarState extends State<MySearchBar> {
               // Aktualizujte výsledky na základě vyhledávacího dotazu
               controller.openView();
             },
-            leading: const Icon(Icons.search, color: ColorsProvider.color_2),
-            hintText: 'Search food...',
+            leading: Icon(Icons.search, color: ColorsProvider.getColor2(context)),
+            hintText: '${'search_food'.tr()}...',
             hintStyle: WidgetStatePropertyAll(
               TextStyle(
-                color: ColorsProvider.color_2,
+                color: ColorsProvider.getColor2(context),
               ),
             ),
           );
         },
-        dividerColor: ColorsProvider.color_2,
-        headerTextStyle: TextStyle(color: ColorsProvider.color_2),
+        dividerColor: ColorsProvider.getColor2(context),
+        headerTextStyle: TextStyle(color: ColorsProvider.getColor2(context)),
         viewBuilder: (suggestions) {
           final List<Widget> suggestionWidgets = suggestions.toList(); // Convert to List
           return ListView.builder(
@@ -85,7 +86,7 @@ class _MySearchBarState extends State<MySearchBar> {
 
           // Nastavte text "Recently used" pro položky ze Sqflite
           dataSqflite.forEach((element) {
-            element.recentlyUsed = "Recently used";
+            element.recentlyUsed = "recently_used".tr();
           });
 
           List<Food> dataSupabase = [];
@@ -142,7 +143,7 @@ class _MySearchBarState extends State<MySearchBar> {
                       flex: 5,
                       child: Text(
                         "${food.name ?? 'Unknown'}",
-                        style: TextStyle(color: ColorsProvider.color_2.withAlpha(230)),
+                        style: TextStyle(color: ColorsProvider.getColor2(context).withAlpha(230)),
                       ),
                     ),
                     if (food.recentlyUsed != null)

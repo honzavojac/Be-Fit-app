@@ -55,7 +55,7 @@ class _foodDiaryBoxesState extends State<foodDiaryBoxes> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         duration: Duration(seconds: 5),
-                        backgroundColor: ColorsProvider.color_2,
+                        backgroundColor: ColorsProvider.getColor2(context),
                         content: Container(
                           height: 30,
                           child: Row(
@@ -67,7 +67,7 @@ class _foodDiaryBoxesState extends State<foodDiaryBoxes> {
                               ),
                               ElevatedButton(
                                 style: ButtonStyle(
-                                  backgroundColor: WidgetStatePropertyAll(ColorsProvider.color_8),
+                                  backgroundColor: WidgetStatePropertyAll(ColorsProvider.getColor8(context)),
                                   foregroundColor: WidgetStatePropertyAll(
                                     ColorsProvider.color_1,
                                   ),
@@ -92,7 +92,7 @@ class _foodDiaryBoxesState extends State<foodDiaryBoxes> {
                     children: [
                       Container(
                         decoration: BoxDecoration(
-                          color: ColorsProvider.color_2,
+                          color: ColorsProvider.getColor2(context),
                           borderRadius: BorderRadius.circular(5),
                           border: Border.all(style: BorderStyle.none),
                         ),
@@ -130,7 +130,7 @@ class _foodDiaryBoxesState extends State<foodDiaryBoxes> {
                       Padding(
                         padding: const EdgeInsets.fromLTRB(10, 1, 10, 5),
                         child: Container(
-                          // color: ColorsProvider.color_8,
+                          // color: ColorsProvider.getColor8(context),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
@@ -243,13 +243,13 @@ class _foodDiaryBoxesState extends State<foodDiaryBoxes> {
 //     // print("${text.indexOf(text)} ${text.length}");
 //     return Text(
 //       text,
-//       style: TextStyle(color: ColorsProvider.color_8, fontWeight: FontWeight.bold, fontSize: 15),
+//       style: TextStyle(color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold, fontSize: 15),
 //     );
 //   } else {
 //     // print("${text.length}text je větší než widget");
 //     return Marquee(
 //       text: text,
-//       style: TextStyle(color: ColorsProvider.color_8, fontWeight: FontWeight.bold, fontSize: 15),
+//       style: TextStyle(color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold, fontSize: 15),
 //       scrollAxis: Axis.horizontal,
 //       crossAxisAlignment: CrossAxisAlignment.start,
 //       blankSpace: 50.0,
