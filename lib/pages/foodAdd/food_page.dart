@@ -41,6 +41,7 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
   DateTime dataTime = DateTime.now();
   SearchController searchController = SearchController();
   load() async {
+    if (!mounted) return;
     calories = 0;
     protein = 0;
     carbs = 0;
@@ -81,11 +82,22 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
         fiber += food.fiber!;
       }
     }
-    intakeCategories = await dbFitness.SelectIntakeCategories();
+    if (mounted) {
+      intakeCategories = await dbFitness.SelectIntakeCategories();
+    }
 
     print("load***************");
-    show = true;
-    setState(() {});
+    if (mounted) {
+      // Check if the widget is still mounted before calling setState
+      show = true;
+      setState(() {});
+    }
+  }
+
+  @override
+  void dispose() {
+    // Add any cleanup code here, like cancelling timers or streams
+    super.dispose();
   }
 
   @override

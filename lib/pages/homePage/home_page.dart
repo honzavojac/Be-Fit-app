@@ -43,6 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<NutriIntake> nutriIntakes = [];
   Measurements? measurement = Measurements();
   load() async {
+    if (!mounted) return;
     calories = 0;
     protein = 0;
     carbs = 0;
@@ -84,9 +85,23 @@ class _HomeScreenState extends State<HomeScreen> {
     }
     print("load***************");
 
-    await SplitStartedStatistic();
-    measurement = await dbFitness.selectOneMeasurement(selectedDate.toString().replaceRange(10, null, ""));
-    setState(() {});
+    if (mounted) {
+      await SplitStartedStatistic(); // Only call if still mounted
+    }
+
+    if (mounted) {
+      measurement = await dbFitness.selectOneMeasurement(selectedDate.toString().replaceRange(10, null, ""));
+      setState(() {}); // Only update the UI if still mounted
+    }
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  @override
+  void dispose() {
+    // Add any cleanup code here, like cancelling timers or streams
+    super.dispose();
   }
 
   @override
@@ -353,7 +368,37 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(bottom: 10, top: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 40),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(context, '/measurements');
+                      },
+                      child: Container(
+                        height: 30,
+                        // width: 100,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(18),
+                          color: ColorsProvider.getColor2(context),
+                        ),
+                        child: Center(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                            child: Text(
+                              "add".tr(),
+                              style: TextStyle(color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 10, top: 40),
                 child: Column(
                   children: [
                     Padding(

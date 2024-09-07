@@ -38,7 +38,6 @@ class _AddIntakePageState extends State<AddIntakePage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     // var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
     // dbFitness.selectedQuantity = 0;

@@ -11,6 +11,7 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:http/http.dart' as http;
 
 ///supabase je jen databáze když změním zařízení tak ať uživatel má data a načtou se mu do aplikace
 ///
@@ -215,6 +216,7 @@ class FitnessProvider extends ChangeNotifier {
       await txn.rawDelete('DELETE FROM body_measurements');
       await txn.rawDelete('DELETE FROM food');
       await txn.rawDelete('DELETE FROM nutri_intake');
+      print("delete nutri intake hotový");
       await txn.rawDelete('DELETE FROM intake_categories');
       await txn.rawDelete('DELETE FROM user');
 
@@ -483,9 +485,53 @@ class FitnessProvider extends ChangeNotifier {
   }
 
   bool beginSaveToSupabaseAndOrderSqlite = false;
+  bool _isSyncing = false;
+  bool checkIfSyncing() {
+    if (_isSyncing == false) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  setSyncingToFalse() {
+    print("syncing set to false");
+    _isSyncing = false;
+  }
+
+  Future<bool> isConnectedToInternet() async {
+    try {
+      final result = await http.get(Uri.parse('https://www.google.com')).timeout(
+            const Duration(seconds: 5),
+            onTimeout: () => http.Response('Timeout', 408),
+          );
+      if (result.statusCode == 200) {
+        return true; // Připojení je v pořádku
+      } else {
+        print("Failed to connect to the internet. Status code: ${result.statusCode}");
+        return false; // Špatné připojení
+      }
+    } catch (e) {
+      print("Error checking internet connection: $e");
+      return false; // Žádné připojení
+    }
+  }
+
   SaveToSupabaseAndOrderSqlite(SupabaseProvider dbSupabase) async {
-    if (beginSaveToSupabaseAndOrderSqlite == false) {
-      beginSaveToSupabaseAndOrderSqlite = true;
+    if (_isSyncing) {
+      print("Syncing is already in progress. Skipping this call.*************************************************************************");
+      return;
+    }
+    print("object");
+    if (!await isConnectedToInternet()) {
+      print("No internet connection. Synchronization aborted.");
+      return;
+    } else {
+      print("Internet connection is good.");
+    }
+
+    _isSyncing = true;
+    try {
       List<Muscle> muscles = await SelectMuscles();
       List<Exercise> exercises = await SelectExercises();
       List<Measurements> measurements = await SelectMeasurements();
@@ -576,6 +622,7 @@ class FitnessProvider extends ChangeNotifier {
           }
         }
       }
+      print("measurements");
       for (var measurement in measurements) {
         int bodyMeasurementsAction = measurement.action ?? 0;
         int? supabaseIdBodyMeasurements = await SyncSqfliteToSupabase(dbSupabase, "body_measurements", measurement, bodyMeasurementsAction);
@@ -583,6 +630,7 @@ class FitnessProvider extends ChangeNotifier {
           await UpadateBodyMeasurements(supabaseIdBodyMeasurements, measurement.idBodyMeasurements ?? 0);
         }
       }
+      print("intake category");
       for (var intakeCategory in intakeCategories) {
         int intakeCategoryAction = intakeCategory.action ?? 0;
         int? supabaseIdIntakeCategory = await SyncSqfliteToSupabase(dbSupabase, "intake_categories", intakeCategory, intakeCategoryAction);
@@ -590,15 +638,28 @@ class FitnessProvider extends ChangeNotifier {
           await UpadateIntakeCategories(supabaseIdIntakeCategory, intakeCategory.idIntakeCategory ?? 0);
         }
       }
+      print("nutri intake **********************************");
       for (var nutriIntake in nutriIntakes) {
         int nutriIntakeAction = nutriIntake.action ?? 0;
-        int? supabaseIdNutriIntake = await SyncSqfliteToSupabase(dbSupabase, "nutri_intake", nutriIntake, nutriIntakeAction);
+        int? supabaseIdNutriIntake;
+        try {
+          supabaseIdNutriIntake = await SyncSqfliteToSupabase(dbSupabase, "nutri_intake", nutriIntake, nutriIntakeAction);
+        } on Exception catch (e) {
+          print("chyba nastává v SyncSqfliteToSupabase: ${e}");
+        }
         if (supabaseIdNutriIntake != null) {
-          await UpadateNutriIntakes(supabaseIdNutriIntake, nutriIntake.idNutriIntake ?? 0);
+          try {
+            await UpadateNutriIntakes(supabaseIdNutriIntake, nutriIntake.idNutriIntake ?? 0);
+          } on Exception catch (e) {
+            print("chyba nastává v UpadateNutriIntakes: ${e}");
+          }
         }
       }
-
-      beginSaveToSupabaseAndOrderSqlite = false;
+    } catch (e) {
+      print("Error during synchronization: $e");
+    } finally {
+      print("konec synchronizace");
+      _isSyncing = false; // Release the lock    }
     }
   }
 
@@ -1990,6 +2051,7 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
 
     await txn.rawInsert('''
     INSERT INTO nutri_intake (
+    
       created_at,
       id_food,
       quantity,

@@ -229,9 +229,13 @@ class _FitnessStatisticState extends State<FitnessStatistic> with TickerProvider
                               exerciseOccurrences[element.supabaseIdExercise!] = 0;
                             }
                           }
+
                           for (var exData in exerciseDataList) {
                             if (exData.reps == null) {
                               exData.reps = 0;
+                            }
+                            if (exData.weight == null) {
+                              exData.weight = 0;
                             }
                             String lookedThisMonth = exData.time!.replaceRange(0, 5, "").replaceRange(2, null, "");
 
@@ -266,7 +270,7 @@ class _FitnessStatisticState extends State<FitnessStatistic> with TickerProvider
                                     print(maxWeightReps);
                                   }
                                   if (!setIdExercise) {
-                                    tempIdExercise = exercise.supabaseIdExercise!; // Přiřazení hodnoty přímo jako int
+                                    tempIdExercise = exercise.idExercise!; // Přiřazení hodnoty přímo jako int
                                     setIdExercise = true;
                                   }
                                 }

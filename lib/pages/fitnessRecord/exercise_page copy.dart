@@ -977,9 +977,9 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
                                                   child: Row(
                                                     children: [
                                                       Padding(
-                                                        padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
+                                                        padding: const EdgeInsets.only(left: 5, right: 5, bottom: 2),
                                                         child: Container(
-                                                          width: 65,
+                                                          // width: 75,
                                                           child: Column(
                                                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                                             children: [
@@ -1035,7 +1035,7 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
                                                                           style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
                                                                         ),
                                                                         Text(
-                                                                          "$weight",
+                                                                          "${weight ?? "-"}",
                                                                           style: TextStyle(
                                                                             fontWeight: FontWeight.bold,
                                                                             fontSize: 16,
@@ -1053,7 +1053,7 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
                                                                           ),
                                                                         ),
                                                                         Text(
-                                                                          "$reps",
+                                                                          "${reps ?? "-"}",
                                                                           style: TextStyle(
                                                                             fontWeight: FontWeight.bold,
                                                                             fontSize: 16,
@@ -1190,7 +1190,7 @@ Widget categoryRow() {
         width: 70,
         child: Center(
           child: Text(
-            "difficulty",
+            "difficulty".tr(),
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
         ),

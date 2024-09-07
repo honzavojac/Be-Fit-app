@@ -118,7 +118,7 @@ class _MyAppState extends State<MyApp> {
         _themeMode = ThemeMode.dark;
         darkTheme = true;
       } else {
-        _themeMode = ThemeMode.system;
+        _themeMode = ThemeMode.dark;
         bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
         if (isDarkMode) {
           darkTheme = true;

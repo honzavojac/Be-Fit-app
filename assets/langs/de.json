@@ -3,6 +3,7 @@
   "Fitness": "Fitness",
   "Food": "Essen",
 
+"add": "Hinzufügen",
   "add_food":"Lebensmittel hinzufügen",
   "new_food": "Gericht erstellen",
   "search_food": "Gericht suchen",
@@ -106,6 +107,9 @@
   "change_theme": "Thema ändern",
   "light": "Hell",
   "dark": "Dunkel",
-  "change_food_database": "Lebensmitteldatenbank ändern"
+  "change_food_database": "Lebensmitteldatenbank ändern",
+  "foodNotFoundMessage": "Lebensmittel nicht in der Datenbank gefunden\nBitte helfen Sie uns, neue Lebensmittel hinzuzufügen",
+  "success_insert_body_measurement": "Messung hinzugefügt",
+  "change_food_database_help": "Lebensmitteldatenbank ändern.\nSie können eine Datenbank aus Ihrem Land oder einer bevorzugten auswählen. 'Undefined' enthält alle verfügbaren Lebensmitteldaten."
 
 }

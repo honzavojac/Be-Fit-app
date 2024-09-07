@@ -3,6 +3,7 @@
   "Fitness": "Posilování",
   "Food": "Jídlo",
 
+   "add":"Přidat",
   "add_food":"Přidat potravinu",
   "new_food": "Vytvořit jídlo",
   "search_food": "Vyhledat jídlo",
@@ -105,5 +106,11 @@
   "change_theme":"Změnit motiv",
   "light":"Světlý",
   "dark":"Tmavý",
-  "change_food_database":"Změnit databázi jídel"
+  "change_food_database":"Změnit databázi potravin",
+  "foodNotFoundMessage":  "Potravina nebyla nalezena v databázi\nProsím, pomozte nám přidáním nové potraviny",
+  "success_insert_body_measurement":"Měření přidáno",
+  "change_food_database_help": "Změna databáze potravin. \nMůžete vybrat databázi z vaší země nebo tu, kterou preferujete. \n'Undefined' zahrnuje všechny dostupné potravinové údaje."  
+   
+  
+
 }

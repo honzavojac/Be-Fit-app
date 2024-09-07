@@ -65,7 +65,7 @@ class _ChoseInitDataPageState extends State<ChoseInitDataPage> {
                       height: 50,
                     ),
                     Image.asset(
-                      'assets/gym.png',
+                      'assets/gym_google2.png',
                       height: 300,
                     ),
                     SizedBox(

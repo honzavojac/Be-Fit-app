@@ -4,21 +4,16 @@ import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
 import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
-import 'package:kaloricke_tabulky_02/main.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/fitness_record_page%20copy.dart';
-import 'package:kaloricke_tabulky_02/pages/fitnessRecord/fitness_record_page.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
-import 'package:kaloricke_tabulky_02/settings.dart';
 import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:kaloricke_tabulky_02/variables.dart';
 import 'package:provider/provider.dart';
 import 'package:kaloricke_tabulky_02/pages/foodAdd/food_page.dart';
 import 'package:kaloricke_tabulky_02/pages/homePage/home_page.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 
 class InitPage extends StatefulWidget {
   const InitPage({super.key});
@@ -55,13 +50,14 @@ class _InitPageState extends State<InitPage> {
   @override
   void initState() {
     super.initState();
+    var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
+    dbFitness.setSyncingToFalse();
   }
 
   bool loading = true;
   Future<void> loadDataFromSupabase() async {
     var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false);
     var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
-
     switchButton = dbFitness.switchButton;
 
     // Definování proměnných pro ukládání dat
@@ -247,8 +243,12 @@ class _InitPageState extends State<InitPage> {
 
             if (sqfliteNutriIntakeList.isEmpty) {
               for (var nutriIntake in supabaseNutriIntakeList) {
-                sqfliteNutriIntakeList.add(nutriIntake);
-                dbFitness.TxnInsertNutriIntake(txn, nutriIntake, nutriIntake.idNutriIntake!, 0);
+                try {
+                  sqfliteNutriIntakeList.add(nutriIntake);
+                  dbFitness.TxnInsertNutriIntake(txn, nutriIntake, nutriIntake.idNutriIntake!, 0);
+                } on Exception catch (e) {
+                  print("nastala chyba při insert nutri intake: $e");
+                }
               }
             }
             if (sqfliteUser == null) {
@@ -294,6 +294,8 @@ class _InitPageState extends State<InitPage> {
     setState(() {});
   }
 
+  //! tutorial
+
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
@@ -312,7 +314,7 @@ class _InitPageState extends State<InitPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Image.asset(
-                        'assets/gym.png',
+                        'assets/gym_google2.png',
                         height: 300,
                       ),
                       SizedBox(
@@ -347,7 +349,7 @@ class _InitPageState extends State<InitPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Image.asset(
-                        'assets/gym.png',
+                        'assets/gym_google2.png',
                         height: 300,
                       ),
                       SizedBox(
@@ -422,7 +424,7 @@ class _InitPageState extends State<InitPage> {
               ),
               _buttonWidget(dbSupabase, context, '/scanFood', 'scan_food'.tr(), Icons.fit_screen_rounded, false),
               _buttonWidget(dbSupabase, context, '/newFood', 'new_food'.tr(), Icons.add_circle_outline_outlined, true),
-              _buttonWidget(dbSupabase, context, '/foodStatistic', 'statistic'.tr(), Icons.bar_chart_rounded, false),
+              _buttonWidget(dbSupabase, context, '/foodStatistic', 'statistic'.tr(), Icons.bar_chart_rounded, true),
               _categoryWidget('workout'.tr()),
               // _buttonWidget(dbSupabase, context, '/fitnessNames', 'Manage fitness names', Icons.text_fields_rounded),
               // _buttonWidget(dbSupabase, context, '/editDeleteExerciseData', 'Edit/Delete exercise data', Icons.edit_rounded),

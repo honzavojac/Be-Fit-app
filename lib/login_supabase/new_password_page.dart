@@ -43,7 +43,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                     height: 50,
                   ),
                   Image.asset(
-                    'assets/gym.png',
+                    'assets/gym_google2.png',
                     height: 250,
                   ),
                   const SizedBox(height: 40),

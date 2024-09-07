@@ -8,6 +8,8 @@ import 'package:provider/provider.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 
+import 'newFood/food_add_page.dart';
+
 class MySearchBar extends StatefulWidget {
   final Function notifyParent;
   final SearchController searchController;
@@ -112,24 +114,41 @@ class _MySearchBarState extends State<MySearchBar> {
               return !sqfliteIds.contains(food.idFood);
             }).toList();
 
-            // Rozdělení Supabase dat na položky, které začínají a nezačínají na hledaný výraz
-            List<Food> startingWithSearchTerm = filteredSupabaseData.where((food) {
-              return food.unaccentName?.toLowerCase().startsWith(searchTerm) ?? false;
-            }).toList();
-
-            List<Food> notStartingWithSearchTerm = filteredSupabaseData.where((food) {
-              return !(food.unaccentName?.toLowerCase().startsWith(searchTerm) ?? false);
-            }).toList();
-
-            // Seřazení obou částí podle názvu
-            startingWithSearchTerm.sort((a, b) => a.name!.toLowerCase().compareTo(b.name!.toLowerCase()));
-            notStartingWithSearchTerm.sort((a, b) => a.name!.toLowerCase().compareTo(b.name!.toLowerCase()));
-
-            // Spojení dat: dataSqflite jako první, pak sortedSupabaseData
-            dataSqflite.addAll([...startingWithSearchTerm, ...notStartingWithSearchTerm]);
+            // Přidání výsledků ze Supabase za výsledky ze Sqflite
+            dataSqflite.addAll(filteredSupabaseData);
           }
 
-          print(dataSqflite.toString());
+          // Seřazení výsledků podle následujících pravidel:
+          // 1. Položky ze Sqflite jsou vždy nahoře.
+          // 2. Pokud není zadán žádný hledaný výraz, seřadí položky podle abecedy.
+          // 3. Pokud je zadán hledaný výraz, položky začínající na tento výraz jsou první, pak ostatní, vše abecedně.
+          dataSqflite.sort((a, b) {
+            String nameA = a.unaccentName?.toLowerCase() ?? '';
+            String nameB = b.unaccentName?.toLowerCase() ?? '';
+
+            bool isFromSqfliteA = a.recentlyUsed != null; // Identifikace Sqflite položek
+            bool isFromSqfliteB = b.recentlyUsed != null;
+
+            // Pokud oba nebo žádný z položek nejsou ze Sqflite, řaď abecedně nebo podle začátku hledaného výrazu
+            if (isFromSqfliteA && !isFromSqfliteB) {
+              return -1; // A je před B (Sqflite je před Supabase)
+            } else if (!isFromSqfliteA && isFromSqfliteB) {
+              return 1; // B je před A (Sqflite je před Supabase)
+            } else {
+              bool startsWithSearchTermA = nameA.startsWith(searchTerm);
+              bool startsWithSearchTermB = nameB.startsWith(searchTerm);
+
+              if (startsWithSearchTermA && startsWithSearchTermB) {
+                return nameA.compareTo(nameB);
+              } else if (startsWithSearchTermA) {
+                return -1;
+              } else if (startsWithSearchTermB) {
+                return 1;
+              } else {
+                return nameA.compareTo(nameB);
+              }
+            }
+          });
 
           // Mapování výsledků na ListTile
           List<Widget> suggestions = dataSqflite.map((food) {
@@ -174,12 +193,55 @@ class _MySearchBarState extends State<MySearchBar> {
           return [
             ...suggestions,
             Container(
-              height: keyboardHeight + 20,
+              height: 500,
               child: ListView(
                 children: [
                   Center(
-                      // child: Text("There is nothing more"),
-                      )
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        "foodNotFoundMessage".tr(),
+                        softWrap: true,
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        height: 35,
+                        // width: 145,
+                        child: ElevatedButton.icon(
+                          onPressed: () async {
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                //tady****************************************************************************************************************************
+                                builder: (context) => FoodAddPage(
+                                  quantity: quantity,
+                                ),
+                              ),
+                            );
+                          },
+                          icon: Icon(Icons.add_circle_outline),
+                          label: Text(
+                            'new_food'.tr(),
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          style: ButtonStyle(
+                            backgroundColor: WidgetStateProperty.all(ColorsProvider.getColor2(context)),
+                            foregroundColor: WidgetStateProperty.all(ColorsProvider.getColor8(context)),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),

@@ -87,6 +87,7 @@ class _SettingsState extends State<Settings> {
     data1 = await dbFitness.SyncFromSupabase(context);
     language = await _getLanguage();
     await dbFitness.SaveToSupabaseAndOrderSqlite(dbSupabase);
+    print("saved to supabase");
     print(language);
 
     setState(() {});
@@ -130,6 +131,24 @@ class _SettingsState extends State<Settings> {
       selectedCountry = user!.country;
       _nameController.text = user!.name;
     });
+  }
+
+  Future<void> waitForSyncingToComplete() async {
+    var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
+    var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false);
+
+    bool syncing = dbFitness.checkIfSyncing();
+
+    // Check if syncing is true
+    while (syncing) {
+      // Wait for a short duration before checking again
+      await Future.delayed(Duration(milliseconds: 500));
+
+      // Re-check the value of syncing
+      syncing = dbFitness.checkIfSyncing();
+    }
+    await dbFitness.SaveToSupabaseAndOrderSqlite(dbSupabase);
+    print("uloženo a sjednoceny databáze");
   }
 
   List<Muscle> data3 = [];
@@ -176,6 +195,8 @@ class _SettingsState extends State<Settings> {
                   );
                 },
               );
+              await waitForSyncingToComplete();
+
               await _deleteCacheDir();
 
               await dbFitness.deleteAllData();
@@ -231,7 +252,7 @@ class _SettingsState extends State<Settings> {
                   child: Row(
                     children: [
                       Text(
-                        "Change language",
+                        "change_language".tr(),
                         style: TextStyle(fontSize: 18),
                       ),
                     ],
@@ -285,7 +306,7 @@ class _SettingsState extends State<Settings> {
                   child: Row(
                     children: [
                       Text(
-                        "Change theme",
+                        "change_theme".tr(),
                         style: TextStyle(fontSize: 18),
                       ),
                     ],
@@ -304,7 +325,7 @@ class _SettingsState extends State<Settings> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      Text("Light"),
+                      Text("light".tr()),
                       Switch(
                         activeTrackColor: ColorsProvider.getColor2(context),
                         activeColor: Colors.black,
@@ -324,7 +345,7 @@ class _SettingsState extends State<Settings> {
                           }
                         },
                       ),
-                      Text("Dark"),
+                      Text("dark".tr()),
                     ],
                   ),
                 ),
@@ -414,7 +435,7 @@ class _SettingsState extends State<Settings> {
                   child: Row(
                     children: [
                       Text(
-                        "Change food database",
+                        "change_food_database".tr(),
                         style: TextStyle(fontSize: 18),
                       ),
                     ],
@@ -488,7 +509,7 @@ class _SettingsState extends State<Settings> {
                     ),
                     Padding(
                       padding: const EdgeInsets.only(left: 8.0),
-                      child: HelpButton(helpText: "This changes the food database. You can select a database from your country or one that you prefer. 'Undefined' includes all available food data."),
+                      child: HelpButton(helpText: "change_food_database_help".tr()),
                     ),
                   ],
                 ),

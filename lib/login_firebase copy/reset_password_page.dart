@@ -56,7 +56,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Image.asset(
-                  'assets/gym.png',
+                  'assets/gym_google2.png',
                   height: 250,
                 ),
                 SizedBox(

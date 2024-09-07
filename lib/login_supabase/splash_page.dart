@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
+import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
 import 'package:kaloricke_tabulky_02/main.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
@@ -27,10 +28,13 @@ class _SplashPageState extends State<SplashPage> {
 
     if (session != null) {
       var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false);
+      var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
+
       UserSupabase? userSupabase = await dbSupabase.getUser();
+      UserSupabase? userSqflite = await dbFitness.SelectUser();
 
       // Check if userSupabase is not null and if the dateOfBirth and country are not null or empty
-      if (userSupabase == null) {
+      if (userSupabase == null && userSqflite == null) {
         print("initdata");
         Navigator.of(context).pushReplacementNamed('/initData', arguments: [session.user.email]);
       } else {
@@ -52,7 +56,7 @@ class _SplashPageState extends State<SplashPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Image.asset(
-                  'assets/gym.png',
+                  'assets/gym_google2.png',
                   height: 300,
                 ),
                 SizedBox(

@@ -867,8 +867,9 @@ class SupabaseProvider extends ChangeNotifier {
     ''').eq('user_id', uid);
 
     final List<dynamic> data = response[0]["nutri_intake"];
-
+    print(data.length);
     List<NutriIntake> nutriIntake = data.map((json) => NutriIntake.fromJson(json as Map<String, dynamic>)).toList();
+    print("length of nutri intake from supabase: ${nutriIntake.length}");
     nutriIntake.sort(
       (a, b) => a.idNutriIntake!.compareTo(b.idNutriIntake!),
     );

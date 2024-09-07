@@ -58,7 +58,7 @@ class _LoginPageState extends State<LoginPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Image.asset(
-                  'assets/gym.png',
+                  'assets/gym_google2.png',
                   height: 250,
                 ),
                 SizedBox(

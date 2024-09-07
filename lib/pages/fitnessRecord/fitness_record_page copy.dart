@@ -3,6 +3,7 @@
 import 'dart:async';
 import 'dart:ui';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -323,9 +324,9 @@ class _FitnessRecordScreenCopyState extends State<FitnessRecordScreenCopy> {
                                                                   child: Row(
                                                                     children: [
                                                                       Padding(
-                                                                        padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
+                                                                        padding: const EdgeInsets.only(left: 5, right: 5, bottom: 2),
                                                                         child: Container(
-                                                                          width: 76,
+                                                                          // width: 76,
                                                                           child: Column(
                                                                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                                                             children: [

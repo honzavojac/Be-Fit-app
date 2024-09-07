@@ -44,13 +44,13 @@ class _FoodAddPageState extends State<FoodAddPage> {
 
     // String country = "CZ";
     String name = nameController.text.trim();
-    int? weight = int.tryParse(weightController.text.trim());
+    int? weight = int.tryParse(weightController.text.trim().replaceAll(',', '.'));
     String? quantity = widget.quantity.isNotEmpty ? widget.quantity[selectedQuantity] : null;
-    double? kcal = double.tryParse(kcalController.text.trim()) ?? 0;
-    double? protein = double.tryParse(proteinController.text.trim()) ?? 0;
-    double? carbs = double.tryParse(carbsController.text.trim()) ?? 0;
-    double? fat = double.tryParse(fatsController.text.trim()) ?? 0;
-    double? fiber = double.tryParse(fiberController.text.trim()) ?? 0;
+    double? kcal = double.tryParse(kcalController.text.trim().replaceAll(',', '.')) ?? 0;
+    double? protein = double.tryParse(proteinController.text.trim().replaceAll(',', '.')) ?? 0;
+    double? carbs = double.tryParse(carbsController.text.trim().replaceAll(',', '.')) ?? 0;
+    double? fat = double.tryParse(fatsController.text.trim().replaceAll(',', '.')) ?? 0;
+    double? fiber = double.tryParse(fiberController.text.trim().replaceAll(',', '.')) ?? 0;
 
     if (selectedCountry != null && name.isNotEmpty && weight != null && now.isNotEmpty) {
       switch (selectedQuantity) {
@@ -75,11 +75,6 @@ class _FoodAddPageState extends State<FoodAddPage> {
           break;
         default:
       }
-      print('Kcal per 100g: ${kcal != null ? kcal : "N/A"}');
-      print('Protein per 100g: ${protein != null ? protein : "N/A"}');
-      print('Carbs per 100g: ${carbs != null ? carbs : "N/A"}');
-      print('Fat per 100g: ${fat != null ? fat : "N/A"}');
-      print('Fiber per 100g: ${fiber != null ? fiber : "N/A"}');
       Food record = Food(
         country: selectedCountry,
         name: name,

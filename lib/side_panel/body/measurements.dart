@@ -64,14 +64,14 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
 
     try {
       // Získání textu z textových polí
-      String weightText = weightTextEditingController.text.trim();
-      String heightText = heightTextEditingController.text.trim();
-      String abdominalCircumferenceText = abdominalCircumferenceTextEditingController.text.trim();
-      String chestCircumferenceText = chestCircumferenceTextEditingController.text.trim();
-      String waistCircumferenceText = waistCircumferenceTextEditingController.text.trim();
-      String thighCircumferenceText = thighCircumferenceTextEditingController.text.trim();
-      String neckCircumferenceText = neckCircumferenceTextEditingController.text.trim();
-      String bicepsCircumferenceText = bicepsCircumferenceTextEditingController.text.trim();
+      String weightText = weightTextEditingController.text.trim().replaceAll(',', '.');
+      String heightText = heightTextEditingController.text.trim().replaceAll(',', '.');
+      String abdominalCircumferenceText = abdominalCircumferenceTextEditingController.text.trim().replaceAll(',', '.');
+      String chestCircumferenceText = chestCircumferenceTextEditingController.text.trim().replaceAll(',', '.');
+      String waistCircumferenceText = waistCircumferenceTextEditingController.text.trim().replaceAll(',', '.');
+      String thighCircumferenceText = thighCircumferenceTextEditingController.text.trim().replaceAll(',', '.');
+      String neckCircumferenceText = neckCircumferenceTextEditingController.text.trim().replaceAll(',', '.');
+      String bicepsCircumferenceText = bicepsCircumferenceTextEditingController.text.trim().replaceAll(',', '.');
 
       // Kontrola a převod textu na číslo, pokud text není prázdný
       weight = weightText.isNotEmpty ? double.tryParse(weightText) : null;
@@ -143,8 +143,8 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          TextFieldWidget("weight".tr(), weightTextEditingController),
-                          TextFieldWidget("height".tr(), heightTextEditingController),
+                          TextFieldWidget("Weight", weightTextEditingController),
+                          TextFieldWidget("Height", heightTextEditingController),
                         ],
                       ),
                       SizedBox(
@@ -166,27 +166,27 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
                       SizedBox(
                         height: 30,
                       ),
-                      TextFieldWidget("abdominal".tr(), abdominalCircumferenceTextEditingController),
+                      TextFieldWidget("Abdominal", abdominalCircumferenceTextEditingController),
                       SizedBox(
                         height: 20,
                       ),
-                      TextFieldWidget("chest".tr(), chestCircumferenceTextEditingController),
+                      TextFieldWidget("Chest", chestCircumferenceTextEditingController),
                       SizedBox(
                         height: 20,
                       ),
-                      TextFieldWidget("waist".tr(), waistCircumferenceTextEditingController),
+                      TextFieldWidget("Waist", waistCircumferenceTextEditingController),
                       SizedBox(
                         height: 20,
                       ),
-                      TextFieldWidget("thingh".tr(), thighCircumferenceTextEditingController),
+                      TextFieldWidget("Thingh", thighCircumferenceTextEditingController),
                       SizedBox(
                         height: 20,
                       ),
-                      TextFieldWidget("neck".tr(), neckCircumferenceTextEditingController),
+                      TextFieldWidget("Neck", neckCircumferenceTextEditingController),
                       SizedBox(
                         height: 20,
                       ),
-                      TextFieldWidget("biceps".tr(), bicepsCircumferenceTextEditingController),
+                      TextFieldWidget("Biceps", bicepsCircumferenceTextEditingController),
                       SizedBox(
                         height: 50,
                       ),
@@ -197,8 +197,28 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
                             var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false);
 
                             bool success = await processMeasurements();
-
+                            AnimationController localAnimationController;
                             if (success) {
+                              showTopSnackBar(
+                                Overlay.of(context),
+
+                                animationDuration: Duration(milliseconds: 1500),
+                                Container(
+                                  height: 50,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 25, right: 25),
+                                    child: CustomSnackBar.success(
+                                      message: "success_insert_body_measurement".tr(),
+                                    ),
+                                  ),
+                                ),
+                                // persistent: true,
+                                onAnimationControllerInit: (controller) => localAnimationController = controller,
+                                displayDuration: Duration(microseconds: 750),
+                                dismissType: DismissType.onSwipe,
+                                dismissDirection: [DismissDirection.endToStart],
+                                reverseAnimationDuration: Duration(milliseconds: 250),
+                              );
                               weightTextEditingController.clear();
                               weightTextEditingController.clear();
                               heightTextEditingController.clear();
@@ -210,7 +230,6 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
                               bicepsCircumferenceTextEditingController.clear();
                               await dbFitness.SaveToSupabaseAndOrderSqlite(dbSupabase);
                             } else {
-                              AnimationController localAnimationController;
                               showTopSnackBar(
                                 Overlay.of(context),
 
@@ -498,15 +517,16 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
   }
 
   Widget TextFieldWidget(String category, TextEditingController textEditingController) {
+    String text = category.toLowerCase().tr();
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
           category == "Neck"
-              ? "$category:  "
+              ? "$text:  "
               : category != "Biceps"
-                  ? "$category: "
-                  : "$category:",
+                  ? "$text: "
+                  : "$text:",
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 19,
