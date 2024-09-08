@@ -137,58 +137,63 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
                   // color: Colors.blue.shade900,
                   child: ListView(
                     children: [
-                      SizedBox(
-                        height: 50,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      Column(
+                        key: keyButton1,
                         children: [
-                          TextFieldWidget("Weight", weightTextEditingController),
-                          TextFieldWidget("Height", heightTextEditingController),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 40,
-                      ),
-                      Container(
-                        height: 40,
-                        child: Center(
-                          child: Text(
-                            "circumference".tr(),
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 23,
-                              color: ColorsProvider.getColor2(context),
+                          SizedBox(
+                            height: 50,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              TextFieldWidget("Weight", weightTextEditingController),
+                              TextFieldWidget("Height", heightTextEditingController),
+                            ],
+                          ),
+                          SizedBox(
+                            height: 40,
+                          ),
+                          Container(
+                            height: 40,
+                            child: Center(
+                              child: Text(
+                                "circumference".tr(),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 23,
+                                  color: ColorsProvider.getColor2(context),
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 30,
-                      ),
-                      TextFieldWidget("Abdominal", abdominalCircumferenceTextEditingController),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      TextFieldWidget("Chest", chestCircumferenceTextEditingController),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      TextFieldWidget("Waist", waistCircumferenceTextEditingController),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      TextFieldWidget("Thingh", thighCircumferenceTextEditingController),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      TextFieldWidget("Neck", neckCircumferenceTextEditingController),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      TextFieldWidget("Biceps", bicepsCircumferenceTextEditingController),
-                      SizedBox(
-                        height: 50,
+                          SizedBox(
+                            height: 30,
+                          ),
+                          TextFieldWidget("Abdominal", abdominalCircumferenceTextEditingController),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          TextFieldWidget("Chest", chestCircumferenceTextEditingController),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          TextFieldWidget("Waist", waistCircumferenceTextEditingController),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          TextFieldWidget("Thingh", thighCircumferenceTextEditingController),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          TextFieldWidget("Neck", neckCircumferenceTextEditingController),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          TextFieldWidget("Biceps", bicepsCircumferenceTextEditingController),
+                          SizedBox(
+                            height: 50,
+                          ),
+                        ],
                       ),
                       Center(
                         child: GestureDetector(

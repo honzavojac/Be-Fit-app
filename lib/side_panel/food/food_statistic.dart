@@ -38,11 +38,14 @@ class _foodStatisticState extends State<foodStatistic> {
               height: 40,
             ),
             Expanded(
-              child: ListView.builder(
-                itemCount: nutriIntake.length,
-                itemBuilder: (context, index) {
-                  return Text("${nutriIntake[index].supabaseIdNutriIntake}  ${nutriIntake[index].idFood}  ${nutriIntake[index].idNutriIntake} ${(nutriIntake[index].supabaseIdNutriIntake == nutriIntake[index].idNutriIntake) ? "true" : "*****"}");
-                },
+              child: Padding(
+                padding: const EdgeInsets.only(left: 20),
+                child: ListView.builder(
+                  itemCount: nutriIntake.length,
+                  itemBuilder: (context, index) {
+                    return Text("${nutriIntake[index].supabaseIdNutriIntake}  ${nutriIntake[index].idFood}  ${nutriIntake[index].idNutriIntake} ${(nutriIntake[index].supabaseIdNutriIntake == nutriIntake[index].idNutriIntake) ? "true" : "*****"}");
+                  },
+                ),
               ),
             ),
           ],

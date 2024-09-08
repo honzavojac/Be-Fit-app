@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
+import '../../init_page.dart';
 import 'new_muscle_box copy.dart';
 
 class AddSplitBoxCopy extends StatefulWidget {
@@ -97,6 +98,7 @@ class _AddSplitBoxCopyState extends State<AddSplitBoxCopy> {
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 15),
                                 child: TextField(
+                                  key: keyNameOfWorkout,
                                   decoration: InputDecoration(
                                     labelText: '${"name_of_split".tr()}:',
                                     labelStyle: TextStyle(
@@ -131,6 +133,7 @@ class _AddSplitBoxCopyState extends State<AddSplitBoxCopy> {
                             ),
                       Expanded(
                         child: Container(
+                          key: keyIsCheckedMuscles,
                           child: ListView.builder(
                             itemCount: muscles.length,
                             itemBuilder: (context, index) {
@@ -165,6 +168,7 @@ class _AddSplitBoxCopyState extends State<AddSplitBoxCopy> {
                   ),
                 ),
                 Container(
+                  key: keySaveSplit,
                   height: 50,
                   width: double.infinity,
                   child: TextButton(
@@ -287,6 +291,7 @@ class _AddSplitBoxCopyState extends State<AddSplitBoxCopy> {
                     width: 150,
                     height: 35,
                     child: ElevatedButton(
+                      key: keyNewMuscle,
                       style: ButtonStyle(
                         backgroundColor: WidgetStatePropertyAll(
                           ColorsProvider.getColor2(context),

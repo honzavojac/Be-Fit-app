@@ -90,6 +90,19 @@ flutter:
     - assets/icons/icon_biceps.png
     - assets/icons/icon_bodybuilder.png
     - assets/icons/icon_half_bodybuilder.png
+    - assets/Tutorial pictures/tutorial_check_exercises.png
+    - assets/Tutorial pictures/tutorial_new_exercise.png
+    - assets/Tutorial pictures/tutorial_split.png
+    - assets/Tutorial pictures/tutorial_tap_exercise.png
+    - assets/Tutorial pictures/tutorial_new_value_exercise.png
+    - assets/Tutorial pictures/tutorial_add_new_value_exercise.png
+    - assets/Tutorial pictures/tutorial_swipe_up_exercise.png
+    - assets/Tutorial pictures/tutorial_historical_exercise.png
+    - assets/Tutorial pictures/tutorial_add_button_food.png
+    - assets/Tutorial pictures/tutorial_search_bar.png
+    - assets/Tutorial pictures/tutorial_search_items.png
+
+
     - assets/langs/cs.json
     - assets/langs/en.json
     - assets/langs/de.json

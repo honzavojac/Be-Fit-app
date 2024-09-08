@@ -9,6 +9,7 @@ import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:provider/provider.dart';
 
+import '../../init_page.dart';
 import 'data_boxes.dart';
 
 DateTime selectedDate = DateTime.now();
@@ -190,7 +191,53 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           Spacer(),
           Container(
-            child: measurement != null ? measurentWidget() : Container(),
+            child: measurement != null
+                ? measurentWidget()
+                : Container(
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 40),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Text(
+                                "measurement".tr(),
+                                style: TextStyle(
+                                  color: ColorsProvider.getColor2(context),
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              GestureDetector(
+                                key: keyMeasurementButton,
+                                onTap: () {
+                                  Navigator.pushNamed(context, '/measurements');
+                                },
+                                child: Container(
+                                  height: 30,
+                                  // width: 100,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(18),
+                                    color: ColorsProvider.getColor2(context),
+                                  ),
+                                  child: Center(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                                      child: Text(
+                                        "add".tr(),
+                                        style: TextStyle(color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
           ),
           Spacer(),
           // Row(
@@ -373,6 +420,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     GestureDetector(
+                      key: keyMeasurementButton,
                       onTap: () {
                         Navigator.pushNamed(context, '/measurements');
                       },

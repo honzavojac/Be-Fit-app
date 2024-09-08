@@ -1,8 +1,6 @@
 import 'package:date_picker_plus/date_picker_plus.dart';
-import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
 import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';

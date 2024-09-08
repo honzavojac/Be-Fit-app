@@ -8,6 +8,7 @@ import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 import '../../data_classes.dart';
+import '../../init_page.dart';
 import '../../providers/colors_provider.dart';
 
 class NewMuscleBoxCopy extends StatefulWidget {
@@ -76,6 +77,7 @@ class _NewMuscleBoxCopyState extends State<NewMuscleBoxCopy> {
               ],
             ),
             Column(
+              key: keyNewMuscleEditingController,
               children: [
                 Expanded(child: Container()),
                 Container(

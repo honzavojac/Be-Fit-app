@@ -16,6 +16,7 @@ import 'package:kaloricke_tabulky_02/providers/variables_provider.dart';
 import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:provider/provider.dart';
 
+import '../../init_page.dart';
 import 'exercise_page copy.dart';
 
 // class FitnessRecordAppBarCopy extends StatelessWidget {
@@ -122,6 +123,15 @@ class _FitnessRecordScreenCopyState extends State<FitnessRecordScreenCopy> {
     return Container(
       child: Stack(
         children: [
+          Positioned(
+            top: -100, // Mimo zobrazení
+            left: -100,
+            child: Container(
+              key: keyDummy1, // Používáme prázdný prvek jako cíl
+              width: 0,
+              height: 0,
+            ),
+          ),
           loaded == true
               ? exercisesData.isNotEmpty
                   ? Container(
@@ -169,6 +179,7 @@ class _FitnessRecordScreenCopyState extends State<FitnessRecordScreenCopy> {
                             height: 15,
                           ),
                           Container(
+                            key: keyFitnesRecordPage,
                             // color: Color.fromARGB(99, 94, 94, 94),
                             margin: EdgeInsets.only(left: 10, right: 10),
                             child: ListView.builder(
@@ -535,6 +546,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         Container(
+          key: keyEditWorkouts,
           height: 35,
           child: ElevatedButton.icon(
             onPressed: () async {

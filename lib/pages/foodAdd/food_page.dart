@@ -108,15 +108,15 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
 
     return Stack(
       children: [
-        /*Positioned(
-          top: 5,
-          right: 30,
-          child: ElevatedButton.icon(
-            onPressed: () {},
-            label: Text('Add new food', style: TextStyle(fontSize: 10)),
-            icon: Icon(Icons.add, size: 20),
+        Positioned(
+          top: -100, // Mimo zobrazení
+          right: -100, // Mimo zobrazení
+          child: Container(
+            key: keyDummy2, // Používáme prázdný prvek jako cíl
+            width: 0,
+            height: 0,
           ),
-        ),*/
+        ),
         Column(
           children: [
             Container(
@@ -163,6 +163,7 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                               height: 35,
                               // width: 145,
                               child: ElevatedButton.icon(
+                                key: keyNewFood,
                                 onPressed: () async {
                                   await Navigator.push(
                                     context,

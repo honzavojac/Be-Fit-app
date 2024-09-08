@@ -259,8 +259,7 @@ class _AddIntakePageState extends State<AddIntakePage> {
                   if (newItem == true) {
                     print("INSERT ITEM");
                     NutriIntake? lastSupabaseIdNutriIntake = await dbFitness.SelectLastNutriIntake();
-                    int? temp = lastSupabaseIdNutriIntake?.supabaseIdNutriIntake ?? 0;
-                    int newSupabaseIdNutriIntake = temp != null ? temp++ : 0;
+                    int newSupabaseIdNutriIntake = (lastSupabaseIdNutriIntake?.supabaseIdNutriIntake ?? 0) + 1;
 
                     print(now.toString());
                     print(selectedDate.toString());
