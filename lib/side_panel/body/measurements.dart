@@ -1,8 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
 import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
 import 'package:kaloricke_tabulky_02/init_page.dart';
@@ -202,6 +200,7 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
                             var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false);
 
                             bool success = await processMeasurements();
+                            // ignore: unused_local_variable
                             AnimationController localAnimationController;
                             if (success) {
                               showTopSnackBar(

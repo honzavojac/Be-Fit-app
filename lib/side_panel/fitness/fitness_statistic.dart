@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -76,13 +78,9 @@ class _FitnessStatisticState extends State<FitnessStatistic> with TickerProvider
     // Generování dat pro PieChart
     if (muscleList.isNotEmpty) {
       pieData = generatePieChartData(prePieData, muscleList);
-      print(pieData.length);
       for (var pieData in pieData) {
-        print(pieData.title);
         if (pieData.value == 0) {
           zeroPieData.add(pieData.title.split('\n').first);
-
-          // print(pieData.title);
         }
       }
     }
@@ -132,6 +130,120 @@ class _FitnessStatisticState extends State<FitnessStatistic> with TickerProvider
       });
     }
     return pieData;
+  }
+
+// 1. Funkce pro počítání split tréninků
+  void calculateSplitData(
+    List<SplitStartedCompleted> dataAllSplits,
+    List<Exercise> filteredExercises,
+    String thisMonth,
+    int? recordSupabaseIdMuscle,
+    int numberOfEndedSplitStartedCompleted,
+    int numberOfEndedSplitStartedCompletedThisMonth,
+    List<int> ended,
+  ) {
+    for (var splitStartedCompleted in dataAllSplits) {
+      String lookedThisMonth = splitStartedCompleted.createdAt!.replaceRange(0, 5, "").replaceRange(2, null, "");
+
+      for (var exData in splitStartedCompleted.exerciseData!) {
+        for (var exercise in filteredExercises) {
+          if (exData.exercisesIdExercise == exercise.supabaseIdExercise && recordSupabaseIdMuscle == exercise.musclesIdMuscle && !ended.contains(splitStartedCompleted.supabaseIdStartedCompleted)) {
+            numberOfEndedSplitStartedCompleted++;
+            ended.add(splitStartedCompleted.supabaseIdStartedCompleted!);
+
+            if (thisMonth == lookedThisMonth) {
+              numberOfEndedSplitStartedCompletedThisMonth++;
+            }
+          }
+        }
+      }
+    }
+  }
+
+// 2. Funkce pro počítání statistik cvičení
+  void calculateExerciseStatistics(
+    List<Exercise> filteredExercises,
+    List<ExerciseData> exerciseDataList,
+    int item,
+    String thisMonth,
+    Map<int, int> exerciseOccurrences,
+    int numberOfEndedExercise,
+    int numberOfSeries,
+    int numberOfSeriesThisMonth,
+    int maxWeight,
+    int maxWeightReps,
+    int tempIdExercise,
+  ) {
+    List<int> exDataEnded = [];
+    bool setIdExercise = false;
+
+    for (var exData in exerciseDataList) {
+      exData.reps ??= 0;
+      exData.weight ??= 0;
+      String lookedThisMonth = exData.time!.replaceRange(0, 5, "").replaceRange(2, null, "");
+
+      for (var i = 0; i < filteredExercises.length; i++) {
+        var exercise = filteredExercises[i];
+
+        if (exData.exercisesIdExercise == exercise.supabaseIdExercise) {
+          // Zvýšení výskytů
+          exerciseOccurrences[exData.exercisesIdExercise!] = (exerciseOccurrences[exData.exercisesIdExercise!] ?? 0) + 1;
+
+          // Počítání statistik pro aktuální cvičení
+          if (item == i || exDataEnded.contains(exData.idStartedCompleted)) {
+            exDataEnded.add(exData.idStartedCompleted!);
+            numberOfEndedExercise++;
+          }
+          if (item == i) {
+            numberOfSeries++;
+            if (thisMonth == lookedThisMonth) {
+              numberOfSeriesThisMonth++;
+            }
+            if (maxWeight <= exData.weight!) {
+              maxWeight = exData.weight!;
+              maxWeightReps = max(maxWeightReps, exData.reps!);
+            }
+            if (!setIdExercise && exercise.supabaseIdExercise != null) {
+              tempIdExercise = exercise.supabaseIdExercise!;
+              setIdExercise = true;
+            }
+          }
+        }
+      }
+    }
+  }
+
+// 3. Funkce pro počítání procent cvičení
+  Map<int, double> calculateExercisePercentages(
+    Map<int, int> exerciseOccurrences,
+  ) {
+    int totalOccurrences = exerciseOccurrences.values.fold(0, (sum, count) => sum + count);
+    return exerciseOccurrences.map((id, count) {
+      double percentage = (totalOccurrences > 0) ? (count / totalOccurrences) * 100 : 0.0;
+      return MapEntry(id, percentage);
+    });
+  }
+
+// 4. Funkce pro generování bodů pro grafy
+  void generateSpots(
+    int tempIdExercise,
+    List<FlSpot> spots,
+    List<String> date,
+    List<FlSpot> spots2,
+    List<String> date2,
+    List<FlSpot> spots3,
+    List<String> date3,
+    List<FlSpot> spots4,
+    List<String> date4,
+    List<FlSpot> spots5,
+    List<String> date5,
+  ) {
+    exerciseStatistic(tempIdExercise, spots, date);
+    avgExerciseStatistic(tempIdExercise, spots3, date3);
+
+    sumOfWeightReps(spots2, date2, tempIdExercise);
+    statistic1RM(tempIdExercise, spots4, date4);
+    avgStatistic1RM(tempIdExercise, spots5, date5);
   }
 
   @override
@@ -190,109 +302,29 @@ class _FitnessStatisticState extends State<FitnessStatistic> with TickerProvider
                         children: muscleList.map((record) {
                           List<Exercise> filteredExercises = exerciseslist.where((exercise) => exercise.musclesIdMuscle == record.supabaseIdMuscle).toList();
                           int item = selectedExerciseIndexMap[record.supabaseIdMuscle] ?? 0;
-                          int tempIdExercise = -1; // Změněno na int
+                          int tempIdExercise = -1;
                           int numberOfEndedSplitStartedCompleted = 0;
                           int numberOfEndedSplitStartedCompletedThisMonth = 0;
                           int numberOfEndedExercise = 0;
                           int numberOfSeries = 0;
                           int numberOfSeriesThisMonth = 0;
-                          List<int> exDataEnded = [];
-                          List<int> ended = [];
-                          DateTime now = DateTime.now();
-                          String thisMonth = now.toString().replaceRange(0, 5, "").replaceRange(2, null, "");
-
-                          for (var splitStartedCompleted in dataAllSplits) {
-                            String lookedThisMonth = splitStartedCompleted.createdAt!.replaceRange(0, 5, "").replaceRange(2, null, "");
-
-                            for (var exData in splitStartedCompleted.exerciseData!) {
-                              for (var i = 0; i < filteredExercises.length; i++) {
-                                var exercise = filteredExercises[i];
-
-                                if (exData.exercisesIdExercise == exercise.supabaseIdExercise && record.supabaseIdMuscle == exercise.musclesIdMuscle && !ended.contains(splitStartedCompleted.supabaseIdStartedCompleted)) {
-                                  numberOfEndedSplitStartedCompleted++;
-                                  ended.add(splitStartedCompleted.supabaseIdStartedCompleted!);
-
-                                  if (thisMonth == lookedThisMonth) {
-                                    numberOfEndedSplitStartedCompletedThisMonth++;
-                                  }
-                                }
-                              }
-                            }
-                          }
                           int maxWeight = 0;
                           int maxWeightReps = 0;
-                          bool setIdExercise = false;
+                          DateTime now = DateTime.now();
+                          String thisMonth = now.toString().replaceRange(0, 5, "").replaceRange(2, null, "");
+                          List<int> ended = [];
                           Map<int, int> exerciseOccurrences = {};
 
-                          for (var element in exerciseslist) {
-                            if (element.musclesIdMuscle == record.supabaseIdMuscle) {
-                              exerciseOccurrences[element.supabaseIdExercise!] = 0;
-                            }
-                          }
+                          // Výpočet splitů
+                          calculateSplitData(dataAllSplits, filteredExercises, thisMonth, record.supabaseIdMuscle, numberOfEndedSplitStartedCompleted, numberOfEndedSplitStartedCompletedThisMonth, ended);
 
-                          for (var exData in exerciseDataList) {
-                            if (exData.reps == null) {
-                              exData.reps = 0;
-                            }
-                            if (exData.weight == null) {
-                              exData.weight = 0;
-                            }
-                            String lookedThisMonth = exData.time!.replaceRange(0, 5, "").replaceRange(2, null, "");
+                          // Výpočet statistik cvičení
+                          calculateExerciseStatistics(filteredExercises, exerciseDataList, item, thisMonth, exerciseOccurrences, numberOfEndedExercise, numberOfSeries, numberOfSeriesThisMonth, maxWeight, maxWeightReps, tempIdExercise);
 
-                            for (var i = 0; i < filteredExercises.length; i++) {
-                              var exercise = filteredExercises[i];
+                          // Výpočet procent cvičení
+                          Map<int, double> exercisePercentages = calculateExercisePercentages(exerciseOccurrences);
 
-                              // Kontrola shody idExercise
-                              if (exData.exercisesIdExercise == exercise.supabaseIdExercise && record.supabaseIdMuscle == exercise.musclesIdMuscle) {
-                                // Zvýšení počtu výskytů pro dané idExercise
-                                if (exerciseOccurrences.containsKey(exData.exercisesIdExercise!)) {
-                                  exerciseOccurrences[exData.exercisesIdExercise!] = exerciseOccurrences[exData.exercisesIdExercise!]! + 1;
-                                } else {
-                                  exerciseOccurrences[exData.exercisesIdExercise!] = 1;
-                                }
-
-                                // Další výpočty, jako v původním kódu
-                                if (item == i && !exDataEnded.contains(exData.idStartedCompleted)) {
-                                  exDataEnded.add(exData.idStartedCompleted!);
-                                  numberOfEndedExercise++;
-                                }
-                                if (item == i) {
-                                  numberOfSeries++;
-                                  if (thisMonth == lookedThisMonth) {
-                                    numberOfSeriesThisMonth++;
-                                  }
-                                  if (maxWeight <= exData.weight!) {
-                                    maxWeight = exData.weight!;
-                                    if (maxWeightReps <= exData.reps!) {
-                                      maxWeightReps = exData.reps!;
-                                    }
-                                    // maxWeightReps = exData.reps!;
-                                    print(maxWeightReps);
-                                  }
-                                  if (!setIdExercise) {
-                                    tempIdExercise = exercise.idExercise!; // Přiřazení hodnoty přímo jako int
-                                    setIdExercise = true;
-                                  }
-                                }
-                              }
-                            }
-                          }
-                          int totalOccurrences = 0;
-                          if (exerciseOccurrences.isNotEmpty) {
-                            totalOccurrences = exerciseOccurrences.values.reduce((a, b) => a + b);
-                          }
-
-                          Map<int, double> exercisePercentages = exerciseOccurrences.map((id, count) {
-                            double percentage = (totalOccurrences > 0) ? (count / totalOccurrences) * 100 : 0.0;
-                            return MapEntry(id, percentage);
-                          });
-
-// Výpis procent pro kontrolu
-                          // print(exercisePercentages.length);
-                          // exercisePercentages.forEach((id, percentage) {
-                          //   print("Exercise ID: $id, Percentage: ${percentage.toStringAsFixed(2)}%");
-                          // });
-
+                          // Generování bodů pro grafy
                           List<FlSpot> spots = [];
                           List<String> date = [];
                           List<FlSpot> spots2 = [];
@@ -303,13 +335,8 @@ class _FitnessStatisticState extends State<FitnessStatistic> with TickerProvider
                           List<String> date4 = [];
                           List<FlSpot> spots5 = [];
                           List<String> date5 = [];
-                          exerciseStatistic(tempIdExercise, spots, date);
-                          avgExerciseStatistic(tempIdExercise, spots3, date3);
+                          generateSpots(tempIdExercise, spots, date, spots2, date2, spots3, date3, spots4, date4, spots5, date5);
 
-                          sumOfWeightReps(spots2, date2, tempIdExercise);
-                          statistic1RM(tempIdExercise, spots4, date4);
-                          avgStatistic1RM(tempIdExercise, spots5, date5);
-                          // int idExercise = int.parse(tempIdExercise.trim());
                           return ListView(
                             children: [
                               const SizedBox(height: 20),
@@ -709,7 +736,6 @@ class _FitnessStatisticState extends State<FitnessStatistic> with TickerProvider
                                             child: ListView.builder(
                                               itemCount: zeroPieData.length,
                                               itemBuilder: (context, index) {
-                                                print(zeroPieData[index]);
                                                 return Row(
                                                   mainAxisAlignment: MainAxisAlignment.center,
                                                   children: [
@@ -1080,10 +1106,6 @@ class _FitnessStatisticState extends State<FitnessStatistic> with TickerProvider
         }
       }
     }
-    // print("spots: ${spots}");
-    // return spots;
-    // Debug output to check values
-    // print('maxHeight: $maxHeight, minHeight: $minHeight, spots: $spots');
   }
 
   int i2 = 0;
@@ -1117,14 +1139,8 @@ class _FitnessStatisticState extends State<FitnessStatistic> with TickerProvider
           exerciseData: exDataList,
         ));
       }
-      // Aktualizace maximální a minimální výšky
-
-      // Přidání bodu do seznamu
-      // spots.add(FlSpot(i2.toDouble(), sum.toDouble()));
-      // i2++;
     }
     for (var splitStartedCompleted in splitStartedCompletedList) {
-      // print(splitStartedCompleted.supabaseIdStartedCompleted);
       double sum = 0;
       for (var exData in splitStartedCompleted.exerciseData!) {
         sum += (exData.weight! * exData.reps!);
@@ -1195,9 +1211,6 @@ class _FitnessStatisticState extends State<FitnessStatistic> with TickerProvider
 
       i3++;
     }
-
-    // Debug output to check values
-    // print('maxHeight3: $maxHeight3, minHeight3: $minHeight3, spots: $spots');
   }
 
   int i4 = 0;
@@ -1243,9 +1256,6 @@ class _FitnessStatisticState extends State<FitnessStatistic> with TickerProvider
         }
       }
     }
-
-    // Debug output to check values
-    // print('maxHeight4: $maxHeight4, minHeight4: $minHeight4, spots: $spots');
   }
 
   int i5 = 0;
@@ -1303,10 +1313,6 @@ class _FitnessStatisticState extends State<FitnessStatistic> with TickerProvider
 
       i5++;
     }
-
-    // print("spots: ${spots}");
-    // Debug output to check values
-    // print('maxHeight5: $maxHeight5, minHeight5: $minHeight5, spots: $spots');
   }
 
   Widget SumaryText(String data, bool? trimText) {
@@ -1517,11 +1523,9 @@ class _BarChartWidgetState extends State<BarChartWidget> {
 
     // Převeďte hodnotu na celé číslo a zjistěte, zda je v datech
     late int index;
-    // print(value);
 
     for (var i = 0; i < widget.exerciseData.length; i++) {
       if (widget.exerciseData.keys.elementAt(i) == value) {
-        // print(true);
         index = i;
       } else {}
     }

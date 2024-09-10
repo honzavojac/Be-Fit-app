@@ -105,6 +105,7 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
     clickedSplitTab = dbSupabase.clickedSplitTab;
     if (splits.isEmpty) {
       return PopScope(
+        // ignore: deprecated_member_use
         onPopInvoked: (didPop) {
           widget.notifyParent;
         },
@@ -159,6 +160,7 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
       );
     } else {
       return PopScope(
+        // ignore: deprecated_member_use
         onPopInvoked: (didPop) {
           widget.notifyParent;
         },
@@ -569,6 +571,7 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
   }
 }
 
+// ignore: must_be_immutable
 class _deleteSplit extends StatefulWidget {
   final BuildContext context;
   final SupabaseProvider dbSupabase;
@@ -576,6 +579,7 @@ class _deleteSplit extends StatefulWidget {
   int a;
   final Function? notifyParent;
   final Function() onPressed;
+  // ignore: unused_element
   _deleteSplit({super.key, required this.context, required this.dbSupabase, required this.record, required this.a, required this.notifyParent, required this.onPressed});
 
   @override

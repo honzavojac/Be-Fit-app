@@ -3,13 +3,11 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
 import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
-import 'package:kaloricke_tabulky_02/main.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/split_page%20copy%203.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/providers/variables_provider.dart';
@@ -112,7 +110,7 @@ class _FitnessRecordScreenCopyState extends State<FitnessRecordScreenCopy> {
   @override
   Widget build(BuildContext context) {
     var variablesProvider = Provider.of<VariablesProvider>(context);
-    var dbFitness = Provider.of<FitnessProvider>(context);
+    Provider.of<FitnessProvider>(context);
     if (selectedSplit > exercisesData.length) {
       selectedSplit = 0;
     }
@@ -718,7 +716,7 @@ class FitnessRecordEndSplit extends StatefulWidget {
 class _FitnessRecordEndSplitState extends State<FitnessRecordEndSplit> {
   @override
   Widget build(BuildContext context) {
-    var variablesProvider = Provider.of<VariablesProvider>(context);
+    Provider.of<VariablesProvider>(context);
     var dbFitness = Provider.of<FitnessProvider>(context);
     var dbSupabase = Provider.of<SupabaseProvider>(context);
 

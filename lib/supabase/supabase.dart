@@ -329,7 +329,7 @@ class SupabaseProvider extends ChangeNotifier {
   }
 
   endSplitStartedCompleted(int idStartedCompleted) async {
-    final response = await supabase.from('split_started_completed').update({
+    await supabase.from('split_started_completed').update({
       'ended': true,
       'ended_at': DateTime.now().toIso8601String(),
     }).eq('id_started_completed', idStartedCompleted);
@@ -394,12 +394,7 @@ class SupabaseProvider extends ChangeNotifier {
     int exerciseIndex,
   ) async {
     int idSelectedExercise;
-    // print("idExercise $idExercise, nameOfExercise $nameOfExercise, idSelectedMuscle $idSelectedMuscle, splitIndex $splitIndex, muscleIndex $muscleIndex, exerciseIndex $exerciseIndex");
-    // int i = 0;
-    // for (var element in splits[splitIndex].selectedMuscle![muscleIndex].selectedExercises!) {
-    //   print("$i - ${element.exercises.nameOfExercise}");
-    //   i++;
-    // }
+
     if (isChecked) {
       //pokud je cvik označen tak insert row
       await supabase.from('selected_exercise').insert({'id_exercise': idExercise, 'id_selected_muscle': idSelectedMuscle});
@@ -808,9 +803,9 @@ class SupabaseProvider extends ChangeNotifier {
     final response = await supabase.from('food').select().eq('id_food', idFood).limit(1).single();
 
     // Kontrola, zda byl vrácen nějaký záznam
-    if (response != null) {
+    if (response.isNotEmpty) {
       // Převedení JSON dat na objekt třídy Food
-      return Food.fromJson(response as Map<String, dynamic>);
+      return Food.fromJson(response);
     }
 
     // Pokud žádný záznam nebyl nalezen, vrátit null

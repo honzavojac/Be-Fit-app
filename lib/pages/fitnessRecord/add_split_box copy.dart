@@ -2,7 +2,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
 import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
-import 'package:kaloricke_tabulky_02/main.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
@@ -213,6 +212,7 @@ class _AddSplitBoxCopyState extends State<AddSplitBoxCopy> {
                           widget.loadParent();
                           Navigator.of(context).pop();
                         } else {
+                          // ignore: unused_local_variable
                           AnimationController localAnimationController;
 
                           showTopSnackBar(

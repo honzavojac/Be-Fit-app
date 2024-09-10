@@ -2,12 +2,9 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
 import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
-import 'package:kaloricke_tabulky_02/init_page.dart';
 import 'package:kaloricke_tabulky_02/pages/foodAdd/food_page.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
-import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:provider/provider.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class NutriIntakeListview extends StatefulWidget {
   final Function notifyParent;
@@ -37,7 +34,6 @@ class _NutriIntakeListviewState extends State<NutriIntakeListview> {
       itemCount: widget.foodList.length,
       itemBuilder: (context, itemIndex) {
         Food food = widget.foodList[itemIndex];
-        int setNumber = itemIndex + 1;
         return Padding(
           padding: const EdgeInsets.fromLTRB(10, 0, 10, 5),
           child: Container(
@@ -275,7 +271,7 @@ Widget customText(
           style: itemString != "Kcal" ? textStyle : textStyleKcal,
         ),
         Text(
-          "${itemValue == null || itemValue == 0 ? 0 : (itemValue % 1 == 0 ? itemValue.toInt() : itemValue)}",
+          "${itemValue == 0 ? 0 : (itemValue % 1 == 0 ? itemValue.toInt() : itemValue)}",
           style: numberStyle,
         ),
         Container(

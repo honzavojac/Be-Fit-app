@@ -126,10 +126,11 @@ class FitnessNamesState extends State<FitnessNames> with WidgetsBindingObserver 
 
   @override
   Widget build(BuildContext context) {
-    var variablesProvider = Provider.of<VariablesProvider>(context);
-    var dbSupabase = Provider.of<SupabaseProvider>(context);
+    Provider.of<VariablesProvider>(context);
+    Provider.of<SupabaseProvider>(context);
     // loadData();
     return PopScope(
+      // ignore: deprecated_member_use
       onPopInvoked: (didPop) async {
         if (mounted) {
           // widget.notifyParent;
@@ -335,11 +336,6 @@ Widget _myListViewBuilder(List<dynamic> data, int index, BuildContext context, L
                                 physics: NeverScrollableScrollPhysics(),
                                 itemCount: data.length,
                                 itemBuilder: (context, itemIndex) {
-                                  String item = index == 1
-                                      ? data[itemIndex].nameSplit
-                                      : index == 2
-                                          ? data[itemIndex].nameOfMuscle
-                                          : "";
                                   return Padding(
                                     padding: const EdgeInsets.only(bottom: 5),
                                     child: Padding(

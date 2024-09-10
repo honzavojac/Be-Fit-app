@@ -159,7 +159,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    var dbSupabase = Provider.of<SupabaseProvider>(context);
+    Provider.of<SupabaseProvider>(context);
 
     return Scaffold(
       backgroundColor: ColorsProvider.getColor2(context),

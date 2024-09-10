@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/main.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
-import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
-import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ResetPassword extends StatefulWidget {

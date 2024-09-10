@@ -9,8 +9,6 @@ import 'package:kaloricke_tabulky_02/main.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 
 import 'package:kaloricke_tabulky_02/pages/foodAdd/newFood/food_main_add_boxes.dart';
-import 'package:kaloricke_tabulky_02/settings.dart';
-import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:kaloricke_tabulky_02/variables.dart';
 import 'package:provider/provider.dart';
 import 'package:diacritic/diacritic.dart';
@@ -45,7 +43,6 @@ class _FoodAddPageState extends State<FoodAddPage> {
     // String country = "CZ";
     String name = nameController.text.trim();
     int? weight = int.tryParse(weightController.text.trim().replaceAll(',', '.'));
-    String? quantity = widget.quantity.isNotEmpty ? widget.quantity[selectedQuantity] : null;
     double? kcal = double.tryParse(kcalController.text.trim().replaceAll(',', '.')) ?? 0;
     double? protein = double.tryParse(proteinController.text.trim().replaceAll(',', '.')) ?? 0;
     double? carbs = double.tryParse(carbsController.text.trim().replaceAll(',', '.')) ?? 0;
@@ -61,7 +58,6 @@ class _FoodAddPageState extends State<FoodAddPage> {
           fat = fat / weight * 100.toDouble();
           fiber = fiber / weight * 100.toDouble();
           weight = 100;
-          quantity = "100g";
           break;
         case 1:
           kcal = kcal / weight;
@@ -70,7 +66,6 @@ class _FoodAddPageState extends State<FoodAddPage> {
           fat = fat / weight;
           fiber = fiber / weight;
           weight = 100;
-          quantity = "100g";
 
           break;
         default:

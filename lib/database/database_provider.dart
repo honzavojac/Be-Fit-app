@@ -114,9 +114,6 @@ class DBHelper extends ChangeNotifier {
 
     await _database.rawQuery('''ATTACH DATABASE '$_assetsDatabasePath' AS DB''');
 
-    // var result = await _database.query('Notes');
-    // print("Notes database:$result");
-
     print("inicializace proběhla úspěšně");
 
     return _database;
@@ -319,9 +316,7 @@ class DBHelper extends ChangeNotifier {
             INSERT INTO NewSplitSval (ID_SPLITU, ID_SVALU)
             VALUES (${temp - 1}, $id_svalu);
           ''');
-            } else if (id_splitu == temp - 2) {
-              print("b");
-            }
+            } else if (id_splitu == temp - 2) {}
           }
         }
         print(mapSplitSval[i]);
@@ -461,8 +456,7 @@ class DBHelper extends ChangeNotifier {
   }
 
   InsertSplitSval(int cislo1, int cislo2) async {
-    var a = await _database.rawQuery('''INSERT INTO SplitSval VALUES(Null,$cislo1,$cislo2)''');
-    print(a);
+    await _database.rawQuery('''INSERT INTO SplitSval VALUES(Null,$cislo1,$cislo2)''');
   }
 
   Future<List<Record>> getSvalyFromSplitId(int cislo) async {

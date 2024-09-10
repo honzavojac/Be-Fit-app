@@ -2,9 +2,7 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
-import 'package:kaloricke_tabulky_02/main.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
-import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:provider/provider.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
@@ -46,10 +44,8 @@ class _NewExerciseBoxCopyState extends State<NewExerciseBoxCopy> {
     var dbSupabase = Provider.of<FitnessProvider>(context, listen: false); // listen: false to avoid rebuilds
     muscles = await dbSupabase.SelectMuscles();
     // Nastavte výchozí hodnotu na první sval, pokud není seznam prázdný
-    print(widget.idMuscle);
     if (muscles.isNotEmpty) {
       for (var muscle in muscles) {
-        print("${muscle.nameOfMuscle} ${muscle.supabaseIdMuscle}");
         if (muscle.supabaseIdMuscle == widget.idMuscle) {
           selectedMuscle = muscle.nameOfMuscle;
         }

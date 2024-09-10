@@ -1,13 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
-import 'package:kaloricke_tabulky_02/main.dart';
-import 'package:kaloricke_tabulky_02/pages/foodAdd/newFood/food_add_page.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
-import 'package:kaloricke_tabulky_02/database/database_provider.dart';
 import 'package:kaloricke_tabulky_02/pages/foodAdd/newFood/change_new_food_box_servingSize.dart';
-import 'package:provider/provider.dart';
 
 class foodMainAddBoxes extends StatefulWidget {
   final TextEditingController nameController;
@@ -137,9 +132,7 @@ class _foodMainAddBoxesState extends State<foodMainAddBoxes> {
         controller: item,
         onChanged: (input) {
           if (input == "") {
-          } else {
-            var value = input;
-          }
+          } else {}
         },
       ),
     );

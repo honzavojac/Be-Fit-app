@@ -309,7 +309,7 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
                                                   itemBuilder: (context, exerciseIndex) {
                                                     String nameOfExercise = exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises![exerciseIndex].exercises!.nameOfExercise!;
                                                     var idSplit = exercisesData[selectedSplit].idSplit!;
-                                                    var idMuscle = exercisesData[selectedSplit].selectedMuscle![muscleIndex].idSelectedMuscle;
+                                                    // var idMuscle = exercisesData[selectedSplit].selectedMuscle![muscleIndex].idSelectedMuscle;
                                                     var idExercise = exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises![exerciseIndex].exercises!.idExercise;
                                                     var exerciseData = exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises![exerciseIndex].exercises!.exerciseData;
                                                     return GestureDetector(
@@ -690,9 +690,9 @@ class FitnessRecordEndSplit extends StatefulWidget {
 class _FitnessRecordEndSplitState extends State<FitnessRecordEndSplit> {
   @override
   Widget build(BuildContext context) {
-    var dbSupabase = Provider.of<SupabaseProvider>(context);
+    Provider.of<SupabaseProvider>(context);
 
-    var variablesProvider = Provider.of<VariablesProvider>(context);
+    Provider.of<VariablesProvider>(context);
     return Padding(
       padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
       child: Row(

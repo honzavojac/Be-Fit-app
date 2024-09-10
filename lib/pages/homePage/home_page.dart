@@ -115,7 +115,6 @@ class _HomeScreenState extends State<HomeScreen> {
     load();
   }
 
-  int _currentStep = 2;
   // void printNavigationStack(BuildContext context) {
   @override
   Widget build(BuildContext context) {
@@ -293,7 +292,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding: const EdgeInsets.only(bottom: 10, top: 10),
                     child: Column(
                       children: splitstartedcompleteds.asMap().entries.map((entry) {
-                        int index = entry.key;
                         SplitStartedCompleted split = entry.value;
                         DateTime parsedDate = DateTime.parse(split.createdAt.toString());
                         final DateFormat formatter = DateFormat('dd.MM.yyyy');
@@ -678,9 +676,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> SplitStartedStatistic() async {
     var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
-    print("selecteddate: ${selectedDate.toString().replaceRange(10, null, "")}");
     splitstartedcompleteds = await dbFitness.SelectLast5SplitStartedCompleted(selectedDate.toString().replaceRange(10, null, ""));
-    print(splitstartedcompleteds);
   }
 }
 

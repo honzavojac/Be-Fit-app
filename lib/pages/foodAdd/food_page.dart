@@ -612,7 +612,7 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                                                                                                     }
                                                                                                   }
                                                                                                 } on Exception catch (e) {
-                                                                                                  // TODO
+                                                                                                  print(e);
                                                                                                 }
 
                                                                                                 setState(() {});

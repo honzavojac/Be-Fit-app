@@ -1,15 +1,9 @@
 // ignore_for_file: deprecated_member_use
 
-import 'dart:math';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
 import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
-import 'package:kaloricke_tabulky_02/main.dart';
-import 'package:kaloricke_tabulky_02/pages/fitnessRecord/add_split_box.dart';
-import 'package:kaloricke_tabulky_02/pages/fitnessRecord/new_exercise_box.dart';
 import 'package:kaloricke_tabulky_02/providers/variables_provider.dart';
 import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:provider/provider.dart';
@@ -322,7 +316,7 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
                           (record) {
                             // dbSupabase.clickedSplitTab = splits.indexOf(record);
                             // splitTextEditingControllers[_tabController.index] = TextEditingController(text: record.nameSplit);
-                            int index = splits.indexOf(record);
+                            splits.indexOf(record);
 
                             return Column(
                               children: [
@@ -737,6 +731,7 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
   }
 }
 
+// ignore: must_be_immutable
 class _deleteSplit extends StatefulWidget {
   final BuildContext context;
   final MySplit record;
@@ -746,6 +741,7 @@ class _deleteSplit extends StatefulWidget {
   final Function() onPressed;
 
   _deleteSplit({
+    // ignore: unused_element
     super.key,
     required this.context,
     required this.record,
@@ -762,7 +758,7 @@ class _deleteSplit extends StatefulWidget {
 class __deleteSplitState extends State<_deleteSplit> {
   @override
   Widget build(BuildContext context) {
-    var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
+    Provider.of<FitnessProvider>(context, listen: false);
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(25, 10, 25, 20),

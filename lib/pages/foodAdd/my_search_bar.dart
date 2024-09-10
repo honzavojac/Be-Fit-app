@@ -187,8 +187,6 @@ class _MySearchBarState extends State<MySearchBar> {
             );
           }).toList();
 
-          double keyboardHeight = await MediaQuery.of(context).viewInsets.bottom;
-
           // Vložení seznamu návrhů a ListView s pevnou výškou
           return [
             ...suggestions,

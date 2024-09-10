@@ -1,13 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:kaloricke_tabulky_02/data_classes.dart';
-import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/login_supabase/splash_page.dart';
 import 'package:kaloricke_tabulky_02/main.dart';
-import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
-import 'package:provider/provider.dart';
 
 class RegisterPage extends StatefulWidget {
   final VoidCallback? showLoginPage;
@@ -59,7 +55,8 @@ class _RegisterPageState extends State<RegisterPage> {
         },
       );
       //vytvoření uživatele
-      final response = await supabase.auth.signUp(email: _emailController.text.trim(), password: _passwordController.text.trim()).catchError(
+      await supabase.auth.signUp(email: _emailController.text.trim(), password: _passwordController.text.trim()).catchError(
+        // ignore: body_might_complete_normally_catch_error
         (error, stackTrace) {
           Navigator.pop(context);
           showDialog(

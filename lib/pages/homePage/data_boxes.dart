@@ -1,6 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:kaloricke_tabulky_02/main.dart';
 
 import '../../providers/colors_provider.dart';
 
@@ -12,7 +11,6 @@ Widget dataBoxes(
   double fiber,
   BuildContext context,
 ) {
-  EdgeInsets globalPadding = const EdgeInsets.fromLTRB(25, 3, 25, 3);
   BorderRadius globalRadius = BorderRadius.circular(18);
   return Column(
     children: [

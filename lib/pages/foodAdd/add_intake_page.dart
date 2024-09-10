@@ -3,10 +3,7 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/date_time_patterns.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
-import 'package:kaloricke_tabulky_02/init_page.dart';
-import 'package:kaloricke_tabulky_02/pages/foodAdd/food_page.dart';
 import 'package:kaloricke_tabulky_02/pages/foodAdd/newFood/change_new_food_box_servingSize.dart';
 import 'package:kaloricke_tabulky_02/pages/homePage/home_page.dart';
 
@@ -535,7 +532,6 @@ class _SelectFoodCategoryState extends State<SelectFoodCategory> {
   bool show = false;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     load();
   }

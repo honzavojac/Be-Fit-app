@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:math';
 
 import 'package:diacritic/diacritic.dart';
 import 'package:flutter/material.dart';
@@ -227,7 +226,6 @@ class FitnessProvider extends ChangeNotifier {
 
   SyncSqfliteToSupabase(SupabaseProvider dbSupabase, String dbTable, dynamic data, int action) async {
     var idUser = dbSupabase.user!.idUser;
-    // print(data.printMuscle());
     dynamic finalData;
     int idRecord;
     String idItem = "";
@@ -369,7 +367,6 @@ class FitnessProvider extends ChangeNotifier {
     switch (action) {
       case 0:
         //data jsou stejné
-        // finalData.printSplit();
         // var responseData = await _database.rawQuery('''SELECT * FROM $dbTable;''');
         finalSupabaseIdItem = supabaseIdItem;
         print("nic se neinsertovalo");
@@ -378,7 +375,6 @@ class FitnessProvider extends ChangeNotifier {
         // funguje
         print("insertuje se do ${dbTable}: ${finalData}");
 
-        // print(finalData);
         //insert do supabase
         try {
           var responseData = await supabase.from('$dbTable').insert(finalData).select();
@@ -639,7 +635,7 @@ class FitnessProvider extends ChangeNotifier {
         }
       }
       print("nutri intake **********************************");
-      for (var nutriIntake in nutriIntakes) {
+      for (var nutriIntake in nutriIntakes.reversed) {
         int nutriIntakeAction = nutriIntake.action ?? 0;
         int? supabaseIdNutriIntake;
         try {
@@ -741,7 +737,6 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     ''');
 
 //
-    print('Joined Data: ${data}');
 
     Map<int, Muscle> muscleMap = {};
 
@@ -798,17 +793,6 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
       }
     }
 
-    // Výpis dat
-    // muscleMap.forEach((key, value) {
-    //   value.printMuscle();
-    //   value.exercises!.forEach((exercise) {
-    //     exercise.printExercise();
-
-    //     exercise.exerciseData!.forEach((exerciseData) {
-    //       exerciseData.printExerciseData();
-    //     });
-    //   });
-    // });
     muscles = muscleMap.values.toList();
 
     return muscles;
@@ -902,7 +886,6 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
       for (var splitStartedCompleted in element.splitStartedCompleted!) {
         for (var element in splitStartedCompleted.exerciseData!) {
           if (element.exercisesIdExercise == supabaseIdExercise) {
-            // print(element.printExerciseData());
             finalData.add(splitStartedCompleted);
             break;
           }
@@ -982,11 +965,7 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
   //Muscles
   Future<List<Muscle>> SelectMuscles() async {
     var data = await _database.rawQuery('''SELECT * FROM muscles''');
-    // var data1 = data[0];
     var finalData = data.map((e) => Muscle.fromJson(e)).toList();
-    // for (var i = 0; i < finalData.length; i++) {
-    //   print("id: ${finalData[i].idMuscle} name: ${finalData[i].nameOfMuscle} action: ${finalData[i].action}");
-    // }
 
     return finalData;
   }
@@ -1021,7 +1000,6 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
   ) async {
     int supabaseIdMuscle = await dbSupabase.insertMuscle(nameOfMuscle);
 
-    print(supabaseIdMuscle);
     await InsertMuscle(supabaseIdMuscle, nameOfMuscle, 0);
   }
 
@@ -1051,9 +1029,7 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     var data = await _database.rawQuery('''SELECT * FROM exercises''');
 
     var finalData = data.map((e) => Exercise.fromJson(e)).toList();
-    // for (var i = 0; i < finalData.length; i++) {
-    //   print("id: ${finalData[i].idExercise} name: ${finalData[i].nameOfExercise} action: ${finalData[i].action}");
-    // }
+
     return finalData;
   }
 
@@ -1099,7 +1075,6 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
       $musclesIdMuscle, 
       $action)
     ''');
-    // notifyListeners();
   }
 
   UpdateExercise(String nameOfExercise, int supabaseIdExercise) async {
@@ -1129,16 +1104,13 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     // var data1 = data[0];
 
     var finalData = data.map((e) => ExerciseData.fromJson(e)).toList();
-    // for (var i = 0; i < finalData.length; i++) {
-    //   print("id: ${finalData[i].idExData!} name: ${finalData[i].idExData!} action: ${finalData[i].action}");
-    // }
+
     return finalData;
   }
 
   Future<List<ExerciseData>> SelectCurrentExerciseDataWhereExerciseIdExerciseAndIdStCo(int exerciseIdExercise, int idStartedCompleted) async {
     var data = await _database.rawQuery('''SELECT * FROM exercise_data 
     WHERE exercises_id_exercise = $exerciseIdExercise AND id_started_completed = $idStartedCompleted''');
-    // print(data);
     var finalData = data.map((e) => ExerciseData.fromJson(e)).toList();
     return finalData;
   }
@@ -1146,7 +1118,6 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
   Future<List<ExerciseData>> SelectCurrentExerciseDataWhereId(int idStartedCompleted) async {
     var data = await _database.rawQuery('''SELECT * FROM exercise_data 
     WHERE id_started_completed = $idStartedCompleted''');
-    // print(data);
     var finalData = data.map((e) => ExerciseData.fromJson(e)).toList();
     return finalData;
   }
@@ -1155,7 +1126,6 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     var data = await _database.rawQuery('''
     SELECT MAX(supabase_id_ex_data) as supabase_id_ex_data FROM exercise_data;
 ''');
-    print(data);
     var finalData = data.map((e) => ExerciseData.fromJson(e)).toList();
     return finalData;
   }
@@ -1174,7 +1144,6 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
   ) async {
     // Příprava hodnot pro vložení do dotazu SQL
     //action 1 == insert
-    print(time);
     await _database.rawQuery('''INSERT INTO exercise_data (
       supabase_id_ex_data, 
       weight, 
@@ -1217,8 +1186,7 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     int action,
   ) async {
     // Příprava hodnot pro vložení do dotazu SQL
-    //action 1 == insert
-    print(time);
+
     await txn.rawQuery('''INSERT INTO exercise_data (
       supabase_id_ex_data, 
       weight, 
@@ -1279,11 +1247,8 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
   //Split
   Future<List<MySplit>> SelectSplit() async {
     var data = await _database.rawQuery('''SELECT * FROM split''');
-    // var data1 = data[0];
     var finalData = data.map((e) => MySplit.fromJson(e)).toList();
-    // for (var i = 0; i < finalData.length; i++) {
-    //   print("id: ${finalData[i].idSplit!} name: ${finalData[i].idSplit!} action: ${finalData[i].action}");
-    // }
+
     return finalData;
   }
 
@@ -1356,22 +1321,11 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     notifyListeners();
   }
 
-  // DeleteAllSplits() async {
-  //   List<MySplit> splitsDelete = await SelectSplit();
-  //   for (var element in splitsDelete) {
-  //     await DeleteSplit(element.idSplit!);
-  //   }
-  //   notifyListeners();
-  // }
-
 //SelectedMuscles
   Future<List<SelectedMuscle>> SelectSelectedMuscles() async {
     var data = await _database.rawQuery('''SELECT * FROM selected_muscles''');
-    // var data1 = data[0];
     var finalData = data.map((e) => SelectedMuscle.fromJson(e)).toList();
-    // for (var i = 0; i < finalData.length; i++) {
-    //   print("id: ${finalData[i].idSelectedMuscle!} name: ${finalData[i].idSelectedMuscle!} action: ${finalData[i].action}");
-    // }
+
     return finalData;
   }
 
@@ -1444,11 +1398,8 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
 //SelectedExercise
   Future<List<SelectedExercise>> SelectSelectedExercises() async {
     var data = await _database.rawQuery('''SELECT * FROM selected_exercise''');
-    // print(data);
     var finalData = data.map((e) => SelectedExercise.fromJson(e)).toList();
-    // for (var i = 0; i < finalData.length; i++) {
-    //   print("id: ${finalData[i].idSelectedExercise!} name: ${finalData[i].idSelectedExercise!} action: ${finalData[i].action}");
-    // }
+
     return finalData;
   }
 
@@ -1521,21 +1472,15 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
   //SplitStartedCompleted
   Future<List<SplitStartedCompleted>> SelectSplitStartedCompleted() async {
     var data = await _database.rawQuery('''SELECT * FROM split_started_completed''');
-    // var data1 = data[0];
     var finalData = data.map((e) => SplitStartedCompleted.fromJson(e)).toList();
-    // for (var i = 0; i < finalData.length; i++) {
-    //   print("id: ${finalData[i].idStartedCompleted!} name: ${finalData[i].idStartedCompleted!} action: ${finalData[i].action}");
-    // }
+
     return finalData;
   }
 
   Future<List<SplitStartedCompleted>> SelectSplitStartedCompletedWhereEnded(bool ended) async {
     var data = await _database.rawQuery('''SELECT * FROM split_started_completed WHERE ended is $ended''');
-    // var data1 = data[0];
     var finalData = data.map((e) => SplitStartedCompleted.fromJson(e)).toList();
-    // for (var i = 0; i < finalData.length; i++) {
-    //   print("id: ${finalData[i].idStartedCompleted!} name: ${finalData[i].idStartedCompleted!} action: ${finalData[i].action}");
-    // }
+
     return finalData;
   }
 
@@ -1556,26 +1501,19 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     ORDER BY supabase_id_started_completed DESC
     LIMIT 2;
 ''', ['$createdAt%']);
-    // print("data2: ${data2}");
     if (data2.isNotEmpty && data2.length > 1) {
-      print(data2);
       var finalData = data2.map((e) => SplitStartedCompleted.fromJson(e)).toList();
       finalData.sort(
         (a, b) => b.createdAt!.compareTo(a.createdAt!),
       );
-      // for (var i = 0; i < finalData.length; i++) {
-      //   print("id: ${finalData[i].idStartedCompleted!} name: ${finalData[i].idStartedCompleted!} action: ${finalData[i].action}");
-      // }
+
       return finalData;
     } else {
-      print(data);
       var finalData = data.map((e) => SplitStartedCompleted.fromJson(e)).toList();
       finalData.sort(
         (a, b) => b.createdAt!.compareTo(a.createdAt!),
       );
-      // for (var i = 0; i < finalData.length; i++) {
-      //   print("id: ${finalData[i].idStartedCompleted!} name: ${finalData[i].idStartedCompleted!} action: ${finalData[i].action}");
-      // }
+
       return finalData;
     }
   }
@@ -1735,8 +1673,6 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     Measurements measurements,
     int action,
   ) async {
-    final db = await _database; // Získání instance databáze
-
     await txn.rawInsert('''
     INSERT INTO body_measurements (
       created_at,
@@ -1923,8 +1859,7 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
   }
 
   Future<void> InsertFood(Transaction txn, Food food) async {
-    if (food != null) {
-      txn.rawInsert('''
+    txn.rawInsert('''
       INSERT INTO food (
         id_food,
         country,
@@ -1947,27 +1882,26 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
         action
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       ''', [
-        food.idFood,
-        food.country,
-        food.name,
-        food.unaccentName,
-        food.weight,
-        food.quantity,
-        food.kcal,
-        food.protein,
-        food.carbs,
-        food.sugar,
-        food.fat,
-        food.fatSatureated,
-        food.fatTrans,
-        food.fatMonounsatureted,
-        food.fatPolyunsatureted,
-        food.fiber,
-        food.water,
-        food.cholesterol,
-        food.action,
-      ]);
-    }
+      food.idFood,
+      food.country,
+      food.name,
+      food.unaccentName,
+      food.weight,
+      food.quantity,
+      food.kcal,
+      food.protein,
+      food.carbs,
+      food.sugar,
+      food.fat,
+      food.fatSatureated,
+      food.fatTrans,
+      food.fatMonounsatureted,
+      food.fatPolyunsatureted,
+      food.fiber,
+      food.water,
+      food.cholesterol,
+      food.action,
+    ]);
   }
 
   //NutriIntake
@@ -2026,6 +1960,7 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
 
     await db.rawInsert('''
     INSERT INTO nutri_intake (
+      id_nutri_intake,
       created_at,
       id_food,
       quantity,
@@ -2033,8 +1968,9 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
       id_intake_category,
       supabase_id_nutri_intake,
       action
-    ) VALUES (?, ?, ?, ?, ?,?,?)
+    ) VALUES (?, ?, ?, ?, ?,?,?,?)
   ''', [
+      supabaseIdNutriIntake,
       nutriIntake.createdAt,
       nutriIntake.idFood,
       nutriIntake.quantity,
@@ -2047,8 +1983,6 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
   }
 
   Future<void> TxnInsertNutriIntake(Transaction txn, NutriIntake nutriIntake, int supabaseIdNutriIntake, int action) async {
-    final db = await _database; // Získání instance databáze
-
     await txn.rawInsert('''
     INSERT INTO nutri_intake (
     
@@ -2139,8 +2073,6 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
   }
 
   Future<void> TxninsertIntakeCategory(Transaction txn, String nameOfIntakeCategory, int action, int supabaseIdIntakeCategory) async {
-    final db = await _database;
-
     // Vložení dat do tabulky intake_categories
     await txn.rawInsert(
       '''
@@ -2233,16 +2165,6 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     }
   }
 
-  ///
-  ///
-  ///
-  ///
-  ///
-  ///
-  ///
-  ///
-  ///
-  ///
   ///
   ///
   ///

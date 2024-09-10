@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:kaloricke_tabulky_02/login_supabase/new_password_page.dart';
 import 'package:kaloricke_tabulky_02/main.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ResetPasswordGetToken extends StatefulWidget {
   final VoidCallback? showResetPasswordGetToken;

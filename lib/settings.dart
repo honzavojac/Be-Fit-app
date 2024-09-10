@@ -23,11 +23,7 @@ class Settings extends StatefulWidget {
   @override
   State<Settings> createState() => _SettingsState();
 }
-//! TODO: odstranit sqflite / supabase přepínač
-//! upravit select jazyků
-// dát tam color picker ale nebude zatím viditelný
-//! dát tam změnu jména,( věku zatím ne ),
-//! udělat odstranění učtu!!!
+//! TODO: udělat odstranění učtu!!!
 
 //
 //
@@ -88,7 +84,6 @@ class _SettingsState extends State<Settings> {
     language = await _getLanguage();
     await dbFitness.SaveToSupabaseAndOrderSqlite(dbSupabase);
     print("saved to supabase");
-    print(language);
 
     setState(() {});
   }
@@ -217,32 +212,6 @@ class _SettingsState extends State<Settings> {
       ),
       body: Column(
         children: [
-          // Container(
-          //   height: 50,
-          //   child: Row(
-          //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          //     children: [
-          //       Text("sqflite"),
-          //       Switch(
-          //         activeTrackColor: ColorsProvider.getColor2(context), activeColor: Colors.black,
-          //         // activeColor: ColorsProvider.getColor2(context),
-          //         inactiveTrackColor: ColorsProvider.getColor8(context),
-          //         value: dbFitness.switchButton,
-          //         onChanged: (value) {
-          //           dbFitness.switchButton = value;
-          //           print(dbFitness.switchButton);
-          //           // setState(() {});,
-          //           Navigator.of(context).pushNamedAndRemoveUntil('/account', (Route<dynamic> route) => false);
-          //         },
-          //       ),
-          //       Text("supabase"),
-          //     ],
-          //   ),
-          // ),
-          // SizedBox(
-          //   height: 20,
-          // ),
-
           Column(
             children: [
               Padding(
@@ -335,7 +304,6 @@ class _SettingsState extends State<Settings> {
                         onChanged: (value) async {
                           SharedPreferences prefs = await SharedPreferences.getInstance();
                           prefs.getString('themeMode');
-                          // print(themeModeString);
                           if (!isDarkMode) {
                             widget.notifyMyApp(ThemeMode.dark);
                             darkTheme = true;
@@ -462,7 +430,6 @@ class _SettingsState extends State<Settings> {
                           }).toList(),
                           onChanged: (value) async {
                             selectedCountry = value;
-                            print(value);
                             await dbFitness.updateUserFoodDatabaseLanguage(value!);
                             user!.country = value;
                             setState(() {});
@@ -517,33 +484,19 @@ class _SettingsState extends State<Settings> {
             ],
           ),
           Spacer(
+            flex: 1,
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+              await prefs.setString("show_tutorial", "true");
+              Navigator.of(context).pop();
+            },
+            child: Text("Show tutorial"),
+          ),
+          Spacer(
             flex: 5,
           ),
-
-          // SizedBox(
-          //   height: 40,
-          // ),
-          // ElevatedButton(
-          //   onPressed: () async {
-          //     Stopwatch stopwatch = Stopwatch()..start();
-          //     await dbFitness.SaveToSupabaseAndOrderSqlite(dbSupabase);
-          //     stopwatch.stop();
-          //     // print("SaveToSupabaseAndOrderSqlite trvalo: ${stopwatch.elapsedMilliseconds} ms");
-          //   },
-          //   child: Text("save to supabase"),
-          // ),
-          // SizedBox(
-          //   height: 20,
-          // ),
-          // ElevatedButton(
-          //   onPressed: () async {
-          //     Stopwatch stopwatch = Stopwatch()..start();
-          //     await dbSupabase.deleteUserAccount();
-          //     stopwatch.stop();
-          //     // print("SaveToSupabaseAndOrderSqlite trvalo: ${stopwatch.elapsedMilliseconds} ms");
-          //   },
-          //   child: Text("delete user"),
-          // ),
 
           SizedBox(
             height: 40,

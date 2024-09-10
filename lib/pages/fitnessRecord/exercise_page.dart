@@ -41,7 +41,6 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
   List<TextEditingController> weightController = [];
   List<TextEditingController> repsController = [];
   List<int> difficultyController = [];
-  TextEditingController _descriptionController = TextEditingController();
 
   String? nameOfExercise;
 
@@ -51,7 +50,6 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
-    bool paused = false;
     // Pokud je aktuální stav stejný jako poslední stav, neprovádějte nic
     if (_lastLifecycleState == state) return;
 
@@ -59,13 +57,10 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
       if (mounted) {
         try {
           await saveDataToDatabase();
-          paused = true;
         } catch (e) {
           print("chyba v exercisePage při vkládání dat změněním stavu aplikace (zavřená app): $e");
         }
-      } else if (state == AppLifecycleState.resumed) {
-        paused = false;
-      }
+      } else if (state == AppLifecycleState.resumed) {}
     }
     _lastLifecycleState = state;
   }
@@ -103,7 +98,7 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
         }
       }
       // Kontrola, zda selectedMuscleList není prázdné
-      if (selectedMuscleList != null && selectedMuscleList.isNotEmpty && widget.muscleIndex < selectedMuscleList.length) {
+      if (selectedMuscleList.isNotEmpty && widget.muscleIndex < selectedMuscleList.length) {
         var selectedExercisesList = selectedMuscleList[widget.muscleIndex].selectedExercises;
 
         // Kontrola, zda selectedExercisesList není prázdné
@@ -671,6 +666,7 @@ class _ExercisePageState extends State<ExercisePage> with WidgetsBindingObserver
       );
     } else {
       return PopScope(
+        // ignore: deprecated_member_use
         onPopInvoked: (didPop) async {
           if (mounted) {
             await saveDataToDatabase();

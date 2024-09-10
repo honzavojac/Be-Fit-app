@@ -295,18 +295,7 @@ class _InitPageState extends State<InitPage> {
               dbFitness.TxnInsertUser(txn, supabaseUser, 0);
             }
           });
-          // if (sqfliteFoodList.isEmpty) {
-          //   List<Food>? foodList = [];
-          //   for (var nutriIntake in sqfliteNutriIntakeList) {
-          //     Food? food = await dbSupabase.SelectSpecificFood(nutriIntake.idFood!);
-          //     print(food!.name);
-          //     foodList.add(food!);
-          //   }
-          //   for (var food in foodList) {
 
-          //     await dbFitness.InsertOrUpdateFood(food, 0);
-          //   }
-          // }
           if (sqfliteFoodList.isEmpty) {
             Set<int> foodIds = sqfliteNutriIntakeList.map((e) => e.idFood!).toSet();
             List<Food?> foodList = await dbSupabase.selectSpecificFoods(foodIds);
@@ -338,10 +327,11 @@ class _InitPageState extends State<InitPage> {
   loadTutorial() async {
     // createTutorial();
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString("show_tutorial", "true");
     String? tutorialShow = await prefs.getString("show_tutorial");
     if (tutorialShow == "true") {
       showTutorial();
+      print("show tutorial");
+      await prefs.setString("show_tutorial", "false");
     } else {
       return;
     }
@@ -489,8 +479,10 @@ class _InitPageState extends State<InitPage> {
         bigSwitch(target.identify);
       },
       onClickTargetWithTapPosition: (p0, p1) {},
-      onClickTarget: (target) {},
-      unFocusAnimationDuration: Duration(milliseconds: 500),
+      onClickTarget: (target) {
+        bigSwitch(target.identify);
+      },
+      unFocusAnimationDuration: Duration(milliseconds: 400),
       // useSafeArea: true,
       colorShadow: Color.fromRGBO(255, 145, 0, 0.575),
       hideSkip: true, paddingFocus: 0, useSafeArea: true,
@@ -506,7 +498,7 @@ class _InitPageState extends State<InitPage> {
     targets.add(
       TargetFocus(
         identify: "Target 0",
-        enableTargetTab: false,
+        enableTargetTab: true,
         enableOverlayTab: true,
         keyTarget: keyBottomNavigation2,
         contents: [
@@ -535,25 +527,9 @@ class _InitPageState extends State<InitPage> {
                         style: TextStyle(color: Colors.black, fontSize: 20),
                       ),
                     ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 100.0, right: 20, bottom: 0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () {
-                              _controller.next();
-
-                              setState(() {
-                                pageProvider = 0;
-                                controller.jumpToPage(0);
-                              });
-                            },
-                            child: Text("Další"),
-                          ),
-                        ],
-                      ),
-                    ),
+                    SizedBox(
+                      height: 100,
+                    )
                   ],
                 ),
               );
@@ -565,7 +541,7 @@ class _InitPageState extends State<InitPage> {
     targets.add(
       TargetFocus(
         identify: "Target 1",
-        enableTargetTab: false,
+        enableTargetTab: true,
         enableOverlayTab: true,
         keyTarget: keyBottomNavigation1,
         contents: [
@@ -594,20 +570,8 @@ class _InitPageState extends State<InitPage> {
                         style: TextStyle(color: Colors.black, fontSize: 20),
                       ),
                     ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 100.0, right: 20, bottom: 0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () {
-                              controller.next();
-                              // Navigator.pushNamed(context, '/measurements');
-                            },
-                            child: Text("Další"),
-                          ),
-                        ],
-                      ),
+                    SizedBox(
+                      height: 100,
                     ),
                   ],
                 ),
@@ -622,7 +586,7 @@ class _InitPageState extends State<InitPage> {
         identify: "Target 2",
         radius: 0,
         paddingFocus: 0,
-        enableTargetTab: false,
+        enableTargetTab: true,
         enableOverlayTab: true,
         keyTarget: keyEditWorkouts,
         contents: [
@@ -654,31 +618,6 @@ class _InitPageState extends State<InitPage> {
                         style: TextStyle(color: Colors.black, fontSize: 20),
                       ),
                     ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 0.0, right: 20, bottom: 0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () {
-                              controller.next();
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => SplitPageCopy(
-                                    notifyParent: () {},
-                                    loadParent: () {},
-                                    clickedSplitTab: 0,
-                                    foundActiveSplit: false,
-                                  ),
-                                ),
-                              );
-                            },
-                            child: Text("Další"),
-                          ),
-                        ],
-                      ),
-                    ),
                   ],
                 ),
               );
@@ -692,7 +631,7 @@ class _InitPageState extends State<InitPage> {
         identify: "Target 3",
         radius: 0,
         paddingFocus: 0,
-        enableTargetTab: false,
+        enableTargetTab: true,
         enableOverlayTab: true,
         keyTarget: keyNewSplit,
         contents: [
@@ -724,31 +663,6 @@ class _InitPageState extends State<InitPage> {
                         style: TextStyle(color: Colors.black, fontSize: 20),
                       ),
                     ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 0.0, right: 20, bottom: 0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () {
-                              controller.next();
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return Center(
-                                    child: AddSplitBoxCopy(
-                                      loadParent: () {},
-                                      splits: [],
-                                    ),
-                                  );
-                                },
-                              );
-                            },
-                            child: Text("Další"),
-                          ),
-                        ],
-                      ),
-                    ),
                   ],
                 ),
               );
@@ -762,7 +676,7 @@ class _InitPageState extends State<InitPage> {
         identify: "Target 4",
         radius: 0,
         paddingFocus: 0,
-        enableTargetTab: false,
+        enableTargetTab: true,
         enableOverlayTab: true,
         keyTarget: keyNewMuscle,
         contents: [
@@ -794,32 +708,6 @@ class _InitPageState extends State<InitPage> {
                         style: TextStyle(color: Colors.black, fontSize: 20),
                       ),
                     ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 0.0, right: 20, bottom: 0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () {
-                              controller.next();
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return Center(
-                                    child: NewMuscleBoxCopy(
-                                      loadParent: () {},
-                                      notifyParent: () {},
-                                      muscles: [],
-                                    ),
-                                  );
-                                },
-                              );
-                            },
-                            child: Text("Další"),
-                          ),
-                        ],
-                      ),
-                    ),
                   ],
                 ),
               );
@@ -833,7 +721,7 @@ class _InitPageState extends State<InitPage> {
         identify: "Target 5",
         radius: 0,
         paddingFocus: 0,
-        enableTargetTab: false,
+        enableTargetTab: true,
         enableOverlayTab: true,
         keyTarget: keyNewMuscleEditingController,
         contents: [
@@ -865,21 +753,6 @@ class _InitPageState extends State<InitPage> {
                         style: TextStyle(color: Colors.black, fontSize: 20),
                       ),
                     ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 0.0, right: 20, bottom: 0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () {
-                              controller.next();
-                              Navigator.of(context).pop();
-                            },
-                            child: Text("Další"),
-                          ),
-                        ],
-                      ),
-                    ),
                   ],
                 ),
               );
@@ -893,7 +766,7 @@ class _InitPageState extends State<InitPage> {
         identify: "Target 6",
         radius: 0,
         paddingFocus: 0,
-        enableTargetTab: false,
+        enableTargetTab: true,
         enableOverlayTab: true,
         keyTarget: keyNameOfWorkout,
         contents: [
@@ -925,20 +798,6 @@ class _InitPageState extends State<InitPage> {
                         style: TextStyle(color: Colors.black, fontSize: 20),
                       ),
                     ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 0.0, right: 20, bottom: 0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () {
-                              controller.next();
-                            },
-                            child: Text("Další"),
-                          ),
-                        ],
-                      ),
-                    ),
                   ],
                 ),
               );
@@ -952,7 +811,7 @@ class _InitPageState extends State<InitPage> {
         identify: "Target 7",
         radius: 0,
         paddingFocus: 0,
-        enableTargetTab: false,
+        enableTargetTab: true,
         enableOverlayTab: true,
         keyTarget: keyIsCheckedMuscles,
         contents: [
@@ -984,20 +843,6 @@ class _InitPageState extends State<InitPage> {
                         style: TextStyle(color: Colors.black, fontSize: 20),
                       ),
                     ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 0.0, right: 20, bottom: 0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () {
-                              controller.next();
-                            },
-                            child: Text("Další"),
-                          ),
-                        ],
-                      ),
-                    ),
                   ],
                 ),
               );
@@ -1011,7 +856,7 @@ class _InitPageState extends State<InitPage> {
         identify: "Target 8",
         radius: 0,
         paddingFocus: 0,
-        enableTargetTab: false,
+        enableTargetTab: true,
         enableOverlayTab: true,
         keyTarget: keySaveSplit,
         contents: [
@@ -1039,21 +884,6 @@ class _InitPageState extends State<InitPage> {
                         style: TextStyle(color: Colors.black, fontSize: 20),
                       ),
                     ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 0.0, right: 20, bottom: 0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () {
-                              controller.next();
-                              Navigator.of(context).pop();
-                            },
-                            child: Text("Další"),
-                          ),
-                        ],
-                      ),
-                    ),
                   ],
                 ),
               );
@@ -1067,7 +897,7 @@ class _InitPageState extends State<InitPage> {
         identify: "Target 9",
         radius: 0, // Radius zůstane nulový
         paddingFocus: 0, // Žádné odsazení
-        enableTargetTab: false, enableOverlayTab: true, keyTarget: keyDummy, // Nezadáváme enableTargetTab: false,enableOverlayTab: false,keyTarget, protože nechceme zaměřit žádný konkrétní prvek
+        enableTargetTab: true, enableOverlayTab: true, keyTarget: keyDummy, // Nezadáváme enableTargetTab: false,enableOverlayTab: false,keyTarget, protože nechceme zaměřit žádný konkrétní prvek
         contents: [
           TargetContent(
             // align: ContentAlign.bottom, // Pozice obsahu, můžeš změnit podle potřeby
@@ -1135,12 +965,6 @@ class _InitPageState extends State<InitPage> {
                         height: 150,
                       ),
                       SizedBox(height: 15),
-                      ElevatedButton(
-                        onPressed: () {
-                          controller.next(); // Přepne na další krok v tutoriálu
-                        },
-                        child: Text("Další"),
-                      ),
                     ],
                   ),
                 ),
@@ -1155,7 +979,7 @@ class _InitPageState extends State<InitPage> {
         identify: "Target 10",
         radius: 0,
         paddingFocus: 0,
-        enableTargetTab: false,
+        enableTargetTab: true,
         enableOverlayTab: true,
         keyTarget: keySplitPageBack,
         contents: [
@@ -1183,21 +1007,6 @@ class _InitPageState extends State<InitPage> {
                         style: TextStyle(color: Colors.black, fontSize: 20),
                       ),
                     ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 0.0, right: 20, bottom: 0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () {
-                              controller.next();
-                              Navigator.of(context).pop();
-                            },
-                            child: Text("Další"),
-                          ),
-                        ],
-                      ),
-                    ),
                   ],
                 ),
               );
@@ -1211,7 +1020,7 @@ class _InitPageState extends State<InitPage> {
         identify: "Target 11",
         radius: 0, // Radius zůstane nulový
         paddingFocus: 0, // Žádné odsazení
-        enableTargetTab: false, enableOverlayTab: true, keyTarget: keyDummy1, // Nezadáváme enableTargetTab: false,enableOverlayTab: false,keyTarget, protože nechceme zaměřit žádný konkrétní prvek
+        enableTargetTab: true, enableOverlayTab: true, keyTarget: keyDummy1, // Nezadáváme enableTargetTab: false,enableOverlayTab: false,keyTarget, protože nechceme zaměřit žádný konkrétní prvek
         contents: [
           TargetContent(
             // align: ContentAlign.bottom, // Pozice obsahu, můžeš změnit podle potřeby
@@ -1248,12 +1057,6 @@ class _InitPageState extends State<InitPage> {
                         ),
                       ),
                       SizedBox(height: 15),
-                      ElevatedButton(
-                        onPressed: () {
-                          controller.next(); // Přepne na další krok v tutoriálu
-                        },
-                        child: Text("Další"),
-                      ),
                     ],
                   ),
                 ),
@@ -1268,7 +1071,7 @@ class _InitPageState extends State<InitPage> {
         identify: "Target 12",
         radius: 0, // Radius zůstane nulový
         paddingFocus: 0, // Žádné odsazení
-        enableTargetTab: false, enableOverlayTab: true, keyTarget: keyDummy1, // Nezadáváme enableTargetTab: false,enableOverlayTab: false,keyTarget, protože nechceme zaměřit žádný konkrétní prvek
+        enableTargetTab: true, enableOverlayTab: true, keyTarget: keyDummy1, // Nezadáváme enableTargetTab: false,enableOverlayTab: false,keyTarget, protože nechceme zaměřit žádný konkrétní prvek
         contents: [
           TargetContent(
             // align: ContentAlign.bottom, // Pozice obsahu, můžeš změnit podle potřeby
@@ -1352,12 +1155,6 @@ class _InitPageState extends State<InitPage> {
                         ),
                       ),
                       SizedBox(height: 15),
-                      ElevatedButton(
-                        onPressed: () {
-                          controller.next(); // Přepne na další krok v tutoriálu
-                        },
-                        child: Text("Další"),
-                      ),
                     ],
                   ),
                 ),
@@ -1372,7 +1169,7 @@ class _InitPageState extends State<InitPage> {
         identify: "Target 13",
         radius: 0, // Radius zůstane nulový
         paddingFocus: 0, // Žádné odsazení
-        enableTargetTab: false, enableOverlayTab: true, keyTarget: keyDummy1, // Nezadáváme enableTargetTab: false,enableOverlayTab: false,keyTarget, protože nechceme zaměřit žádný konkrétní prvek
+        enableTargetTab: true, enableOverlayTab: true, keyTarget: keyDummy1, // Nezadáváme enableTargetTab: false,enableOverlayTab: false,keyTarget, protože nechceme zaměřit žádný konkrétní prvek
         contents: [
           TargetContent(
             // align: ContentAlign.bottom, // Pozice obsahu, můžeš změnit podle potřeby
@@ -1417,16 +1214,6 @@ class _InitPageState extends State<InitPage> {
                         height: 250,
                       ),
                       SizedBox(height: 15),
-                      ElevatedButton(
-                        onPressed: () {
-                          _controller.next(); // Přepne na další krok v tutoriálu
-                          setState(() {
-                            pageProvider = 2;
-                            controller.jumpToPage(2);
-                          });
-                        },
-                        child: Text("Další"),
-                      ),
                     ],
                   ),
                 ),
@@ -1439,7 +1226,7 @@ class _InitPageState extends State<InitPage> {
     targets.add(
       TargetFocus(
         identify: "Target 14",
-        enableTargetTab: false,
+        enableTargetTab: true,
         enableOverlayTab: true,
         keyTarget: keyBottomNavigation3,
         contents: [
@@ -1468,19 +1255,8 @@ class _InitPageState extends State<InitPage> {
                         style: TextStyle(color: Colors.black, fontSize: 20),
                       ),
                     ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 100.0, right: 20, bottom: 0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () {
-                              controller.next();
-                            },
-                            child: Text("Další"),
-                          ),
-                        ],
-                      ),
+                    SizedBox(
+                      height: 100,
                     ),
                     SizedBox(
                       height: 50,
@@ -1496,7 +1272,7 @@ class _InitPageState extends State<InitPage> {
     targets.add(
       TargetFocus(
         identify: "Target 15",
-        enableTargetTab: false,
+        enableTargetTab: true,
         enableOverlayTab: true,
         keyTarget: keyDummy2,
         contents: [
@@ -1570,19 +1346,8 @@ class _InitPageState extends State<InitPage> {
                         style: TextStyle(color: Colors.black, fontSize: 20),
                       ),
                     ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 30.0, right: 20, bottom: 0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () {
-                              controller.next();
-                            },
-                            child: Text("Další"),
-                          ),
-                        ],
-                      ),
+                    SizedBox(
+                      height: 30,
                     ),
                   ],
                 ),
@@ -1595,7 +1360,7 @@ class _InitPageState extends State<InitPage> {
     targets.add(
       TargetFocus(
         identify: "Target 16",
-        enableTargetTab: false,
+        enableTargetTab: true,
         enableOverlayTab: true,
         keyTarget: keyNewFood,
         contents: [
@@ -1627,24 +1392,8 @@ class _InitPageState extends State<InitPage> {
                         style: TextStyle(color: Colors.black, fontSize: 20),
                       ),
                     ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 30.0, right: 20, bottom: 0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () {
-                              _controller.next();
-
-                              setState(() {
-                                pageProvider = 1;
-                                controller.jumpToPage(1);
-                              });
-                            },
-                            child: Text("Další"),
-                          ),
-                        ],
-                      ),
+                    SizedBox(
+                      height: 30,
                     ),
                   ],
                 ),
@@ -1657,7 +1406,7 @@ class _InitPageState extends State<InitPage> {
     targets.add(
       TargetFocus(
         identify: "Target 17",
-        enableTargetTab: false,
+        enableTargetTab: true,
         enableOverlayTab: true,
         keyTarget: keyMeasurementButton,
         contents: [
@@ -1678,21 +1427,6 @@ class _InitPageState extends State<InitPage> {
                     Text(
                       "Změř si své tělesné hodnoty",
                       style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 25.0),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(right: 20, bottom: 0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () {
-                              controller.next();
-                              // Navigator.pushNamed(context, '/measurements');
-                            },
-                            child: Text("Další"),
-                          ),
-                        ],
-                      ),
                     ),
                     SizedBox(
                       height: 20,
@@ -1788,7 +1522,6 @@ class _InitPageState extends State<InitPage> {
               ),
       );
     } else {
-      // print("hhhhhhhhhhhhhhhhhhhhhhhh${switchButton}hhhhhhhhhhhhhhhhhhhhhhhhhhh");
       return Scaffold(
         key: _scaffoldKey, drawerEnableOpenDragGesture: false,
         drawer: Drawer(
@@ -1880,7 +1613,6 @@ class _InitPageState extends State<InitPage> {
                 children: [
                   GestureDetector(
                     onTap: () {
-                      print("object");
                       _scaffoldKey.currentState?.openDrawer();
                     },
                     child: Icon(
@@ -1891,15 +1623,6 @@ class _InitPageState extends State<InitPage> {
                 ],
               ),
             ),
-            // Center(
-            //   child: ElevatedButton(
-            //     onPressed: () {
-            //       print("show tutorial");
-            //       showTutorial();
-            //     },
-            //     child: Text("data"),
-            //   ),
-            // ),
           ],
         ),
         bottomNavigationBar: NavigationBar(

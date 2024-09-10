@@ -169,7 +169,6 @@ class _ChoseInitDataPageState extends State<ChoseInitDataPage> {
                                       splashRadius: 0,
                                       onDateSelected: (value) {
                                         _selectedDateOfBirth = value;
-                                        print(value);
                                         setState(() {});
                                         Navigator.of(context).pop();
                                       },

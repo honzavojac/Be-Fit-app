@@ -237,30 +237,3 @@ class _foodDiaryBoxesState extends State<foodDiaryBoxes> {
     );
   }
 }
-
-// Widget buildAnimatedText(String text, double textPainter, double boxConstraints) {
-//   if (textPainter < boxConstraints) {
-//     // print("${text.indexOf(text)} ${text.length}");
-//     return Text(
-//       text,
-//       style: TextStyle(color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold, fontSize: 15),
-//     );
-//   } else {
-//     // print("${text.length}text je větší než widget");
-//     return Marquee(
-//       text: text,
-//       style: TextStyle(color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold, fontSize: 15),
-//       scrollAxis: Axis.horizontal,
-//       crossAxisAlignment: CrossAxisAlignment.start,
-//       blankSpace: 50.0,
-//       // velocity: 100.0,
-//       startAfter: Duration(seconds: 2),
-//       pauseAfterRound: Duration(seconds: 2),
-//       startPadding: 0.0,
-//       // accelerationDuration: Duration(seconds: 1),
-//       // accelerationCurve: Curves.linear,
-//       // decelerationDuration: Duration(milliseconds: 500),
-//       // decelerationCurve: Curves.easeOut,
-//     );
-//   }
-// }

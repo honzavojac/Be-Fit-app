@@ -2,10 +2,8 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
 import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
-import 'package:kaloricke_tabulky_02/init_page.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -241,40 +239,11 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
     }
   }
 
-  void _showDropdown() {
-    final List<int> _dropdownOptions = [1, 2, 3, 4, 5];
-    // Vytvoří nové klíčové hodnoty pro nový DropdownButton2
-    final RenderBox renderBox = context.findRenderObject() as RenderBox;
-    final Offset offset = renderBox.localToGlobal(Offset.zero);
-
-    showMenu<int>(
-      context: context,
-      position: RelativeRect.fromLTRB(
-        offset.dx,
-        offset.dy,
-        offset.dx + renderBox.size.width,
-        offset.dy + renderBox.size.height,
-      ),
-      items: _dropdownOptions.map((int value) {
-        return PopupMenuItem<int>(
-          value: value,
-          child: Text(value.toString()),
-        );
-      }).toList(),
-    ).then((int? newValue) {
-      if (newValue != null) {
-        setState(() {
-          // _selectedValue = newValue;
-        });
-      }
-    });
-  }
-
   List<FocusNode> focusNodes = [FocusNode(), FocusNode()];
 
   @override
   Widget build(BuildContext context) {
-    var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
+    Provider.of<FitnessProvider>(context, listen: false);
     DraggableScrollableController _controller = DraggableScrollableController();
 
     final _sheet = GlobalKey();
@@ -421,6 +390,7 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
       );
     } else {
       return PopScope(
+        // ignore: deprecated_member_use
         onPopInvoked: (didPop) async {
           print("onPopInvoked**********************");
           await saveToDatabase();
