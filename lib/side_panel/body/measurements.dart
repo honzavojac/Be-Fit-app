@@ -179,7 +179,7 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
                           SizedBox(
                             height: 20,
                           ),
-                          TextFieldWidget("Thingh", thighCircumferenceTextEditingController),
+                          TextFieldWidget("Thigh", thighCircumferenceTextEditingController),
                           SizedBox(
                             height: 20,
                           ),

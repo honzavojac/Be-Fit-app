@@ -35,6 +35,9 @@ var pageProvider = 1;
 
 //Fitness
 
+GlobalKey keyHomeDummy = GlobalKey();
+GlobalKey keySplitDummy = GlobalKey();
+
 GlobalKey keyButton1 = GlobalKey();
 GlobalKey keyFitnesRecordPage = GlobalKey();
 GlobalKey keyEditWorkouts = GlobalKey();
@@ -62,10 +65,9 @@ GlobalKey keyMeasurementButton = GlobalKey();
 GlobalKey keyBottomNavigation1 = GlobalKey();
 GlobalKey keyBottomNavigation2 = GlobalKey();
 GlobalKey keyBottomNavigation3 = GlobalKey();
+final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
-class _InitPageState extends State<InitPage> {
-  final scaffoldKey = GlobalKey<ScaffoldState>();
-
+class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
   // final List<Widget> _appBars = [
   //   FitnessRecordAppBarCopy(),
   //   HomeAppBar(),
@@ -87,11 +89,31 @@ class _InitPageState extends State<InitPage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this); // Registruje observer
     var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
     dbFitness.setSyncingToFalse();
     createTutorial();
     // Future.delayed(Duration.zero, showTutorial);
     // showTutorial();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this); // Odregistruje observer
+    super.dispose();
+  } // Tato metoda sleduje změny v životním cyklu aplikace
+
+  @override
+  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
+    super.didChangeAppLifecycleState(state);
+
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.detached) {
+      var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
+      var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false);
+      print("**********začátek ukládání po zavření nebo vypnutí mobilu**********");
+      await dbFitness.SaveToSupabaseAndOrderSqlite(dbSupabase);
+      print("**********konec ukládání po zavření nebo vypnutí mobilu**********");
+    }
   }
 
   bool loading = true;
@@ -478,23 +500,70 @@ class _InitPageState extends State<InitPage> {
       onClickOverlay: (target) {
         bigSwitch(target.identify);
       },
-      onClickTargetWithTapPosition: (p0, p1) {},
+      // onClickTargetWithTapPosition: (p0, p1) {},
+
       onClickTarget: (target) {
         bigSwitch(target.identify);
       },
       unFocusAnimationDuration: Duration(milliseconds: 400),
       // useSafeArea: true,
-      colorShadow: Color.fromRGBO(255, 145, 0, 0.575),
-      hideSkip: true, paddingFocus: 0, useSafeArea: true,
+      opacityShadow: 0.6,
+      colorShadow: Color.fromRGBO(255, 145, 0, 1),
+      hideSkip: false, paddingFocus: 0,
+      useSafeArea: true,
       // textSkip: "Next",
       // paddingFocus: 10,
       // opacityShadow: 0.5,
-      imageFilter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+      imageFilter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
     );
   }
 
   List<TargetFocus> _createTargets() {
     List<TargetFocus> targets = [];
+    targets.add(
+      TargetFocus(
+        identify: "Target ", alignSkip: AlignmentDirectional(-500, 0),
+        radius: 0, // Radius zůstane nulový
+        paddingFocus: 0, // Žádné odsazení
+        enableTargetTab: true,
+        enableOverlayTab: true, keyTarget: keyHomeDummy, // Nezadáváme enableTargetTab: true,enableOverlayTab: false,keyTarget, protože nechceme zaměřit žádný konkrétní prvek
+        contents: [
+          TargetContent(
+            // align: ContentAlign.bottom, // Pozice obsahu, můžeš změnit podle potřeby
+            builder: (context, controller) {
+              return Center(
+                child: Container(
+                  // Overlay je vytvořen pomocí knihovny, zde pouze obsah
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(height: 200),
+                      Text(
+                        "tutorial_hello".tr(),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white, // Bílá barva, aby vynikl na tmavém pozadí
+                          fontSize: 25.0,
+                        ),
+                      ),
+                      SizedBox(height: 100),
+                      Text(
+                        "tutorial_hello.1".tr(),
+                        softWrap: true,
+                        style: TextStyle(
+                          color: Colors.white, // Bílá barva, aby vynikl na tmavém pozadí
+                          fontSize: 20.0,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
     targets.add(
       TargetFocus(
         identify: "Target 0",
@@ -515,7 +584,7 @@ class _InitPageState extends State<InitPage> {
                   children: [
                     Text(
                       "Home".tr(),
-                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 25.0),
+                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 25.0),
                     ),
                     Padding(
                       padding: EdgeInsets.only(
@@ -523,8 +592,8 @@ class _InitPageState extends State<InitPage> {
                       ),
                       child: Text(
                         textAlign: TextAlign.center,
-                        "Tady uvidíš své dnešní hodnoty z jídla, cvičení i měření těla",
-                        style: TextStyle(color: Colors.black, fontSize: 20),
+                        "tutorial_0".tr(),
+                        style: TextStyle(color: Colors.white, fontSize: 20),
                       ),
                     ),
                     SizedBox(
@@ -558,7 +627,7 @@ class _InitPageState extends State<InitPage> {
                   children: [
                     Text(
                       "Fitness".tr(),
-                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 25.0),
+                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 25.0),
                     ),
                     Padding(
                       padding: EdgeInsets.only(
@@ -566,8 +635,8 @@ class _InitPageState extends State<InitPage> {
                       ),
                       child: Text(
                         textAlign: TextAlign.center,
-                        "Až si v následujících krocích vytvoříš svůj první trénink, tak zde do něj budeš vkládat hodnoty",
-                        style: TextStyle(color: Colors.black, fontSize: 20),
+                        "tutorial_1".tr(),
+                        style: TextStyle(color: Colors.white, fontSize: 20),
                       ),
                     ),
                     SizedBox(
@@ -605,8 +674,8 @@ class _InitPageState extends State<InitPage> {
                       height: 100,
                     ),
                     Text(
-                      "Fitness".tr(),
-                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 25.0),
+                      "tutorial_2".tr(),
+                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 25.0),
                     ),
                     Padding(
                       padding: EdgeInsets.only(
@@ -614,8 +683,8 @@ class _InitPageState extends State<InitPage> {
                       ),
                       child: Text(
                         textAlign: TextAlign.center,
-                        "Tady si vytvoříš své tréninky (splity)",
-                        style: TextStyle(color: Colors.black, fontSize: 20),
+                        "tutorial_2.1".tr(),
+                        style: TextStyle(color: Colors.white, fontSize: 20),
                       ),
                     ),
                   ],
@@ -650,8 +719,8 @@ class _InitPageState extends State<InitPage> {
                       height: 100,
                     ),
                     Text(
-                      "Fitness".tr(),
-                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 25.0),
+                      "tutorial_3".tr(),
+                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 25.0),
                     ),
                     Padding(
                       padding: EdgeInsets.only(
@@ -659,8 +728,8 @@ class _InitPageState extends State<InitPage> {
                       ),
                       child: Text(
                         textAlign: TextAlign.center,
-                        "Tady si vytvoříš svůj první trénink",
-                        style: TextStyle(color: Colors.black, fontSize: 20),
+                        "tutorial_3.1".tr(),
+                        style: TextStyle(color: Colors.white, fontSize: 20),
                       ),
                     ),
                   ],
@@ -695,8 +764,8 @@ class _InitPageState extends State<InitPage> {
                       height: 100,
                     ),
                     Text(
-                      "new_muscle".tr(),
-                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 25.0),
+                      "tutorial_4".tr(),
+                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 25.0),
                     ),
                     Padding(
                       padding: EdgeInsets.only(
@@ -704,8 +773,8 @@ class _InitPageState extends State<InitPage> {
                       ),
                       child: Text(
                         textAlign: TextAlign.center,
-                        "Tady si vytvoříš svoje svaly, které chceš cvičit",
-                        style: TextStyle(color: Colors.black, fontSize: 20),
+                        "tutorial_4.1".tr(),
+                        style: TextStyle(color: Colors.white, fontSize: 20),
                       ),
                     ),
                   ],
@@ -741,7 +810,7 @@ class _InitPageState extends State<InitPage> {
                     ),
                     Text(
                       "new_muscle".tr(),
-                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 25.0),
+                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 25.0),
                     ),
                     Padding(
                       padding: EdgeInsets.only(
@@ -749,8 +818,8 @@ class _InitPageState extends State<InitPage> {
                       ),
                       child: Text(
                         textAlign: TextAlign.center,
-                        "Zadej název svalu",
-                        style: TextStyle(color: Colors.black, fontSize: 20),
+                        "tutorial_5".tr(),
+                        style: TextStyle(color: Colors.white, fontSize: 20),
                       ),
                     ),
                   ],
@@ -761,89 +830,70 @@ class _InitPageState extends State<InitPage> {
         ],
       ),
     );
-    targets.add(
-      TargetFocus(
-        identify: "Target 6",
-        radius: 0,
-        paddingFocus: 0,
-        enableTargetTab: true,
-        enableOverlayTab: true,
-        keyTarget: keyNameOfWorkout,
-        contents: [
-          TargetContent(
-            padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-            // customPosition: CustomTargetContentPosition(top: 500, left: 0),
-            align: ContentAlign.bottom,
-            builder: (context, controller) {
-              return Container(
-                // color: Colors.blue,
-                child: Column(
-                  // mainAxisSize: MainAxisSize.max,
-                  // crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      height: 150,
-                    ),
-                    Text(
-                      "workout_name".tr(),
-                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 25.0),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(
-                        top: 30.0,
-                      ),
-                      child: Text(
-                        textAlign: TextAlign.center,
-                        "Zadej název tréninku (splitu)",
-                        style: TextStyle(color: Colors.black, fontSize: 20),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-        ],
-      ),
-    );
+
     targets.add(
       TargetFocus(
         identify: "Target 7",
-        radius: 0,
-        paddingFocus: 0,
-        enableTargetTab: true,
-        enableOverlayTab: true,
-        keyTarget: keyIsCheckedMuscles,
+        radius: 0, // Radius zůstane nulový
+        paddingFocus: 0, // Žádné odsazení
+        enableTargetTab: true, enableOverlayTab: true, keyTarget: keySplitDummy, // Nezadáváme enableTargetTab: true,enableOverlayTab: false,keyTarget, protože nechceme zaměřit žádný konkrétní prvek
         contents: [
           TargetContent(
-            padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-            // customPosition: CustomTargetContentPosition(top: 500, left: 0),
-            align: ContentAlign.bottom,
+            // align: ContentAlign.bottom, // Pozice obsahu, můžeš změnit podle potřeby
             builder: (context, controller) {
-              return Container(
-                // color: Colors.blue,
-                child: Column(
-                  // mainAxisSize: MainAxisSize.max,
-                  // crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      height: 100,
-                    ),
-                    Text(
-                      "Vyber cviky pro trénink",
-                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 25.0),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(
-                        top: 30.0,
+              return Center(
+                child: Container(
+                  // Overlay je vytvořen pomocí knihovny, zde pouze obsah
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        height: 150,
                       ),
-                      child: Text(
-                        textAlign: TextAlign.center,
-                        "Vyber které svaly chceš v svém tréniku (splitu) cvičit",
-                        style: TextStyle(color: Colors.black, fontSize: 20),
+                      Text(
+                        "name_of_split".tr(),
+                        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 25.0),
                       ),
-                    ),
-                  ],
+                      Padding(
+                        padding: EdgeInsets.only(
+                          top: 30.0,
+                        ),
+                        child: Text(
+                          textAlign: TextAlign.center,
+                          "tutorial_6".tr(),
+                          style: TextStyle(color: Colors.white, fontSize: 20),
+                        ),
+                      ),
+                      Image.asset(
+                        'assets/Tutorial pictures/tutorial_new_split_name_split.png',
+                        height: 250,
+                      ),
+                      SizedBox(height: 25),
+                      Text(
+                        "tutorial_7".tr(),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white, // Bílá barva, aby vynikl na tmavém pozadí
+                          fontSize: 25.0,
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 20.0),
+                        child: Text(
+                          "tutorial_7.1".tr(),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                          ),
+                        ),
+                      ),
+                      Image.asset(
+                        'assets/Tutorial pictures/tutorial_new_split_select.png',
+                        height: 250,
+                      ),
+                    ],
+                  ),
                 ),
               );
             },
@@ -878,10 +928,19 @@ class _InitPageState extends State<InitPage> {
                       padding: EdgeInsets.only(
                         top: 30.0,
                       ),
-                      child: Text(
-                        textAlign: TextAlign.center,
-                        "Následně tvůj trénink (split) ulož",
-                        style: TextStyle(color: Colors.black, fontSize: 20),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(18),
+                          color: const Color.fromARGB(255, 255, 18, 1),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(2.0),
+                          child: Text(
+                            textAlign: TextAlign.center,
+                            "tutorial_8".tr(),
+                            style: TextStyle(color: Colors.white, fontSize: 20),
+                          ),
+                        ),
                       ),
                     ),
                   ],
@@ -897,7 +956,9 @@ class _InitPageState extends State<InitPage> {
         identify: "Target 9",
         radius: 0, // Radius zůstane nulový
         paddingFocus: 0, // Žádné odsazení
-        enableTargetTab: true, enableOverlayTab: true, keyTarget: keyDummy, // Nezadáváme enableTargetTab: false,enableOverlayTab: false,keyTarget, protože nechceme zaměřit žádný konkrétní prvek
+        enableTargetTab: true,
+        enableOverlayTab: true,
+        keyTarget: keySplitDummy, // Nezadáváme enableTargetTab: true,enableOverlayTab: false,keyTarget, protože nechceme zaměřit žádný konkrétní prvek
         contents: [
           TargetContent(
             // align: ContentAlign.bottom, // Pozice obsahu, můžeš změnit podle potřeby
@@ -908,22 +969,22 @@ class _InitPageState extends State<InitPage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      SizedBox(height: 40),
+                      SizedBox(height: 180),
                       Text(
-                        "Přidání nových cviků", // Překlad textu
+                        "tutorial_9".tr(),
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: Colors.black, // Bílá barva, aby vynikl na tmavém pozadí
+                          color: Colors.white, // Bílá barva, aby vynikl na tmavém pozadí
                           fontSize: 25.0,
                         ),
                       ),
                       Padding(
                         padding: EdgeInsets.only(top: 20.0),
                         child: Text(
-                          "Až si vytvoříš spllit tak si vytvoř cviky které chceš cvičit",
+                          "tutorial_9.1".tr(),
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: Colors.black,
+                            color: Colors.white,
                             fontSize: 18,
                           ),
                         ),
@@ -936,10 +997,10 @@ class _InitPageState extends State<InitPage> {
                       Padding(
                         padding: EdgeInsets.only(top: 20.0),
                         child: Text(
-                          "Zadej název cviku  \nPokud cvik nepatří do daného svalu tak změň kategorii \na klikni uložit",
+                          "tutorial_9.2".tr(),
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: Colors.black,
+                            color: Colors.white,
                             fontSize: 18,
                           ),
                         ),
@@ -952,7 +1013,7 @@ class _InitPageState extends State<InitPage> {
                       Padding(
                         padding: EdgeInsets.only(top: 20.0),
                         child: Text(
-                          "Vyber si cviky které chceš cvičit",
+                          "tutorial_9.3".tr(),
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: Colors.white,
@@ -1001,10 +1062,13 @@ class _InitPageState extends State<InitPage> {
                       padding: EdgeInsets.only(
                         top: 30.0,
                       ),
-                      child: Text(
-                        textAlign: TextAlign.center,
-                        "Jdi zpátky na hlavní obrazovky",
-                        style: TextStyle(color: Colors.black, fontSize: 20),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Text(
+                          textAlign: TextAlign.center,
+                          "tutorial_10".tr(),
+                          style: TextStyle(color: Colors.white, fontSize: 20),
+                        ),
                       ),
                     ),
                   ],
@@ -1020,7 +1084,7 @@ class _InitPageState extends State<InitPage> {
         identify: "Target 11",
         radius: 0, // Radius zůstane nulový
         paddingFocus: 0, // Žádné odsazení
-        enableTargetTab: true, enableOverlayTab: true, keyTarget: keyDummy1, // Nezadáváme enableTargetTab: false,enableOverlayTab: false,keyTarget, protože nechceme zaměřit žádný konkrétní prvek
+        enableTargetTab: true, enableOverlayTab: true, keyTarget: keyDummy1, // Nezadáváme enableTargetTab: true,enableOverlayTab: false,keyTarget, protože nechceme zaměřit žádný konkrétní prvek
         contents: [
           TargetContent(
             // align: ContentAlign.bottom, // Pozice obsahu, můžeš změnit podle potřeby
@@ -1033,10 +1097,10 @@ class _InitPageState extends State<InitPage> {
                     children: [
                       SizedBox(height: 180),
                       Text(
-                        "Jak začít trénink?", // Překlad textu
+                        "tutorial_11".tr(),
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: Colors.black, // Bílá barva, aby vynikl na tmavém pozadí
+                          color: Colors.white, // Bílá barva, aby vynikl na tmavém pozadí
                           fontSize: 25.0,
                         ),
                       ),
@@ -1048,10 +1112,10 @@ class _InitPageState extends State<InitPage> {
                       Padding(
                         padding: EdgeInsets.only(top: 20.0),
                         child: Text(
-                          "Klikni na jeden box",
+                          "tutorial_11.1".tr(),
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: Colors.black,
+                            color: Colors.white,
                             fontSize: 18,
                           ),
                         ),
@@ -1071,7 +1135,7 @@ class _InitPageState extends State<InitPage> {
         identify: "Target 12",
         radius: 0, // Radius zůstane nulový
         paddingFocus: 0, // Žádné odsazení
-        enableTargetTab: true, enableOverlayTab: true, keyTarget: keyDummy1, // Nezadáváme enableTargetTab: false,enableOverlayTab: false,keyTarget, protože nechceme zaměřit žádný konkrétní prvek
+        enableTargetTab: true, enableOverlayTab: true, keyTarget: keyDummy1, // Nezadáváme enableTargetTab: true,enableOverlayTab: false,keyTarget, protože nechceme zaměřit žádný konkrétní prvek
         contents: [
           TargetContent(
             // align: ContentAlign.bottom, // Pozice obsahu, můžeš změnit podle potřeby
@@ -1084,10 +1148,10 @@ class _InitPageState extends State<InitPage> {
                     children: [
                       SizedBox(height: 120),
                       Text(
-                        "Jak začít trénink", // Překlad textu
+                        "tutorial_12".tr(),
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: Colors.black, // Bílá barva, aby vynikl na tmavém pozadí
+                          color: Colors.white, // Bílá barva, aby vynikl na tmavém pozadí
                           fontSize: 25.0,
                         ),
                       ),
@@ -1097,19 +1161,19 @@ class _InitPageState extends State<InitPage> {
                       ),
                       Text(
                         softWrap: true,
-                        "Trénink začneš tím, že přidáš jeden řádek pro zápis hodnot",
+                        "tutorial_12.1".tr(),
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: Colors.black,
+                          color: Colors.white,
                           fontSize: 18,
                         ),
                       ),
                       SizedBox(height: 15),
                       Text(
-                        "Začal jsi trénink", // Překlad textu
+                        "tutorial_12.2".tr(),
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: Colors.black, // Bílá barva, aby vynikl na tmavém pozadí
+                          color: Colors.white, // Bílá barva, aby vynikl na tmavém pozadí
                           fontSize: 25.0,
                         ),
                       ),
@@ -1122,10 +1186,9 @@ class _InitPageState extends State<InitPage> {
                         padding: EdgeInsets.only(top: 20.0),
                         child: Text(
                           // softWrap: true,
-                          "Zadej odcvičené hodnoty a zvol obtížnost série",
-                          textAlign: TextAlign.center,
+                          "tutorial_12.3".tr(), textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: Colors.black,
+                            color: Colors.white,
                             fontSize: 18,
                           ),
                         ),
@@ -1134,10 +1197,10 @@ class _InitPageState extends State<InitPage> {
                         padding: EdgeInsets.only(top: 5.0),
                         child: Text(
                           softWrap: true,
-                          "Hodnoty nemusíš manuálně ukládat, ukládají se automaticky",
+                          "tutorial_12.4".tr(),
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: Colors.black,
+                            color: Colors.white,
                             fontSize: 18,
                           ),
                         ),
@@ -1146,10 +1209,10 @@ class _InitPageState extends State<InitPage> {
                         padding: EdgeInsets.only(top: 5.0),
                         child: Text(
                           softWrap: true,
-                          "(Dej pozor, když řádek následně posunutím doleva vymažeš, tak se trénink nezruší!!!)",
+                          "tutorial_12.5".tr(),
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: Colors.black,
+                            color: Colors.white,
                             fontSize: 18,
                           ),
                         ),
@@ -1169,7 +1232,7 @@ class _InitPageState extends State<InitPage> {
         identify: "Target 13",
         radius: 0, // Radius zůstane nulový
         paddingFocus: 0, // Žádné odsazení
-        enableTargetTab: true, enableOverlayTab: true, keyTarget: keyDummy1, // Nezadáváme enableTargetTab: false,enableOverlayTab: false,keyTarget, protože nechceme zaměřit žádný konkrétní prvek
+        enableTargetTab: true, enableOverlayTab: true, keyTarget: keyDummy1, // Nezadáváme enableTargetTab: true,enableOverlayTab: false,keyTarget, protože nechceme zaměřit žádný konkrétní prvek
         contents: [
           TargetContent(
             // align: ContentAlign.bottom, // Pozice obsahu, můžeš změnit podle potřeby
@@ -1183,12 +1246,11 @@ class _InitPageState extends State<InitPage> {
                       SizedBox(height: 180),
                       Text(
                         softWrap: true,
-                        "Chceš se podívat jak se ti vedlo minulé tréninky?", // Překlad textu
+                        "tutorial_13".tr(),
                         textAlign: TextAlign.center,
-
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: Colors.black, // Bílá barva, aby vynikl na tmavém pozadí
+                          color: Colors.white, // Bílá barva, aby vynikl na tmavém pozadí
                           fontSize: 25.0,
                         ),
                       ),
@@ -1200,10 +1262,10 @@ class _InitPageState extends State<InitPage> {
                         padding: EdgeInsets.only(top: 20.0),
                         child: Text(
                           softWrap: true,
-                          "Pokud jsi v minulosti odcvičil tento sval a zadal hodnoty, po posunutí nahoru uvidíš své minulé hodnoty pro daný cvik",
+                          "tutorial_13.1".tr(),
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: Colors.black,
+                            color: Colors.white,
                             fontSize: 18,
                           ),
                         ),
@@ -1243,7 +1305,7 @@ class _InitPageState extends State<InitPage> {
                   children: [
                     Text(
                       "Food".tr(),
-                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 25.0),
+                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 25.0),
                     ),
                     Padding(
                       padding: EdgeInsets.only(
@@ -1251,8 +1313,8 @@ class _InitPageState extends State<InitPage> {
                       ),
                       child: Text(
                         textAlign: TextAlign.center,
-                        "Zde můžeš zadávat jídla, které jsi snědl",
-                        style: TextStyle(color: Colors.black, fontSize: 20),
+                        "tutorial_14".tr(),
+                        style: TextStyle(color: Colors.white, fontSize: 20),
                       ),
                     ),
                     SizedBox(
@@ -1291,8 +1353,8 @@ class _InitPageState extends State<InitPage> {
                       height: 150,
                     ),
                     Text(
-                      "Vyhledávání potravin",
-                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 25.0),
+                      "tutorial_15".tr(),
+                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 25.0),
                     ),
                     Padding(
                       padding: EdgeInsets.only(
@@ -1300,8 +1362,8 @@ class _InitPageState extends State<InitPage> {
                       ),
                       child: Text(
                         textAlign: TextAlign.center,
-                        "Potraviny můžeš hledat těmito dvěma způsoby:",
-                        style: TextStyle(color: Colors.black, fontSize: 20),
+                        "tutorial_15.1".tr(),
+                        style: TextStyle(color: Colors.white, fontSize: 20),
                       ),
                     ),
                     Image.asset(
@@ -1314,8 +1376,8 @@ class _InitPageState extends State<InitPage> {
                       ),
                       child: Text(
                         textAlign: TextAlign.center,
-                        "nebo kliknutím na plus tlačítko",
-                        style: TextStyle(color: Colors.black, fontSize: 20),
+                        "tutorial_15.2".tr(),
+                        style: TextStyle(color: Colors.white, fontSize: 20),
                       ),
                     ),
                     Image.asset(
@@ -1328,8 +1390,8 @@ class _InitPageState extends State<InitPage> {
                       ),
                       child: Text(
                         textAlign: TextAlign.center,
-                        "Otevře se ti nabídka potravin",
-                        style: TextStyle(color: Colors.black, fontSize: 20),
+                        "tutorial_15.3".tr(),
+                        style: TextStyle(color: Colors.white, fontSize: 20),
                       ),
                     ),
                     Image.asset(
@@ -1342,8 +1404,8 @@ class _InitPageState extends State<InitPage> {
                       ),
                       child: Text(
                         textAlign: TextAlign.center,
-                        "Vybereš si potravinu a v dalším kroku zadáš gramáž a klikneš přidat",
-                        style: TextStyle(color: Colors.black, fontSize: 20),
+                        "tutorial_15.4".tr(),
+                        style: TextStyle(color: Colors.white, fontSize: 20),
                       ),
                     ),
                     SizedBox(
@@ -1379,8 +1441,8 @@ class _InitPageState extends State<InitPage> {
                       height: 150,
                     ),
                     Text(
-                      "Přidání nové potraviny",
-                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 25.0),
+                      "tutorial_16".tr(),
+                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 25.0),
                     ),
                     Padding(
                       padding: EdgeInsets.only(
@@ -1388,8 +1450,8 @@ class _InitPageState extends State<InitPage> {
                       ),
                       child: Text(
                         textAlign: TextAlign.center,
-                        "Pokud nenajdeš potravinu, tak si ji můžeš vytvořit",
-                        style: TextStyle(color: Colors.black, fontSize: 20),
+                        "tutorial_16.1".tr(),
+                        style: TextStyle(color: Colors.white, fontSize: 20),
                       ),
                     ),
                     SizedBox(
@@ -1425,8 +1487,8 @@ class _InitPageState extends State<InitPage> {
                       height: 150,
                     ),
                     Text(
-                      "Změř si své tělesné hodnoty",
-                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 25.0),
+                      "tutorial_17".tr(),
+                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 25.0),
                     ),
                     SizedBox(
                       height: 20,
@@ -1439,10 +1501,53 @@ class _InitPageState extends State<InitPage> {
         ],
       ),
     );
+    targets.add(
+      TargetFocus(
+        identify: "Target 18",
+        enableTargetTab: true,
+        enableOverlayTab: true,
+        keyTarget: keyHomeDummy,
+        alignSkip: Alignment(-100, -100),
+        contents: [
+          TargetContent(
+            padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+            // customPosition: CustomTargetContentPosition(top: 500, left: 0),
+            align: ContentAlign.bottom,
+            builder: (context, controller) {
+              return Container(
+                // color: Colors.blue,
+                child: Column(
+                  // mainAxisSize: MainAxisSize.max,
+                  // crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: 300,
+                    ),
+                    Text(
+                      "tutorial_18".tr(),
+                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 25.0),
+                    ),
+                    SizedBox(
+                      height: 80,
+                    ),
+                    Text(
+                      textAlign: TextAlign.center,
+                      "tutorial_18.1".tr(),
+                      style: TextStyle(color: Colors.white, fontSize: 20),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+
     return targets;
   }
 
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  // final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
     loadDataFromSupabase();
@@ -1523,7 +1628,7 @@ class _InitPageState extends State<InitPage> {
       );
     } else {
       return Scaffold(
-        key: _scaffoldKey, drawerEnableOpenDragGesture: false,
+        key: scaffoldKey, drawerEnableOpenDragGesture: false,
         drawer: Drawer(
           backgroundColor: ColorsProvider.getColor2(context),
           width: MediaQuery.of(context).size.width / 1.50,
@@ -1570,7 +1675,7 @@ class _InitPageState extends State<InitPage> {
               ),
               _buttonWidget(dbSupabase, context, '/scanFood', 'scan_food'.tr(), Icons.fit_screen_rounded, false),
               _buttonWidget(dbSupabase, context, '/newFood', 'new_food'.tr(), Icons.add_circle_outline_outlined, true),
-              _buttonWidget(dbSupabase, context, '/foodStatistic', 'statistic'.tr(), Icons.bar_chart_rounded, true),
+              _buttonWidget(dbSupabase, context, '/foodStatistic', 'statistic'.tr(), Icons.bar_chart_rounded, false),
               _categoryWidget('workout'.tr()),
               // _buttonWidget(dbSupabase, context, '/fitnessNames', 'Manage fitness names', Icons.text_fields_rounded),
               // _buttonWidget(dbSupabase, context, '/editDeleteExerciseData', 'Edit/Delete exercise data', Icons.edit_rounded),
@@ -1613,7 +1718,7 @@ class _InitPageState extends State<InitPage> {
                 children: [
                   GestureDetector(
                     onTap: () {
-                      _scaffoldKey.currentState?.openDrawer();
+                      scaffoldKey.currentState?.openDrawer();
                     },
                     child: Icon(
                       Icons.menu_rounded,
@@ -1701,11 +1806,14 @@ class _InitPageState extends State<InitPage> {
 
   Widget _buttonWidget(SupabaseProvider dbSupabase, BuildContext context, String page, String name, IconData icon, bool show, {double paddingLeft = 20}) {
     return GestureDetector(
-      onTap: () {
+      onTap: () async {
         if (show == false) {
         } else {
           dbSupabase.getUser();
-          Navigator.pushNamed(context, page);
+          await Navigator.pushNamed(context, page);
+          if (page == '/settings') {
+            setState(() {});
+          }
         }
       },
       child: Container(

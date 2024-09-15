@@ -55,7 +55,7 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
     for (var nutriIntake in nutriIntakes) {
       if (nutriIntake.action == 3) {
       } else {
-        print(nutriIntake.action);
+        // print(nutriIntake.action);
 
         int weight = nutriIntake.weight!;
         Food? food = await dbFitness.selectSpecificFood(nutriIntake.idFood!);
@@ -74,7 +74,7 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
           createdAt: nutriIntake.createdAt,
         );
         foodList.add(food);
-        print(food.action);
+        // print(food.action);
         calories += food.kcal!;
         protein += food.protein!;
         carbs += food.carbs!;
@@ -323,359 +323,375 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                         child: Column(
                           children: [
                             Expanded(
-                              child: ListView(
+                              child: ReorderableListView.builder(
                                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                                children: [
-                                  // Padding(
-                                  //   padding: const EdgeInsets.only(bottom: 5.0),
-                                  //   child: Row(
-                                  //     mainAxisAlignment: MainAxisAlignment.end,
-                                  //     children: [
-                                  //       Padding(
-                                  //         padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-                                  //         child: Container(
-                                  //           height: 35,
-                                  //           width: 170,
-                                  //           decoration: BoxDecoration(color: ColorsProvider.getColor2(context), borderRadius: BorderRadius.circular(50)),
-                                  //           child: Row(
-                                  //             mainAxisAlignment: MainAxisAlignment.center,
-                                  //             children: [
-                                  //               Icon(
-                                  //                 Icons.more_vert,
-                                  //                 color: ColorsProvider.getColor8(context),
-                                  //               ),
-                                  //               Text(
-                                  //                 "Manage categories",
-                                  //                 style: TextStyle(
-                                  //                   fontWeight: FontWeight.bold,
-                                  //                   color: ColorsProvider.getColor8(context),
-                                  //                 ),
-                                  //               )
-                                  //             ],
-                                  //           ),
-                                  //         ),
-                                  //       ),
-                                  //     ],
-                                  //   ),
-                                  // ),
-                                  ...intakeCategories.map(
-                                    (category) {
-                                      List<Food> newFoodList = [];
-                                      foodList.forEach(
-                                        (element) {
-                                          if (category.supabaseIdIntakeCategory == element.intakeCategory) {
-                                            newFoodList.add(element);
-                                          }
-                                        },
-                                      );
-                                      double sumOfKcal = 0;
-                                      for (var food in newFoodList) {
-                                        sumOfKcal += food.kcal!;
-                                      }
-                                      return // Změna Container na použití 'Expanded' a nastavení výšky 'ListView.builder'
-                                          Padding(
-                                        padding: const EdgeInsets.only(bottom: 15),
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            color: ColorsProvider.getColor2(context),
-                                            borderRadius: BorderRadius.circular(12),
-                                          ),
-                                          child: SingleChildScrollView(
-                                            physics: NeverScrollableScrollPhysics(),
-                                            child:
-                                                // Zajištění, že Row má pevně daný prostor
-                                                Column(
-                                              mainAxisAlignment: MainAxisAlignment.start,
-                                              children: [
-                                                Container(
-                                                  padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-                                                  child: Row(
-                                                    children: [
-                                                      // Padding(
-                                                      //   padding: const EdgeInsets.only(left: 10),
-                                                      //   child: GestureDetector(
-                                                      //     onTap: () async {
-                                                      //       print("object");
-                                                      //       // await Navigator.of(context).push(route);
-                                                      //       load();
-                                                      //     },
-                                                      //     child: Container(
-                                                      //       // color: Colors.blue,
-                                                      //       width: 35,
-                                                      //       child: Icon(
-                                                      //         Icons.more_vert,
-                                                      //         size: 30,
-                                                      //         color: ColorsProvider.getColor8(context),
-                                                      //       ),
-                                                      //     ),
-                                                      //   ),
-                                                      // ),
-                                                      Padding(
-                                                        padding: const EdgeInsets.only(left: 10),
-                                                        child: Text(
-                                                          '${category.name}'.tr(),
-                                                          style: TextStyle(
-                                                            color: ColorsProvider.getColor8(context),
-                                                            fontSize: 20,
-                                                            fontWeight: FontWeight.bold,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      Expanded(
-                                                        child: Row(
-                                                          mainAxisAlignment: MainAxisAlignment.end,
-                                                          children: [
-                                                            sumOfKcal <= 0
-                                                                ? Container()
-                                                                : Text(
-                                                                    '${sumOfKcal.round()} Kcal',
-                                                                    style: TextStyle(
-                                                                      color: ColorsProvider.getColor8(context),
-                                                                      fontSize: 20,
-                                                                      fontWeight: FontWeight.bold,
-                                                                    ),
-                                                                  ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      Padding(
-                                                        padding: const EdgeInsets.only(right: 5, left: 15),
-                                                        child: openSearchBar(searchController, category.supabaseIdIntakeCategory!),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                Container(
-                                                  // color: Colors.blue,
-                                                  child: Column(
-                                                    children: [
-                                                      ...newFoodList.map(
-                                                        (food) => Stack(
-                                                          children: [
-                                                            Padding(
-                                                              padding: const EdgeInsets.fromLTRB(5, 0, 5, 5),
-                                                              child: GestureDetector(
-                                                                onLongPress: () {
-                                                                  print("Logn press");
-                                                                },
-                                                                onTap: () async {
-                                                                  print("tap press");
-                                                                  print(food.idNutriIntake);
-                                                                  dbFitness.selectedIntakeCategoryValue = food.intakeCategory!;
-                                                                  await Navigator.of(context).pushNamed('/addIntakePage', arguments: [food, quantity, false, intakeCategories]);
+                                itemCount: intakeCategories.length,
+                                onReorder: (int oldIndex, int newIndex) async {
+                                  print("oldIndex: $oldIndex    newIndex: $newIndex");
 
-                                                                  await load();
-                                                                },
-                                                                child: Container(
-                                                                  decoration: BoxDecoration(
-                                                                    color: Color.fromARGB(100, 0, 0, 0),
-                                                                    borderRadius: variablesProvider.zaobleni,
-                                                                  ),
-                                                                  // height: 80,
-                                                                  child: Column(
-                                                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                                                    children: [
-                                                                      Row(
-                                                                        mainAxisAlignment: MainAxisAlignment.center,
-                                                                        children: [
-                                                                          Expanded(
-                                                                            child: Container(
-                                                                              alignment: Alignment.center, // Center the container content
-                                                                              child: Padding(
-                                                                                padding: EdgeInsets.symmetric(horizontal: 2.0),
-                                                                                child: TextScroll(
-                                                                                  "${food.name.toString()}",
-                                                                                  mode: TextScrollMode.endless,
-                                                                                  velocity: Velocity(pixelsPerSecond: Offset(35, 0)),
-                                                                                  delayBefore: Duration(milliseconds: 500),
-                                                                                  pauseBetween: Duration(milliseconds: 1000),
-                                                                                  style: TextStyle(
-                                                                                    fontSize: 22,
-                                                                                    fontWeight: FontWeight.w500,
-                                                                                    color: ColorsProvider.getColor8(context),
-                                                                                  ),
-                                                                                  textAlign: TextAlign.center,
-                                                                                  // textDirection: TextDirection.LTR,
-                                                                                  selectable: false,
-                                                                                ),
-                                                                              ),
-                                                                            ),
-                                                                          ),
-                                                                        ],
-                                                                      ),
-                                                                      Row(
-                                                                        mainAxisAlignment: MainAxisAlignment.center,
-                                                                        children: [
-                                                                          SizedBox(
-                                                                            width: 60,
-                                                                          ),
-                                                                          customText("Weight", food.weight!.toDouble(), context),
-                                                                          customText("Kcal", food.kcal, context),
-                                                                        ],
-                                                                      ),
-                                                                    ],
-                                                                  ),
+                                  if (oldIndex < newIndex) {
+                                    newIndex -= 1;
+                                  }
+
+                                  final IntakeCategories item = intakeCategories.removeAt(oldIndex);
+                                  intakeCategories.insert(newIndex, item);
+
+                                  // Seřazení dočasných kategorií podle jména
+                                  List<IntakeCategories> tempIntakeCategories = List.from(intakeCategories);
+                                  tempIntakeCategories.sort((a, b) => a.name!.compareTo(b.name!));
+
+                                  // První smyčka: Aktualizace s negativním ID
+                                  for (var i = 0; i < intakeCategories.length; i++) {
+                                    await dbFitness.UpdateDailyNutriIntakeToMinus(i * -1, "${selectedDate.toString().replaceRange(10, null, "")}", intakeCategories[i].supabaseIdIntakeCategory!);
+                                    print("${intakeCategories[i].name}    ${tempIntakeCategories[i].name}");
+                                  }
+
+                                  // Druhá smyčka: Aktualizace kategorií na základě action
+                                  for (var i = 0; i < intakeCategories.length; i++) {
+                                    for (var element in nutriIntakes) {
+                                      if (element.intakeCategory == intakeCategories[i].supabaseIdIntakeCategory) {
+                                        int action = 0; // Defaultní hodnota pro action
+                                        // Vyhodnocení a aktualizace action na základě hodnoty element.action
+                                        switch (element.action) {
+                                          case 0:
+                                            print("object 0");
+                                            action = 2; // Nebo uprav podle logiky
+                                            break;
+                                          case 1:
+                                            print("object 1");
+                                            action = 1; // Nebo uprav podle logiky
+                                            break;
+                                          case 2:
+                                            print("object 2");
+                                            action = 2; // Nebo uprav podle logiky
+                                            break;
+                                          case 3:
+                                          case 4:
+                                            print("No action needed for object ${element.action}");
+                                            break;
+                                          default:
+                                            print("Unknown action for element ${element.action}");
+                                        }
+
+                                        // Aktualizace v databázi s novou action
+                                        await dbFitness.UpdateDailyNutriIntakeToOriginal(tempIntakeCategories[i].supabaseIdIntakeCategory!, "${selectedDate.toString().replaceRange(10, null, "")}", i * -1, action);
+                                      }
+                                    }
+                                  }
+
+                                  // Znovu načtení dat
+                                  await load();
+                                },
+                                itemBuilder: (context, index) {
+                                  var category = intakeCategories[index];
+                                  List<Food> newFoodList = [];
+                                  foodList.forEach(
+                                    (element) {
+                                      if (category.supabaseIdIntakeCategory == element.intakeCategory) {
+                                        newFoodList.add(element);
+                                      }
+                                    },
+                                  );
+                                  double sumOfKcal = 0;
+                                  for (var food in newFoodList) {
+                                    sumOfKcal += food.kcal!;
+                                  }
+                                  return // Změna Container na použití 'Expanded' a nastavení výšky 'ListView.builder'
+                                      Padding(
+                                    key: Key('$index'),
+                                    padding: const EdgeInsets.only(bottom: 10),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: ColorsProvider.getColor2(context),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: SingleChildScrollView(
+                                        physics: NeverScrollableScrollPhysics(),
+                                        child:
+                                            // Zajištění, že Row má pevně daný prostor
+                                            Column(
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          children: [
+                                            Container(
+                                              // color: Colors.blue,
+                                              padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+                                              child: Row(
+                                                children: [
+                                                  ReorderableDragStartListener(
+                                                    index: index,
+                                                    child: Padding(
+                                                      padding: const EdgeInsets.only(left: 10),
+                                                      child: Icon(
+                                                        Icons.drag_handle_rounded,
+                                                        size: 30,
+                                                        color: ColorsProvider.getColor8(context),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding: const EdgeInsets.only(left: 10),
+                                                    child: Text(
+                                                      '${category.name}'.tr(),
+                                                      style: TextStyle(
+                                                        color: ColorsProvider.getColor8(context),
+                                                        fontSize: 20,
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Expanded(
+                                                    child: Row(
+                                                      mainAxisAlignment: MainAxisAlignment.end,
+                                                      children: [
+                                                        sumOfKcal <= 0
+                                                            ? Container()
+                                                            : Text(
+                                                                '${sumOfKcal.round()} Kcal',
+                                                                style: TextStyle(
+                                                                  color: ColorsProvider.getColor8(context),
+                                                                  fontSize: 20,
+                                                                  fontWeight: FontWeight.bold,
                                                                 ),
                                                               ),
-                                                            ),
-                                                            Container(
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding: const EdgeInsets.only(right: 5, left: 15),
+                                                    child: openSearchBar(searchController, category.supabaseIdIntakeCategory!),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Container(
+                                              // color: Colors.blue,
+                                              child: Column(
+                                                children: [
+                                                  ...newFoodList.map(
+                                                    (food) => Stack(
+                                                      children: [
+                                                        Padding(
+                                                          padding: const EdgeInsets.fromLTRB(5, 0, 5, 5),
+                                                          child: GestureDetector(
+                                                            // onLongPress: () {
+                                                            //   print("Logn press");
+                                                            // },
+                                                            onTap: () async {
+                                                              print("tap press");
+                                                              print(food.idNutriIntake);
+                                                              dbFitness.selectedIntakeCategoryValue = food.intakeCategory!;
+                                                              await Navigator.of(context).pushNamed('/addIntakePage', arguments: [food, quantity, false, intakeCategories]);
+
+                                                              await load();
+                                                            },
+                                                            child: Container(
+                                                              decoration: BoxDecoration(
+                                                                color: Color.fromARGB(100, 0, 0, 0),
+                                                                borderRadius: variablesProvider.zaobleni,
+                                                              ),
                                                               // height: 80,
                                                               child: Column(
                                                                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                                                                 children: [
-                                                                  Container(
-                                                                    child: Column(
-                                                                      mainAxisAlignment: MainAxisAlignment.center,
-                                                                      children: [
-                                                                        Row(
-                                                                          mainAxisAlignment: MainAxisAlignment.end,
-                                                                          children: [
-                                                                            GestureDetector(
-                                                                              onTap: () {
-                                                                                print("delete");
-                                                                                showDialog(
-                                                                                  context: context,
-                                                                                  builder: (BuildContext context) {
-                                                                                    return AlertDialog(
-                                                                                      title: Text('confirm_delete'.tr()),
-                                                                                      content: Text('${"delete_nutri_intake_question".tr()} ${food.weight}g ${food.name}?'),
-                                                                                      actions: [
-                                                                                        Row(
-                                                                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                                                                          children: [
-                                                                                            GestureDetector(
-                                                                                              onTap: () {
-                                                                                                Navigator.of(context).pop();
-                                                                                              },
-                                                                                              child: Container(
-                                                                                                height: 40,
-                                                                                                width: 100,
-                                                                                                decoration: BoxDecoration(
-                                                                                                  color: ColorsProvider.getColor2(context),
-                                                                                                  borderRadius: BorderRadius.circular(15),
-                                                                                                ),
-                                                                                                child: Center(
-                                                                                                  child: Text(
-                                                                                                    'cancel'.tr(),
-                                                                                                    style: TextStyle(color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold),
-                                                                                                  ),
-                                                                                                ),
-                                                                                              ),
-                                                                                            ),
-                                                                                            GestureDetector(
-                                                                                              onTap: () async {
-                                                                                                NutriIntake nutriIntake = NutriIntake(
-                                                                                                  idFood: food.idFood,
-                                                                                                  idNutriIntake: food.idNutriIntake,
-                                                                                                  intakeCategory: food.intakeCategory,
-                                                                                                  quantity: food.quantity,
-                                                                                                  createdAt: food.createdAt,
-                                                                                                  weight: food.weight,
-                                                                                                  action: food.action,
-                                                                                                );
-                                                                                                try {
-                                                                                                  switch (food.action) {
-                                                                                                    case 0:
-                                                                                                      // nastavit 3 a pak se to odstraní ze supabase při sync
-
-                                                                                                      await dbFitness.UpdateNutriIntake(food.idNutriIntake!, nutriIntake, selectedDate.toString(), 3);
-                                                                                                      break;
-                                                                                                    case 1:
-                                                                                                      // odstranit hned ze sqflite
-
-                                                                                                      print(food.idNutriIntake);
-                                                                                                      await dbFitness.DeleteNutriIntake(food.idNutriIntake!);
-
-                                                                                                      break;
-                                                                                                    case 2:
-                                                                                                      // nastavit 3 a pak se to odstraní ze supabase při sync
-                                                                                                      await dbFitness.UpdateNutriIntake(food.idNutriIntake!, nutriIntake, selectedDate.toString(), 3);
-
-                                                                                                      break;
-                                                                                                    case 3:
-                                                                                                      // nic, při sync se to odstraní ze supabase
-                                                                                                      break;
-                                                                                                    case 4:
-                                                                                                      // asi nenastane nikdy
-                                                                                                      break;
-                                                                                                    default:
-                                                                                                      print("!!! NEZNÁMÝ STAV, NĚCO SELHALO !!!");
-                                                                                                  }
-                                                                                                  for (int i = 0; i < newFoodList.length; i++) {
-                                                                                                    if (newFoodList[i].idNutriIntake == food.idNutriIntake) {
-                                                                                                      newFoodList.removeAt(i);
-                                                                                                    }
-                                                                                                  }
-                                                                                                  for (int i = 0; i < foodList.length; i++) {
-                                                                                                    if (foodList[i].idNutriIntake == food.idNutriIntake) {
-                                                                                                      foodList.removeAt(i);
-                                                                                                    }
-                                                                                                  }
-                                                                                                } on Exception catch (e) {
-                                                                                                  print(e);
-                                                                                                }
-
-                                                                                                setState(() {});
-
-                                                                                                Navigator.of(context).pop();
-                                                                                              },
-                                                                                              child: Container(
-                                                                                                height: 40,
-                                                                                                width: 100,
-                                                                                                // padding: EdgeInsets.fromLTRB(25, 10, 25, 10),
-                                                                                                decoration: BoxDecoration(
-                                                                                                  color: ColorsProvider.color_9,
-                                                                                                  borderRadius: BorderRadius.circular(15),
-                                                                                                ),
-                                                                                                child: Center(
-                                                                                                  child: Text(
-                                                                                                    'yes_delete'.tr(),
-                                                                                                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                                                                                                  ),
-                                                                                                ),
-                                                                                              ),
-                                                                                            ),
-                                                                                          ],
-                                                                                        ),
-                                                                                      ],
-                                                                                    );
-                                                                                  },
-                                                                                );
-                                                                              },
-                                                                              child: Container(
-                                                                                height: 60, // color: Colors.red,
-                                                                                width: 45,
-                                                                                child: Center(
-                                                                                  child: Icon(
-                                                                                    Icons.close_rounded,
-                                                                                    color: ColorsProvider.getColor8(context),
-                                                                                    size: 30,
-                                                                                  ),
-                                                                                ),
+                                                                  Row(
+                                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                                    children: [
+                                                                      Expanded(
+                                                                        child: Container(
+                                                                          alignment: Alignment.center, // Center the container content
+                                                                          child: Padding(
+                                                                            padding: EdgeInsets.symmetric(horizontal: 2.0),
+                                                                            child: TextScroll(
+                                                                              "${food.name.toString()}",
+                                                                              mode: TextScrollMode.endless,
+                                                                              velocity: Velocity(pixelsPerSecond: Offset(35, 0)),
+                                                                              delayBefore: Duration(milliseconds: 500),
+                                                                              pauseBetween: Duration(milliseconds: 1000),
+                                                                              style: TextStyle(
+                                                                                fontSize: 22,
+                                                                                fontWeight: FontWeight.w500,
+                                                                                color: ColorsProvider.getColor8(context),
                                                                               ),
+                                                                              textAlign: TextAlign.center,
+                                                                              // textDirection: TextDirection.LTR,
+                                                                              selectable: false,
                                                                             ),
-                                                                          ],
+                                                                          ),
                                                                         ),
-                                                                      ],
-                                                                    ),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                  Row(
+                                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                                    children: [
+                                                                      SizedBox(
+                                                                        width: 60,
+                                                                      ),
+                                                                      customText("Weight", (food.weight ?? 0).toDouble(), context),
+                                                                      customText("Kcal", food.kcal ?? 0, context),
+                                                                    ],
                                                                   ),
                                                                 ],
                                                               ),
                                                             ),
-                                                          ],
+                                                          ),
                                                         ),
-                                                      )
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
+                                                        Container(
+                                                          // height: 80,
+                                                          child: Column(
+                                                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                                            children: [
+                                                              Container(
+                                                                child: Column(
+                                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                                  children: [
+                                                                    Row(
+                                                                      mainAxisAlignment: MainAxisAlignment.end,
+                                                                      children: [
+                                                                        GestureDetector(
+                                                                          onTap: () {
+                                                                            print("delete");
+                                                                            showDialog(
+                                                                              context: context,
+                                                                              builder: (BuildContext context) {
+                                                                                return AlertDialog(
+                                                                                  title: Text('confirm_delete'.tr()),
+                                                                                  content: Text('${"delete_nutri_intake_question".tr()} ${food.weight}g ${food.name}?'),
+                                                                                  actions: [
+                                                                                    Row(
+                                                                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                                                      children: [
+                                                                                        GestureDetector(
+                                                                                          onTap: () {
+                                                                                            Navigator.of(context).pop();
+                                                                                          },
+                                                                                          child: Container(
+                                                                                            height: 40,
+                                                                                            width: 100,
+                                                                                            decoration: BoxDecoration(
+                                                                                              color: ColorsProvider.getColor2(context),
+                                                                                              borderRadius: BorderRadius.circular(15),
+                                                                                            ),
+                                                                                            child: Center(
+                                                                                              child: Text(
+                                                                                                'cancel'.tr(),
+                                                                                                style: TextStyle(color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold),
+                                                                                              ),
+                                                                                            ),
+                                                                                          ),
+                                                                                        ),
+                                                                                        GestureDetector(
+                                                                                          onTap: () async {
+                                                                                            NutriIntake nutriIntake = NutriIntake(
+                                                                                              idFood: food.idFood,
+                                                                                              idNutriIntake: food.idNutriIntake,
+                                                                                              intakeCategory: food.intakeCategory,
+                                                                                              quantity: food.quantity,
+                                                                                              createdAt: food.createdAt,
+                                                                                              weight: food.weight,
+                                                                                              action: food.action,
+                                                                                            );
+                                                                                            try {
+                                                                                              switch (food.action) {
+                                                                                                case 0:
+                                                                                                  // nastavit 3 a pak se to odstraní ze supabase při sync
+
+                                                                                                  await dbFitness.UpdateNutriIntake(food.idNutriIntake!, nutriIntake, 3);
+                                                                                                  break;
+                                                                                                case 1:
+                                                                                                  // odstranit hned ze sqflite
+
+                                                                                                  print(food.idNutriIntake);
+                                                                                                  await dbFitness.DeleteNutriIntake(food.idNutriIntake!);
+
+                                                                                                  break;
+                                                                                                case 2:
+                                                                                                  // nastavit 3 a pak se to odstraní ze supabase při sync
+                                                                                                  await dbFitness.UpdateNutriIntake(food.idNutriIntake!, nutriIntake, 3);
+
+                                                                                                  break;
+                                                                                                case 3:
+                                                                                                  // nic, při sync se to odstraní ze supabase
+                                                                                                  break;
+                                                                                                case 4:
+                                                                                                  // asi nenastane nikdy
+                                                                                                  break;
+                                                                                                default:
+                                                                                                  print("!!! NEZNÁMÝ STAV, NĚCO SELHALO !!!");
+                                                                                              }
+                                                                                              for (int i = 0; i < newFoodList.length; i++) {
+                                                                                                if (newFoodList[i].idNutriIntake == food.idNutriIntake) {
+                                                                                                  newFoodList.removeAt(i);
+                                                                                                }
+                                                                                              }
+                                                                                              for (int i = 0; i < foodList.length; i++) {
+                                                                                                if (foodList[i].idNutriIntake == food.idNutriIntake) {
+                                                                                                  foodList.removeAt(i);
+                                                                                                }
+                                                                                              }
+                                                                                            } on Exception catch (e) {
+                                                                                              print(e);
+                                                                                            }
+
+                                                                                            setState(() {});
+
+                                                                                            Navigator.of(context).pop();
+                                                                                          },
+                                                                                          child: Container(
+                                                                                            height: 40,
+                                                                                            width: 100,
+                                                                                            // padding: EdgeInsets.fromLTRB(25, 10, 25, 10),
+                                                                                            decoration: BoxDecoration(
+                                                                                              color: ColorsProvider.color_9,
+                                                                                              borderRadius: BorderRadius.circular(15),
+                                                                                            ),
+                                                                                            child: Center(
+                                                                                              child: Text(
+                                                                                                'yes_delete'.tr(),
+                                                                                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                                                                              ),
+                                                                                            ),
+                                                                                          ),
+                                                                                        ),
+                                                                                      ],
+                                                                                    ),
+                                                                                  ],
+                                                                                );
+                                                                              },
+                                                                            );
+                                                                          },
+                                                                          child: Container(
+                                                                            height: 60, // color: Colors.red,
+                                                                            width: 45,
+                                                                            child: Center(
+                                                                              child: Icon(
+                                                                                Icons.close_rounded,
+                                                                                color: ColorsProvider.getColor8(context),
+                                                                                size: 30,
+                                                                              ),
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  )
+                                                ],
+                                              ),
                                             ),
-                                          ),
+                                          ],
                                         ),
-                                      );
-                                    },
-                                  )
-                                ],
+                                      ),
+                                    ),
+                                  );
+                                },
                               ),
                             ),
                           ],

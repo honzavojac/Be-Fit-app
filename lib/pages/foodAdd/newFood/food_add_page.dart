@@ -4,11 +4,13 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
 import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
+import 'package:kaloricke_tabulky_02/init_page.dart';
 import 'package:kaloricke_tabulky_02/main.dart';
 
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 
 import 'package:kaloricke_tabulky_02/pages/foodAdd/newFood/food_main_add_boxes.dart';
+import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:kaloricke_tabulky_02/variables.dart';
 import 'package:provider/provider.dart';
 import 'package:diacritic/diacritic.dart';
@@ -35,6 +37,8 @@ TextEditingController fiberController = TextEditingController();
 class _FoodAddPageState extends State<FoodAddPage> {
   Future<bool> insertFood() async {
     var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
+    var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false);
+    var idUser = dbSupabase.user!.idUser;
     int selectedQuantity = dbFitness.selectedQuantity;
 
     DateTime dateTime = DateTime.now();
@@ -70,6 +74,7 @@ class _FoodAddPageState extends State<FoodAddPage> {
           break;
         default:
       }
+
       Food record = Food(
         country: selectedCountry,
         name: name,
@@ -82,6 +87,7 @@ class _FoodAddPageState extends State<FoodAddPage> {
         carbs: carbs,
         fat: fat,
         fiber: fiber,
+        insertedByIdUser: idUser,
       );
 
       print(record);

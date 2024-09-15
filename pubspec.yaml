@@ -101,6 +101,9 @@ flutter:
     - assets/Tutorial pictures/tutorial_add_button_food.png
     - assets/Tutorial pictures/tutorial_search_bar.png
     - assets/Tutorial pictures/tutorial_search_items.png
+    - assets/Tutorial pictures/tutorial_new_split_select.png
+    - assets/Tutorial pictures/tutorial_new_split_name_split.png
+
 
 
     - assets/langs/cs.json

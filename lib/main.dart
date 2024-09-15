@@ -9,7 +9,6 @@ import 'package:kaloricke_tabulky_02/settings.dart';
 import 'package:kaloricke_tabulky_02/side_panel/fitness/edit_delete_exercise_data.dart';
 import 'package:kaloricke_tabulky_02/side_panel/fitness/fitness_names.dart';
 import 'package:kaloricke_tabulky_02/side_panel/fitness/fitness_statistic.dart';
-import 'package:kaloricke_tabulky_02/side_panel/food/add_food.dart';
 import 'package:kaloricke_tabulky_02/side_panel/food/food_statistic.dart';
 import 'package:kaloricke_tabulky_02/side_panel/food/scan_food.dart';
 import 'package:kaloricke_tabulky_02/variables.dart';
@@ -30,10 +29,16 @@ import 'package:kaloricke_tabulky_02/login_supabase/splash_page.dart';
 
 import 'login_supabase/reset_password_get_token.dart';
 import 'side_panel/body/measurements.dart';
+import 'package:flutter/services.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
+
+  //obrazovka se nebude otáčet
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp, // Vertikální orientace
+  ]);
 
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String? languageCode = prefs.getString('selected_language_code');
@@ -163,7 +168,6 @@ class _MyAppState extends State<MyApp> {
         '/editDeleteExerciseData': (context) => EditDeleteExerciseData(),
         '/fitnessStatistic': (context) => FitnessStatistic(),
         '/scanFood': (context) => ScanFood(),
-        '/addFood': (context) => AddFood(),
         '/newFood': (context) => FoodAddPage(
               quantity: <String>[
                 '1g',

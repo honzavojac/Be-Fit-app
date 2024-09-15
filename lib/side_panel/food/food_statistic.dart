@@ -12,9 +12,11 @@ class foodStatistic extends StatefulWidget {
 
 class _foodStatisticState extends State<foodStatistic> {
   List<NutriIntake> nutriIntake = [];
+  List<Food> foodList = [];
   load() async {
     var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
     nutriIntake = await dbFitness.SelectNutriIntakes();
+    foodList = await dbFitness.SelectFood();
     setState(() {});
   }
 
@@ -39,14 +41,20 @@ class _foodStatisticState extends State<foodStatistic> {
             ),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.only(left: 20),
-                child: ListView.builder(
-                  itemCount: nutriIntake.length,
-                  itemBuilder: (context, index) {
-                    return Text("${nutriIntake[index].supabaseIdNutriIntake}  ${nutriIntake[index].idFood}  ${nutriIntake[index].idNutriIntake} ${(nutriIntake[index].supabaseIdNutriIntake == nutriIntake[index].idNutriIntake) ? "true" : "*****"}");
-                  },
-                ),
-              ),
+                  padding: const EdgeInsets.only(left: 20),
+                  child: ReorderableListView.builder(
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        key: Key('$index'),
+                        padding: const EdgeInsets.all(8.0),
+                        child: Container(height: 50, color: Colors.blue, child: Text("${nutriIntake[index].supabaseIdNutriIntake} || ${nutriIntake[index].idNutriIntake}")),
+                      );
+                    },
+                    itemCount: nutriIntake.length,
+                    onReorder: (oldIndex, newIndex) {
+                      print("object");
+                    },
+                  )),
             ),
           ],
         ),

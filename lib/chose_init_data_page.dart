@@ -179,7 +179,7 @@ class _ChoseInitDataPageState extends State<ChoseInitDataPage> {
                                       daysOfTheWeekTextStyle: TextStyle(color: ColorsProvider.getColor2(context)),
                                       enabledCellsDecoration: BoxDecoration(),
                                       initialPickerType: PickerType.days,
-                                      leadingDateTextStyle: TextStyle(color: ColorsProvider.getColor2(context)),
+                                      leadingDateTextStyle: TextStyle(color: ColorsProvider.getColor2(context), fontWeight: FontWeight.bold, fontSize: 23),
                                       slidersColor: ColorsProvider.getColor2(context),
                                       slidersSize: 25,
                                       selectedCellDecoration: BoxDecoration(

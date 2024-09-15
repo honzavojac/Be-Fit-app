@@ -125,143 +125,156 @@ class _HomeScreenState extends State<HomeScreen> {
 
     // final visibleSplits = splitstartedcompleteds.skip(3).take(3).toList();
 
-    return Container(
-      child: Column(
-        children: [
-          Container(
-            height: 80,
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(15, 40, 15, 0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  selectedDate.toString().replaceRange(10, null, "") != now.toString().replaceRange(10, null, "")
-                      ? Container(
-                          height: 35,
-                          child: ElevatedButton.icon(
-                            onPressed: () async {
-                              selectedDate = now;
-                              load();
-                            },
-                            // icon: Icon(Icons.add_circle_outline),
-                            label: Text(
-                              'now'.tr(),
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            style: ButtonStyle(
-                              // backgroundColor: WidgetStateProperty.all(ColorsProvider.getColor2(context).withAlpha(50)),
-                              foregroundColor: WidgetStateProperty.all(ColorsProvider.getColor2(context)),
-                            ),
-                          ),
-                        )
-                      : Container(),
-                ],
-              ),
-            ),
+    return Stack(
+      children: [
+        Positioned(
+          top: -100,
+          right: -100,
+          child: SizedBox(
+            height: 0,
+            width: 0,
+            key: keyHomeDummy,
           ),
-          dateRow(
-            back: () {
-              selectedDate = selectedDate.subtract(Duration(days: 1));
-              load();
-            },
-            forward: () {
-              if (selectedDate.toString().replaceRange(10, null, "") == now.toString().replaceRange(10, null, "")) {
-              } else {
-                selectedDate = selectedDate.add(Duration(days: 1));
-                load();
-              }
-            },
-            onDateSelected: (value) {
-              print(value);
-              selectedDate = value;
-              load();
-              Navigator.of(context).pop();
-            },
-          ),
-          Spacer(),
-          Container(
-            child: dataBoxes(calories, protein, carbs, fat, fiber, context),
-          ),
-          Spacer(),
-          Container(
-            child: lastSplitWidget(),
-          ),
-          Spacer(),
-          Container(
-            child: measurement != null
-                ? measurentWidget()
-                : Container(
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 40),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              Text(
-                                "measurement".tr(),
-                                style: TextStyle(
-                                  color: ColorsProvider.getColor2(context),
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold,
+        ),
+        Container(
+          child: Column(
+            children: [
+              Container(
+                height: 80,
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(15, 40, 15, 0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      selectedDate.toString().replaceRange(10, null, "") != now.toString().replaceRange(10, null, "")
+                          ? Container(
+                              height: 35,
+                              child: ElevatedButton.icon(
+                                onPressed: () async {
+                                  selectedDate = now;
+                                  load();
+                                },
+                                // icon: Icon(Icons.add_circle_outline),
+                                label: Text(
+                                  'now'.tr(),
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                style: ButtonStyle(
+                                  // backgroundColor: WidgetStateProperty.all(ColorsProvider.getColor2(context).withAlpha(50)),
+                                  foregroundColor: WidgetStateProperty.all(ColorsProvider.getColor2(context)),
                                 ),
                               ),
-                              GestureDetector(
-                                key: keyMeasurementButton,
-                                onTap: () {
-                                  Navigator.pushNamed(context, '/measurements');
-                                },
-                                child: Container(
-                                  height: 30,
-                                  // width: 100,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(18),
-                                    color: ColorsProvider.getColor2(context),
+                            )
+                          : Container(),
+                    ],
+                  ),
+                ),
+              ),
+              dateRow(
+                back: () {
+                  selectedDate = selectedDate.subtract(Duration(days: 1));
+                  load();
+                },
+                forward: () {
+                  if (selectedDate.toString().replaceRange(10, null, "") == now.toString().replaceRange(10, null, "")) {
+                  } else {
+                    selectedDate = selectedDate.add(Duration(days: 1));
+                    load();
+                  }
+                },
+                onDateSelected: (value) {
+                  print(value);
+                  selectedDate = value;
+                  load();
+                  Navigator.of(context).pop();
+                },
+              ),
+              Spacer(),
+              Container(
+                child: dataBoxes(calories, protein, carbs, fat, fiber, context),
+              ),
+              Spacer(),
+              Container(
+                child: lastSplitWidget(),
+              ),
+              Spacer(),
+              Container(
+                child: measurement != null
+                    ? measurentWidget()
+                    : Container(
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 40),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                children: [
+                                  Text(
+                                    "measurement".tr(),
+                                    style: TextStyle(
+                                      color: ColorsProvider.getColor2(context),
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                  child: Center(
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                                      child: Text(
-                                        "add".tr(),
-                                        style: TextStyle(color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold),
+                                  GestureDetector(
+                                    key: keyMeasurementButton,
+                                    onTap: () {
+                                      Navigator.pushNamed(context, '/measurements');
+                                    },
+                                    child: Container(
+                                      height: 30,
+                                      // width: 100,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(18),
+                                        color: ColorsProvider.getColor2(context),
+                                      ),
+                                      child: Center(
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                                          child: Text(
+                                            "add".tr(),
+                                            style: TextStyle(color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
+                                ],
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
+                      ),
+              ),
+              Spacer(),
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              //   children: [
+              //     ElevatedButton(
+              //       onPressed: () {
+              //         controller.jumpTo(0);
+              //         hasToOpenDropdown = true;
+              //         print(hasToOpenDropdown);
+              //       },
+              //       child: Text("Start split"),
+              //     ),
+              //     ElevatedButton(
+              //       onPressed: () {
+              //         Navigator.pushNamed(context, '/measurements');
+              //       },
+              //       child: Text("Measurements"),
+              //     ),
+              //     // DemoDropdown(),
+              //   ],
+              // ),
+              // Spacer(),
+            ],
           ),
-          Spacer(),
-          // Row(
-          //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          //   children: [
-          //     ElevatedButton(
-          //       onPressed: () {
-          //         controller.jumpTo(0);
-          //         hasToOpenDropdown = true;
-          //         print(hasToOpenDropdown);
-          //       },
-          //       child: Text("Start split"),
-          //     ),
-          //     ElevatedButton(
-          //       onPressed: () {
-          //         Navigator.pushNamed(context, '/measurements');
-          //       },
-          //       child: Text("Measurements"),
-          //     ),
-          //     // DemoDropdown(),
-          //   ],
-          // ),
-          // Spacer(),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -594,7 +607,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              '${"thingh".tr()}:',
+                                              '${"thigh".tr()}:',
                                               style: TextStyle(color: Colors.grey[400]),
                                             ),
                                             Text(

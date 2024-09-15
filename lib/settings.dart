@@ -490,7 +490,10 @@ class _SettingsState extends State<Settings> {
             onPressed: () async {
               SharedPreferences prefs = await SharedPreferences.getInstance();
               await prefs.setString("show_tutorial", "true");
+              pageProvider = 1;
+              controller.jumpToPage(1);
               Navigator.of(context).pop();
+              scaffoldKey.currentState?.closeDrawer();
             },
             child: Text("Show tutorial"),
           ),

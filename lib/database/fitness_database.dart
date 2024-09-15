@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:diacritic/diacritic.dart';
 import 'package:flutter/material.dart';
@@ -514,6 +515,7 @@ class FitnessProvider extends ChangeNotifier {
   }
 
   SaveToSupabaseAndOrderSqlite(SupabaseProvider dbSupabase) async {
+    Stopwatch stopwatch = Stopwatch()..start();
     if (_isSyncing) {
       print("Syncing is already in progress. Skipping this call.*************************************************************************");
       return;
@@ -529,10 +531,13 @@ class FitnessProvider extends ChangeNotifier {
     _isSyncing = true;
     try {
       List<Muscle> muscles = await SelectMuscles();
-      List<Exercise> exercises = await SelectExercises();
-      List<Measurements> measurements = await SelectMeasurements();
-      List<IntakeCategories> intakeCategories = await SelectIntakeCategories();
-      List<NutriIntake> nutriIntakes = await SelectNutriIntakes();
+      List<Exercise> exercises = await SelectExercisesWhereActionIsNotZero();
+      List<Measurements> measurements = await SelectMeasurementsWhereActionIsNotZero();
+      List<IntakeCategories> intakeCategories = await SelectIntakeCategoriesWhereActionIsNotZero();
+      List<NutriIntake> nutriIntakes = await SelectNutriIntakesWhereActionIsNotZero();
+
+      List<MySplit> allData = await SelectAllData();
+      List<ExerciseData> exercisesData = await SelectExerciseDataWhereActionIsNotZero();
 
       for (var muscle in muscles) {
         int muscleAction = muscle.action ?? 0;
@@ -554,9 +559,6 @@ class FitnessProvider extends ChangeNotifier {
           }
         }
       }
-
-      List<MySplit> allData = await SelectAllData();
-      List<ExerciseData> exercisesData = await SelectExerciseData();
 
       for (var split in allData) {
         int splitAction = split.action ?? 0;
@@ -635,7 +637,10 @@ class FitnessProvider extends ChangeNotifier {
         }
       }
       print("nutri intake **********************************");
-      for (var nutriIntake in nutriIntakes.reversed) {
+      nutriIntakes.sort(
+        (a, b) => a.supabaseIdNutriIntake!.compareTo(b.supabaseIdNutriIntake!),
+      );
+      for (var nutriIntake in nutriIntakes) {
         int nutriIntakeAction = nutriIntake.action ?? 0;
         int? supabaseIdNutriIntake;
         try {
@@ -648,6 +653,12 @@ class FitnessProvider extends ChangeNotifier {
             await UpadateNutriIntakes(supabaseIdNutriIntake, nutriIntake.idNutriIntake ?? 0);
           } on Exception catch (e) {
             print("chyba nastává v UpadateNutriIntakes: ${e}");
+            try {
+              await UpadateNutriIntakes(0, nutriIntake.idNutriIntake ?? 0);
+              await UpadateNutriIntakes(supabaseIdNutriIntake, 0);
+            } on Exception catch (e) {
+              print("chyba stále přetrvává ************************ UpadateNutriIntakes: ${e}");
+            }
           }
         }
       }
@@ -657,6 +668,8 @@ class FitnessProvider extends ChangeNotifier {
       print("konec synchronizace");
       _isSyncing = false; // Release the lock    }
     }
+    stopwatch.stop();
+    print("${stopwatch.elapsed.inMilliseconds}ms");
   }
 
   UpdateSupabaseIdItemAndAction(String dbTable, int idRecord, int? supabaseIdItem, int action) async {
@@ -799,12 +812,19 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
   }
 
   Future<List<MySplit>> SelectAllData() async {
-    List<MySplit> splits = await SelectSplit();
-    List<Muscle> muscles = await SelectMuscles();
-    List<Exercise> exercises = await SelectExercises();
-    List<SelectedMuscle> selectedMuscles = await SelectSelectedMuscles();
-    List<SelectedExercise> selectedExercises = await SelectSelectedExercises();
-    List<SplitStartedCompleted> splitStartedCompleteds = await SelectSplitStartedCompleted();
+    List<MySplit> splits = [];
+    List<Muscle> muscles = [];
+    List<Exercise> exercises = [];
+    List<SelectedMuscle> selectedMuscles = [];
+    List<SelectedExercise> selectedExercises = [];
+    List<SplitStartedCompleted> splitStartedCompleteds = [];
+
+    splits = await SelectSplit();
+    muscles = await SelectMuscles();
+    exercises = await SelectExercises();
+    selectedMuscles = await SelectSelectedMuscles();
+    selectedExercises = await SelectSelectedExercises();
+    splitStartedCompleteds = await SelectSplitStartedCompleted();
 
     for (var split in splits) {
       split.selectedMuscle = [];
@@ -970,6 +990,13 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     return finalData;
   }
 
+  Future<List<Muscle>> SelectMusclesWhereActionIsNotZero() async {
+    var data = await _database.rawQuery('''SELECT * FROM muscles WHERE action IS NOT 0''');
+    var finalData = data.map((e) => Muscle.fromJson(e)).toList();
+
+    return finalData;
+  }
+
   InsertMuscle(
     int? supabaseIdMuscle,
     String nameOfMuscle,
@@ -1027,6 +1054,14 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
   //Exercise
   Future<List<Exercise>> SelectExercises() async {
     var data = await _database.rawQuery('''SELECT * FROM exercises''');
+
+    var finalData = data.map((e) => Exercise.fromJson(e)).toList();
+
+    return finalData;
+  }
+
+  Future<List<Exercise>> SelectExercisesWhereActionIsNotZero() async {
+    var data = await _database.rawQuery('''SELECT * FROM exercises WHERE action IS NOT 0''');
 
     var finalData = data.map((e) => Exercise.fromJson(e)).toList();
 
@@ -1101,6 +1136,15 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
   //ExerciseData
   Future<List<ExerciseData>> SelectExerciseData() async {
     var data = await _database.rawQuery('''SELECT * FROM exercise_data''');
+    // var data1 = data[0];
+
+    var finalData = data.map((e) => ExerciseData.fromJson(e)).toList();
+
+    return finalData;
+  }
+
+  Future<List<ExerciseData>> SelectExerciseDataWhereActionIsNotZero() async {
+    var data = await _database.rawQuery('''SELECT * FROM exercise_data WHERE action IS NOT 0''');
     // var data1 = data[0];
 
     var finalData = data.map((e) => ExerciseData.fromJson(e)).toList();
@@ -1252,6 +1296,13 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     return finalData;
   }
 
+  Future<List<MySplit>> SelectSplitWhereActionIsNotZero() async {
+    var data = await _database.rawQuery('''SELECT * FROM split WHERE action IS NOT 0''');
+    var finalData = data.map((e) => MySplit.fromJson(e)).toList();
+
+    return finalData;
+  }
+
   InsertSplit(
     int? supabaseIdSplit,
     String nameOfSplit,
@@ -1324,6 +1375,13 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
 //SelectedMuscles
   Future<List<SelectedMuscle>> SelectSelectedMuscles() async {
     var data = await _database.rawQuery('''SELECT * FROM selected_muscles''');
+    var finalData = data.map((e) => SelectedMuscle.fromJson(e)).toList();
+
+    return finalData;
+  }
+
+  Future<List<SelectedMuscle>> SelectSelectedMusclesWhereActionIsNotZero() async {
+    var data = await _database.rawQuery('''SELECT * FROM selected_muscles WHERE action IS NOT 0''');
     var finalData = data.map((e) => SelectedMuscle.fromJson(e)).toList();
 
     return finalData;
@@ -1403,6 +1461,13 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     return finalData;
   }
 
+  Future<List<SelectedExercise>> SelectSelectedExercisesWhereActionIsNotZero() async {
+    var data = await _database.rawQuery('''SELECT * FROM selected_exercise WHERE action IS NOT 0''');
+    var finalData = data.map((e) => SelectedExercise.fromJson(e)).toList();
+
+    return finalData;
+  }
+
   InsertSelectedExercise(
     int? supabaseIdSelectedExercise,
     int idExercise,
@@ -1472,6 +1537,13 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
   //SplitStartedCompleted
   Future<List<SplitStartedCompleted>> SelectSplitStartedCompleted() async {
     var data = await _database.rawQuery('''SELECT * FROM split_started_completed''');
+    var finalData = data.map((e) => SplitStartedCompleted.fromJson(e)).toList();
+
+    return finalData;
+  }
+
+  Future<List<SplitStartedCompleted>> SelectSplitStartedCompletedWhereActionIsNotZero() async {
+    var data = await _database.rawQuery('''SELECT * FROM split_started_completed WHERE action IS NOT 0''');
     var finalData = data.map((e) => SplitStartedCompleted.fromJson(e)).toList();
 
     return finalData;
@@ -1615,6 +1687,12 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
   //Measurement
   SelectMeasurements() async {
     var data = await _database.rawQuery('''SELECT * FROM body_measurements''');
+    var finalData = data.map((e) => Measurements.fromJson(e)).toList();
+    return finalData;
+  }
+
+  SelectMeasurementsWhereActionIsNotZero() async {
+    var data = await _database.rawQuery('''SELECT * FROM body_measurements WHERE action IS NOT 0''');
     var finalData = data.map((e) => Measurements.fromJson(e)).toList();
     return finalData;
   }
@@ -1920,6 +1998,22 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     return finalData;
   }
 
+  Future<List<NutriIntake>> SelectNutriIntakesWhereActionIsNotZero() async {
+    final db = await _database;
+
+    // Use the rawQuery method to filter by date
+    var data = await db.rawQuery(
+      '''
+    SELECT * FROM nutri_intake WHERE action IS NOT 0 ORDER BY id_nutri_intake
+  ''',
+    );
+
+    // Map the data to a list of NutriIntake objects
+    var finalData = data.map((e) => NutriIntake.fromJson(e)).toList();
+
+    return finalData;
+  }
+
   Future<NutriIntake?> SelectLastNutriIntake() async {
     final db = await _database;
 
@@ -2019,7 +2113,33 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     notifyListeners(); // Oznámení změny
   }
 
-  Future<void> UpdateNutriIntake(int idNutriIntake, NutriIntake nutriIntake, String createdAt, int action) async {
+  UpdateDailyNutriIntakeToMinus(int newIdIntakeCategory, String day, int oldIdIntakeCategory) async {
+    final db = await _database; // Získání instance databáze
+
+    await db.rawUpdate('''
+    UPDATE nutri_intake 
+    SET id_intake_category = ?
+
+    WHERE  DATE(created_at) = ?
+      AND id_intake_category = ?
+  ''', [newIdIntakeCategory, day, oldIdIntakeCategory]);
+  }
+
+  UpdateDailyNutriIntakeToOriginal(int newIdIntakeCategory, String day, int minusIdIntakeCategory, int action) async {
+    final db = await _database; // Získání instance databáze
+
+    await db.rawUpdate('''
+    UPDATE nutri_intake SET
+      id_intake_category = ?,
+      action = ?
+    WHERE  DATE(created_at) = ?
+      AND id_intake_category = ?
+   ''', [newIdIntakeCategory, action, day, minusIdIntakeCategory]);
+
+    notifyListeners();
+  }
+
+  Future<void> UpdateNutriIntake(int idNutriIntake, NutriIntake nutriIntake, int action) async {
     final db = await _database; // Získání instance databáze
 
     await db.rawUpdate('''
@@ -2031,7 +2151,7 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
       id_intake_category = ?,
       action = ?
     WHERE id_nutri_intake = ?
-  ''', [
+   ''', [
       nutriIntake.idFood,
       nutriIntake.quantity,
       nutriIntake.weight,
@@ -2051,6 +2171,20 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     // Use the rawQuery method to filter by date
     var data = await db.rawQuery(
       ''' SELECT * FROM intake_categories ORDER BY id_intake_category
+  ''',
+    );
+
+    // Map the data to a list of NutriIntake objects
+    var finalData = data.map((e) => IntakeCategories.fromJson(e)).toList();
+    return finalData;
+  }
+
+  Future<List<IntakeCategories>> SelectIntakeCategoriesWhereActionIsNotZero() async {
+    final db = await _database;
+
+    // Use the rawQuery method to filter by date
+    var data = await db.rawQuery(
+      ''' SELECT * FROM intake_categories WHERE action IS NOT 0 ORDER BY id_intake_category
   ''',
     );
 
@@ -2212,4 +2346,6 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
   }
 
   int selectedQuantity = 0;
+
+  transaction(Future<Null> Function(dynamic txn) param0) {}
 }

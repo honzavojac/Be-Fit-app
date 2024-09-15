@@ -38,6 +38,8 @@
 
   "header_new_food": "Přidat nové jídlo",
   "error_serving_size_box_is_empty": "Gramáž je prázdná",
+  "error_serving_size_box_is_null": "Gramáž nemůže být nula",
+
 
   "split": "Trénink",
   "number_of_sets": "Počet sérií",
@@ -48,7 +50,7 @@
   "abdominal": "Břicho",
   "chest": "Hrudník",
   "waist": "Pas",
-  "thingh": "Stehno",
+  "thigh": "Stehno",
   "neck": "Krk",
   "biceps": "Biceps",
   "error_all_boxes_are_empty":"Boxy jsou prázdné",
@@ -109,7 +111,53 @@
   "change_food_database":"Změnit databázi potravin",
   "foodNotFoundMessage":  "Potravina nebyla nalezena v databázi\nProsím, pomozte nám přidáním nové potraviny",
   "success_insert_body_measurement":"Měření přidáno",
-  "change_food_database_help": "Změna databáze potravin. \nMůžete vybrat databázi z vaší země nebo tu, kterou preferujete. \n'Undefined' zahrnuje všechny dostupné potravinové údaje."  
+  "change_food_database_help": "Změna databáze potravin. \nMůžete vybrat databázi z vaší země nebo tu, kterou preferujete. \n'Undefined' zahrnuje všechny dostupné potravinové údaje.",
+ 
+"tutorial_hello": "Vítej v našem průvodci! Ukážeme ti, jak používat tuto aplikaci.",
+"tutorial_hello.1": "Klikni na oranžovou oblast na obrazovce, abys přešel na další část tutoriálu.",
+"tutorial_0": "Na této stránce uvidíš přehled svého denního jídla, tréninku a měření těla.",
+"tutorial_1": "Jakmile vytvoříš svůj první trénink, budeš sem moci zadávat výsledky a sledovat svůj pokrok.",
+"tutorial_2": "Editování tréniků",
+"tutorial_2.1": "Tady si můžeš vytvořit vlastní tréninky (splity), abys měl přehled o svých cvičeních.",
+
+"tutorial_3": "Přidání nového tréninku",
+"tutorial_3.1": "Začneme tím, že vytvoříš svůj první trénink.",
+"tutorial_4": "Vytvoření nového svalu",
+"tutorial_4.1": "Zde si vytvoříš svaly, které chceš ve svých trénincích cvičit.",
+"tutorial_5": "Nejdřív zadej název svalu, který chceš trénovat.",
+"tutorial_6": "Teď pojmenuj svůj nový trénink (split).",
+"tutorial_7": "Výběr cviků do tréninku",
+"tutorial_7.1": "Můžeš také vybrat svaly, které chceš v tomto tréninku cvičit.",
+"tutorial_8": "Hotovo? Nezapomeň trénink uložit.",
+"tutorial_9": "Přidávání cviků",
+"tutorial_9.1": "Jakmile máš vytvořený trénink, můžeš si k němu přidat nové cviky.",
+"tutorial_9.2": "Zadej název cviku. Pokud cvik nespadá do zvoleného svalu, změň jeho kategorii a klikni na Uložit.",
+"tutorial_9.3": "Vyber cviky, které chceš ve svém tréninku cvičit.",
+"tutorial_10": "Vrať se zpět na hlavní obrazovku pro spuštění tréninku.",
+"tutorial_11": "Jak zahájit trénink?",
+"tutorial_11.1": "Jednoduše klikni na jeden z cviků",
+"tutorial_12": "Jak začít cvičení?",
+"tutorial_12.1": "Přidej nový řádek pro zápis odcvičených hodnot.",
+"tutorial_12.2": "Teď jsi připraven začít cvičení.",
+"tutorial_12.3": "Zadej své výsledky a nastav úroveň obtížnosti pro každou sérii.",
+"tutorial_12.4": "Hodnoty se automaticky ukládají, takže se nemusíš bát o jejich ztrátu.",
+"tutorial_12.5":"(Dej pozor, když řádek posunutím doleva vymažeš, tak se trénink nezruší!!!)",
+"tutorial_13": "Chceš se podívat, jak ti šly minulé tréninky?",
+"tutorial_13.1": "Pokud jsi v minulosti cvičil tento sval, můžeš posunutím spodního okraje obrazovky vidět své výsledky z minulých cvičení.",
+"tutorial_14": "Zde můžeš přidávat jídla, která jsi snědl.",
+"tutorial_15": "Jak hledat potraviny?",
+"tutorial_15.1": "Můžeš hledat potraviny těmito způsoby:",
+"tutorial_15.2": "nebo klikni na tlačítko plus.",
+"tutorial_15.3": "Otevře se ti nabídka potravin.",
+"tutorial_15.4": "Vyber potravinu, zadej gramáž a klikni na Přidat.",
+"tutorial_16": "Chceš přidat novou potravinu?",
+"tutorial_16.1": "Pokud nemůžeš najít potravinu, můžeš si ji jednoduše vytvořit.",
+"tutorial_17":"Změř si své tělesné hodnoty",
+"tutorial_18":"Toto je konec průvodce",
+"tutorial_18.1":"Pokud chceš průvodce spustit znovu, přejdi do nastavení"
+
+
+  
    
   
 

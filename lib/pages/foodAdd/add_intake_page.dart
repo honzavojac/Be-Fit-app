@@ -47,18 +47,9 @@ class _AddIntakePageState extends State<AddIntakePage> {
     final args = ModalRoute.of(context)!.settings.arguments as List<dynamic>;
     food = args[0];
     newItem = args[2];
-    if (newItem == true) {
-      food = Food(
-        idFood: food.idFood!,
-        name: food.name!,
-        unaccentName: removeDiacritics(food.name!.toLowerCase()),
-        kcal: food.kcal ?? 0,
-        protein: food.protein ?? 0,
-        carbs: food.carbs ?? 0,
-        fat: food.fat ?? 0,
-        fiber: food.fiber ?? 0,
-        action: food.action,
-      );
+    print("1**************  ${weightController.text}");
+    if (newItem == true || (food.weight == 0)) {
+      food = Food(idFood: food.idFood!, name: food.name!, unaccentName: removeDiacritics(food.name!.toLowerCase()), kcal: food.kcal ?? 0, protein: food.protein ?? 0, carbs: food.carbs ?? 0, fat: food.fat ?? 0, fiber: food.fiber ?? 0, action: food.action, idNutriIntake: food.idNutriIntake ?? null);
     } else {
       weightController.text = food.weight!.toString();
       food = Food(
@@ -216,6 +207,8 @@ class _AddIntakePageState extends State<AddIntakePage> {
       floatingActionButton: show == true
           ? GestureDetector(
               onTap: () async {
+                double isWeightControllerNull = double.tryParse(weightController.text.trim()) ?? 0;
+
                 if (weightController.text.isEmpty) {
                   showTopSnackBar(
                     Overlay.of(context),
@@ -226,7 +219,7 @@ class _AddIntakePageState extends State<AddIntakePage> {
                       child: Padding(
                         padding: const EdgeInsets.only(left: 25, right: 25),
                         child: CustomSnackBar.error(
-                          message: "Serving size box is empty",
+                          message: "error_serving_size_box_is_empty".tr(),
                         ),
                       ),
                     ),
@@ -238,10 +231,33 @@ class _AddIntakePageState extends State<AddIntakePage> {
                     reverseAnimationDuration: Duration(milliseconds: 250),
                     onTap: () {},
                   );
+                } else if (isWeightControllerNull == 0) {
+                  showTopSnackBar(
+                    Overlay.of(context),
+
+                    animationDuration: Duration(milliseconds: 1500),
+                    Container(
+                      height: 50,
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 25, right: 25),
+                        child: CustomSnackBar.error(
+                          message: "error_serving_size_box_is_null".tr(),
+                        ),
+                      ),
+                    ),
+                    // persistent: true,
+                    onAnimationControllerInit: (controller) => controller,
+                    displayDuration: Duration(microseconds: 750),
+                    dismissType: DismissType.onSwipe,
+                    dismissDirection: [DismissDirection.up, DismissDirection.horizontal],
+                    reverseAnimationDuration: Duration(milliseconds: 250),
+                    onTap: () {},
+                  );
+                  return;
                 } else {
                   DateTime dateTime = DateTime.now();
                   String now = dateTime.toString().replaceRange(19, null, "");
-
+                  print(weightController.text);
                   NutriIntake nutriIntake = await NutriIntake(
                     createdAt: now,
                     weight: dbFitness.selectedQuantity == 0 ? int.parse(weightController.text.trim()) : int.parse(weightController.text.trim()) * 100,
@@ -252,6 +268,7 @@ class _AddIntakePageState extends State<AddIntakePage> {
                   );
                   print("intakeCategory: ${dbFitness.selectedIntakeCategoryValue}");
                   // Insert do Sqflite pro ofline režim
+                  food.weight = int.tryParse(weightController.text.trim()) ?? 0;
                   await dbFitness.InsertOrUpdateFood(food, 0); //action 0 protože se to nebude insertovat do supabase, tam to je a nepotřeboju duplicity
                   if (newItem == true) {
                     print("INSERT ITEM");
@@ -272,13 +289,14 @@ class _AddIntakePageState extends State<AddIntakePage> {
                     print(food.action);
                     switch (food.action) {
                       case 0 || null:
-                        await dbFitness.UpdateNutriIntake(food.idNutriIntake!, nutriIntake, selectedDate.toString(), 2);
+                        print(food);
+                        await dbFitness.UpdateNutriIntake(food.idNutriIntake!, nutriIntake, 2);
                         break;
                       case 1:
-                        await dbFitness.UpdateNutriIntake(food.idNutriIntake!, nutriIntake, selectedDate.toString(), 1);
+                        await dbFitness.UpdateNutriIntake(food.idNutriIntake!, nutriIntake, 1);
                         break;
                       case 2:
-                        await dbFitness.UpdateNutriIntake(food.idNutriIntake!, nutriIntake, selectedDate.toString(), 2);
+                        await dbFitness.UpdateNutriIntake(food.idNutriIntake!, nutriIntake, 2);
 
                         break;
                       case 3:

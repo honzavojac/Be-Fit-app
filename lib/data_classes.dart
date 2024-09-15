@@ -675,32 +675,35 @@ class Food {
   int? action;
   String? createdAt;
   int? idNutriIntake;
+  int? insertedByIdUser;
 
-  Food(
-      {this.idFood,
-      this.country,
-      this.name,
-      this.unaccentName, // Add this parameter
-      this.recentlyUsed,
-      this.weight,
-      this.quantity,
-      this.kcal,
-      this.protein,
-      this.carbs,
-      this.sugar,
-      this.fat,
-      this.fatSatureated,
-      this.fatTrans,
-      this.fatMonounsatureted,
-      this.fatPolyunsatureted,
-      this.fiber,
-      this.water,
-      this.cholesterol,
-      this.intakeCategory,
-      this.supabaseIdFood,
-      this.action,
-      this.createdAt,
-      this.idNutriIntake});
+  Food({
+    this.idFood,
+    this.country,
+    this.name,
+    this.unaccentName, // Add this parameter
+    this.recentlyUsed,
+    this.weight,
+    this.quantity,
+    this.kcal,
+    this.protein,
+    this.carbs,
+    this.sugar,
+    this.fat,
+    this.fatSatureated,
+    this.fatTrans,
+    this.fatMonounsatureted,
+    this.fatPolyunsatureted,
+    this.fiber,
+    this.water,
+    this.cholesterol,
+    this.intakeCategory,
+    this.supabaseIdFood,
+    this.action,
+    this.createdAt,
+    this.idNutriIntake,
+    this.insertedByIdUser,
+  });
 
   factory Food.fromJson(Map<String, dynamic> json) {
     return Food(
@@ -749,6 +752,7 @@ class Food {
       'water': water,
       'cholesterol': cholesterol,
       'created_at': createdAt,
+      'inserted_by_id_user': insertedByIdUser,
     };
   }
 
