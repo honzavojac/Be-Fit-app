@@ -1,7 +1,7 @@
 name: kaloricke_tabulky_02
 description: A new Flutter project.
 
-version: 1.0.2+4
+version: 1.0.2+5
 
 environment:
   sdk: '>=3.1.2 <4.0.0'

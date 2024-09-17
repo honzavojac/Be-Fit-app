@@ -393,9 +393,22 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                                     },
                                   );
                                   double sumOfKcal = 0;
+                                  double sumOfProtein = 0;
+                                  double sumOfCarbs = 0;
+                                  double sumOfFat = 0;
+                                  double sumOfFiber = 0;
+
                                   for (var food in newFoodList) {
                                     sumOfKcal += food.kcal!;
+                                    sumOfProtein += food.protein!;
+                                    sumOfCarbs += food.carbs!;
+                                    sumOfFat += food.fat!;
+                                    sumOfFiber += food.fiber!;
                                   }
+                                  sumOfProtein = (sumOfProtein * 10).round() / 10.toDouble();
+                                  sumOfCarbs = (sumOfCarbs * 10).round() / 10.toDouble();
+                                  sumOfFat = (sumOfFat * 10).round() / 10.toDouble();
+                                  sumOfFiber = (sumOfFiber * 10).round() / 10.toDouble();
                                   return // Změna Container na použití 'Expanded' a nastavení výšky 'ListView.builder'
                                       Padding(
                                     key: Key('$index'),
@@ -412,55 +425,203 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                                             Column(
                                           mainAxisAlignment: MainAxisAlignment.start,
                                           children: [
-                                            Container(
-                                              // color: Colors.blue,
-                                              padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-                                              child: Row(
-                                                children: [
-                                                  ReorderableDragStartListener(
-                                                    index: index,
-                                                    child: Padding(
-                                                      padding: const EdgeInsets.only(left: 10),
-                                                      child: Icon(
-                                                        Icons.drag_handle_rounded,
-                                                        size: 30,
-                                                        color: ColorsProvider.getColor8(context),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  Padding(
-                                                    padding: const EdgeInsets.only(left: 10),
-                                                    child: Text(
-                                                      '${category.name}'.tr(),
-                                                      style: TextStyle(
-                                                        color: ColorsProvider.getColor8(context),
-                                                        fontSize: 20,
-                                                        fontWeight: FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  Expanded(
-                                                    child: Row(
-                                                      mainAxisAlignment: MainAxisAlignment.end,
-                                                      children: [
-                                                        sumOfKcal <= 0
-                                                            ? Container()
-                                                            : Text(
-                                                                '${sumOfKcal.round()} Kcal',
-                                                                style: TextStyle(
-                                                                  color: ColorsProvider.getColor8(context),
-                                                                  fontSize: 20,
-                                                                  fontWeight: FontWeight.bold,
+                                            GestureDetector(
+                                              onDoubleTap: () {
+                                                print("double tap");
+                                                showDialog(
+                                                  useSafeArea: true,
+                                                  context: context,
+                                                  builder: (BuildContext context) {
+                                                    return Center(
+                                                      child: Container(
+                                                          height: 280,
+                                                          width: MediaQuery.of(context).size.width * 0.7,
+                                                          decoration: BoxDecoration(
+                                                            border: Border.all(
+                                                              color: ColorsProvider.getColor8(context),
+                                                              width: 2,
+                                                            ),
+                                                            color: ColorsProvider.getColor2(context),
+                                                            borderRadius: BorderRadius.circular(18),
+                                                          ),
+                                                          child: Column(
+                                                            children: [
+                                                              Stack(
+                                                                children: [
+                                                                  Row(
+                                                                    children: [
+                                                                      Expanded(
+                                                                        child: Center(
+                                                                          child: Container(
+                                                                            height: 50,
+                                                                            child: Padding(
+                                                                              padding: const EdgeInsets.all(8.0),
+                                                                              child: Text(
+                                                                                "${category.name}".tr(),
+                                                                                style: TextStyle(
+                                                                                  color: ColorsProvider.getColor8(context),
+                                                                                  fontWeight: FontWeight.bold,
+                                                                                  fontSize: 22,
+                                                                                ),
+                                                                              ),
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                  Row(
+                                                                    children: [
+                                                                      Expanded(
+                                                                        child: Container(
+                                                                          height: 50,
+                                                                          decoration: BoxDecoration(
+                                                                            color: ColorsProvider.getColor8(context).withOpacity(0.3),
+                                                                            borderRadius: BorderRadius.only(
+                                                                              topLeft: Radius.circular(16),
+                                                                              topRight: Radius.circular(16),
+                                                                            ),
+                                                                          ),
+                                                                          child: Text(""),
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              SizedBox(
+                                                                height: 20,
+                                                              ),
+                                                              Row(
+                                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                                children: [
+                                                                  Text(
+                                                                    "${sumOfKcal.round()}",
+                                                                    style: TextStyle(fontSize: 20, color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold),
+                                                                  ),
+                                                                  SizedBox(width: 5),
+                                                                  Text(
+                                                                    "Kcal",
+                                                                    style: TextStyle(fontSize: 20, color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              Padding(
+                                                                padding: const EdgeInsets.all(8.0), // Pro přidání mezery okolo
+                                                                child: Row(
+                                                                  mainAxisAlignment: MainAxisAlignment.center, // Zarovnání na střed
+                                                                  crossAxisAlignment: CrossAxisAlignment.start, // Zarovná texty nahoru
+                                                                  children: [
+                                                                    // První sloupec s popisky
+                                                                    Column(
+                                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                                      children: [
+                                                                        Text(
+                                                                          "${"protein".tr()}:",
+                                                                          style: TextStyle(fontSize: 20, color: ColorsProvider.getColor8(context)),
+                                                                        ),
+                                                                        SizedBox(height: 8), // Prostor mezi řádky
+                                                                        Text(
+                                                                          "${"fat".tr()}:",
+                                                                          style: TextStyle(fontSize: 20, color: ColorsProvider.getColor8(context)),
+                                                                        ),
+                                                                        SizedBox(height: 8),
+                                                                        Text(
+                                                                          "${"carbs".tr()}:",
+                                                                          style: TextStyle(fontSize: 20, color: ColorsProvider.getColor8(context)),
+                                                                        ),
+                                                                        SizedBox(height: 8),
+                                                                        Text(
+                                                                          "${"fiber".tr()}:",
+                                                                          style: TextStyle(fontSize: 20, color: ColorsProvider.getColor8(context)),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                    SizedBox(width: 10), // Prostor mezi sloupci
+                                                                    // Druhý sloupec s hodnotami
+                                                                    Column(
+                                                                      crossAxisAlignment: CrossAxisAlignment.end, // Zarovnání doprava
+                                                                      children: [
+                                                                        Text(
+                                                                          "${sumOfProtein} g",
+                                                                          style: TextStyle(fontSize: 20, color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold),
+                                                                        ),
+                                                                        SizedBox(height: 8),
+                                                                        Text(
+                                                                          "${sumOfFat} g",
+                                                                          style: TextStyle(fontSize: 20, color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold),
+                                                                        ),
+                                                                        SizedBox(height: 8),
+                                                                        Text(
+                                                                          "${sumOfCarbs} g",
+                                                                          style: TextStyle(fontSize: 20, color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold),
+                                                                        ),
+                                                                        SizedBox(height: 8),
+                                                                        Text(
+                                                                          "${sumOfFiber} g",
+                                                                          style: TextStyle(fontSize: 20, color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                  ],
                                                                 ),
                                                               ),
-                                                      ],
+                                                            ],
+                                                          )),
+                                                    );
+                                                  },
+                                                );
+                                              },
+                                              child: Container(
+                                                color: Colors.transparent,
+                                                padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+                                                child: Row(
+                                                  children: [
+                                                    ReorderableDragStartListener(
+                                                      index: index,
+                                                      child: Padding(
+                                                        padding: const EdgeInsets.only(left: 10),
+                                                        child: Icon(
+                                                          Icons.drag_handle_rounded,
+                                                          size: 30,
+                                                          color: ColorsProvider.getColor8(context),
+                                                        ),
+                                                      ),
                                                     ),
-                                                  ),
-                                                  Padding(
-                                                    padding: const EdgeInsets.only(right: 5, left: 15),
-                                                    child: openSearchBar(searchController, category.supabaseIdIntakeCategory!),
-                                                  ),
-                                                ],
+                                                    Padding(
+                                                      padding: const EdgeInsets.only(left: 10),
+                                                      child: Text(
+                                                        '${category.name}'.tr(),
+                                                        style: TextStyle(
+                                                          color: ColorsProvider.getColor8(context),
+                                                          fontSize: 20,
+                                                          fontWeight: FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Expanded(
+                                                      child: Row(
+                                                        mainAxisAlignment: MainAxisAlignment.end,
+                                                        children: [
+                                                          sumOfKcal <= 0
+                                                              ? Container()
+                                                              : Text(
+                                                                  '${sumOfKcal.round()} Kcal',
+                                                                  style: TextStyle(
+                                                                    color: ColorsProvider.getColor8(context),
+                                                                    fontSize: 20,
+                                                                    fontWeight: FontWeight.bold,
+                                                                  ),
+                                                                ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    Padding(
+                                                      padding: const EdgeInsets.only(right: 5, left: 15),
+                                                      child: openSearchBar(searchController, category.supabaseIdIntakeCategory!),
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                             ),
                                             Container(

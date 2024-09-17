@@ -353,7 +353,27 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
                                                       child: TextField(
                                                         onChanged: (value) async {
                                                           clickedSplitTab = await _tabController.index;
-                                                          await dbFitness.UpdateSplit(value, record.supabaseIdSplit!);
+                                                          // print(value);
+                                                          switch (record.action) {
+                                                            case 0:
+                                                              print("object 0");
+                                                              await dbFitness.UpdateSplitAndSetAction(value, record.supabaseIdSplit!, 2);
+                                                              record.action = 2;
+                                                              break;
+                                                            case 1:
+                                                              print("object 1");
+                                                              await dbFitness.UpdateSplitAndSetAction(value, record.supabaseIdSplit!, 1);
+                                                              record.action = 1;
+                                                              break;
+                                                            case 2:
+                                                              print("object 2");
+                                                              await dbFitness.UpdateSplitAndSetAction(value, record.supabaseIdSplit!, 2);
+                                                              record.action = 2;
+                                                              break;
+                                                            default:
+                                                              print("ostatní stavy které by neměly být dostupné");
+                                                          }
+
                                                           // print(clickedSplitTab);
                                                           widget.loadParent();
                                                           record.nameSplit = value;
@@ -434,7 +454,26 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
                                                                             child: TextField(
                                                                               onChanged: (value) async {
                                                                                 clickedSplitTab = await _tabController.index;
-                                                                                await dbFitness.UpdateMuscle(value, record.selectedMuscle![muscleIndex].muscles!.supabaseIdMuscle!);
+                                                                                switch (record.selectedMuscle![muscleIndex].muscles!.action) {
+                                                                                  case 0:
+                                                                                    print("object 0");
+                                                                                    await dbFitness.UpdateMuscleAndSetAction(value, record.selectedMuscle![muscleIndex].muscles!.supabaseIdMuscle!, 2);
+                                                                                    record.selectedMuscle![muscleIndex].muscles!.action = 2;
+                                                                                    break;
+                                                                                  case 1:
+                                                                                    print("object 1");
+                                                                                    await dbFitness.UpdateMuscleAndSetAction(value, record.selectedMuscle![muscleIndex].muscles!.supabaseIdMuscle!, 1);
+                                                                                    record.selectedMuscle![muscleIndex].muscles!.action = 1;
+                                                                                    break;
+                                                                                  case 2:
+                                                                                    print("object 2");
+                                                                                    await dbFitness.UpdateMuscleAndSetAction(value, record.selectedMuscle![muscleIndex].muscles!.supabaseIdMuscle!, 2);
+                                                                                    record.selectedMuscle![muscleIndex].muscles!.action = 2;
+                                                                                    break;
+                                                                                  default:
+                                                                                    print("ostatní stavy které by neměly být dostupné");
+                                                                                }
+
                                                                                 print(clickedSplitTab);
                                                                                 widget.loadParent();
                                                                               },
@@ -537,7 +576,28 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
                                                                                   controller: TextEditingController(text: nameOfExercise),
                                                                                   onChanged: (value) async {
                                                                                     clickedSplitTab = await _tabController.index;
-                                                                                    await dbFitness.UpdateExercise(value, supabaseIdExercise);
+                                                                                    switch (exercises[itemIndex].action) {
+                                                                                      case 0:
+                                                                                        print("object 0");
+                                                                                        await dbFitness.UpdateExerciseAndSetAction(value, supabaseIdExercise, 2);
+                                                                                        exercises[itemIndex].action = 2;
+                                                                                        break;
+                                                                                      case 1:
+                                                                                        print("object 1");
+                                                                                        await dbFitness.UpdateExerciseAndSetAction(value, supabaseIdExercise, 1);
+                                                                                        exercises[itemIndex].action = 1;
+
+                                                                                        break;
+                                                                                      case 2:
+                                                                                        print("object 2");
+                                                                                        await dbFitness.UpdateExerciseAndSetAction(value, supabaseIdExercise, 2);
+                                                                                        exercises[itemIndex].action = 2;
+
+                                                                                        break;
+                                                                                      default:
+                                                                                        print("ostatní stavy které by neměly být dostupné");
+                                                                                    }
+
                                                                                     print(clickedSplitTab);
                                                                                     widget.loadParent();
                                                                                   },

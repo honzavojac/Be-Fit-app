@@ -1034,6 +1034,10 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     await _database.rawQuery('''UPDATE muscles SET name_of_muscle = '$text' WHERE supabase_id_muscle = $id''');
   }
 
+  UpdateMuscleAndSetAction(String text, int id, int action) async {
+    await _database.rawQuery('''UPDATE muscles SET name_of_muscle = '$text', action = '$action' WHERE supabase_id_muscle = $id''');
+  }
+
   DeleteMuscle(int id) async {
     try {
       await _database.rawQuery('''DELETE FROM muscles WHERE id_muscle = $id''');
@@ -1114,6 +1118,10 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
 
   UpdateExercise(String nameOfExercise, int supabaseIdExercise) async {
     await _database.rawQuery('''UPDATE exercises SET name_of_exercise = '$nameOfExercise' WHERE supabase_id_exercise = $supabaseIdExercise''');
+  }
+
+  UpdateExerciseAndSetAction(String nameOfExercise, int supabaseIdExercise, int action) async {
+    await _database.rawQuery('''UPDATE exercises SET name_of_exercise = '$nameOfExercise', action = '$action' WHERE supabase_id_exercise = $supabaseIdExercise''');
   }
 
   DeleteExercise(int id) async {
@@ -1361,6 +1369,10 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
 
   UpdateSplit(String nameOfSplit, int supabaseIdSplit) async {
     await _database.rawQuery('''UPDATE split SET name_split = '$nameOfSplit'WHERE supabase_id_split = $supabaseIdSplit''');
+  }
+
+  UpdateSplitAndSetAction(String nameOfSplit, int supabaseIdSplit, int action) async {
+    await _database.rawQuery('''UPDATE split SET name_split = '$nameOfSplit', action = '$action' WHERE supabase_id_split = $supabaseIdSplit''');
   }
 
   DeleteSplit(int id, int action) async {
@@ -1703,7 +1715,7 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     SELECT *
     FROM body_measurements
     WHERE created_at < ? OR created_at LIKE ?
-    ORDER BY id_body_measurements DESC
+    ORDER BY created_at DESC
     LIMIT 1;
   ''', [createdAt, '$createdAt%']);
 
