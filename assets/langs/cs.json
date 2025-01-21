@@ -154,10 +154,12 @@
 "tutorial_16.1": "Pokud nemůžeš najít potravinu, můžeš si ji jednoduše vytvořit.",
 "tutorial_17":"Změř si své tělesné hodnoty",
 "tutorial_18":"Toto je konec průvodce",
-"tutorial_18.1":"Pokud chceš průvodce spustit znovu, přejdi do nastavení"
+"tutorial_18.1":"Pokud chceš průvodce spustit znovu, přejdi do nastavení",
 
+"there_are_no_measurement": "Zatím tady nejsou žádná měření",
+"there_are_no_muscles":  "Je tu prázdno... čas vytvořit svaly a začít cvičit!",
+"show_tutorial": "Zobrazit tutoriál"
 
-  
    
   
 

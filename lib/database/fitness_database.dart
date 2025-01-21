@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:math';
 
 import 'package:diacritic/diacritic.dart';
 import 'package:flutter/material.dart';
@@ -192,6 +191,13 @@ class FitnessProvider extends ChangeNotifier {
           name TEXT,
           action INTEGER,
           supabase_id_intake_category INTEGER
+      );
+      CREATE TABLE food_comments (
+        id_comment INTEGER PRIMARY KEY AUTOINCREMENT,
+        comment TEXT,
+        action INTEGER,
+        created_at TEXT,
+        supabase_id_comment INTEGER
       );
         ''');
       print("Databáze byly vytvořeny");
@@ -2066,7 +2072,6 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
 
     await db.rawInsert('''
     INSERT INTO nutri_intake (
-      id_nutri_intake,
       created_at,
       id_food,
       quantity,
@@ -2074,18 +2079,18 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
       id_intake_category,
       supabase_id_nutri_intake,
       action
-    ) VALUES (?, ?, ?, ?, ?,?,?,?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?)
   ''', [
-      supabaseIdNutriIntake,
-      nutriIntake.createdAt,
-      nutriIntake.idFood,
-      nutriIntake.quantity,
-      nutriIntake.weight,
-      nutriIntake.intakeCategory,
-      supabaseIdNutriIntake,
-      1,
+      nutriIntake.createdAt.toString(), // created_at (předpokládáme, že je správně formátován)
+      nutriIntake.idFood, // id_food
+      nutriIntake.quantity, // quantity
+      nutriIntake.weight, // weight
+      nutriIntake.intakeCategory, // id_intake_category
+      supabaseIdNutriIntake, // supabase_id_nutri_intake (zřejmě by měla být jiná hodnota)
+      action // action (vloží se proměnná)
     ]);
-    notifyListeners();
+
+    notifyListeners(); // Pouze pokud je třída založená na ChangeNotifier
   }
 
   Future<void> TxnInsertNutriIntake(Transaction txn, NutriIntake nutriIntake, int supabaseIdNutriIntake, int action) async {

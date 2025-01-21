@@ -13,6 +13,7 @@ import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/providers/variables_provider.dart';
 import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:provider/provider.dart';
+import 'package:text_scroll/text_scroll.dart';
 
 import '../../init_page.dart';
 import 'exercise_page copy.dart';
@@ -319,10 +320,31 @@ class _FitnessRecordScreenCopyState extends State<FitnessRecordScreenCopy> {
                                                             Row(
                                                               mainAxisAlignment: MainAxisAlignment.center,
                                                               children: [
-                                                                Text(
-                                                                  "$nameOfExercise".toUpperCase(),
-                                                                  style: TextStyle(color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold, fontSize: 18),
+                                                                Expanded(
+                                                                  child: Container(
+                                                                    alignment: Alignment.center, // Center the container content
+                                                                    child: TextScroll(
+                                                                      intervalSpaces: 5,
+                                                                      "${nameOfExercise.toUpperCase()}",
+                                                                      mode: TextScrollMode.endless,
+                                                                      velocity: Velocity(pixelsPerSecond: Offset(35, 0)),
+                                                                      delayBefore: Duration(milliseconds: 1000),
+                                                                      pauseBetween: Duration(milliseconds: 1000),
+                                                                      style: TextStyle(
+                                                                        fontSize: 18,
+                                                                        fontWeight: FontWeight.bold,
+                                                                        color: ColorsProvider.getColor8(context),
+                                                                      ),
+                                                                      textAlign: TextAlign.center,
+                                                                      // textDirection: TextDirection.LTR,
+                                                                      selectable: false,
+                                                                    ),
+                                                                  ),
                                                                 ),
+                                                                // Text(
+                                                                //   "$nameOfExercise".toUpperCase(),
+                                                                //   style: TextStyle(color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold, fontSize: 18),
+                                                                // ),
                                                               ],
                                                             ),
                                                             Expanded(

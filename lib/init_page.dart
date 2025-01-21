@@ -7,6 +7,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
 import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
+import 'package:kaloricke_tabulky_02/main.dart';
+import 'package:kaloricke_tabulky_02/pages/fitnessRecord/exercise_page%20copy.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/fitness_record_page%20copy.dart';
 import 'package:kaloricke_tabulky_02/pages/fitnessRecord/split_page%20copy%203.dart';
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
@@ -35,7 +37,9 @@ var pageProvider = 1;
 
 //Fitness
 
-GlobalKey keyHomeDummy = GlobalKey();
+GlobalKey? keyHomeDummy = GlobalKey();
+GlobalKey? keyWelcomeDummy = GlobalKey();
+
 GlobalKey keySplitDummy = GlobalKey();
 
 GlobalKey keyButton1 = GlobalKey();
@@ -92,7 +96,7 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this); // Registruje observer
     var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
     dbFitness.setSyncingToFalse();
-    createTutorial();
+    // createTutorial();
     // Future.delayed(Duration.zero, showTutorial);
     // showTutorial();
   }
@@ -108,11 +112,24 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
     super.didChangeAppLifecycleState(state);
 
     if (state == AppLifecycleState.paused || state == AppLifecycleState.detached) {
-      var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
-      var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false);
-      print("**********začátek ukládání po zavření nebo vypnutí mobilu**********");
-      await dbFitness.SaveToSupabaseAndOrderSqlite(dbSupabase);
-      print("**********konec ukládání po zavření nebo vypnutí mobilu**********");
+      if (!checkActiveExercisePage()) {
+        var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
+        var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false);
+        print("**********začátek ukládání po zavření nebo vypnutí mobilu**********");
+        await dbFitness.SaveToSupabaseAndOrderSqlite(dbSupabase);
+        print("**********konec ukládání po zavření nebo vypnutí mobilu**********");
+      }
+      //! TODO:
+    }
+  }
+
+  bool checkActiveExercisePage() {
+    if (exercisePageKey.currentContext != null) {
+      print('Widget is active in the widget tree');
+      return true;
+    } else {
+      print('Widget is not active');
+      return false;
     }
   }
 
@@ -305,6 +322,7 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
 
             if (sqfliteNutriIntakeList.isEmpty) {
               for (var nutriIntake in supabaseNutriIntakeList) {
+                print("**** nutri intake **** ${nutriIntake.createdAt}");
                 try {
                   sqfliteNutriIntakeList.add(nutriIntake);
                   dbFitness.TxnInsertNutriIntake(txn, nutriIntake, nutriIntake.idNutriIntake!, 0);
@@ -347,10 +365,10 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
 
   //! tutorial
   loadTutorial() async {
-    // createTutorial();
+    createTutorial();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? tutorialShow = await prefs.getString("show_tutorial");
-    if (tutorialShow == "true") {
+    if (tutorialShow == "true" || tutorialShow == null || tutorialShow.isEmpty) {
       showTutorial();
       print("show tutorial");
       await prefs.setString("show_tutorial", "false");
@@ -366,6 +384,16 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
 
   void bigSwitch(String target) {
     switch (target) {
+      case "Target_home_welcome":
+        // Akce pro Target welcome
+        print("This is Target welcome");
+
+        break;
+      case "Target_welcome":
+        // Akce pro Target welcome
+        print("This is Target welcome");
+
+        break;
       case "Target 0":
         // Akce pro Target 0
         print("This is Target 0");
@@ -520,50 +548,99 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
 
   List<TargetFocus> _createTargets() {
     List<TargetFocus> targets = [];
-    targets.add(
-      TargetFocus(
-        identify: "Target ", alignSkip: AlignmentDirectional(-500, 0),
-        radius: 0, // Radius zůstane nulový
-        paddingFocus: 0, // Žádné odsazení
-        enableTargetTab: true,
-        enableOverlayTab: true, keyTarget: keyHomeDummy, // Nezadáváme enableTargetTab: true,enableOverlayTab: false,keyTarget, protože nechceme zaměřit žádný konkrétní prvek
-        contents: [
-          TargetContent(
-            // align: ContentAlign.bottom, // Pozice obsahu, můžeš změnit podle potřeby
-            builder: (context, controller) {
-              return Center(
-                child: Container(
-                  // Overlay je vytvořen pomocí knihovny, zde pouze obsah
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(height: 200),
-                      Text(
-                        "tutorial_hello".tr(),
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white, // Bílá barva, aby vynikl na tmavém pozadí
-                          fontSize: 25.0,
+
+    // if (keyHomeDummy != null) {
+    //   targets.add(
+    //     TargetFocus(
+    //       identify: "Target_home_welcome", alignSkip: AlignmentDirectional(-500, 0),
+    //       radius: 0, // Radius zůstane nulový
+    //       paddingFocus: 0, // Žádné odsazení
+    //       enableTargetTab: true,
+    //       enableOverlayTab: true, keyTarget: keyHomeDummy, // Nezadáváme enableTargetTab: true,enableOverlayTab: false,keyTarget, protože nechceme zaměřit žádný konkrétní prvek
+    //       contents: [
+    //         TargetContent(
+    //           // align: ContentAlign.bottom, // Pozice obsahu, můžeš změnit podle potřeby
+    //           builder: (context, controller) {
+    //             return Center(
+    //               child: Container(
+    //                 // Overlay je vytvořen pomocí knihovny, zde pouze obsah
+    //                 child: Column(
+    //                   mainAxisAlignment: MainAxisAlignment.center,
+    //                   children: [
+    //                     SizedBox(height: 200),
+    //                     Text(
+    //                       "tutorial_hello".tr(),
+    //                       style: TextStyle(
+    //                         fontWeight: FontWeight.bold,
+    //                         color: Colors.white, // Bílá barva, aby vynikl na tmavém pozadí
+    //                         fontSize: 25.0,
+    //                       ),
+    //                     ),
+    //                     SizedBox(height: 100),
+    //                     Text(
+    //                       "tutorial_hello.1".tr(),
+    //                       softWrap: true,
+    //                       style: TextStyle(
+    //                         color: Colors.white, // Bílá barva, aby vynikl na tmavém pozadí
+    //                         fontSize: 20.0,
+    //                       ),
+    //                     ),
+    //                   ],
+    //                 ),
+    //               ),
+    //             );
+    //           },
+    //         ),
+    //       ],
+    //     ),
+    //   );
+    // }
+    keyWelcomeDummy != null
+        ? targets.add(
+            TargetFocus(
+              identify: "Target_welcome", alignSkip: AlignmentDirectional(-500, 0),
+              radius: 0, // Radius zůstane nulový
+              paddingFocus: 0, // Žádné odsazení
+              enableTargetTab: true,
+              enableOverlayTab: true, keyTarget: keyWelcomeDummy, // Nezadáváme enableTargetTab: true,enableOverlayTab: false,keyTarget, protože nechceme zaměřit žádný konkrétní prvek
+              contents: [
+                TargetContent(
+                  // align: ContentAlign.bottom, // Pozice obsahu, můžeš změnit podle potřeby
+                  builder: (context, controller) {
+                    return Center(
+                      child: Container(
+                        // Overlay je vytvořen pomocí knihovny, zde pouze obsah
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(height: 200),
+                            Text(
+                              "tutorial_hello".tr(),
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white, // Bílá barva, aby vynikl na tmavém pozadí
+                                fontSize: 25.0,
+                              ),
+                            ),
+                            SizedBox(height: 100),
+                            Text(
+                              "tutorial_hello.1".tr(),
+                              softWrap: true,
+                              style: TextStyle(
+                                color: Colors.white, // Bílá barva, aby vynikl na tmavém pozadí
+                                fontSize: 20.0,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      SizedBox(height: 100),
-                      Text(
-                        "tutorial_hello.1".tr(),
-                        softWrap: true,
-                        style: TextStyle(
-                          color: Colors.white, // Bílá barva, aby vynikl na tmavém pozadí
-                          fontSize: 20.0,
-                        ),
-                      ),
-                    ],
-                  ),
+                    );
+                  },
                 ),
-              );
-            },
-          ),
-        ],
-      ),
-    );
+              ],
+            ),
+          )
+        : null;
     targets.add(
       TargetFocus(
         identify: "Target 0",
@@ -1557,75 +1634,87 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
     // dbSupabase.getUser();
     if (loading == true) {
       return Scaffold(
-        backgroundColor: ColorsProvider.getColor2(context),
-        body: iconPage == true
-            ? Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset(
-                        'assets/gym_google2.png',
-                        height: 300,
-                      ),
-                      SizedBox(
-                        height: 100,
-                      ),
-                      Container(
-                        height: 70,
-                        child: Text(
-                          "Welcome",
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 35, color: ColorsProvider.getColor8(context)),
-                        ),
-                      ),
-                      // LoadingAnimationWidget.staggeredDotsWave(
-                      //   color: ColorsProvider.getColor8(context),
-                      //   size: 100,
-                      // ),
-                      SizedBox(
-                        height: 110,
-                      ),
-                      // Text(
-                      //   "Loading data",
-                      //   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 35, color: ColorsProvider.getColor8(context)),
-                      // ),
-                    ],
-                  ),
-                ],
-              )
-            : Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset(
-                        'assets/gym_google2.png',
-                        height: 300,
-                      ),
-                      SizedBox(
-                        height: 100,
-                      ),
-                      LoadingAnimationWidget.staggeredDotsWave(
-                        color: ColorsProvider.getColor8(context),
-                        size: 100,
-                      ),
-                      SizedBox(
-                        height: 30,
-                      ),
-                      Container(
-                        height: 50,
-                        child: Text(
-                          "Loading data",
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 35, color: ColorsProvider.getColor8(context)),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+          backgroundColor: ColorsProvider.getColor2(context),
+          body: Stack(
+            children: [
+              Positioned(
+                top: -100,
+                right: -100,
+                child: SizedBox(
+                  height: 0,
+                  width: 0,
+                  key: keyWelcomeDummy,
+                ),
               ),
-      );
+              iconPage == true
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              'assets/gym_google2.png',
+                              height: 300,
+                            ),
+                            SizedBox(
+                              height: 100,
+                            ),
+                            Container(
+                              height: 70,
+                              child: Text(
+                                "Welcome",
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 35, color: ColorsProvider.getColor8(context)),
+                              ),
+                            ),
+                            // LoadingAnimationWidget.staggeredDotsWave(
+                            //   color: ColorsProvider.getColor8(context),
+                            //   size: 100,
+                            // ),
+                            SizedBox(
+                              height: 110,
+                            ),
+                            // Text(
+                            //   "Loading data",
+                            //   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 35, color: ColorsProvider.getColor8(context)),
+                            // ),
+                          ],
+                        ),
+                      ],
+                    )
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              'assets/gym_google2.png',
+                              height: 300,
+                            ),
+                            SizedBox(
+                              height: 100,
+                            ),
+                            LoadingAnimationWidget.staggeredDotsWave(
+                              color: ColorsProvider.getColor8(context),
+                              size: 100,
+                            ),
+                            SizedBox(
+                              height: 30,
+                            ),
+                            Container(
+                              height: 50,
+                              child: Text(
+                                "Loading data",
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 35, color: ColorsProvider.getColor8(context)),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+            ],
+          ));
     } else {
       return Scaffold(
         key: scaffoldKey, drawerEnableOpenDragGesture: false,
@@ -1693,6 +1782,15 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
         // ),
         body: Stack(
           children: [
+            Positioned(
+              top: -100,
+              right: -100,
+              child: SizedBox(
+                height: 0,
+                width: 0,
+                key: keyWelcomeDummy,
+              ),
+            ),
             PageView(
               controller: controller,
               onPageChanged: (index) {

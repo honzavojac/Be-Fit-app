@@ -25,6 +25,7 @@ class _ChoseInitDataPageState extends State<ChoseInitDataPage> {
   TextEditingController _nameController = TextEditingController(text: "Username");
   DateTime? _selectedDateOfBirth;
   String? language;
+  bool isPressedGoToApp = false;
 
   @override
   void initState() {
@@ -46,6 +47,46 @@ class _ChoseInitDataPageState extends State<ChoseInitDataPage> {
     // Uložit volbu jazyka do SharedPreferences
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('selected_language_code', locale.languageCode);
+  }
+
+  insertUser() async {
+    var user = {
+      'name': _nameController.text.trim(),
+      'email': email,
+      'country': "none",
+      'birth_date': _selectedDateOfBirth.toString(),
+    };
+    await supabase.from("users").insert(user);
+    var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false);
+    var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
+
+    UserSupabase? newUser = await dbSupabase.getUser();
+    // Získání ID nově registrovaného uživatele
+    print("id new newUser: ${newUser!.idUser}");
+    final categories = [
+      {'name': 'Meal 1', 'id_user': newUser.idUser},
+      {'name': 'Meal 2', 'id_user': newUser.idUser},
+      {'name': 'Meal 3', 'id_user': newUser.idUser},
+      {'name': 'Meal 4', 'id_user': newUser.idUser},
+      {'name': 'Meal 5', 'id_user': newUser.idUser},
+      {'name': 'Meal 6', 'id_user': newUser.idUser},
+    ];
+    await supabase.from("intake_categories").insert(categories);
+    var data = await supabase.from("intake_categories").select().eq("id_user", newUser.idUser);
+    List<dynamic> finalData = data;
+    final List<IntakeCategories> intakeCategories = finalData.map((e) => IntakeCategories.fromJson(e)).toList();
+    for (var intakeCategory in intakeCategories) {
+      print(intakeCategory.name);
+      await dbFitness.insertIntakeCategory(intakeCategory.name!, 0, intakeCategory.idIntakeCategory!);
+    }
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString("show_tutorial", "true");
+
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => SplashPage()),
+      (Route<dynamic> route) => false,
+    );
   }
 
   @override
@@ -243,41 +284,15 @@ class _ChoseInitDataPageState extends State<ChoseInitDataPage> {
       ),
       floatingActionButton: GestureDetector(
         onTap: () async {
-          var user = {
-            'name': _nameController.text.trim(),
-            'email': email,
-            'country': "none",
-            'birth_date': _selectedDateOfBirth.toString(),
-          };
-          await supabase.from("users").insert(user);
-          var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false);
-          var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
-
-          UserSupabase? newUser = await dbSupabase.getUser();
-          // Získání ID nově registrovaného uživatele
-          print("id new newUser: ${newUser!.idUser}");
-          final categories = [
-            {'name': 'Meal 1', 'id_user': newUser.idUser},
-            {'name': 'Meal 2', 'id_user': newUser.idUser},
-            {'name': 'Meal 3', 'id_user': newUser.idUser},
-            {'name': 'Meal 4', 'id_user': newUser.idUser},
-            {'name': 'Meal 5', 'id_user': newUser.idUser},
-            {'name': 'Meal 6', 'id_user': newUser.idUser},
-          ];
-          await supabase.from("intake_categories").insert(categories);
-          var data = await supabase.from("intake_categories").select().eq("id_user", newUser.idUser);
-          List<dynamic> finalData = data;
-          final List<IntakeCategories> intakeCategories = finalData.map((e) => IntakeCategories.fromJson(e)).toList();
-          for (var intakeCategory in intakeCategories) {
-            print(intakeCategory.name);
-            await dbFitness.insertIntakeCategory(intakeCategory.name!, 0, intakeCategory.idIntakeCategory!);
+          if (!isPressedGoToApp) {
+            isPressedGoToApp = true;
+            print(isPressedGoToApp);
+            await insertUser();
+            print(isPressedGoToApp);
+            isPressedGoToApp = false;
+            print(isPressedGoToApp);
           }
-
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => SplashPage()),
-            (Route<dynamic> route) => false,
-          );
+          print(isPressedGoToApp);
         },
         child: Padding(
           padding: const EdgeInsets.only(bottom: 10),

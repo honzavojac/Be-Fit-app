@@ -349,137 +349,169 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
                           ),
                         ),
                         SliverList(
-                          delegate: SliverChildBuilderDelegate(
-                            childCount: measurements.length,
-                            (BuildContext context, int index) {
-                              var measurement = measurements[index];
-                              String now = "${measurement.createdAt!.replaceRange(0, 8, "")}.${measurement.createdAt!.replaceRange(0, 5, "").replaceRange(2, null, "")}.${measurement.createdAt!.replaceRange(4, null, "")}";
-                              return Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Container(
-                                  height: 180,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: ColorsProvider.getColor2(context),
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                          top: 5,
-                                        ),
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              "${now}",
-                                              style: TextStyle(color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold, fontSize: 20),
-                                            )
-                                          ],
-                                        ),
+                          delegate: measurements.isEmpty
+                              ? SliverChildListDelegate([
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Container(
+                                      height: 100,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        color: ColorsProvider.getColor2(context),
                                       ),
-                                      Expanded(
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(left: 5, right: 5, top: 5, bottom: 5),
-                                          child: Container(
-                                            decoration: BoxDecoration(color: Color.fromARGB(135, 0, 0, 0), borderRadius: BorderRadius.circular(12)),
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                              top: 5,
+                                            ),
                                             child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                              mainAxisAlignment: MainAxisAlignment.center,
                                               children: [
-                                                Padding(
-                                                  padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
-                                                  child: Container(
-                                                    width: 105,
-                                                    child: Column(
-                                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                                      children: [
-                                                        Text(
-                                                          "${"weight".tr()}: ${measurement.weight ?? ""}",
-                                                          style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
-                                                        ),
-                                                        Text(
-                                                          "${"height".tr()}: ${measurement.height ?? ""}",
-                                                          style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                                Column(
-                                                  children: [
-                                                    Row(
-                                                      children: [
-                                                        Text(
-                                                          "circumference".tr(),
-                                                          style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w400),
-                                                        )
-                                                      ],
-                                                    ),
-                                                    Expanded(
-                                                      child: Row(
-                                                        children: [
-                                                          Padding(
-                                                            padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
-                                                            child: Container(
-                                                              width: 150,
-                                                              child: Column(
-                                                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                                                children: [
-                                                                  Text(
-                                                                    "${"abdominal".tr()}: ${measurement.abdominalCircumference ?? ""}",
-                                                                    style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
-                                                                  ),
-                                                                  Text(
-                                                                    "${"chest".tr()}: ${measurement.chestCircumference ?? ""}",
-                                                                    style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
-                                                                  ),
-                                                                  Text(
-                                                                    "${"waist".tr()}: ${measurement.waistCircumference ?? ""}",
-                                                                    style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
-                                                                  ),
-                                                                ],
+                                                Text(
+                                                  "there_are_no_measurement".tr(),
+                                                  style: TextStyle(color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold, fontSize: 20),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  )
+                                ])
+                              : SliverChildBuilderDelegate(
+                                  childCount: measurements.length,
+                                  (BuildContext context, int index) {
+                                    var measurement = measurements[index];
+                                    String now = "${measurement.createdAt!.replaceRange(0, 8, "")}.${measurement.createdAt!.replaceRange(0, 5, "").replaceRange(2, null, "")}.${measurement.createdAt!.replaceRange(4, null, "")}";
+                                    return Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Container(
+                                        height: 180,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(10),
+                                          color: ColorsProvider.getColor2(context),
+                                        ),
+                                        child: Column(
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                top: 5,
+                                              ),
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                children: [
+                                                  Text(
+                                                    "${now}",
+                                                    style: TextStyle(color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold, fontSize: 20),
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                            Expanded(
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(left: 5, right: 5, top: 5, bottom: 5),
+                                                child: Container(
+                                                  decoration: BoxDecoration(color: Color.fromARGB(135, 0, 0, 0), borderRadius: BorderRadius.circular(12)),
+                                                  child: Row(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                    children: [
+                                                      Padding(
+                                                        padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
+                                                        child: Container(
+                                                          width: 105,
+                                                          child: Column(
+                                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                            children: [
+                                                              Text(
+                                                                "${"weight".tr()}: ${measurement.weight ?? ""}",
+                                                                style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
                                                               ),
-                                                            ),
+                                                              Text(
+                                                                "${"height".tr()}: ${measurement.height ?? ""}",
+                                                                style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
+                                                              ),
+                                                            ],
                                                           ),
-                                                          Padding(
-                                                            padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
-                                                            child: Container(
-                                                              width: 100,
-                                                              child: Column(
-                                                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                                                children: [
-                                                                  Text(
-                                                                    "${"thigh".tr()}: ${measurement.thighCircumference ?? ""}",
-                                                                    style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
+                                                        ),
+                                                      ),
+                                                      Column(
+                                                        children: [
+                                                          Row(
+                                                            children: [
+                                                              Text(
+                                                                "circumference".tr(),
+                                                                style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w400),
+                                                              )
+                                                            ],
+                                                          ),
+                                                          Expanded(
+                                                            child: Row(
+                                                              children: [
+                                                                Padding(
+                                                                  padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
+                                                                  child: Container(
+                                                                    width: 150,
+                                                                    child: Column(
+                                                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                                      children: [
+                                                                        Text(
+                                                                          "${"abdominal".tr()}: ${measurement.abdominalCircumference ?? ""}",
+                                                                          style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
+                                                                        ),
+                                                                        Text(
+                                                                          "${"chest".tr()}: ${measurement.chestCircumference ?? ""}",
+                                                                          style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
+                                                                        ),
+                                                                        Text(
+                                                                          "${"waist".tr()}: ${measurement.waistCircumference ?? ""}",
+                                                                          style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
+                                                                        ),
+                                                                      ],
+                                                                    ),
                                                                   ),
-                                                                  Text(
-                                                                    "${"neck".tr()}: ${measurement.neckCircumference ?? ""}",
-                                                                    style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
+                                                                ),
+                                                                Padding(
+                                                                  padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
+                                                                  child: Container(
+                                                                    width: 100,
+                                                                    child: Column(
+                                                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                                      children: [
+                                                                        Text(
+                                                                          "${"thigh".tr()}: ${measurement.thighCircumference ?? ""}",
+                                                                          style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
+                                                                        ),
+                                                                        Text(
+                                                                          "${"neck".tr()}: ${measurement.neckCircumference ?? ""}",
+                                                                          style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
+                                                                        ),
+                                                                        Text(
+                                                                          "${"biceps".tr()}: ${measurement.bicepsCircumference ?? ""}",
+                                                                          style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
+                                                                        ),
+                                                                      ],
+                                                                    ),
                                                                   ),
-                                                                  Text(
-                                                                    "${"biceps".tr()}: ${measurement.bicepsCircumference ?? ""}",
-                                                                    style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
-                                                                  ),
-                                                                ],
-                                                              ),
+                                                                ),
+                                                              ],
                                                             ),
                                                           ),
                                                         ],
                                                       ),
-                                                    ),
-                                                  ],
+                                                    ],
+                                                  ),
                                                 ),
-                                              ],
+                                              ),
                                             ),
-                                          ),
+                                          ],
                                         ),
                                       ),
-                                    ],
-                                  ),
+                                    );
+                                  },
                                 ),
-                              );
-                            },
-                          ),
                         ),
                       ],
                     ),

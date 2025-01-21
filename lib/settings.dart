@@ -197,6 +197,8 @@ class _SettingsState extends State<Settings> {
               await dbFitness.deleteAllData();
               user = null;
               dbSupabase.clearUserData();
+              SharedPreferences preferences = await SharedPreferences.getInstance();
+              await preferences.clear();
               _signOut();
             },
             icon: Icon(
@@ -495,7 +497,7 @@ class _SettingsState extends State<Settings> {
               Navigator.of(context).pop();
               scaffoldKey.currentState?.closeDrawer();
             },
-            child: Text("Show tutorial"),
+            child: Text("show_tutorial".tr()),
           ),
           Spacer(
             flex: 5,

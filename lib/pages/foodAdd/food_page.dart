@@ -199,10 +199,18 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                 ],
               ),
             ),
+            Container(
+              // color: Colors.blue,
+              height: 10,
+            ),
             MySearchBar(
               notifyParent: load,
               searchController: searchController,
               intakeCategories: intakeCategories,
+            ),
+            Container(
+              // color: Colors.blue,
+              height: 10,
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -317,11 +325,98 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
             Expanded(
               child: show == true
                   ? Padding(
-                      padding: const EdgeInsets.only(top: 10.0),
+                      padding: const EdgeInsets.only(top: 2.0),
                       child: Container(
                         // color: Colors.green[900],
                         child: Column(
                           children: [
+                            Container(
+                              height: 50,
+                              // color: Colors.blue,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Text(
+                                            calories.toInt().toString(),
+                                            style: TextStyle(fontSize: 16, color: ColorsProvider.getColor2(context), fontWeight: FontWeight.bold),
+                                          ),
+                                          Text(
+                                            " Kcal",
+                                            style: TextStyle(fontSize: 15, color: ColorsProvider.getColor2(context), fontWeight: FontWeight.bold),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Text(
+                                            "${"protein".tr()}: ",
+                                            style: TextStyle(fontSize: 15, color: ColorsProvider.getColor2(context), fontWeight: FontWeight.bold),
+                                          ),
+                                          Text(
+                                            protein.toInt().toString(),
+                                            style: TextStyle(fontSize: 16, color: ColorsProvider.getColor2(context), fontWeight: FontWeight.bold),
+                                          ),
+                                        ],
+                                      ),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            "${"fat".tr()}: ",
+                                            style: TextStyle(fontSize: 15, color: ColorsProvider.getColor2(context), fontWeight: FontWeight.bold),
+                                          ),
+                                          Text(
+                                            fat.toInt().toString(),
+                                            style: TextStyle(fontSize: 16, color: ColorsProvider.getColor2(context), fontWeight: FontWeight.bold),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Text(
+                                            "${"carbs".tr()}: ",
+                                            style: TextStyle(fontSize: 15, color: ColorsProvider.getColor2(context), fontWeight: FontWeight.bold),
+                                          ),
+                                          Text(
+                                            carbs.toInt().toString(),
+                                            style: TextStyle(fontSize: 16, color: ColorsProvider.getColor2(context), fontWeight: FontWeight.bold),
+                                          ),
+                                        ],
+                                      ),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            "${"fiber".tr()}: ",
+                                            style: TextStyle(fontSize: 15, color: ColorsProvider.getColor2(context), fontWeight: FontWeight.bold),
+                                          ),
+                                          Text(
+                                            fiber.toInt().toString(),
+                                            style: TextStyle(fontSize: 16, color: ColorsProvider.getColor2(context), fontWeight: FontWeight.bold),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              ),
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
                             Expanded(
                               child: ReorderableListView.builder(
                                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
@@ -522,12 +617,12 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                                                                         ),
                                                                         SizedBox(height: 8), // Prostor mezi řádky
                                                                         Text(
-                                                                          "${"fat".tr()}:",
+                                                                          "${"carbs".tr()}:",
                                                                           style: TextStyle(fontSize: 20, color: ColorsProvider.getColor8(context)),
                                                                         ),
                                                                         SizedBox(height: 8),
                                                                         Text(
-                                                                          "${"carbs".tr()}:",
+                                                                          "${"fat".tr()}:",
                                                                           style: TextStyle(fontSize: 20, color: ColorsProvider.getColor8(context)),
                                                                         ),
                                                                         SizedBox(height: 8),
@@ -548,12 +643,12 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                                                                         ),
                                                                         SizedBox(height: 8),
                                                                         Text(
-                                                                          "${sumOfFat} g",
+                                                                          "${sumOfCarbs} g",
                                                                           style: TextStyle(fontSize: 20, color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold),
                                                                         ),
                                                                         SizedBox(height: 8),
                                                                         Text(
-                                                                          "${sumOfCarbs} g",
+                                                                          "${sumOfFat} g",
                                                                           style: TextStyle(fontSize: 20, color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold),
                                                                         ),
                                                                         SizedBox(height: 8),
@@ -647,7 +742,7 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                                                             },
                                                             child: Container(
                                                               decoration: BoxDecoration(
-                                                                color: Color.fromARGB(100, 0, 0, 0),
+                                                                color: Color.fromARGB(90, 0, 0, 0),
                                                                 borderRadius: variablesProvider.zaobleni,
                                                               ),
                                                               // height: 80,
@@ -663,6 +758,8 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                                                                           child: Padding(
                                                                             padding: EdgeInsets.symmetric(horizontal: 2.0),
                                                                             child: TextScroll(
+                                                                              intervalSpaces: 2,
+
                                                                               "${food.name.toString()}",
                                                                               mode: TextScrollMode.endless,
                                                                               velocity: Velocity(pixelsPerSecond: Offset(35, 0)),
@@ -793,7 +890,7 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                                                                                             } on Exception catch (e) {
                                                                                               print(e);
                                                                                             }
-
+                                                                                            await load();
                                                                                             setState(() {});
 
                                                                                             Navigator.of(context).pop();

@@ -856,3 +856,43 @@ class IntakeCategories {
     return 'IntakeCategories(idIntakeCategory: $idIntakeCategory, name: $name, supabaseIdIntakeCategory: $supabaseIdIntakeCategory, action: $action)';
   }
 }
+
+class FoodComments {
+  int? idComment;
+  String? foodComment;
+  int? supabaseIdComment;
+  int? action;
+
+  FoodComments({
+    this.idComment,
+    this.foodComment,
+    this.supabaseIdComment,
+    this.action,
+  });
+
+  // Named constructor for creating an object from a JSON map
+  factory FoodComments.fromJson(Map<String, dynamic> json) {
+    return FoodComments(
+      idComment: json['id_comment'],
+      foodComment: json['comment'],
+      supabaseIdComment: json['supabase_id_comment'],
+      action: json['action'],
+    );
+  }
+
+  // Method to convert the object into a JSON map
+  Map<String, dynamic> toJson() {
+    return {
+      'id_comment': idComment,
+      'comment': foodComment,
+      'supabase_id_comment': supabaseIdComment,
+      'action': action,
+    };
+  }
+
+  // Overriding toString method for easier debugging
+  @override
+  String toString() {
+    return 'FoodComments(id_comment: $idComment, comment: $foodComment, supabase_id_comment: $supabaseIdComment, action: $action)';
+  }
+}

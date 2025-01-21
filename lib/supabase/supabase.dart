@@ -870,5 +870,27 @@ class SupabaseProvider extends ChangeNotifier {
     );
     return nutriIntake;
   }
+
+//  food comments
+  FoodCommentsTable() async {
+    final uid = supabase.auth.currentUser!.id;
+
+    final response = await supabase.from('users').select('''
+    food_comments(
+      id_comment,
+      comment,
+      created_at     
+    )
+    ''').eq('user_id', uid);
+
+    final List<dynamic> data = response[0]["nutri_intake"];
+    print(data.length);
+    List<NutriIntake> nutriIntake = data.map((json) => NutriIntake.fromJson(json as Map<String, dynamic>)).toList();
+    print("length of nutri intake from supabase: ${nutriIntake.length}");
+    nutriIntake.sort(
+      (a, b) => a.idNutriIntake!.compareTo(b.idNutriIntake!),
+    );
+    return nutriIntake;
+  }
 //
 }

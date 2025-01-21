@@ -153,6 +153,9 @@
   "tutorial_16.1": "Wenn Sie ein Lebensmittel nicht finden können, können Sie es einfach erstellen.",
   "tutorial_17": "Mess deine Körperwerte",
   "tutorial_18": "Das ist das Ende des Leitfadens",
-  "tutorial_18.1": "Wenn du den Leitfaden erneut starten möchtest, gehe zu den Einstellungen"
+  "tutorial_18.1": "Wenn du den Leitfaden erneut starten möchtest, gehe zu den Einstellungen",
 
+  "there_are_no_measurement": "Es gibt noch keine Messungen",
+  "there_are_no_muscles":"Es ist leer hier... Zeit, Muskeln aufzubauen!",
+  "show_tutorial": "Tutorial anzeigen"
 }

@@ -4,6 +4,7 @@ import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/main.dart';
 import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LoginPage extends StatefulWidget {
@@ -261,6 +262,8 @@ class _LoginPageState extends State<LoginPage> {
       padding: const EdgeInsets.symmetric(horizontal: 80),
       child: GestureDetector(
         onTap: () async {
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setString("show_tutorial", "false");
           await signIn();
           await dbSupabase.getUser();
         },

@@ -28,6 +28,7 @@ class ExercisePageCopy extends StatefulWidget {
 }
 
 // double initialDragableSize = 0.1;
+final GlobalKey exercisePageKey = GlobalKey();
 
 class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBindingObserver {
   String? nameOfExercise;
@@ -62,7 +63,7 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
       if (mounted) {
         try {
           await saveToDatabase();
-          print("saved 2 *************************************************");
+          print("saved to sqflite *************************************************");
           // widget.loadData();
           paused = true;
         } catch (e) {
@@ -133,7 +134,6 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
   }
 
   saveToDatabase() async {
-    print("saveToDatabase");
     try {
       var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
 
@@ -164,7 +164,7 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
           await dbFitness.DeleteExerciseData(exerciseDataItem.supabaseIdExData!);
         }
       }
-      print("Data saved successfully.");
+      print("Data saved successfully to sqflite.");
     } catch (e) {
       print("Error saving data: $e");
     }
@@ -250,6 +250,7 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
 
     if (showWidget == false) {
       return Scaffold(
+        key: exercisePageKey,
         appBar: AppBar(
           foregroundColor: ColorsProvider.color_3,
           title: Row(
@@ -398,6 +399,7 @@ class _ExercisePageCopyState extends State<ExercisePageCopy> with WidgetsBinding
           await widget.onExerciseDataReturned(finalExerciseData);
         },
         child: Scaffold(
+          key: exercisePageKey,
           appBar: AppBar(
             foregroundColor: ColorsProvider.getColor2(context),
             title: Row(

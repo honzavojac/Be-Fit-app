@@ -153,6 +153,9 @@
   "tutorial_16.1": "If you can’t find a food item, you can easily create it.",
   "tutorial_17": "Measure Your Body Values",
   "tutorial_18": "This is the end of the guide",
-  "tutorial_18.1": "If you want to restart the guide, go to settings"
+  "tutorial_18.1": "If you want to restart the guide, go to settings",
 
+  "there_are_no_measurement": "There are no measurements yet",
+  "there_are_no_muscles":"It's empty here... time to build muscles!",
+  "show_tutorial": "Show tutorial"
 }
