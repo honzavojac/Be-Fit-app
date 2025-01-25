@@ -17,6 +17,16 @@ List<Map<String, String>> languages = [
 String? selectedCountry;
 // bool? hasToOpenDropdown = false;
 bool darkTheme = true;
+int? selectedAppColor;
+List<String> appColors = [
+  "orange",
+  "blue",
+  "red",
+  "yellow",
+  "green",
+  "purple",
+  "white",
+];
 List<Locale> locales = [
   Locale('cs'),
   Locale('en'),

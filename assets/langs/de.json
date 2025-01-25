@@ -2,7 +2,6 @@
   "Home": "Startseite",
   "Fitness": "Fitness",
   "Food": "Essen",
-
   "add": "Hinzufügen",
   "add_food": "Essen hinzufügen",
   "new_food": "Lebensmittel erstellen",
@@ -23,7 +22,6 @@
   "fiber": "Ballaststoffe",
   "weight": "Gewicht",
   "height": "Höhe",
-
   "now": "Heute",
   "add_nutri_intake": "Hinzufügen",
   "update_nutri_intake": "Aktualisieren",
@@ -35,15 +33,12 @@
   "insert_text": "wird eingefügt in",
   "update_text": "wird aktualisiert in",
   "grams": "Gramm",
-
   "header_new_food": "Neues Lebensmittel hinzufügen",
   "error_serving_size_box_is_empty": "Portionsgröße ist leer",
   "error_serving_size_box_is_null": "Portionsgröße darf nicht null sein",
-
   "split": "Training",
   "number_of_sets": "Anzahl der Sätze",
   "total_work_volume": "Gesamtarbeitsvolumen",
-
   "measurement": "Körpermessung",
   "circumference": "Umfang",
   "abdominal": "Bauch",
@@ -53,10 +48,8 @@
   "neck": "Hals",
   "biceps": "Bizeps",
   "error_all_boxes_are_empty": "Boxen sind leer",
-
   "edit_split": "Trainings bearbeiten",
   "header_edit_your_split": "Training bearbeiten",
-
   "delete": "Löschen",
   "split_delete": "Training",
   "new_muscle": "Neuer Muskel",
@@ -68,27 +61,22 @@
   "enter_name_of_exercise": "Name der Übung eingeben",
   "enter_name_of_split": "Name des Trainings eingeben",
   "enter_name_of_muscle": "Name des Muskels eingeben",
-
   "save": "Speichern",
   "error_name_of_split_is_empty": "Name des Trainings ist leer",
   "error_you_have_not_selected_any_muscle": "Keinen Muskel ausgewählt",
   "error_the_name_of_new_exercise_cannot_be_empty": "Name der Übung darf nicht leer sein",
   "error_the_name_of_new_muscle_cannot_be_empty": "Name des Muskels darf nicht leer sein",
-
   "workout": "Training",
   "statistic": "Statistik",
   "body": "Körper",
   "scan_food": "Essen scannen",
   "settings": "Einstellungen",
   "swipe_up": "Nach oben wischen",
-
   "set": "Satz",
   "exercise_weight": "Gewicht",
   "reps": "Wiederholungen",
   "difficulty": "Schwierigkeit",
-
   "end_this_split": "Training beenden",
-
   "fitness_statistic": "Fitness-Statistik",
   "total_workouts": "Gesamttrainingseinheiten",
   "workouts_this_month": "Trainingseinheiten diesen Monat",
@@ -107,18 +95,24 @@
   "change_theme": "Thema ändern",
   "light": "Helles",
   "dark": "Dunkles",
+  "change_app_color": "App-Farbe ändern",
+  "orange": "Orange",
+  "blue": "Blau",
+  "red": "Rot",
+  "yellow": "Gelb",
+  "green": "Grün",
+  "purple": "Lila",
+  "white": "Weiß",
   "change_food_database": "Lebensmitteldatenbank ändern",
   "foodNotFoundMessage": "Lebensmittel nicht in der Datenbank gefunden\nBitte helfen Sie uns, indem Sie ein neues Lebensmittel hinzufügen",
   "success_insert_body_measurement": "Messung hinzugefügt",
   "change_food_database_help": "Ändern Sie die Lebensmitteldatenbank. \nSie können eine Datenbank aus Ihrem Land oder eine bevorzugte auswählen. \n'Undefined' umfasst alle verfügbaren Lebensmitteldaten.",
-
   "tutorial_hello": "Willkommen zu unserem Leitfaden! Wir zeigen Ihnen, wie Sie diese App verwenden.",
   "tutorial_hello.1": "Klicken Sie auf den orangefarbenen Bereich auf dem Bildschirm, um zum nächsten Teil des Tutorials zu gelangen.",
   "tutorial_0": "Auf dieser Seite sehen Sie eine Übersicht über Ihr tägliches Essen, Training und Ihre Körpermessungen.",
   "tutorial_1": "Sobald Sie Ihr erstes Training erstellt haben, können Sie hier Ergebnisse eingeben und Ihren Fortschritt verfolgen.",
   "tutorial_2": "Trainings bearbeiten",
   "tutorial_2.1": "Hier können Sie Ihre eigenen Trainings (Splits) erstellen, um Ihre Übungen im Blick zu behalten.",
-
   "tutorial_3": "Neues Training hinzufügen",
   "tutorial_3.1": "Lassen Sie uns beginnen, indem Sie Ihr erstes Training erstellen.",
   "tutorial_4": "Neuen Muskel erstellen",
@@ -154,8 +148,7 @@
   "tutorial_17": "Mess deine Körperwerte",
   "tutorial_18": "Das ist das Ende des Leitfadens",
   "tutorial_18.1": "Wenn du den Leitfaden erneut starten möchtest, gehe zu den Einstellungen",
-
   "there_are_no_measurement": "Es gibt noch keine Messungen",
-  "there_are_no_muscles":"Es ist leer hier... Zeit, Muskeln aufzubauen!",
+  "there_are_no_muscles": "Es ist leer hier... Zeit, Muskeln aufzubauen!",
   "show_tutorial": "Tutorial anzeigen"
 }

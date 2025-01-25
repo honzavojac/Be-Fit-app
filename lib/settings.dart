@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -146,6 +147,27 @@ class _SettingsState extends State<Settings> {
     print("uloženo a sjednoceny databáze");
   }
 
+  Color _getColorForItem(int index) {
+    switch (index) {
+      case 0:
+        return Color.fromRGBO(255, 143, 0, 1);
+      case 1:
+        return Color.fromARGB(255, 0, 187, 255);
+      case 2:
+        return Color.fromRGBO(255, 0, 0, 1);
+      case 3:
+        return Color.fromRGBO(221, 255, 0, 1);
+      case 4:
+        return Color.fromRGBO(21, 255, 0, 1);
+      case 5:
+        return Color.fromRGBO(200, 0, 255, 1);
+      case 6:
+        return Color.fromRGBO(255, 255, 255, 1);
+      default:
+        return Colors.white; // Defaultní barva
+    }
+  }
+
   List<Muscle> data3 = [];
   @override
   Widget build(BuildContext context) {
@@ -172,7 +194,10 @@ class _SettingsState extends State<Settings> {
                           children: [
                             Text(
                               "Deleting user data",
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 35, color: Colors.white),
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 35,
+                                  color: Colors.white),
                             ),
                             // LoadingAnimationWidget.waveDots(color: Colors.white, size: 20)
                           ],
@@ -197,7 +222,8 @@ class _SettingsState extends State<Settings> {
               await dbFitness.deleteAllData();
               user = null;
               dbSupabase.clearUserData();
-              SharedPreferences preferences = await SharedPreferences.getInstance();
+              SharedPreferences preferences =
+                  await SharedPreferences.getInstance();
               await preferences.clear();
               _signOut();
             },
@@ -243,7 +269,14 @@ class _SettingsState extends State<Settings> {
                         // height: 20,
                         width: 100,
                         decoration: BoxDecoration(
-                          color: locales[index].languageCode.toString().toLowerCase() == language.toString().toLowerCase() ? ColorsProvider.getColor2(context) : Colors.transparent, // Výchozí barva nebo jiná barva
+                          color: locales[index]
+                                      .languageCode
+                                      .toString()
+                                      .toLowerCase() ==
+                                  language.toString().toLowerCase()
+                              ? ColorsProvider.getColor2(context)
+                              : Colors
+                                  .transparent, // Výchozí barva nebo jiná barva
                           borderRadius: BorderRadius.circular(18),
                         ),
                         child: Padding(
@@ -304,7 +337,8 @@ class _SettingsState extends State<Settings> {
                         inactiveTrackColor: ColorsProvider.getColor8(context),
                         value: isDarkMode,
                         onChanged: (value) async {
-                          SharedPreferences prefs = await SharedPreferences.getInstance();
+                          SharedPreferences prefs =
+                              await SharedPreferences.getInstance();
                           prefs.getString('themeMode');
                           if (!isDarkMode) {
                             widget.notifyMyApp(ThemeMode.dark);
@@ -325,7 +359,119 @@ class _SettingsState extends State<Settings> {
           Spacer(
             flex: 1,
           ),
+          darkTheme == true
+              ? Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          children: [
+                            Text(
+                              "change_app_color".tr(),
+                              style: TextStyle(fontSize: 18),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 50),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: DropdownButtonHideUnderline(
+                              child: DropdownButton2<String>(
+                                isExpanded: true,
+                                value: appColors[selectedAppColor ?? 0],
+                                items: appColors.map((color) {
+                                  return DropdownMenuItem<String>(
+                                    value: color,
+                                    child: Text(
+                                      color.tr(),
+                                      style: TextStyle(
+                                        color: switch (
+                                            appColors.indexOf(color)) {
+                                          0 => colorOrange,
+                                          1 => colorBlue,
+                                          2 => colorRed,
+                                          3 => colorYellow,
+                                          4 => colorGreen,
+                                          5 => colorPurple,
+                                          6 => colorWhite,
 
+                                          // TODO: Handle this case.
+                                          int() => colorWhite,
+                                        },
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                                onChanged: (value) async {
+                                  int index = appColors.indexOf(value!);
+                                  SharedPreferences prefs =
+                                      await SharedPreferences.getInstance();
+                                  prefs.setInt('appColor', index);
+
+                                  selectedAppColor = index;
+                                  setState(() {});
+                                },
+                                buttonStyleData: ButtonStyleData(
+                                  // width: 180,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 14),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(18),
+                                    border: Border.all(
+                                      color: Colors.black,
+                                      width: 2,
+                                    ),
+                                  ),
+                                ),
+                                iconStyleData: IconStyleData(
+                                  icon:
+                                      Icon(Icons.keyboard_arrow_down_outlined),
+                                  iconSize: 17,
+                                  iconEnabledColor:
+                                      ColorsProvider.getColor2(context),
+                                ),
+                                dropdownStyleData: DropdownStyleData(
+                                  maxHeight: 200,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(18),
+                                    border: Border.all(
+                                      width: 2,
+                                      color: ColorsProvider.getColor8(context),
+                                    ),
+                                  ),
+                                  offset: const Offset(0, -0),
+                                  scrollbarTheme: ScrollbarThemeData(
+                                    radius: const Radius.circular(40),
+                                    interactive: true,
+                                    thickness: WidgetStateProperty.all(6),
+                                    thumbVisibility:
+                                        WidgetStateProperty.all(true),
+                                  ),
+                                ),
+                                menuItemStyleData: const MenuItemStyleData(
+                                  // height: 40,
+                                  padding: EdgeInsets.only(left: 10, right: 18),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                )
+              : SizedBox(),
+          darkTheme == true
+              ? Spacer(
+                  flex: 1,
+                )
+              : SizedBox(),
           // Column(
           //   children: [
           //     Padding(
@@ -426,13 +572,15 @@ class _SettingsState extends State<Settings> {
                               value: country['code'],
                               child: Text(
                                 country['name']!,
-                                style: TextStyle(color: ColorsProvider.getColor2(context)),
+                                style: TextStyle(
+                                    color: ColorsProvider.getColor2(context)),
                               ),
                             );
                           }).toList(),
                           onChanged: (value) async {
                             selectedCountry = value;
-                            await dbFitness.updateUserFoodDatabaseLanguage(value!);
+                            await dbFitness
+                                .updateUserFoodDatabaseLanguage(value!);
                             user!.country = value;
                             setState(() {});
                           },
@@ -478,7 +626,8 @@ class _SettingsState extends State<Settings> {
                     ),
                     Padding(
                       padding: const EdgeInsets.only(left: 8.0),
-                      child: HelpButton(helpText: "change_food_database_help".tr()),
+                      child: HelpButton(
+                          helpText: "change_food_database_help".tr()),
                     ),
                   ],
                 ),

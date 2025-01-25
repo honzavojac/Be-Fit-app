@@ -2,7 +2,6 @@
   "Home": "Home",
   "Fitness": "Fitness",
   "Food": "Food",
-
   "add": "Add",
   "add_food": "Add Food",
   "new_food": "Create Food",
@@ -23,7 +22,6 @@
   "fiber": "Fiber",
   "weight": "Weight",
   "height": "Height",
-
   "now": "Today",
   "add_nutri_intake": "Add",
   "update_nutri_intake": "Update",
@@ -35,15 +33,12 @@
   "insert_text": "will be inserted into",
   "update_text": "will be updated in",
   "grams": "grams",
-
   "header_new_food": "Add New Food",
   "error_serving_size_box_is_empty": "Serving Size is empty",
   "error_serving_size_box_is_null": "Serving Size cannot be zero",
-
   "split": "Workout",
   "number_of_sets": "Number of Sets",
   "total_work_volume": "Total Work Volume",
-
   "measurement": "Body Measurement",
   "circumference": "Circumference",
   "abdominal": "Abdominal",
@@ -53,10 +48,8 @@
   "neck": "Neck",
   "biceps": "Biceps",
   "error_all_boxes_are_empty": "Boxes are empty",
-
   "edit_split": "Edit Workouts",
   "header_edit_your_split": "Edit Workout",
-
   "delete": "Delete",
   "split_delete": "workout",
   "new_muscle": "New Muscle",
@@ -68,27 +61,22 @@
   "enter_name_of_exercise": "Enter Exercise Name",
   "enter_name_of_split": "Enter Workout Name",
   "enter_name_of_muscle": "Enter Muscle Name",
-
   "save": "Save",
   "error_name_of_split_is_empty": "Workout Name is empty",
   "error_you_have_not_selected_any_muscle": "You have not selected any muscle",
   "error_the_name_of_new_exercise_cannot_be_empty": "Exercise Name cannot be empty",
   "error_the_name_of_new_muscle_cannot_be_empty": "Muscle Name cannot be empty",
-
   "workout": "Workout",
   "statistic": "Statistics",
   "body": "Body",
   "scan_food": "Scan Food",
   "settings": "Settings",
   "swipe_up": "Swipe Up",
-
   "set": "Set",
   "exercise_weight": "Weight",
   "reps": "Reps",
   "difficulty": "Difficulty",
-
   "end_this_split": "End Workout",
-
   "fitness_statistic": "Fitness Statistics",
   "total_workouts": "Total Workouts",
   "workouts_this_month": "Workouts This Month",
@@ -107,18 +95,24 @@
   "change_theme": "Change Theme",
   "light": "Light",
   "dark": "Dark",
+  "change_app_color": "Change App Color",
+  "orange": "Orange",
+  "blue": "Blue",
+  "red": "Red",
+  "yellow": "Yellow",
+  "green": "Green",
+  "purple": "Purple",
+  "white": "White",
   "change_food_database": "Change Food Database",
   "foodNotFoundMessage": "Food not found in the database\nPlease help us by adding a new food item",
   "success_insert_body_measurement": "Measurement added",
   "change_food_database_help": "Change the food database. \nYou can select a database from your country or one you prefer. \n'Undefined' includes all available food data.",
-
   "tutorial_hello": "Welcome to our guide! We'll show you how to use this app.",
   "tutorial_hello.1": "Click the orange area on the screen to move to the next part of the tutorial.",
   "tutorial_0": "On this page, you’ll see an overview of your daily food, workouts, and body measurements.",
   "tutorial_1": "Once you create your first workout, you can enter results here and track your progress.",
   "tutorial_2": "Editing Workouts",
   "tutorial_2.1": "Here you can create your own workouts (splits) to keep track of your exercises.",
-
   "tutorial_3": "Adding a New Workout",
   "tutorial_3.1": "Let’s start by creating your first workout.",
   "tutorial_4": "Creating a New Muscle",
@@ -154,8 +148,7 @@
   "tutorial_17": "Measure Your Body Values",
   "tutorial_18": "This is the end of the guide",
   "tutorial_18.1": "If you want to restart the guide, go to settings",
-
   "there_are_no_measurement": "There are no measurements yet",
-  "there_are_no_muscles":"It's empty here... time to build muscles!",
+  "there_are_no_muscles": "It's empty here... time to build muscles!",
   "show_tutorial": "Show tutorial"
 }

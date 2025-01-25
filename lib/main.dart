@@ -42,6 +42,7 @@ void main() async {
 
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String? languageCode = prefs.getString('selected_language_code');
+  selectedAppColor = prefs.getInt("appColor");
   Locale startLocale;
 
   if (languageCode != null) {
