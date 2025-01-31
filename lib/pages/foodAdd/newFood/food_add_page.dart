@@ -4,7 +4,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
 import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
-import 'package:kaloricke_tabulky_02/init_page.dart';
 import 'package:kaloricke_tabulky_02/main.dart';
 
 import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
@@ -182,6 +181,7 @@ class _FoodAddPageState extends State<FoodAddPage> {
                       // width: 150,
                       child: ElevatedButton.icon(
                         onPressed: () async {
+                          print("object");
                           bool inserted = await insertFood();
                           inserted ? clearControllers() : null;
                         },

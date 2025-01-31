@@ -103,30 +103,31 @@ class _FitnessStatisticState extends State<FitnessStatistic> with TickerProvider
     Color? lastColor;
     if (prePieData.isNotEmpty) {
       // Calculate the total count
-      int total = prePieData.values.fold(0, (sum, count) => sum + count);
+      int? total = prePieData.values.fold(0, (sum, count) => sum! + count);
+      if (total != null) {
+        prePieData.forEach((muscleId, count) {
+          String muscleName = muscles.firstWhere((muscle) => muscle.supabaseIdMuscle == muscleId).nameOfMuscle!;
 
-      prePieData.forEach((muscleId, count) {
-        String muscleName = muscles.firstWhere((muscle) => muscle.supabaseIdMuscle == muscleId).nameOfMuscle!;
+          // Ensure the current color is not the same as the last used color
+          while (predefinedColors[colorIndex % predefinedColors.length] == lastColor) {
+            colorIndex++;
+          }
 
-        // Ensure the current color is not the same as the last used color
-        while (predefinedColors[colorIndex % predefinedColors.length] == lastColor) {
+          // Get the color and increment the index
+          Color color = predefinedColors[colorIndex % predefinedColors.length];
           colorIndex++;
-        }
+          lastColor = color;
 
-        // Get the color and increment the index
-        Color color = predefinedColors[colorIndex % predefinedColors.length];
-        colorIndex++;
-        lastColor = color;
+          // Calculate the percentage and round it
+          double? percentage = ((count / total) * 1000).roundToDouble() / 10;
 
-        // Calculate the percentage and round it
-        int percentage = ((count / total) * 100).round();
-
-        pieData.add(PieChartDataModel(
-          value: count.toDouble(),
-          color: color,
-          title: "$muscleName\n$percentage%",
-        ));
-      });
+          pieData.add(PieChartDataModel(
+            value: count.toDouble(),
+            color: color,
+            title: "$muscleName\n${percentage}%",
+          ));
+        });
+      }
     }
     return pieData;
   }
@@ -160,7 +161,18 @@ class _FitnessStatisticState extends State<FitnessStatistic> with TickerProvider
       ),
       body: show == true
           ? muscleList.isEmpty
-              ? Container()
+              ? Container(
+                  child: Center(
+                    child: Text(
+                      "there_are_no_muscles".tr(),
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: ColorsProvider.getColor2(context),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                )
               : Column(
                   children: [
                     DefaultTabController(
@@ -638,7 +650,6 @@ class _FitnessStatisticState extends State<FitnessStatistic> with TickerProvider
                                           height: 300,
                                           child: Padding(
                                             padding: const EdgeInsets.all(20),
-                                            // ! TODO:
                                             child: BarChartWidget(
                                               exerciseData: exercisePercentages,
                                               exercises: filteredExercises,
@@ -676,28 +687,30 @@ class _FitnessStatisticState extends State<FitnessStatistic> with TickerProvider
                                     child: Row(
                                       children: [
                                         Expanded(
-                                          child: PieChart(
-                                            PieChartData(
-                                              pieTouchData: PieTouchData(
-                                                touchCallback: (FlTouchEvent event, pieTouchResponse) {
-                                                  setState(() {
-                                                    if (!event.isInterestedForInteractions || pieTouchResponse == null || pieTouchResponse.touchedSection == null) {
-                                                      touchedIndex = -1;
-                                                      return;
-                                                    }
-                                                    touchedIndex = pieTouchResponse.touchedSection!.touchedSectionIndex;
-                                                  });
-                                                },
-                                              ),
-                                              borderData: FlBorderData(
-                                                show: false,
-                                              ),
+                                          child: pieData.isEmpty
+                                              ? Container()
+                                              : PieChart(
+                                                  PieChartData(
+                                                    pieTouchData: PieTouchData(
+                                                      touchCallback: (FlTouchEvent event, pieTouchResponse) {
+                                                        setState(() {
+                                                          if (!event.isInterestedForInteractions || pieTouchResponse == null || pieTouchResponse.touchedSection == null) {
+                                                            touchedIndex = -1;
+                                                            return;
+                                                          }
+                                                          touchedIndex = pieTouchResponse.touchedSection!.touchedSectionIndex;
+                                                        });
+                                                      },
+                                                    ),
+                                                    borderData: FlBorderData(
+                                                      show: false,
+                                                    ),
 
-                                              sectionsSpace: 2,
-                                              centerSpaceRadius: 40,
-                                              sections: showingSections(pieData), // Vaše metoda pro první graf
-                                            ),
-                                          ),
+                                                    sectionsSpace: 2,
+                                                    centerSpaceRadius: 40,
+                                                    sections: showingSections(pieData), // Vaše metoda pro první graf
+                                                  ),
+                                                ),
                                         ),
                                       ],
                                     ),
@@ -1408,7 +1421,6 @@ class PieChartDataModel {
   PieChartDataModel({required this.value, required this.color, required this.title});
 }
 
-//! TODO:
 class BarChartWidget extends StatefulWidget {
   final Map<int, double> exerciseData;
   final List<Exercise> exercises;

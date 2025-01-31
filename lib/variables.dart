@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 
+BorderRadius zaobleni = BorderRadius.circular(12);
+
 List<Map<String, String>> languages = [
   {'code': 'none', 'name': 'Undefined'},
   {'code': 'CS', 'name': 'Czech'},
@@ -17,6 +19,16 @@ List<Map<String, String>> languages = [
 String? selectedCountry;
 // bool? hasToOpenDropdown = false;
 bool darkTheme = true;
+int? selectedAppColor;
+List<String> appColors = [
+  "orange",
+  "blue",
+  "red",
+  "yellow",
+  "green",
+  "purple",
+  "white",
+];
 List<Locale> locales = [
   Locale('cs'),
   Locale('en'),

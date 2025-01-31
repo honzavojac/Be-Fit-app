@@ -32,8 +32,8 @@ class _MySearchBarState extends State<MySearchBar> {
     var dbFitness = Provider.of<FitnessProvider>(context);
 
     return Container(
-      height: 85,
-      padding: EdgeInsets.fromLTRB(25, 20, 25, 20),
+      height: 45,
+      padding: EdgeInsets.fromLTRB(25, 0, 25, 0),
       child: SearchAnchor(
         searchController: widget.searchController,
         builder: (BuildContext context, SearchController controller) {

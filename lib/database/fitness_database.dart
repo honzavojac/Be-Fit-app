@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:math';
 
 import 'package:diacritic/diacritic.dart';
 import 'package:flutter/material.dart';
@@ -56,7 +55,8 @@ class FitnessProvider extends ChangeNotifier {
     databasesPath = (await getApplicationDocumentsDirectory()).path;
     String appPath = join(databasesPath, 'fitnessDatabase.db');
 
-    _database = await openDatabase(appPath, version: 1, onCreate: (Database db, int version) {
+    _database = await openDatabase(appPath, version: 1,
+        onCreate: (Database db, int version) {
       db.execute('''
         CREATE TABLE muscles (
             id_muscle INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -71,6 +71,7 @@ class FitnessProvider extends ChangeNotifier {
             muscles_id_muscle INTEGER NOT NULL,
             supabase_id_exercise INTEGER,
             action INTEGER,
+            comment TEXT,
             FOREIGN KEY (muscles_id_muscle) REFERENCES muscles (id_muscle)
         );
 
@@ -193,6 +194,13 @@ class FitnessProvider extends ChangeNotifier {
           action INTEGER,
           supabase_id_intake_category INTEGER
       );
+      CREATE TABLE food_comments (
+        id_comment INTEGER PRIMARY KEY AUTOINCREMENT,
+        comment TEXT,
+        action INTEGER,
+        created_at TEXT,
+        supabase_id_comment INTEGER
+      );
         ''');
       print("Databáze byly vytvořeny");
     });
@@ -225,7 +233,8 @@ class FitnessProvider extends ChangeNotifier {
     print("Delete all data hotový");
   }
 
-  SyncSqfliteToSupabase(SupabaseProvider dbSupabase, String dbTable, dynamic data, int action) async {
+  SyncSqfliteToSupabase(SupabaseProvider dbSupabase, String dbTable,
+      dynamic data, int action) async {
     var idUser = dbSupabase.user!.idUser;
     dynamic finalData;
     int idRecord;
@@ -247,6 +256,7 @@ class FitnessProvider extends ChangeNotifier {
       case "exercises":
         finalData = {
           'name_of_exercise': data.nameOfExercise,
+          'comment': data.comment,
           'muscles_id_muscle': data.musclesIdMuscle,
         };
         idRecord = data.idExercise;
@@ -261,7 +271,9 @@ class FitnessProvider extends ChangeNotifier {
           'difficulty': data.difficulty,
           'technique': data.technique,
           'exercises_id_exercise': data.exercisesIdExercise,
-          'comment': data.comment == null || data.comment == "null" ? null : data.comment,
+          'comment': data.comment == null || data.comment == "null"
+              ? null
+              : data.comment,
           'time': data.time,
           'id_started_completed': data.idStartedCompleted,
         };
@@ -362,7 +374,8 @@ class FitnessProvider extends ChangeNotifier {
         //něco se pokazilo
         idRecord = -1;
         action = 99;
-        print("stala se chyba v fitness_database (nejspíš v jméně zadané tabulky)");
+        print(
+            "stala se chyba v fitness_database (nejspíš v jméně zadané tabulky)");
     }
     int? finalSupabaseIdItem;
     switch (action) {
@@ -378,10 +391,12 @@ class FitnessProvider extends ChangeNotifier {
 
         //insert do supabase
         try {
-          var responseData = await supabase.from('$dbTable').insert(finalData).select();
+          var responseData =
+              await supabase.from('$dbTable').insert(finalData).select();
           finalSupabaseIdItem = responseData[0]['$idItem'];
 
-          await UpdateSupabaseIdItemAndAction(dbTable, idRecord, finalSupabaseIdItem, 0);
+          await UpdateSupabaseIdItemAndAction(
+              dbTable, idRecord, finalSupabaseIdItem, 0);
         } catch (e) {
           print("Stala se chyba při sync hodnot do supabase: chyba $e");
         }
@@ -394,12 +409,16 @@ class FitnessProvider extends ChangeNotifier {
         print("updatuje se ${finalData}");
         print("supabaseIdItem $supabaseIdItem");
         try {
-          await supabase.from('$dbTable').update(finalData).eq(idItem, supabaseIdItem!);
+          await supabase
+              .from('$dbTable')
+              .update(finalData)
+              .eq(idItem, supabaseIdItem!);
         } catch (e) {
           print("chyba při update $e");
         }
         try {
-          await _database.rawQuery('''UPDATE $dbTable SET action = 0 WHERE $updateDeleteColumn = $supabaseIdItem''');
+          await _database.rawQuery(
+              '''UPDATE $dbTable SET action = 0 WHERE $updateDeleteColumn = $supabaseIdItem''');
         } catch (e) {
           print("chyba při update action v sqflite");
         }
@@ -415,16 +434,19 @@ class FitnessProvider extends ChangeNotifier {
           print("Stala se chyba při delete row v supabase");
         }
         try {
-          await _database.rawQuery('''DELETE FROM $dbTable WHERE $updateDeleteColumn == $supabaseIdItem''');
+          await _database.rawQuery(
+              '''DELETE FROM $dbTable WHERE $updateDeleteColumn == $supabaseIdItem''');
         } catch (e) {
-          print("Stala se chyba při delete row v sqflite v FitnessProvider při sync hodnot");
+          print(
+              "Stala se chyba při delete row v sqflite v FitnessProvider při sync hodnot");
         }
 
         break;
       case 4:
         //delete v sqlite
         try {
-          await _database.rawQuery('''DELETE FROM $dbTable WHERE $updateDeleteColumn == $supabaseIdItem''');
+          await _database.rawQuery(
+              '''DELETE FROM $dbTable WHERE $updateDeleteColumn == $supabaseIdItem''');
         } catch (e) {
           print("delete v sqflite se nezdařil, chyba: $e");
         }
@@ -433,52 +455,73 @@ class FitnessProvider extends ChangeNotifier {
     return finalSupabaseIdItem;
   }
 
-  UpdateSelectedMuscleMusclesIdMuscle(int newMusclesIdMuscle, int oldMusclesIdMuscle) async {
-    await _database.rawQuery('''UPDATE selected_muscles SET muscles_id_muscle = $newMusclesIdMuscle WHERE muscles_id_muscle = $oldMusclesIdMuscle''');
+  UpdateSelectedMuscleMusclesIdMuscle(
+      int newMusclesIdMuscle, int oldMusclesIdMuscle) async {
+    await _database.rawQuery(
+        '''UPDATE selected_muscles SET muscles_id_muscle = $newMusclesIdMuscle WHERE muscles_id_muscle = $oldMusclesIdMuscle''');
   }
 
-  UpadateExercisesMusclesIdMuscle(int newMusclesIdMuscle, int oldMusclesIdMuscle) async {
-    await _database.rawQuery('''UPDATE exercises SET muscles_id_muscle = $newMusclesIdMuscle WHERE muscles_id_muscle = $oldMusclesIdMuscle''');
+  UpadateExercisesMusclesIdMuscle(
+      int newMusclesIdMuscle, int oldMusclesIdMuscle) async {
+    await _database.rawQuery(
+        '''UPDATE exercises SET muscles_id_muscle = $newMusclesIdMuscle WHERE muscles_id_muscle = $oldMusclesIdMuscle''');
   }
 
-  UpadateExerciseDataExercisesIdExercise(int newExercisesIdExercise, int oldExercisesIdExercise) async {
-    await _database.rawQuery('''UPDATE exercise_data SET exercises_id_exercise = $newExercisesIdExercise WHERE exercises_id_exercise = $oldExercisesIdExercise''');
+  UpadateExerciseDataExercisesIdExercise(
+      int newExercisesIdExercise, int oldExercisesIdExercise) async {
+    await _database.rawQuery(
+        '''UPDATE exercise_data SET exercises_id_exercise = $newExercisesIdExercise WHERE exercises_id_exercise = $oldExercisesIdExercise''');
   }
 
   UpadateExerciseDataIdExData(int newIdExData, int oldIdExData) async {
-    await _database.rawQuery('''UPDATE exercise_data SET id_ex_data = $newIdExData WHERE id_ex_data = $oldIdExData''');
+    await _database.rawQuery(
+        '''UPDATE exercise_data SET id_ex_data = $newIdExData WHERE id_ex_data = $oldIdExData''');
   }
 
-  UpadateSelectedExerciseIdExercise(int newExercisesIdExercise, int oldExercisesIdExercise) async {
-    await _database.rawQuery('''UPDATE selected_exercise SET id_exercise = $newExercisesIdExercise WHERE id_exercise = $oldExercisesIdExercise''');
+  UpadateSelectedExerciseIdExercise(
+      int newExercisesIdExercise, int oldExercisesIdExercise) async {
+    await _database.rawQuery(
+        '''UPDATE selected_exercise SET id_exercise = $newExercisesIdExercise WHERE id_exercise = $oldExercisesIdExercise''');
   }
 
-  UpadateSelectedMusclesSplitIdSplit(int newSplitIdSplit, int oldSplitIdSplit) async {
-    await _database.rawQuery('''UPDATE selected_muscles SET split_id_split = $newSplitIdSplit WHERE split_id_split = $oldSplitIdSplit''');
+  UpadateSelectedMusclesSplitIdSplit(
+      int newSplitIdSplit, int oldSplitIdSplit) async {
+    await _database.rawQuery(
+        '''UPDATE selected_muscles SET split_id_split = $newSplitIdSplit WHERE split_id_split = $oldSplitIdSplit''');
   }
 
-  UpadateSelectedExerciseIdSelectedMuscle(int newIdSelectedMuscle, int oldIdSelectedMuscle) async {
-    await _database.rawQuery('''UPDATE selected_exercise SET id_selected_muscle = $newIdSelectedMuscle WHERE id_selected_muscle = $newIdSelectedMuscle''');
+  UpadateSelectedExerciseIdSelectedMuscle(
+      int newIdSelectedMuscle, int oldIdSelectedMuscle) async {
+    await _database.rawQuery(
+        '''UPDATE selected_exercise SET id_selected_muscle = $newIdSelectedMuscle WHERE id_selected_muscle = $newIdSelectedMuscle''');
   }
 
   UpadateSplitStartedCompletedSplitId(int newSplitId, int oldSplitId) async {
-    await _database.rawQuery('''UPDATE split_started_completed SET split_id = $newSplitId WHERE split_id = $oldSplitId''');
+    await _database.rawQuery(
+        '''UPDATE split_started_completed SET split_id = $newSplitId WHERE split_id = $oldSplitId''');
   }
 
-  UpadateExerciseDataIdStartedCompleted(int newIdSplitStarted, int oldIdSplitStarted) async {
-    await _database.rawQuery('''UPDATE exercise_data SET id_started_completed = $newIdSplitStarted WHERE id_started_completed = $oldIdSplitStarted''');
+  UpadateExerciseDataIdStartedCompleted(
+      int newIdSplitStarted, int oldIdSplitStarted) async {
+    await _database.rawQuery(
+        '''UPDATE exercise_data SET id_started_completed = $newIdSplitStarted WHERE id_started_completed = $oldIdSplitStarted''');
   }
 
-  UpadateBodyMeasurements(int newIdBodyMeasurements, int oldIdBodyMeasurements) async {
-    await _database.rawQuery('''UPDATE body_measurements SET id_body_measurements = $newIdBodyMeasurements WHERE id_body_measurements = $oldIdBodyMeasurements''');
+  UpadateBodyMeasurements(
+      int newIdBodyMeasurements, int oldIdBodyMeasurements) async {
+    await _database.rawQuery(
+        '''UPDATE body_measurements SET id_body_measurements = $newIdBodyMeasurements WHERE id_body_measurements = $oldIdBodyMeasurements''');
   }
 
-  UpadateIntakeCategories(int newIdIntakeCategory, int oldIdIntakeCategory) async {
-    await _database.rawQuery('''UPDATE intake_categories SET id_intake_category = $newIdIntakeCategory WHERE id_intake_category = $oldIdIntakeCategory''');
+  UpadateIntakeCategories(
+      int newIdIntakeCategory, int oldIdIntakeCategory) async {
+    await _database.rawQuery(
+        '''UPDATE intake_categories SET id_intake_category = $newIdIntakeCategory WHERE id_intake_category = $oldIdIntakeCategory''');
   }
 
   UpadateNutriIntakes(int newIdNutriIntake, int oldIdNutriIntake) async {
-    await _database.rawQuery('''UPDATE nutri_intake SET id_nutri_intake = $newIdNutriIntake WHERE id_nutri_intake = $oldIdNutriIntake''');
+    await _database.rawQuery(
+        '''UPDATE nutri_intake SET id_nutri_intake = $newIdNutriIntake WHERE id_nutri_intake = $oldIdNutriIntake''');
   }
 
   bool beginSaveToSupabaseAndOrderSqlite = false;
@@ -498,14 +541,16 @@ class FitnessProvider extends ChangeNotifier {
 
   Future<bool> isConnectedToInternet() async {
     try {
-      final result = await http.get(Uri.parse('https://www.google.com')).timeout(
-            const Duration(seconds: 5),
-            onTimeout: () => http.Response('Timeout', 408),
-          );
+      final result =
+          await http.get(Uri.parse('https://www.google.com')).timeout(
+                const Duration(seconds: 5),
+                onTimeout: () => http.Response('Timeout', 408),
+              );
       if (result.statusCode == 200) {
         return true; // Připojení je v pořádku
       } else {
-        print("Failed to connect to the internet. Status code: ${result.statusCode}");
+        print(
+            "Failed to connect to the internet. Status code: ${result.statusCode}");
         return false; // Špatné připojení
       }
     } catch (e) {
@@ -517,7 +562,8 @@ class FitnessProvider extends ChangeNotifier {
   SaveToSupabaseAndOrderSqlite(SupabaseProvider dbSupabase) async {
     Stopwatch stopwatch = Stopwatch()..start();
     if (_isSyncing) {
-      print("Syncing is already in progress. Skipping this call.*************************************************************************");
+      print(
+          "Syncing is already in progress. Skipping this call.*************************************************************************");
       return;
     }
     print("object");
@@ -532,28 +578,38 @@ class FitnessProvider extends ChangeNotifier {
     try {
       List<Muscle> muscles = await SelectMuscles();
       List<Exercise> exercises = await SelectExercisesWhereActionIsNotZero();
-      List<Measurements> measurements = await SelectMeasurementsWhereActionIsNotZero();
-      List<IntakeCategories> intakeCategories = await SelectIntakeCategoriesWhereActionIsNotZero();
-      List<NutriIntake> nutriIntakes = await SelectNutriIntakesWhereActionIsNotZero();
+      List<Measurements> measurements =
+          await SelectMeasurementsWhereActionIsNotZero();
+      List<IntakeCategories> intakeCategories =
+          await SelectIntakeCategoriesWhereActionIsNotZero();
+      List<NutriIntake> nutriIntakes =
+          await SelectNutriIntakesWhereActionIsNotZero();
 
       List<MySplit> allData = await SelectAllData();
-      List<ExerciseData> exercisesData = await SelectExerciseDataWhereActionIsNotZero();
+      List<ExerciseData> exercisesData =
+          await SelectExerciseDataWhereActionIsNotZero();
 
       for (var muscle in muscles) {
         int muscleAction = muscle.action ?? 0;
-        int? supabaseIdMuscle = await SyncSqfliteToSupabase(dbSupabase, "muscles", muscle, muscleAction);
+        int? supabaseIdMuscle = await SyncSqfliteToSupabase(
+            dbSupabase, "muscles", muscle, muscleAction);
         if (supabaseIdMuscle != null) {
-          await UpdateSelectedMuscleMusclesIdMuscle(supabaseIdMuscle, muscle.supabaseIdMuscle ?? 0);
-          await UpadateExercisesMusclesIdMuscle(supabaseIdMuscle, muscle.supabaseIdMuscle ?? 0);
+          await UpdateSelectedMuscleMusclesIdMuscle(
+              supabaseIdMuscle, muscle.supabaseIdMuscle ?? 0);
+          await UpadateExercisesMusclesIdMuscle(
+              supabaseIdMuscle, muscle.supabaseIdMuscle ?? 0);
 
           for (var exercise in exercises) {
             if (muscle.supabaseIdMuscle == exercise.musclesIdMuscle) {
               exercise.musclesIdMuscle = supabaseIdMuscle;
               int exerciseAction = exercise.action ?? 0;
-              int? supabaseIdExercise = await SyncSqfliteToSupabase(dbSupabase, "exercises", exercise, exerciseAction);
+              int? supabaseIdExercise = await SyncSqfliteToSupabase(
+                  dbSupabase, "exercises", exercise, exerciseAction);
               if (supabaseIdExercise != null) {
-                await UpadateExerciseDataExercisesIdExercise(supabaseIdExercise, exercise.supabaseIdExercise ?? 0);
-                await UpadateSelectedExerciseIdExercise(supabaseIdExercise, exercise.supabaseIdExercise ?? 0);
+                await UpadateExerciseDataExercisesIdExercise(
+                    supabaseIdExercise, exercise.supabaseIdExercise ?? 0);
+                await UpadateSelectedExerciseIdExercise(
+                    supabaseIdExercise, exercise.supabaseIdExercise ?? 0);
               }
             }
           }
@@ -562,45 +618,69 @@ class FitnessProvider extends ChangeNotifier {
 
       for (var split in allData) {
         int splitAction = split.action ?? 0;
-        int? supabaseIdSplit = await SyncSqfliteToSupabase(dbSupabase, "split", split, splitAction);
+        int? supabaseIdSplit = await SyncSqfliteToSupabase(
+            dbSupabase, "split", split, splitAction);
         if (supabaseIdSplit != null) {
-          await UpadateSelectedMusclesSplitIdSplit(supabaseIdSplit, split.supabaseIdSplit ?? 0);
-          await UpadateSplitStartedCompletedSplitId(supabaseIdSplit, split.supabaseIdSplit ?? 0);
+          await UpadateSelectedMusclesSplitIdSplit(
+              supabaseIdSplit, split.supabaseIdSplit ?? 0);
+          await UpadateSplitStartedCompletedSplitId(
+              supabaseIdSplit, split.supabaseIdSplit ?? 0);
 
           for (var selectedMuscle in split.selectedMuscle ?? []) {
             if (split.supabaseIdSplit == selectedMuscle.splitIdSplit) {
               selectedMuscle.splitIdSplit = supabaseIdSplit;
               int selectedMuscleAction = selectedMuscle.action ?? 0;
-              int? supabaseIdSelectedMuscle = await SyncSqfliteToSupabase(dbSupabase, "selected_muscles", selectedMuscle, selectedMuscleAction);
+              int? supabaseIdSelectedMuscle = await SyncSqfliteToSupabase(
+                  dbSupabase,
+                  "selected_muscles",
+                  selectedMuscle,
+                  selectedMuscleAction);
               if (supabaseIdSelectedMuscle != null) {
-                await UpadateSelectedExerciseIdSelectedMuscle(supabaseIdSelectedMuscle, selectedMuscle.supabaseIdSelectedMuscle ?? 0);
+                await UpadateSelectedExerciseIdSelectedMuscle(
+                    supabaseIdSelectedMuscle,
+                    selectedMuscle.supabaseIdSelectedMuscle ?? 0);
 
-                for (var selectedExercise in selectedMuscle.selectedExercises ?? []) {
-                  if (selectedMuscle.supabaseIdSelectedMuscle == selectedExercise.idSelectedMuscle) {
-                    selectedExercise.idSelectedMuscle = supabaseIdSelectedMuscle;
+                for (var selectedExercise
+                    in selectedMuscle.selectedExercises ?? []) {
+                  if (selectedMuscle.supabaseIdSelectedMuscle ==
+                      selectedExercise.idSelectedMuscle) {
+                    selectedExercise.idSelectedMuscle =
+                        supabaseIdSelectedMuscle;
                     int selectedExerciseAction = selectedExercise.action ?? 0;
-                    await SyncSqfliteToSupabase(dbSupabase, "selected_exercise", selectedExercise, selectedExerciseAction);
+                    await SyncSqfliteToSupabase(dbSupabase, "selected_exercise",
+                        selectedExercise, selectedExerciseAction);
                   }
                 }
               }
             }
           }
 
-          for (var splitStartedCompletedItem in split.splitStartedCompleted ?? []) {
+          for (var splitStartedCompletedItem
+              in split.splitStartedCompleted ?? []) {
             print("začátek");
             if (split.supabaseIdSplit == splitStartedCompletedItem.splitId) {
               splitStartedCompletedItem.splitId = supabaseIdSplit;
-              int splitStartedCompletedAction = splitStartedCompletedItem.action ?? 0;
-              int? supabaseIdStartedCompleted = await SyncSqfliteToSupabase(dbSupabase, "split_started_completed", splitStartedCompletedItem, splitStartedCompletedAction);
+              int splitStartedCompletedAction =
+                  splitStartedCompletedItem.action ?? 0;
+              int? supabaseIdStartedCompleted = await SyncSqfliteToSupabase(
+                  dbSupabase,
+                  "split_started_completed",
+                  splitStartedCompletedItem,
+                  splitStartedCompletedAction);
               if (supabaseIdStartedCompleted != null) {
                 print("splitstartedcompleted není null");
-                await UpadateExerciseDataIdStartedCompleted(supabaseIdStartedCompleted, splitStartedCompletedItem.supabaseIdStartedCompleted ?? 0);
+                await UpadateExerciseDataIdStartedCompleted(
+                    supabaseIdStartedCompleted,
+                    splitStartedCompletedItem.supabaseIdStartedCompleted ?? 0);
 
                 for (var exerciseDataItem in exercisesData) {
-                  if (splitStartedCompletedItem.supabaseIdStartedCompleted == exerciseDataItem.idStartedCompleted) {
-                    exerciseDataItem.idStartedCompleted = supabaseIdStartedCompleted;
+                  if (splitStartedCompletedItem.supabaseIdStartedCompleted ==
+                      exerciseDataItem.idStartedCompleted) {
+                    exerciseDataItem.idStartedCompleted =
+                        supabaseIdStartedCompleted;
                     int exerciseDataAction = exerciseDataItem.action ?? 0;
-                    await SyncSqfliteToSupabase(dbSupabase, "exercise_data", exerciseDataItem, exerciseDataAction);
+                    await SyncSqfliteToSupabase(dbSupabase, "exercise_data",
+                        exerciseDataItem, exerciseDataAction);
                   }
                 }
               } else {
@@ -608,10 +688,13 @@ class FitnessProvider extends ChangeNotifier {
                 if (splitStartedCompletedItem.ended == true) {
                   print("start exercisedata opravy");
                   for (var exerciseDataItem in exercisesData) {
-                    if (splitStartedCompletedItem.supabaseIdStartedCompleted == exerciseDataItem.idStartedCompleted) {
-                      exerciseDataItem.idStartedCompleted = splitStartedCompletedItem.supabaseIdStartedCompleted;
+                    if (splitStartedCompletedItem.supabaseIdStartedCompleted ==
+                        exerciseDataItem.idStartedCompleted) {
+                      exerciseDataItem.idStartedCompleted =
+                          splitStartedCompletedItem.supabaseIdStartedCompleted;
                       int exerciseDataAction = exerciseDataItem.action ?? 0;
-                      await SyncSqfliteToSupabase(dbSupabase, "exercise_data", exerciseDataItem, exerciseDataAction);
+                      await SyncSqfliteToSupabase(dbSupabase, "exercise_data",
+                          exerciseDataItem, exerciseDataAction);
                     }
                   }
                 }
@@ -623,17 +706,24 @@ class FitnessProvider extends ChangeNotifier {
       print("measurements");
       for (var measurement in measurements) {
         int bodyMeasurementsAction = measurement.action ?? 0;
-        int? supabaseIdBodyMeasurements = await SyncSqfliteToSupabase(dbSupabase, "body_measurements", measurement, bodyMeasurementsAction);
+        int? supabaseIdBodyMeasurements = await SyncSqfliteToSupabase(
+            dbSupabase,
+            "body_measurements",
+            measurement,
+            bodyMeasurementsAction);
         if (supabaseIdBodyMeasurements != null) {
-          await UpadateBodyMeasurements(supabaseIdBodyMeasurements, measurement.idBodyMeasurements ?? 0);
+          await UpadateBodyMeasurements(
+              supabaseIdBodyMeasurements, measurement.idBodyMeasurements ?? 0);
         }
       }
       print("intake category");
       for (var intakeCategory in intakeCategories) {
         int intakeCategoryAction = intakeCategory.action ?? 0;
-        int? supabaseIdIntakeCategory = await SyncSqfliteToSupabase(dbSupabase, "intake_categories", intakeCategory, intakeCategoryAction);
+        int? supabaseIdIntakeCategory = await SyncSqfliteToSupabase(dbSupabase,
+            "intake_categories", intakeCategory, intakeCategoryAction);
         if (supabaseIdIntakeCategory != null) {
-          await UpadateIntakeCategories(supabaseIdIntakeCategory, intakeCategory.idIntakeCategory ?? 0);
+          await UpadateIntakeCategories(
+              supabaseIdIntakeCategory, intakeCategory.idIntakeCategory ?? 0);
         }
       }
       print("nutri intake **********************************");
@@ -644,20 +734,23 @@ class FitnessProvider extends ChangeNotifier {
         int nutriIntakeAction = nutriIntake.action ?? 0;
         int? supabaseIdNutriIntake;
         try {
-          supabaseIdNutriIntake = await SyncSqfliteToSupabase(dbSupabase, "nutri_intake", nutriIntake, nutriIntakeAction);
+          supabaseIdNutriIntake = await SyncSqfliteToSupabase(
+              dbSupabase, "nutri_intake", nutriIntake, nutriIntakeAction);
         } on Exception catch (e) {
           print("chyba nastává v SyncSqfliteToSupabase: ${e}");
         }
         if (supabaseIdNutriIntake != null) {
           try {
-            await UpadateNutriIntakes(supabaseIdNutriIntake, nutriIntake.idNutriIntake ?? 0);
+            await UpadateNutriIntakes(
+                supabaseIdNutriIntake, nutriIntake.idNutriIntake ?? 0);
           } on Exception catch (e) {
             print("chyba nastává v UpadateNutriIntakes: ${e}");
             try {
               await UpadateNutriIntakes(0, nutriIntake.idNutriIntake ?? 0);
               await UpadateNutriIntakes(supabaseIdNutriIntake, 0);
             } on Exception catch (e) {
-              print("chyba stále přetrvává ************************ UpadateNutriIntakes: ${e}");
+              print(
+                  "chyba stále přetrvává ************************ UpadateNutriIntakes: ${e}");
             }
           }
         }
@@ -672,45 +765,56 @@ class FitnessProvider extends ChangeNotifier {
     print("${stopwatch.elapsed.inMilliseconds}ms");
   }
 
-  UpdateSupabaseIdItemAndAction(String dbTable, int idRecord, int? supabaseIdItem, int action) async {
+  UpdateSupabaseIdItemAndAction(
+      String dbTable, int idRecord, int? supabaseIdItem, int action) async {
     switch (dbTable) {
       case "muscles":
-        await _database.rawQuery('''UPDATE muscles SET supabase_id_muscle = $supabaseIdItem, action = $action WHERE id_muscle = $idRecord''');
+        await _database.rawQuery(
+            '''UPDATE muscles SET supabase_id_muscle = $supabaseIdItem, action = $action WHERE id_muscle = $idRecord''');
         break;
       case "exercises":
-        await _database.rawQuery('''UPDATE exercises SET supabase_id_exercise = $supabaseIdItem, action = $action WHERE id_exercise = $idRecord''');
+        await _database.rawQuery(
+            '''UPDATE exercises SET supabase_id_exercise = $supabaseIdItem, action = $action WHERE id_exercise = $idRecord''');
 
         break;
       case "exercise_data":
-        await _database.rawQuery('''UPDATE exercise_data SET supabase_id_ex_data = $supabaseIdItem, action = $action WHERE id_ex_data = $idRecord''');
+        await _database.rawQuery(
+            '''UPDATE exercise_data SET supabase_id_ex_data = $supabaseIdItem, action = $action WHERE id_ex_data = $idRecord''');
 
         break;
       case "split":
-        await _database.rawQuery('''UPDATE split SET supabase_id_split = $supabaseIdItem, action = $action  WHERE id_split = $idRecord''');
+        await _database.rawQuery(
+            '''UPDATE split SET supabase_id_split = $supabaseIdItem, action = $action  WHERE id_split = $idRecord''');
 
         break;
       case "selected_muscles":
-        await _database.rawQuery('''UPDATE selected_muscles SET supabase_id_selected_muscle = $supabaseIdItem, action = $action WHERE id_selected_muscle = $idRecord''');
+        await _database.rawQuery(
+            '''UPDATE selected_muscles SET supabase_id_selected_muscle = $supabaseIdItem, action = $action WHERE id_selected_muscle = $idRecord''');
 
         break;
       case "selected_exercise":
-        await _database.rawQuery('''UPDATE selected_exercise SET supabase_id_selected_exercise = $supabaseIdItem, action = $action WHERE id_selected_exercise = $idRecord''');
+        await _database.rawQuery(
+            '''UPDATE selected_exercise SET supabase_id_selected_exercise = $supabaseIdItem, action = $action WHERE id_selected_exercise = $idRecord''');
 
         break;
       case "split_started_completed":
-        await _database.rawQuery('''UPDATE split_started_completed SET supabase_id_started_completed = $supabaseIdItem, action = $action WHERE id_started_completed = $idRecord''');
+        await _database.rawQuery(
+            '''UPDATE split_started_completed SET supabase_id_started_completed = $supabaseIdItem, action = $action WHERE id_started_completed = $idRecord''');
 
         break;
       case "body_measurements":
-        await _database.rawQuery('''UPDATE body_measurements SET supabase_id_body_measurements = $supabaseIdItem, action = $action WHERE id_body_measurements = $idRecord''');
+        await _database.rawQuery(
+            '''UPDATE body_measurements SET supabase_id_body_measurements = $supabaseIdItem, action = $action WHERE id_body_measurements = $idRecord''');
 
         break;
       case "intake_categories":
-        await _database.rawQuery('''UPDATE intake_categories SET supabase_id_intake_category = $supabaseIdItem, action = $action WHERE id_intake_category = $idRecord''');
+        await _database.rawQuery(
+            '''UPDATE intake_categories SET supabase_id_intake_category = $supabaseIdItem, action = $action WHERE id_intake_category = $idRecord''');
 
         break;
       case "nutri_intake":
-        await _database.rawQuery('''UPDATE nutri_intake SET supabase_id_nutri_intake = $supabaseIdItem, action = $action WHERE id_nutri_intake = $idRecord''');
+        await _database.rawQuery(
+            '''UPDATE nutri_intake SET supabase_id_nutri_intake = $supabaseIdItem, action = $action WHERE id_nutri_intake = $idRecord''');
 
         break;
       default:
@@ -772,7 +876,8 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
 
       // Vytvoření cvičení (Exercise), pokud ještě neexistuje
       int? exerciseId = item['id_exercise'] as int?;
-      if (!muscle.exercises!.any((exercise) => exercise.idExercise == exerciseId)) {
+      if (!muscle.exercises!
+          .any((exercise) => exercise.idExercise == exerciseId)) {
         Exercise exercise = Exercise(
           idExercise: exerciseId,
           nameOfExercise: item['name_of_exercise'] as String?,
@@ -785,7 +890,8 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
       }
 
       // Získání cvičení
-      Exercise? exercise = muscle.exercises!.firstWhere((item) => item.idExercise == exerciseId);
+      Exercise? exercise =
+          muscle.exercises!.firstWhere((item) => item.idExercise == exerciseId);
 
       // Přidání ExerciseData, pokud jsou k dispozici
       if (item['id_ex_data'] != null) {
@@ -794,7 +900,8 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
           weight: item['weight'] as int,
           reps: item['reps'] as int,
           difficulty: item['difficulty'] as int,
-          technique: item['technique'] != null ? item['technique'] as String : "",
+          technique:
+              item['technique'] != null ? item['technique'] as String : "",
           comment: item['comment'] != null ? item['comment'] as String : "",
           time: item['time'].toString(),
           exercisesIdExercise: item['exercises_id_exercise'] as int,
@@ -837,10 +944,12 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
 
           // Přidání selectedExercises do selectedMuscles
           for (var selectedExercise in selectedExercises) {
-            if (selectedMuscle.supabaseIdSelectedMuscle == selectedExercise.idSelectedMuscle) {
+            if (selectedMuscle.supabaseIdSelectedMuscle ==
+                selectedExercise.idSelectedMuscle) {
               // Přidání exercises do selectedExercises
               for (var exercise in exercises) {
-                if (selectedExercise.idExercise == exercise.supabaseIdExercise) {
+                if (selectedExercise.idExercise ==
+                    exercise.supabaseIdExercise) {
                   selectedExercise.exercises = exercise;
                 }
               }
@@ -893,7 +1002,8 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
 
           // Přidání exerciseData do splitStartedCompleted
           for (var exerciseDataItem in exerciseData) {
-            if (exerciseDataItem.idStartedCompleted == splitStartedCompleted.supabaseIdStartedCompleted) {
+            if (exerciseDataItem.idStartedCompleted ==
+                splitStartedCompleted.supabaseIdStartedCompleted) {
               splitStartedCompleted.exerciseData!.add(exerciseDataItem);
             }
           }
@@ -932,9 +1042,11 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
         int totalWorkVolume = 0;
         if (split.supabaseIdSplit == splitStartedCompleted.splitId) {
           for (var exercise in exerciseData) {
-            if (exercise.idStartedCompleted == splitStartedCompleted.supabaseIdStartedCompleted) {
+            if (exercise.idStartedCompleted ==
+                splitStartedCompleted.supabaseIdStartedCompleted) {
               numberOfSets += 1;
-              totalWorkVolume += ((exercise.weight ?? 0) * (exercise.reps ?? 0));
+              totalWorkVolume +=
+                  ((exercise.weight ?? 0) * (exercise.reps ?? 0));
             }
           }
 
@@ -967,7 +1079,8 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
 
           // Přidání exerciseData do splitStartedCompleted
           for (var exerciseDataItem in exerciseData) {
-            if (exerciseDataItem.idStartedCompleted == splitStartedCompleted.supabaseIdStartedCompleted) {
+            if (exerciseDataItem.idStartedCompleted ==
+                splitStartedCompleted.supabaseIdStartedCompleted) {
               splitStartedCompleted.exerciseData!.add(exerciseDataItem);
             }
           }
@@ -991,7 +1104,8 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
   }
 
   Future<List<Muscle>> SelectMusclesWhereActionIsNotZero() async {
-    var data = await _database.rawQuery('''SELECT * FROM muscles WHERE action IS NOT 0''');
+    var data = await _database
+        .rawQuery('''SELECT * FROM muscles WHERE action IS NOT 0''');
     var finalData = data.map((e) => Muscle.fromJson(e)).toList();
 
     return finalData;
@@ -1031,11 +1145,13 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
   }
 
   UpdateMuscle(String text, int id) async {
-    await _database.rawQuery('''UPDATE muscles SET name_of_muscle = '$text' WHERE supabase_id_muscle = $id''');
+    await _database.rawQuery(
+        '''UPDATE muscles SET name_of_muscle = '$text' WHERE supabase_id_muscle = $id''');
   }
 
   UpdateMuscleAndSetAction(String text, int id, int action) async {
-    await _database.rawQuery('''UPDATE muscles SET name_of_muscle = '$text', action = '$action' WHERE supabase_id_muscle = $id''');
+    await _database.rawQuery(
+        '''UPDATE muscles SET name_of_muscle = '$text', action = '$action' WHERE supabase_id_muscle = $id''');
   }
 
   DeleteMuscle(int id) async {
@@ -1065,7 +1181,8 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
   }
 
   Future<List<Exercise>> SelectExercisesWhereActionIsNotZero() async {
-    var data = await _database.rawQuery('''SELECT * FROM exercises WHERE action IS NOT 0''');
+    var data = await _database
+        .rawQuery('''SELECT * FROM exercises WHERE action IS NOT 0''');
 
     var finalData = data.map((e) => Exercise.fromJson(e)).toList();
 
@@ -1094,39 +1211,80 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     notifyListeners();
   }
 
+  selectExerciseComment(int idExercise) async {
+    var data = await _database.rawQuery(
+        '''SELECT comment, action FROM exercises WHERE supabase_id_exercise = $idExercise''');
+    print(data);
+    if (data.isNotEmpty && data[0]['comment'] != null) {
+      // Přístup k prvnímu výsledku
+
+      String comment = data[0]['comment'] as String;
+      int action = data[0]['action'] as int;
+      print("Comment: $comment");
+      return [comment, action];
+    } else {
+      print("No comment found for idExercise: $idExercise");
+      return "";
+    }
+  }
+
+  selectAllCommentFromExercises() async {
+    var data = await _database.rawQuery(
+        '''SELECT comment,name_of_exercise,id_exercise, supabase_id_exercise FROM exercises''');
+
+    var finalData = data.map((e) => Exercise.fromJson(e)).toList();
+    print("length of comments: ${finalData.length}");
+    for (var element in finalData) {
+      element.printComment();
+    }
+  }
+
   TxnInsertExercise(
     Transaction txn,
     int? supabaseIdExercise,
     String nameOfExercise,
+    String comment,
     int musclesIdMuscle,
     int action,
   ) async {
     //action 1 == insert
     await txn.rawQuery('''INSERT INTO exercises (
       supabase_id_exercise, 
-      name_of_exercise, 
+      name_of_exercise,
+      comment,
       muscles_id_muscle,
       action
     ) 
     VALUES(
       $supabaseIdExercise,
       '$nameOfExercise', 
+      '$comment',
       $musclesIdMuscle, 
       $action)
     ''');
   }
 
   UpdateExercise(String nameOfExercise, int supabaseIdExercise) async {
-    await _database.rawQuery('''UPDATE exercises SET name_of_exercise = '$nameOfExercise' WHERE supabase_id_exercise = $supabaseIdExercise''');
+    await _database.rawQuery(
+        '''UPDATE exercises SET name_of_exercise = '$nameOfExercise' WHERE supabase_id_exercise = $supabaseIdExercise''');
   }
 
-  UpdateExerciseAndSetAction(String nameOfExercise, int supabaseIdExercise, int action) async {
-    await _database.rawQuery('''UPDATE exercises SET name_of_exercise = '$nameOfExercise', action = '$action' WHERE supabase_id_exercise = $supabaseIdExercise''');
+  UpdateExerciseComment(
+      String comment, int supabaseIdExercise, int action) async {
+    await _database.rawQuery(
+        '''UPDATE exercises SET comment = '$comment', action = '$action' WHERE supabase_id_exercise = $supabaseIdExercise''');
+  }
+
+  UpdateExerciseAndSetAction(
+      String nameOfExercise, int supabaseIdExercise, int action) async {
+    await _database.rawQuery(
+        '''UPDATE exercises SET name_of_exercise = '$nameOfExercise', action = '$action' WHERE supabase_id_exercise = $supabaseIdExercise''');
   }
 
   DeleteExercise(int id) async {
     try {
-      await _database.rawQuery('''DELETE FROM exercises WHERE id_exercise = $id''');
+      await _database
+          .rawQuery('''DELETE FROM exercises WHERE id_exercise = $id''');
     } on Exception catch (e) {
       print(e);
     }
@@ -1152,7 +1310,8 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
   }
 
   Future<List<ExerciseData>> SelectExerciseDataWhereActionIsNotZero() async {
-    var data = await _database.rawQuery('''SELECT * FROM exercise_data WHERE action IS NOT 0''');
+    var data = await _database
+        .rawQuery('''SELECT * FROM exercise_data WHERE action IS NOT 0''');
     // var data1 = data[0];
 
     var finalData = data.map((e) => ExerciseData.fromJson(e)).toList();
@@ -1160,14 +1319,17 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     return finalData;
   }
 
-  Future<List<ExerciseData>> SelectCurrentExerciseDataWhereExerciseIdExerciseAndIdStCo(int exerciseIdExercise, int idStartedCompleted) async {
+  Future<List<ExerciseData>>
+      SelectCurrentExerciseDataWhereExerciseIdExerciseAndIdStCo(
+          int exerciseIdExercise, int idStartedCompleted) async {
     var data = await _database.rawQuery('''SELECT * FROM exercise_data 
     WHERE exercises_id_exercise = $exerciseIdExercise AND id_started_completed = $idStartedCompleted''');
     var finalData = data.map((e) => ExerciseData.fromJson(e)).toList();
     return finalData;
   }
 
-  Future<List<ExerciseData>> SelectCurrentExerciseDataWhereId(int idStartedCompleted) async {
+  Future<List<ExerciseData>> SelectCurrentExerciseDataWhereId(
+      int idStartedCompleted) async {
     var data = await _database.rawQuery('''SELECT * FROM exercise_data 
     WHERE id_started_completed = $idStartedCompleted''');
     var finalData = data.map((e) => ExerciseData.fromJson(e)).toList();
@@ -1267,7 +1429,8 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     notifyListeners();
   }
 
-  UpdateExerciseData(int? weight, int? reps, int? difficulty, int supabaseIdExData, int action) async {
+  UpdateExerciseData(int? weight, int? reps, int? difficulty,
+      int supabaseIdExData, int action) async {
     await _database.rawQuery('''
     UPDATE exercise_data 
     SET 
@@ -1281,7 +1444,8 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
 
   DeleteExerciseData(int supabaseIdExData) async {
     try {
-      await _database.rawQuery('''DELETE FROM exercise_data WHERE supabase_id_ex_data = $supabaseIdExData''');
+      await _database.rawQuery(
+          '''DELETE FROM exercise_data WHERE supabase_id_ex_data = $supabaseIdExData''');
     } on Exception catch (e) {
       print(e);
     }
@@ -1305,7 +1469,8 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
   }
 
   Future<List<MySplit>> SelectSplitWhereActionIsNotZero() async {
-    var data = await _database.rawQuery('''SELECT * FROM split WHERE action IS NOT 0''');
+    var data = await _database
+        .rawQuery('''SELECT * FROM split WHERE action IS NOT 0''');
     var finalData = data.map((e) => MySplit.fromJson(e)).toList();
 
     return finalData;
@@ -1320,7 +1485,8 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
   ) async {
     //action 1 == insert
     DateTime date = DateTime.now();
-    String formattedDate = DateFormat("yyyy-MM-ddTHH:mm:ss.SSS").format(date.toLocal());
+    String formattedDate =
+        DateFormat("yyyy-MM-ddTHH:mm:ss.SSS").format(date.toLocal());
     await _database.rawQuery('''INSERT INTO split (
       supabase_id_split, 
       name_split, 
@@ -1348,7 +1514,8 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
   ) async {
     //action 1 == insert
     DateTime date = DateTime.now();
-    String formattedDate = DateFormat("yyyy-MM-ddTHH:mm:ss.SSS").format(date.toLocal());
+    String formattedDate =
+        DateFormat("yyyy-MM-ddTHH:mm:ss.SSS").format(date.toLocal());
     await txn.rawQuery('''INSERT INTO split (
       supabase_id_split, 
       name_split, 
@@ -1368,16 +1535,20 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
   }
 
   UpdateSplit(String nameOfSplit, int supabaseIdSplit) async {
-    await _database.rawQuery('''UPDATE split SET name_split = '$nameOfSplit'WHERE supabase_id_split = $supabaseIdSplit''');
+    await _database.rawQuery(
+        '''UPDATE split SET name_split = '$nameOfSplit'WHERE supabase_id_split = $supabaseIdSplit''');
   }
 
-  UpdateSplitAndSetAction(String nameOfSplit, int supabaseIdSplit, int action) async {
-    await _database.rawQuery('''UPDATE split SET name_split = '$nameOfSplit', action = '$action' WHERE supabase_id_split = $supabaseIdSplit''');
+  UpdateSplitAndSetAction(
+      String nameOfSplit, int supabaseIdSplit, int action) async {
+    await _database.rawQuery(
+        '''UPDATE split SET name_split = '$nameOfSplit', action = '$action' WHERE supabase_id_split = $supabaseIdSplit''');
   }
 
   DeleteSplit(int id, int action) async {
     try {
-      await _database.rawQuery('''UPDATE split SET is_active = FALSE, action = $action  WHERE supabase_id_split = $id''');
+      await _database.rawQuery(
+          '''UPDATE split SET is_active = FALSE, action = $action  WHERE supabase_id_split = $id''');
     } on Exception catch (e) {
       print(e);
     }
@@ -1392,8 +1563,10 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     return finalData;
   }
 
-  Future<List<SelectedMuscle>> SelectSelectedMusclesWhereActionIsNotZero() async {
-    var data = await _database.rawQuery('''SELECT * FROM selected_muscles WHERE action IS NOT 0''');
+  Future<List<SelectedMuscle>>
+      SelectSelectedMusclesWhereActionIsNotZero() async {
+    var data = await _database
+        .rawQuery('''SELECT * FROM selected_muscles WHERE action IS NOT 0''');
     var finalData = data.map((e) => SelectedMuscle.fromJson(e)).toList();
 
     return finalData;
@@ -1445,12 +1618,14 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
   }
 
   UpdateSelectedMuscle(String text, int id) async {
-    await _database.rawQuery('''UPDATE selected_muscles SET name_of_muscle = '$text' WHERE id_muscle = $id''');
+    await _database.rawQuery(
+        '''UPDATE selected_muscles SET name_of_muscle = '$text' WHERE id_muscle = $id''');
   }
 
   DeleteSelectedMuscle(int id) async {
     try {
-      await _database.rawQuery('''DELETE FROM selected_muscles WHERE id_selected_muscle = $id''');
+      await _database.rawQuery(
+          '''DELETE FROM selected_muscles WHERE id_selected_muscle = $id''');
     } on Exception catch (e) {
       print(e);
     }
@@ -1473,8 +1648,10 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     return finalData;
   }
 
-  Future<List<SelectedExercise>> SelectSelectedExercisesWhereActionIsNotZero() async {
-    var data = await _database.rawQuery('''SELECT * FROM selected_exercise WHERE action IS NOT 0''');
+  Future<List<SelectedExercise>>
+      SelectSelectedExercisesWhereActionIsNotZero() async {
+    var data = await _database
+        .rawQuery('''SELECT * FROM selected_exercise WHERE action IS NOT 0''');
     var finalData = data.map((e) => SelectedExercise.fromJson(e)).toList();
 
     return finalData;
@@ -1526,12 +1703,14 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
   }
 
   UpdateSelectedExercise(int action, int idSelectedExercise) async {
-    await _database.rawQuery('''UPDATE selected_exercise SET action = $action WHERE supabase_id_selected_exercise = $idSelectedExercise''');
+    await _database.rawQuery(
+        '''UPDATE selected_exercise SET action = $action WHERE supabase_id_selected_exercise = $idSelectedExercise''');
   }
 
   DeleteSelectedExercise(int idSelectedExercise) async {
     try {
-      await _database.rawQuery('''DELETE FROM selected_exercise WHERE id_selected_exercise = $idSelectedExercise''');
+      await _database.rawQuery(
+          '''DELETE FROM selected_exercise WHERE id_selected_exercise = $idSelectedExercise''');
     } on Exception catch (e) {
       print(e);
     }
@@ -1539,7 +1718,8 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
   }
 
   DeleteAllSelectedExercises() async {
-    List<SelectedExercise> selectedExerciseDelete = await SelectSelectedExercises();
+    List<SelectedExercise> selectedExerciseDelete =
+        await SelectSelectedExercises();
     for (var element in selectedExerciseDelete) {
       await DeleteSelectedExercise(element.idSelectedExercise!);
     }
@@ -1548,27 +1728,33 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
 
   //SplitStartedCompleted
   Future<List<SplitStartedCompleted>> SelectSplitStartedCompleted() async {
-    var data = await _database.rawQuery('''SELECT * FROM split_started_completed''');
+    var data =
+        await _database.rawQuery('''SELECT * FROM split_started_completed''');
     var finalData = data.map((e) => SplitStartedCompleted.fromJson(e)).toList();
 
     return finalData;
   }
 
-  Future<List<SplitStartedCompleted>> SelectSplitStartedCompletedWhereActionIsNotZero() async {
-    var data = await _database.rawQuery('''SELECT * FROM split_started_completed WHERE action IS NOT 0''');
+  Future<List<SplitStartedCompleted>>
+      SelectSplitStartedCompletedWhereActionIsNotZero() async {
+    var data = await _database.rawQuery(
+        '''SELECT * FROM split_started_completed WHERE action IS NOT 0''');
     var finalData = data.map((e) => SplitStartedCompleted.fromJson(e)).toList();
 
     return finalData;
   }
 
-  Future<List<SplitStartedCompleted>> SelectSplitStartedCompletedWhereEnded(bool ended) async {
-    var data = await _database.rawQuery('''SELECT * FROM split_started_completed WHERE ended is $ended''');
+  Future<List<SplitStartedCompleted>> SelectSplitStartedCompletedWhereEnded(
+      bool ended) async {
+    var data = await _database.rawQuery(
+        '''SELECT * FROM split_started_completed WHERE ended is $ended''');
     var finalData = data.map((e) => SplitStartedCompleted.fromJson(e)).toList();
 
     return finalData;
   }
 
-  Future<List<SplitStartedCompleted>> SelectLast5StartedCompleted(String createdAt) async {
+  Future<List<SplitStartedCompleted>> SelectLast5StartedCompleted(
+      String createdAt) async {
     print(createdAt);
     var data = await _database.rawQuery('''
     SELECT *
@@ -1586,14 +1772,16 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     LIMIT 2;
 ''', ['$createdAt%']);
     if (data2.isNotEmpty && data2.length > 1) {
-      var finalData = data2.map((e) => SplitStartedCompleted.fromJson(e)).toList();
+      var finalData =
+          data2.map((e) => SplitStartedCompleted.fromJson(e)).toList();
       finalData.sort(
         (a, b) => b.createdAt!.compareTo(a.createdAt!),
       );
 
       return finalData;
     } else {
-      var finalData = data.map((e) => SplitStartedCompleted.fromJson(e)).toList();
+      var finalData =
+          data.map((e) => SplitStartedCompleted.fromJson(e)).toList();
       finalData.sort(
         (a, b) => b.createdAt!.compareTo(a.createdAt!),
       );
@@ -1611,7 +1799,8 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     int action,
   ) async {
     DateTime date = DateTime.now();
-    String formattedDate = DateFormat("yyyy-MM-ddTHH:mm:ss.SSS").format(date.toLocal());
+    String formattedDate =
+        DateFormat("yyyy-MM-ddTHH:mm:ss.SSS").format(date.toLocal());
     //action 1 == insert
     await _database.rawQuery('''INSERT INTO split_started_completed (
       supabase_id_started_completed, 
@@ -1643,7 +1832,8 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     int action,
   ) async {
     DateTime date = DateTime.now();
-    String formattedDate = DateFormat("yyyy-MM-ddTHH:mm:ss.SSS").format(date.toLocal());
+    String formattedDate =
+        DateFormat("yyyy-MM-ddTHH:mm:ss.SSS").format(date.toLocal());
     //action 1 == insert
     await txn.rawQuery('''INSERT INTO split_started_completed (
       supabase_id_started_completed, 
@@ -1665,7 +1855,8 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     notifyListeners();
   }
 
-  UpdateSplitStartedCompleted(bool ended, String endedAt, int idStartedCompleted) async {
+  UpdateSplitStartedCompleted(
+      bool ended, String endedAt, int idStartedCompleted) async {
     await _database.rawQuery('''
       UPDATE split_started_completed 
       SET 
@@ -1681,7 +1872,8 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
 
   DeleteSplitStartedCompleted(int id) async {
     try {
-      await _database.rawQuery('''DELETE FROM split_started_completed WHERE id_started_completed = $id''');
+      await _database.rawQuery(
+          '''DELETE FROM split_started_completed WHERE id_started_completed = $id''');
     } on Exception catch (e) {
       print(e);
     }
@@ -1689,7 +1881,8 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
   }
 
   DeleteAllSplitStartedCompleteds() async {
-    List<SplitStartedCompleted> splitStartedCompletedDelete = await SelectSplitStartedCompleted();
+    List<SplitStartedCompleted> splitStartedCompletedDelete =
+        await SelectSplitStartedCompleted();
     for (var element in splitStartedCompletedDelete) {
       await DeleteSplitStartedCompleted(element.idStartedCompleted!);
     }
@@ -1704,7 +1897,8 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
   }
 
   SelectMeasurementsWhereActionIsNotZero() async {
-    var data = await _database.rawQuery('''SELECT * FROM body_measurements WHERE action IS NOT 0''');
+    var data = await _database
+        .rawQuery('''SELECT * FROM body_measurements WHERE action IS NOT 0''');
     var finalData = data.map((e) => Measurements.fromJson(e)).toList();
     return finalData;
   }
@@ -1850,7 +2044,8 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     final db = await _database; // Získání instance databáze
 
     // Nejprve zkontroluj, zda již záznam s konkrétním id_food existuje
-    var result = await db.rawQuery('SELECT id_food FROM food WHERE id_food = ?', [food.idFood]);
+    var result = await db
+        .rawQuery('SELECT id_food FROM food WHERE id_food = ?', [food.idFood]);
 
     if (result.isNotEmpty) {
       print("aktualizace food");
@@ -2061,12 +2256,12 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     return finalData;
   }
 
-  Future<void> InsertNutriIntake(NutriIntake nutriIntake, int supabaseIdNutriIntake, int action) async {
+  Future<void> InsertNutriIntake(
+      NutriIntake nutriIntake, int supabaseIdNutriIntake, int action) async {
     final db = await _database; // Získání instance databáze
 
     await db.rawInsert('''
     INSERT INTO nutri_intake (
-      id_nutri_intake,
       created_at,
       id_food,
       quantity,
@@ -2074,21 +2269,23 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
       id_intake_category,
       supabase_id_nutri_intake,
       action
-    ) VALUES (?, ?, ?, ?, ?,?,?,?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?)
   ''', [
-      supabaseIdNutriIntake,
-      nutriIntake.createdAt,
-      nutriIntake.idFood,
-      nutriIntake.quantity,
-      nutriIntake.weight,
-      nutriIntake.intakeCategory,
-      supabaseIdNutriIntake,
-      1,
+      nutriIntake.createdAt
+          .toString(), // created_at (předpokládáme, že je správně formátován)
+      nutriIntake.idFood, // id_food
+      nutriIntake.quantity, // quantity
+      nutriIntake.weight, // weight
+      nutriIntake.intakeCategory, // id_intake_category
+      supabaseIdNutriIntake, // supabase_id_nutri_intake (zřejmě by měla být jiná hodnota)
+      action // action (vloží se proměnná)
     ]);
-    notifyListeners();
+
+    notifyListeners(); // Pouze pokud je třída založená na ChangeNotifier
   }
 
-  Future<void> TxnInsertNutriIntake(Transaction txn, NutriIntake nutriIntake, int supabaseIdNutriIntake, int action) async {
+  Future<void> TxnInsertNutriIntake(Transaction txn, NutriIntake nutriIntake,
+      int supabaseIdNutriIntake, int action) async {
     await txn.rawInsert('''
     INSERT INTO nutri_intake (
     
@@ -2125,7 +2322,8 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     notifyListeners(); // Oznámení změny
   }
 
-  UpdateDailyNutriIntakeToMinus(int newIdIntakeCategory, String day, int oldIdIntakeCategory) async {
+  UpdateDailyNutriIntakeToMinus(
+      int newIdIntakeCategory, String day, int oldIdIntakeCategory) async {
     final db = await _database; // Získání instance databáze
 
     await db.rawUpdate('''
@@ -2137,7 +2335,8 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
   ''', [newIdIntakeCategory, day, oldIdIntakeCategory]);
   }
 
-  UpdateDailyNutriIntakeToOriginal(int newIdIntakeCategory, String day, int minusIdIntakeCategory, int action) async {
+  UpdateDailyNutriIntakeToOriginal(int newIdIntakeCategory, String day,
+      int minusIdIntakeCategory, int action) async {
     final db = await _database; // Získání instance databáze
 
     await db.rawUpdate('''
@@ -2151,7 +2350,8 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     notifyListeners();
   }
 
-  Future<void> UpdateNutriIntake(int idNutriIntake, NutriIntake nutriIntake, int action) async {
+  Future<void> UpdateNutriIntake(
+      int idNutriIntake, NutriIntake nutriIntake, int action) async {
     final db = await _database; // Získání instance databáze
 
     await db.rawUpdate('''
@@ -2191,7 +2391,8 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     return finalData;
   }
 
-  Future<List<IntakeCategories>> SelectIntakeCategoriesWhereActionIsNotZero() async {
+  Future<List<IntakeCategories>>
+      SelectIntakeCategoriesWhereActionIsNotZero() async {
     final db = await _database;
 
     // Use the rawQuery method to filter by date
@@ -2205,7 +2406,8 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     return finalData;
   }
 
-  Future<void> insertIntakeCategory(String nameOfIntakeCategory, int action, int supabaseIdIntakeCategory) async {
+  Future<void> insertIntakeCategory(String nameOfIntakeCategory, int action,
+      int supabaseIdIntakeCategory) async {
     final db = await _database;
 
     // Vložení dat do tabulky intake_categories
@@ -2214,18 +2416,30 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     INSERT INTO intake_categories (name,action,supabase_id_intake_category)
     VALUES (?,?,?)
     ''',
-      [nameOfIntakeCategory, action, supabaseIdIntakeCategory], // Parametr pro název kategorie
+      [
+        nameOfIntakeCategory,
+        action,
+        supabaseIdIntakeCategory
+      ], // Parametr pro název kategorie
     );
   }
 
-  Future<void> TxninsertIntakeCategory(Transaction txn, String nameOfIntakeCategory, int action, int supabaseIdIntakeCategory) async {
+  Future<void> TxninsertIntakeCategory(
+      Transaction txn,
+      String nameOfIntakeCategory,
+      int action,
+      int supabaseIdIntakeCategory) async {
     // Vložení dat do tabulky intake_categories
     await txn.rawInsert(
       '''
     INSERT INTO intake_categories (name,action,supabase_id_intake_category)
     VALUES (?,?,?)
     ''',
-      [nameOfIntakeCategory, action, supabaseIdIntakeCategory], // Parametr pro název kategorie
+      [
+        nameOfIntakeCategory,
+        action,
+        supabaseIdIntakeCategory
+      ], // Parametr pro název kategorie
     );
   }
 
@@ -2263,7 +2477,11 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
   updateUser(String name, int action) async {
     final db = await database;
     await db.rawUpdate(
-      '''UPDATE USER SET name = ?, action = ? ''', [name, action], // Make sure to provide the variables in the same order as the placeholders
+      '''UPDATE USER SET name = ?, action = ? ''',
+      [
+        name,
+        action
+      ], // Make sure to provide the variables in the same order as the placeholders
     );
   }
 
@@ -2271,7 +2489,10 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     try {
       final db = await database;
       await db.rawUpdate(
-        '''UPDATE USER SET country = ? ''', [countryCode], // Make sure to provide the variables in the same order as the placeholders
+        '''UPDATE USER SET country = ? ''',
+        [
+          countryCode
+        ], // Make sure to provide the variables in the same order as the placeholders
       );
 
       print("updated selected food country");
@@ -2280,7 +2501,8 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     }
   }
 
-  Future<void> TxnInsertUser(Transaction txn, UserSupabase user, int action) async {
+  Future<void> TxnInsertUser(
+      Transaction txn, UserSupabase user, int action) async {
     try {
       // Vložení uživatele do databáze
 
@@ -2351,7 +2573,8 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
         }
       }
       if (!exists) {
-        await InsertMuscle(supabaseData[i].idMuscle!, supabaseData[i].nameOfMuscle!, 0);
+        await InsertMuscle(
+            supabaseData[i].idMuscle!, supabaseData[i].nameOfMuscle!, 0);
       }
     }
     return await SelectMuscles();

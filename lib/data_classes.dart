@@ -23,7 +23,8 @@ class Muscle {
     List<Exercise>? exercisesList;
 
     if (exercisesFromJson != null) {
-      exercisesList = exercisesFromJson.map((e) => Exercise.fromJson(e)).toList();
+      exercisesList =
+          exercisesFromJson.map((e) => Exercise.fromJson(e)).toList();
     }
 
     return Muscle(
@@ -67,6 +68,7 @@ class Exercise {
   int? supabaseIdExercise;
   int? action;
   int? idUser;
+  String? comment;
 
   List<ExerciseData>? exerciseData;
 
@@ -78,11 +80,13 @@ class Exercise {
     this.action = 0,
     this.exerciseData,
     this.idUser,
+    this.comment,
   });
 
   factory Exercise.fromJson(Map<String, dynamic> json) {
     var exerciseDataFromJson = json['exercise_data'] as List?;
-    List<ExerciseData>? exerciseDataList = exerciseDataFromJson?.map((e) => ExerciseData.fromJson(e)).toList();
+    List<ExerciseData>? exerciseDataList =
+        exerciseDataFromJson?.map((e) => ExerciseData.fromJson(e)).toList();
 
     return Exercise(
       idExercise: json['id_exercise'],
@@ -91,6 +95,7 @@ class Exercise {
       supabaseIdExercise: json['supabase_id_exercise'],
       action: json['action'] ?? 0,
       exerciseData: exerciseDataList,
+      comment: json['comment'],
     );
   }
 
@@ -101,6 +106,7 @@ class Exercise {
       'muscles_id_muscle': musclesIdMuscle,
       // 'supabase_id_exercise': supabaseIdExercise,
       // 'action': action,
+      'comment': comment,
       'exercise_data': exerciseData?.map((e) => e.toJson()).toList(),
       // 'users_id_user': idUser,
     };
@@ -111,10 +117,16 @@ class Exercise {
       'id_exercise': idExercise,
       'name_of_exercise': nameOfExercise,
       'muscles_id_muscle': musclesIdMuscle,
+      'comment': comment,
       // 'supabase_id_exercise': supabaseIdExercise,
       // 'action': action,
       // 'users_id_user': idUser,
     };
+  }
+
+  printComment() {
+    print(
+        "comment: $comment id_exercise:$idExercise spIdExercise: $supabaseIdExercise exercise: $nameOfExercise ");
   }
 
   printExercise() {
@@ -209,7 +221,8 @@ class ExerciseData {
   }
 
   printExerciseData() {
-    print("id_ex_data: $idExData *** weight: $weight *** reps: $reps *** difficulty: $difficulty *** technique: $technique *** comment: $comment *** time: ${time!.replaceRange(10, time!.length, "")} *** exercises_id_exercise: $exercisesIdExercise *** id_started_completed: $idStartedCompleted *** operation: $operation *** action: $action *** supabase_id_ex_data: $supabaseIdExData");
+    print(
+        "id_ex_data: $idExData *** weight: $weight *** reps: $reps *** difficulty: $difficulty *** technique: $technique *** comment: $comment *** time: ${time!.replaceRange(10, time!.length, "")} *** exercises_id_exercise: $exercisesIdExercise *** id_started_completed: $idStartedCompleted *** operation: $operation *** action: $action *** supabase_id_ex_data: $supabaseIdExData");
   }
 }
 
@@ -237,15 +250,20 @@ class MySplit {
   });
 
   factory MySplit.fromJson(Map<String, dynamic> json) {
-    var selectedMuscleFromJson = json['selected_muscles'] as List<dynamic>? ?? [];
-    List<SelectedMuscle> selectedMusclesList = selectedMuscleFromJson.map((e) => SelectedMuscle.fromJson(e)).toList();
+    var selectedMuscleFromJson =
+        json['selected_muscles'] as List<dynamic>? ?? [];
+    List<SelectedMuscle> selectedMusclesList =
+        selectedMuscleFromJson.map((e) => SelectedMuscle.fromJson(e)).toList();
 
-    var splitStartedCompletedFromJson = json['split_started_completed'] as List<dynamic>? ?? []; //pokud jsou data null tak se nastaví prázdný seznam
-    List<SplitStartedCompleted> splitStartedCompletedList = splitStartedCompletedFromJson
-        .map(
-          (e) => SplitStartedCompleted.fromJson(e),
-        )
-        .toList();
+    var splitStartedCompletedFromJson =
+        json['split_started_completed'] as List<dynamic>? ??
+            []; //pokud jsou data null tak se nastaví prázdný seznam
+    List<SplitStartedCompleted> splitStartedCompletedList =
+        splitStartedCompletedFromJson
+            .map(
+              (e) => SplitStartedCompleted.fromJson(e),
+            )
+            .toList();
 
     return MySplit(
       idSplit: json['id_split'],
@@ -255,7 +273,9 @@ class MySplit {
       action: json['action'] ?? 0,
       selectedMuscle: selectedMusclesList,
       splitStartedCompleted: splitStartedCompletedList,
-      isActive: json['is_active'] is bool ? json['is_active'] : (json['is_active'] as int) != 0,
+      isActive: json['is_active'] is bool
+          ? json['is_active']
+          : (json['is_active'] as int) != 0,
     );
   }
   Map<String, dynamic> toJson() {
@@ -291,7 +311,8 @@ class MySplit {
   }
 
   printSplit() {
-    print("id_split: $idSplit *** is_active: $isActive *** name_split: $nameSplit *** created_at: $createdAt ***  action: $action *** supabase_id_split: $supabaseIdSplit *** selected_muscles: $selectedMuscle");
+    print(
+        "id_split: $idSplit *** is_active: $isActive *** name_split: $nameSplit *** created_at: $createdAt ***  action: $action *** supabase_id_split: $supabaseIdSplit *** selected_muscles: $selectedMuscle");
   }
 }
 
@@ -317,11 +338,18 @@ class SelectedMuscle {
   });
 
   factory SelectedMuscle.fromJson(Map<String, dynamic> json) {
-    var muscleFromJson = json['muscles'] != null ? json['muscles'] as Map<String, dynamic> : null;
-    Muscle? muscles = muscleFromJson != null ? Muscle.fromJson(muscleFromJson) : null;
+    var muscleFromJson = json['muscles'] != null
+        ? json['muscles'] as Map<String, dynamic>
+        : null;
+    Muscle? muscles =
+        muscleFromJson != null ? Muscle.fromJson(muscleFromJson) : null;
 
-    var selectedExercisesFromJson = json['selected_exercise'] != null ? json['selected_exercise'] as List<dynamic> : [];
-    List<SelectedExercise> selectedExercisesList = selectedExercisesFromJson.map((e) => SelectedExercise.fromJson(e as Map<String, dynamic>)).toList();
+    var selectedExercisesFromJson = json['selected_exercise'] != null
+        ? json['selected_exercise'] as List<dynamic>
+        : [];
+    List<SelectedExercise> selectedExercisesList = selectedExercisesFromJson
+        .map((e) => SelectedExercise.fromJson(e as Map<String, dynamic>))
+        .toList();
 
     return SelectedMuscle(
       idSelectedMuscle: json['id_selected_muscle'],
@@ -361,7 +389,8 @@ class SelectedMuscle {
   }
 
   printSelectedMuscle() {
-    print("id_selected_muscle: $idSelectedMuscle *** split_id_split: $splitIdSplit *** muscles_id_muscle: $musclesIdMuscle *** supabase_id_muscle: $supabaseIdSelectedMuscle *** action: $action *** muscles: $muscles ");
+    print(
+        "id_selected_muscle: $idSelectedMuscle *** split_id_split: $splitIdSplit *** muscles_id_muscle: $musclesIdMuscle *** supabase_id_muscle: $supabaseIdSelectedMuscle *** action: $action *** muscles: $muscles ");
   }
 }
 
@@ -385,8 +414,11 @@ class SelectedExercise {
   });
 
   factory SelectedExercise.fromJson(Map<String, dynamic> json) {
-    var exercisesFromJson = json['exercises'] != null ? json['exercises'] as Map<String, dynamic> : null;
-    Exercise? exercises = exercisesFromJson != null ? Exercise.fromJson(exercisesFromJson) : null;
+    var exercisesFromJson = json['exercises'] != null
+        ? json['exercises'] as Map<String, dynamic>
+        : null;
+    Exercise? exercises =
+        exercisesFromJson != null ? Exercise.fromJson(exercisesFromJson) : null;
     return SelectedExercise(
       idSelectedExercise: json['id_selected_exercise'],
       idExercise: json['id_exercise'],
@@ -460,7 +492,8 @@ class SplitStartedCompleted {
 
   factory SplitStartedCompleted.fromJson(Map<String, dynamic> json) {
     var exerciseDataFromJson = json['exercise_data'] as List?;
-    List<ExerciseData>? exerciseDataList = exerciseDataFromJson?.map((e) => ExerciseData.fromJson(e)).toList();
+    List<ExerciseData>? exerciseDataList =
+        exerciseDataFromJson?.map((e) => ExerciseData.fromJson(e)).toList();
     var lateEnded = json['ended'];
     bool ended;
     if (lateEnded == 1 || lateEnded == true) {
@@ -538,10 +571,12 @@ class UserSupabase {
   // Factory constructor for creating a new UserSupabase instance from a map.
   factory UserSupabase.fromJson(Map<String, dynamic> json) {
     var musclesFromJson = json['muscles'] as List<dynamic>?; // Check for null
-    List<Muscle>? musclesList = musclesFromJson?.map((e) => Muscle.fromJson(e)).toList();
+    List<Muscle>? musclesList =
+        musclesFromJson?.map((e) => Muscle.fromJson(e)).toList();
 
     var splitsFromJson = json['split'] as List<dynamic>?; // Check for null
-    List<MySplit>? splitList = splitsFromJson?.map((e) => MySplit.fromJson(e)).toList();
+    List<MySplit>? splitList =
+        splitsFromJson?.map((e) => MySplit.fromJson(e)).toList();
 
     return UserSupabase(
       idUser: json['id_user'],
@@ -564,8 +599,12 @@ class UserSupabase {
       'birth_date': dateOfBirth, // Include date of birth if available
       'country': country, // Include country if available
       'action': action,
-      'muscles': muscles?.map((e) => e.toJson()).toList(), // Convert each Muscle to JSON
-      'split': split?.map((e) => e.toJson()).toList(), // Convert each MySplit to JSON
+      'muscles': muscles
+          ?.map((e) => e.toJson())
+          .toList(), // Convert each Muscle to JSON
+      'split': split
+          ?.map((e) => e.toJson())
+          .toList(), // Convert each MySplit to JSON
     };
   }
 }
@@ -604,12 +643,17 @@ class Measurements {
       idBodyMeasurements: json['id_body_measurements'],
       weight: double.tryParse(json['weight'].toString()),
       height: json['height'],
-      abdominalCircumference: double.tryParse(json['abdominal_circumference'].toString()),
-      chestCircumference: double.tryParse(json['chest_circumference'].toString()),
-      waistCircumference: double.tryParse(json['waist_circumference'].toString()),
-      thighCircumference: double.tryParse(json['thigh_circumference'].toString()),
+      abdominalCircumference:
+          double.tryParse(json['abdominal_circumference'].toString()),
+      chestCircumference:
+          double.tryParse(json['chest_circumference'].toString()),
+      waistCircumference:
+          double.tryParse(json['waist_circumference'].toString()),
+      thighCircumference:
+          double.tryParse(json['thigh_circumference'].toString()),
       neckCircumference: double.tryParse(json['neck_circumference'].toString()),
-      bicepsCircumference: double.tryParse(json['biceps_circumference'].toString()),
+      bicepsCircumference:
+          double.tryParse(json['biceps_circumference'].toString()),
       createdAt: json['created_at'],
       supabaseIdBodyMeasurements: json['supabase_id_body_measurements'],
       action: json['action'],
@@ -720,8 +764,10 @@ class Food {
       fat: double.tryParse(json['fat'].toString()),
       fatSatureated: double.tryParse(json['fat_saturated'].toString()),
       fatTrans: double.tryParse(json['fat_trans'].toString()),
-      fatMonounsatureted: double.tryParse(json['fat_monounsaturated'].toString()),
-      fatPolyunsatureted: double.tryParse(json['fat_polyunsaturated'].toString()),
+      fatMonounsatureted:
+          double.tryParse(json['fat_monounsaturated'].toString()),
+      fatPolyunsatureted:
+          double.tryParse(json['fat_polyunsaturated'].toString()),
       fiber: double.tryParse(json['fiber'].toString()),
       water: double.tryParse(json['water'].toString()),
       cholesterol: double.tryParse(json['cholesterol'].toString()),
@@ -854,5 +900,45 @@ class IntakeCategories {
   @override
   String toString() {
     return 'IntakeCategories(idIntakeCategory: $idIntakeCategory, name: $name, supabaseIdIntakeCategory: $supabaseIdIntakeCategory, action: $action)';
+  }
+}
+
+class FoodComments {
+  int? idComment;
+  String? foodComment;
+  int? supabaseIdComment;
+  int? action;
+
+  FoodComments({
+    this.idComment,
+    this.foodComment,
+    this.supabaseIdComment,
+    this.action,
+  });
+
+  // Named constructor for creating an object from a JSON map
+  factory FoodComments.fromJson(Map<String, dynamic> json) {
+    return FoodComments(
+      idComment: json['id_comment'],
+      foodComment: json['comment'],
+      supabaseIdComment: json['supabase_id_comment'],
+      action: json['action'],
+    );
+  }
+
+  // Method to convert the object into a JSON map
+  Map<String, dynamic> toJson() {
+    return {
+      'id_comment': idComment,
+      'comment': foodComment,
+      'supabase_id_comment': supabaseIdComment,
+      'action': action,
+    };
+  }
+
+  // Overriding toString method for easier debugging
+  @override
+  String toString() {
+    return 'FoodComments(id_comment: $idComment, comment: $foodComment, supabase_id_comment: $supabaseIdComment, action: $action)';
   }
 }
