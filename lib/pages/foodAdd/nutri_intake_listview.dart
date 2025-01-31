@@ -49,7 +49,9 @@ class _NutriIntakeListviewState extends State<NutriIntakeListview> {
                         },
                         onTap: () async {
                           print("tap press");
-                          await Navigator.of(context).pushNamed('/addIntakePage', arguments: [food, quantity, false]);
+                          await Navigator.of(context).pushNamed(
+                              '/addIntakePage',
+                              arguments: [food, quantity, false]);
                           widget.notifyParent();
                         },
                         child: Container(
@@ -66,7 +68,11 @@ class _NutriIntakeListviewState extends State<NutriIntakeListview> {
                                 children: [
                                   Text(
                                     food.name.toString(),
-                                    style: TextStyle(fontSize: 23, fontWeight: FontWeight.w500, color: ColorsProvider.getColor8(context)),
+                                    style: TextStyle(
+                                        fontSize: 23,
+                                        fontWeight: FontWeight.w500,
+                                        color:
+                                            ColorsProvider.getColor8(context)),
                                   )
                                 ],
                               ),
@@ -76,7 +82,8 @@ class _NutriIntakeListviewState extends State<NutriIntakeListview> {
                                   SizedBox(
                                     width: 60,
                                   ),
-                                  customText("Weight", food.weight!.toDouble(), context),
+                                  customText("Weight", food.weight!.toDouble(),
+                                      context),
                                   customText("Kcal", food.kcal, context),
                                 ],
                               ),
@@ -105,26 +112,42 @@ class _NutriIntakeListviewState extends State<NutriIntakeListview> {
                                             builder: (BuildContext context) {
                                               return AlertDialog(
                                                 title: Text('Confirm delete'),
-                                                content: Text(' Do you want delete ${food.weight}g ${food.name}?'),
+                                                content: Text(
+                                                    ' Do you want delete ${food.weight}g ${food.name}?'),
                                                 actions: [
                                                   Row(
-                                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceEvenly,
                                                     children: [
                                                       GestureDetector(
                                                         onTap: () {
-                                                          Navigator.of(context).pop();
+                                                          Navigator.of(context)
+                                                              .pop();
                                                         },
                                                         child: Container(
                                                           height: 40,
                                                           width: 100,
-                                                          decoration: BoxDecoration(
-                                                            color: ColorsProvider.getColor2(context),
-                                                            borderRadius: BorderRadius.circular(15),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color: ColorsProvider
+                                                                .getColor2(
+                                                                    context),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        15),
                                                           ),
                                                           child: Center(
                                                             child: Text(
                                                               'Cancel',
-                                                              style: TextStyle(color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold),
+                                                              style: TextStyle(
+                                                                  color: ColorsProvider
+                                                                      .getColor8(
+                                                                          context),
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold),
                                                             ),
                                                           ),
                                                         ),
@@ -137,8 +160,13 @@ class _NutriIntakeListviewState extends State<NutriIntakeListview> {
                                                               break;
                                                             case 1:
                                                               // odstranit hned ze sqflite
-                                                              await widget.foodList.removeAt(itemIndex);
-                                                              await dbFitness.DeleteNutriIntake(food.idNutriIntake!);
+                                                              await widget
+                                                                  .foodList
+                                                                  .removeAt(
+                                                                      itemIndex);
+                                                              await dbFitness
+                                                                  .DeleteNutriIntake(
+                                                                      food.idNutriIntake!);
 
                                                               break;
                                                             case 2:
@@ -151,24 +179,37 @@ class _NutriIntakeListviewState extends State<NutriIntakeListview> {
                                                               // asi nenastane nikdy
                                                               break;
                                                             default:
-                                                              print("!!! NEZNÁMÝ STAV, NĚCO SELHALO !!!");
+                                                              print(
+                                                                  "!!! NEZNÁMÝ STAV, NĚCO SELHALO !!!");
                                                           }
                                                           setState(() {});
 
-                                                          Navigator.of(context).pop();
+                                                          Navigator.of(context)
+                                                              .pop();
                                                         },
                                                         child: Container(
                                                           height: 40,
                                                           width: 100,
                                                           // padding: EdgeInsets.fromLTRB(25, 10, 25, 10),
-                                                          decoration: BoxDecoration(
-                                                            color: ColorsProvider.color_9,
-                                                            borderRadius: BorderRadius.circular(15),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color:
+                                                                ColorsProvider
+                                                                    .color_9,
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        15),
                                                           ),
                                                           child: Center(
                                                             child: Text(
                                                               'Yes',
-                                                              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold),
                                                             ),
                                                           ),
                                                         ),
@@ -220,7 +261,8 @@ class _NutriIntakeListviewState extends State<NutriIntakeListview> {
                                           child: Center(
                                             child: Icon(
                                               Icons.close_rounded,
-                                              color: ColorsProvider.getColor8(context),
+                                              color: ColorsProvider.getColor8(
+                                                  context),
                                               size: 30,
                                             ),
                                           ),
@@ -257,11 +299,23 @@ Widget customText(
   BuildContext context,
 ) {
   itemValue = (itemValue! * 100).round() / 100;
-  TextStyle textStyle = TextStyle(fontSize: 19, fontWeight: FontWeight.w600, color: ColorsProvider.getColor8(context));
-  TextStyle textStyleKcal = TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: ColorsProvider.getColor8(context));
+  TextStyle textStyle = TextStyle(
+      fontSize: 19,
+      fontWeight: FontWeight.w600,
+      color: ColorsProvider.getColor8(context));
+  TextStyle textStyleKcal = TextStyle(
+      fontSize: 20,
+      fontWeight: FontWeight.w600,
+      color: ColorsProvider.getColor8(context));
 
-  TextStyle numberStyle = TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: ColorsProvider.getColor8(context));
-  TextStyle gStyle = TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: ColorsProvider.getColor8(context));
+  TextStyle numberStyle = TextStyle(
+      fontSize: 20,
+      fontWeight: FontWeight.w700,
+      color: ColorsProvider.getColor8(context));
+  TextStyle gStyle = TextStyle(
+      fontSize: 17,
+      fontWeight: FontWeight.w600,
+      color: ColorsProvider.getColor8(context));
   return Container(
     width: 150,
     child: Row(
@@ -271,7 +325,7 @@ Widget customText(
           style: itemString != "Kcal" ? textStyle : textStyleKcal,
         ),
         Text(
-          "${itemValue == 0 ? 0 : (itemValue % 1 == 0 ? itemValue.toInt() : itemValue)}",
+          "${itemValue == 0 ? 0 : (itemValue % 1 == 0 ? itemValue.toInt() : (itemValue * 10).round() / 10)}",
           style: numberStyle,
         ),
         Container(

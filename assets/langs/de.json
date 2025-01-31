@@ -62,6 +62,7 @@
   "enter_name_of_split": "Name des Trainings eingeben",
   "enter_name_of_muscle": "Name des Muskels eingeben",
   "save": "Speichern",
+  "enter_exercise_description": "Gib die Beschreibung der Übung ein",
   "error_name_of_split_is_empty": "Name des Trainings ist leer",
   "error_you_have_not_selected_any_muscle": "Keinen Muskel ausgewählt",
   "error_the_name_of_new_exercise_cannot_be_empty": "Name der Übung darf nicht leer sein",

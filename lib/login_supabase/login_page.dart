@@ -213,7 +213,8 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: 30),
                 _buildTextField(_emailController, "Email"),
                 const SizedBox(height: 5),
-                _buildTextField(_passwordController, "Password", obscureText: true),
+                _buildTextField(_passwordController, "Password",
+                    obscureText: true),
                 const SizedBox(height: 20),
                 _buildSignInButton(),
                 const SizedBox(height: 5),
@@ -228,13 +229,15 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String hintText, {bool obscureText = false}) {
+  Widget _buildTextField(TextEditingController controller, String hintText,
+      {bool obscureText = false}) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 50),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.grey[800],
-          border: Border.all(color: ColorsProvider.getColor8(context), width: 4),
+          border:
+              Border.all(color: ColorsProvider.getColor8(context), width: 4),
           borderRadius: BorderRadius.circular(15),
         ),
         child: Padding(
@@ -245,7 +248,10 @@ class _LoginPageState extends State<LoginPage> {
             decoration: InputDecoration(
               border: InputBorder.none,
               hintText: hintText,
-              hintStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: ColorsProvider.getColor2(context)),
+              hintStyle: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                  color: ColorsProvider.getColor2(context)),
             ),
             cursorColor: ColorsProvider.getColor2(context),
             style: TextStyle(color: ColorsProvider.getColor2(context)),
@@ -270,7 +276,8 @@ class _LoginPageState extends State<LoginPage> {
         child: Container(
           height: 55,
           decoration: BoxDecoration(
-            border: Border.all(color: ColorsProvider.getColor8(context), width: 3),
+            border:
+                Border.all(color: ColorsProvider.getColor8(context), width: 3),
             color: ColorsProvider.color_9,
             borderRadius: BorderRadius.circular(15),
           ),
@@ -303,7 +310,8 @@ class _LoginPageState extends State<LoginPage> {
                   color: ColorsProvider.getColor8(context),
                 ),
               ),
-              if (widget.showRegisterPage != null) // Tady provádíme ověření, zda je showRegisterPage dostupné
+              if (widget.showRegisterPage !=
+                  null) // Tady provádíme ověření, zda je showRegisterPage dostupné
                 GestureDetector(
                   onTap: () {
                     widget.showRegisterPage!();
@@ -352,42 +360,42 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildSignInWithGoogle() {
-    var dbSupabase = Provider.of<SupabaseProvider>(context);
+//   Widget _buildSignInWithGoogle() {
+//     var dbSupabase = Provider.of<SupabaseProvider>(context);
 
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 50),
-      child: Column(
-        children: [
-          Text(
-            "or sign in with",
-            style: TextStyle(
-              color: ColorsProvider.getColor8(context),
-            ),
-          ),
-          const SizedBox(height: 10),
-          GestureDetector(
-            child: Container(
-              height: 70,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: ColorsProvider.getColor8(context), width: 2),
-              ),
-              child: const Padding(
-                padding: EdgeInsets.all(2.0),
-                child: Image(image: AssetImage("assets/google_icon.png")),
-              ),
-            ),
-            onTap: () {
-              print("google auth");
+//     return Padding(
+//       padding: EdgeInsets.symmetric(horizontal: 50),
+//       child: Column(
+//         children: [
+//           Text(
+//             "or sign in with",
+//             style: TextStyle(
+//               color: ColorsProvider.getColor8(context),
+//             ),
+//           ),
+//           const SizedBox(height: 10),
+//           GestureDetector(
+//             child: Container(
+//               height: 70,
+//               decoration: BoxDecoration(
+//                 color: Colors.white,
+//                 borderRadius: BorderRadius.circular(10),
+//                 border: Border.all(color: ColorsProvider.getColor8(context), width: 2),
+//               ),
+//               child: const Padding(
+//                 padding: EdgeInsets.all(2.0),
+//                 child: Image(image: AssetImage("assets/google_icon.png")),
+//               ),
+//             ),
+//             onTap: () {
+//               print("google auth");
 
-              print(dbSupabase.user!.email);
-              // AuthService().signInWithGoogle();
-            },
-          ),
-        ],
-      ),
-    );
-  }
+//               print(dbSupabase.user!.email);
+//               // AuthService().signInWithGoogle();
+//             },
+//           ),
+//         ],
+//       ),
+//     );
+//   }
 }

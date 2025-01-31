@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 
+BorderRadius zaobleni = BorderRadius.circular(12);
+
 List<Map<String, String>> languages = [
   {'code': 'none', 'name': 'Undefined'},
   {'code': 'CS', 'name': 'Czech'},

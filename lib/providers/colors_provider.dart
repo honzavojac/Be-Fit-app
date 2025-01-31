@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/variables.dart';
 
+// všechny barvy aplikace
 Color colorOrange = Color.fromRGBO(255, 143, 0, 1);
 Color colorBlue = Color.fromARGB(255, 0, 187, 255);
 Color colorRed = Color.fromRGBO(255, 44, 44, 1);
@@ -8,12 +9,14 @@ Color colorYellow = Color.fromRGBO(255, 204, 0, 1);
 Color colorGreen = Color.fromRGBO(21, 255, 0, 1);
 Color colorPurple = Color.fromRGBO(200, 0, 255, 1);
 Color colorWhite = Color.fromRGBO(255, 255, 255, 1);
+Color colorBlack = Colors.black;
 
 class ColorsProvider extends ChangeNotifier {
   //amber texty
   static const Color color_1 = Color(0xF9FFC107);
-  //amber[800] tlačítka, obrysy,linie
+
   static Color getColor2(BuildContext context) {
+    // primární barva aplikace (většina widgetů)
     bool isDarkTheme = Theme.of(context).brightness == Brightness.dark;
     switch (selectedAppColor) {
       case 0:
@@ -33,9 +36,7 @@ class ColorsProvider extends ChangeNotifier {
             ? Color.fromRGBO(255, 255, 255, 1)
             : Color.fromARGB(141, 0, 0, 0);
       default:
-        return isDarkTheme
-            ? Color.fromRGBO(0, 0, 0, 1)
-            : Color.fromARGB(141, 0, 0, 0);
+        return isDarkTheme ? colorOrange : Color.fromARGB(141, 0, 0, 0);
     }
   }
 

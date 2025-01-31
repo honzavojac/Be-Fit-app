@@ -53,6 +53,7 @@ void main() async {
 
   FitnessProvider dbFitness = FitnessProvider();
   await dbFitness.initializeDB();
+  dbFitness.selectAllCommentFromExercises();
   // await dbFitness.deleteFile("fitnessDatabase.db");
   // dbFitness.DeleteMuscle(1);
   // dbFitness.SelectMuscles();
@@ -65,6 +66,7 @@ void main() async {
   SupabaseProvider dbSupabase = SupabaseProvider();
   await dbSupabase.initialize();
   dbSupabase.getUser();
+
   // dbSupabase.initFoodApi();
 
   // DBHelper dbHelper = DBHelper();

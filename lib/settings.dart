@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -25,10 +24,6 @@ class Settings extends StatefulWidget {
   State<Settings> createState() => _SettingsState();
 }
 //! TODO: udělat odstranění učtu!!!
-
-//
-//
-// String? selectedCountry;
 
 class _SettingsState extends State<Settings> {
   final TextEditingController _nameController = TextEditingController();
@@ -174,7 +169,6 @@ class _SettingsState extends State<Settings> {
     var dbSupabase = Provider.of<SupabaseProvider>(context);
     var dbFitness = Provider.of<FitnessProvider>(context);
     bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
     return Scaffold(
       appBar: AppBar(
         title: Text("settings".tr()),
@@ -359,7 +353,7 @@ class _SettingsState extends State<Settings> {
           Spacer(
             flex: 1,
           ),
-          darkTheme == true
+          isDarkMode == true
               ? Column(
                   children: [
                     Padding(
@@ -391,19 +385,9 @@ class _SettingsState extends State<Settings> {
                                     child: Text(
                                       color.tr(),
                                       style: TextStyle(
-                                        color: switch (
-                                            appColors.indexOf(color)) {
-                                          0 => colorOrange,
-                                          1 => colorBlue,
-                                          2 => colorRed,
-                                          3 => colorYellow,
-                                          4 => colorGreen,
-                                          5 => colorPurple,
-                                          6 => colorWhite,
-
-                                          // TODO: Handle this case.
-                                          int() => colorWhite,
-                                        },
+                                        color: _getColorForItem(
+                                          appColors.indexOf(color),
+                                        ),
                                       ),
                                     ),
                                   );
@@ -467,7 +451,7 @@ class _SettingsState extends State<Settings> {
                   ],
                 )
               : SizedBox(),
-          darkTheme == true
+          isDarkMode == true
               ? Spacer(
                   flex: 1,
                 )
@@ -646,7 +630,10 @@ class _SettingsState extends State<Settings> {
               Navigator.of(context).pop();
               scaffoldKey.currentState?.closeDrawer();
             },
-            child: Text("show_tutorial".tr()),
+            child: Text(
+              "show_tutorial".tr(),
+              style: TextStyle(color: ColorsProvider.getColor2(context)),
+            ),
           ),
           Spacer(
             flex: 5,

@@ -62,6 +62,7 @@
   "enter_name_of_split": "Zadejte název tréninku",
   "enter_name_of_muscle": "Zadejte název svalu",
   "save": "Uložit",
+  "enter_exercise_description": "Zadej popis cviku",
   "error_name_of_split_is_empty": "Název tréninku je prázdný",
   "error_you_have_not_selected_any_muscle": "Nevybrali jste žádný sval",
   "error_the_name_of_new_exercise_cannot_be_empty": "Název cviku nemůže být prázdný",

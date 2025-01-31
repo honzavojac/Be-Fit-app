@@ -6,6 +6,8 @@ import 'package:kaloricke_tabulky_02/providers/variables_provider.dart';
 import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:provider/provider.dart';
 
+import '../../variables.dart';
+
 class FitnessNames extends StatefulWidget {
   const FitnessNames({super.key});
 
@@ -18,7 +20,8 @@ List<TextEditingController> musclesTextEditingControllers = [];
 
 List<TextEditingController> exercisesTextEditingControllers = [];
 
-class FitnessNamesState extends State<FitnessNames> with WidgetsBindingObserver {
+class FitnessNamesState extends State<FitnessNames>
+    with WidgetsBindingObserver {
   int selectedIndex = 0;
   List<String> items = ["", "Splits", "Muscles", "Exercises"];
   List<dynamic> data = [];
@@ -61,9 +64,12 @@ class FitnessNamesState extends State<FitnessNames> with WidgetsBindingObserver 
 
         for (int i = 0; i < data.length; i++) {
           if (!updateExercises.containsKey(i)) {
-            updateExercises[i] = List.generate(data[i].exercises.length, (index) => false);
+            updateExercises[i] =
+                List.generate(data[i].exercises.length, (index) => false);
           } else {
-            for (var j = updateExercises[i]!.length; j < data[i].exercises.length; j++) {
+            for (var j = updateExercises[i]!.length;
+                j < data[i].exercises.length;
+                j++) {
               updateExercises[i]!.add(false);
             }
           }
@@ -87,7 +93,8 @@ class FitnessNamesState extends State<FitnessNames> with WidgetsBindingObserver 
     for (var i = 0; i < updateSplits.length; i++) {
       if (updateSplits[i] == true) {
         print("raw update");
-        await dbSupabase.updateSplit(splitData[i].idSplit, splitTextEditingControllers[i].text.trim());
+        await dbSupabase.updateSplit(
+            splitData[i].idSplit, splitTextEditingControllers[i].text.trim());
       }
     }
   }
@@ -105,7 +112,8 @@ class FitnessNamesState extends State<FitnessNames> with WidgetsBindingObserver 
           print("update");
           await updateText();
         } catch (e) {
-          print("chyba v fitness_names při vkládání dat změněním stavu aplikace (zavřená app): $e");
+          print(
+              "chyba v fitness_names při vkládání dat změněním stavu aplikace (zavřená app): $e");
         }
       }
     } else if (state == AppLifecycleState.resumed) {
@@ -207,7 +215,6 @@ class CustomDropdown extends StatefulWidget {
 class _CustomDropdownState extends State<CustomDropdown> {
   @override
   Widget build(BuildContext context) {
-    var variablesProvider = Provider.of<VariablesProvider>(context);
     return Container(
       width: 260,
       child: DropdownButtonHideUnderline(
@@ -217,7 +224,9 @@ class _CustomDropdownState extends State<CustomDropdown> {
             style: TextStyle(fontSize: 14),
           ),
           isExpanded: true,
-          value: widget.selectedIndex == 0 ? null : widget.items[widget.selectedIndex],
+          value: widget.selectedIndex == 0
+              ? null
+              : widget.items[widget.selectedIndex],
           items: widget.items.skip(1).map<DropdownMenuItem<String>>((item) {
             return DropdownMenuItem<String>(
               value: item,
@@ -239,7 +248,7 @@ class _CustomDropdownState extends State<CustomDropdown> {
             width: 180,
             padding: const EdgeInsets.symmetric(horizontal: 14),
             decoration: BoxDecoration(
-              borderRadius: variablesProvider.zaobleni,
+              borderRadius: zaobleni,
               border: Border.all(
                 color: ColorsProvider.getColor2(context),
                 width: 0.5,
@@ -254,8 +263,9 @@ class _CustomDropdownState extends State<CustomDropdown> {
           dropdownStyleData: DropdownStyleData(
             maxHeight: 200,
             decoration: BoxDecoration(
-              borderRadius: variablesProvider.zaobleni,
-              border: Border.all(width: 2, color: ColorsProvider.getColor2(context)),
+              borderRadius: zaobleni,
+              border: Border.all(
+                  width: 2, color: ColorsProvider.getColor2(context)),
             ),
             offset: const Offset(0, -0),
             scrollbarTheme: ScrollbarThemeData(
@@ -274,25 +284,33 @@ class _CustomDropdownState extends State<CustomDropdown> {
   }
 }
 
-Widget _myListViewBuilder(List<dynamic> data, int index, BuildContext context, List<bool>? updateSplits, List<bool>? updateMuscles, Map<int, List<bool>>? updateExercises) {
+Widget _myListViewBuilder(
+    List<dynamic> data,
+    int index,
+    BuildContext context,
+    List<bool>? updateSplits,
+    List<bool>? updateMuscles,
+    Map<int, List<bool>>? updateExercises) {
   for (var i = 0; i < data.length; i++) {
     switch (index) {
       case 1:
-        splitTextEditingControllers.add(TextEditingController(text: data[i].nameSplit));
+        splitTextEditingControllers
+            .add(TextEditingController(text: data[i].nameSplit));
         break;
       case 2:
-        musclesTextEditingControllers.add(TextEditingController(text: data[i].nameOfMuscle));
+        musclesTextEditingControllers
+            .add(TextEditingController(text: data[i].nameOfMuscle));
 
         break;
       case 3:
         for (var j = 0; j < data[i].exercises.length; j++) {
-          exercisesTextEditingControllers.add(TextEditingController(text: data[i].exercises[j].nameOfExercise));
+          exercisesTextEditingControllers.add(
+              TextEditingController(text: data[i].exercises[j].nameOfExercise));
         }
         break;
       default:
     }
   }
-  var variablesProvider = Provider.of<VariablesProvider>(context);
   print("aaaaaaaaaaaaaaaaa$index");
   return index == 1 || index == 2
       ? Expanded(
@@ -304,7 +322,9 @@ Widget _myListViewBuilder(List<dynamic> data, int index, BuildContext context, L
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 15),
                     child: Container(
-                      decoration: BoxDecoration(color: ColorsProvider.getColor2(context), borderRadius: BorderRadius.circular(20)),
+                      decoration: BoxDecoration(
+                          color: ColorsProvider.getColor2(context),
+                          borderRadius: BorderRadius.circular(20)),
                       child: Column(
                         children: [
                           Padding(
@@ -313,11 +333,13 @@ Widget _myListViewBuilder(List<dynamic> data, int index, BuildContext context, L
                               height: 30,
                               decoration: BoxDecoration(
                                 // color: ColorsProvider.getColor2(context),
-                                borderRadius: variablesProvider.zaobleni,
+                                borderRadius: zaobleni,
                               ),
                               child: Center(
                                 child: Text(
-                                  index == 1 ? "Splits".toUpperCase() : "Muscles".toUpperCase(),
+                                  index == 1
+                                      ? "Splits".toUpperCase()
+                                      : "Muscles".toUpperCase(),
                                   style: TextStyle(
                                     color: ColorsProvider.getColor8(context),
                                     fontWeight: FontWeight.bold,
@@ -329,7 +351,8 @@ Widget _myListViewBuilder(List<dynamic> data, int index, BuildContext context, L
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.only(left: 5, right: 5, top: 12, bottom: 15),
+                            padding: const EdgeInsets.only(
+                                left: 5, right: 5, top: 12, bottom: 15),
                             child: Container(
                               child: ListView.builder(
                                 shrinkWrap: true,
@@ -339,7 +362,8 @@ Widget _myListViewBuilder(List<dynamic> data, int index, BuildContext context, L
                                   return Padding(
                                     padding: const EdgeInsets.only(bottom: 5),
                                     child: Padding(
-                                      padding: const EdgeInsets.fromLTRB(20, 5, 20, 0),
+                                      padding: const EdgeInsets.fromLTRB(
+                                          20, 5, 20, 0),
                                       child: TextField(
                                         onChanged: (value) {
                                           if (index == 1) {
@@ -349,29 +373,41 @@ Widget _myListViewBuilder(List<dynamic> data, int index, BuildContext context, L
                                           }
                                         },
                                         controller: index == 1
-                                            ? splitTextEditingControllers[itemIndex]
+                                            ? splitTextEditingControllers[
+                                                itemIndex]
                                             : index == 2
-                                                ? musclesTextEditingControllers[itemIndex]
+                                                ? musclesTextEditingControllers[
+                                                    itemIndex]
                                                 : TextEditingController(),
                                         decoration: InputDecoration(
                                           filled: true,
-                                          fillColor: ColorsProvider.getColor2(context),
+                                          fillColor:
+                                              ColorsProvider.getColor2(context),
                                           enabledBorder: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(12),
-                                            borderSide: BorderSide(color: Colors.black, width: 2),
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            borderSide: BorderSide(
+                                                color: Colors.black, width: 2),
                                           ),
                                           focusedBorder: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(12),
-                                            borderSide: BorderSide(color: Colors.black, width: 3.5),
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            borderSide: BorderSide(
+                                                color: Colors.black,
+                                                width: 3.5),
                                           ),
                                           border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(12),
+                                            borderRadius:
+                                                BorderRadius.circular(12),
                                           ),
-                                          contentPadding: EdgeInsets.symmetric(horizontal: 10.0),
+                                          contentPadding: EdgeInsets.symmetric(
+                                              horizontal: 10.0),
                                         ),
-                                        cursorColor: ColorsProvider.getColor8(context),
+                                        cursorColor:
+                                            ColorsProvider.getColor8(context),
                                         style: TextStyle(
-                                          color: ColorsProvider.getColor8(context),
+                                          color:
+                                              ColorsProvider.getColor8(context),
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
@@ -401,7 +437,9 @@ Widget _myListViewBuilder(List<dynamic> data, int index, BuildContext context, L
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 15),
                         child: Container(
-                          decoration: BoxDecoration(color: ColorsProvider.getColor2(context), borderRadius: BorderRadius.circular(20)),
+                          decoration: BoxDecoration(
+                              color: ColorsProvider.getColor2(context),
+                              borderRadius: BorderRadius.circular(20)),
                           child: Column(
                             children: [
                               Padding(
@@ -410,13 +448,14 @@ Widget _myListViewBuilder(List<dynamic> data, int index, BuildContext context, L
                                   height: 30,
                                   decoration: BoxDecoration(
                                     // color: ColorsProvider.getColor2(context),
-                                    borderRadius: variablesProvider.zaobleni,
+                                    borderRadius: zaobleni,
                                   ),
                                   child: Center(
                                     child: Text(
                                       "$muscle".toUpperCase(),
                                       style: TextStyle(
-                                        color: ColorsProvider.getColor8(context),
+                                        color:
+                                            ColorsProvider.getColor8(context),
                                         fontWeight: FontWeight.bold,
                                         fontSize: 25,
                                         letterSpacing: 2,
@@ -426,7 +465,8 @@ Widget _myListViewBuilder(List<dynamic> data, int index, BuildContext context, L
                                 ),
                               ),
                               Padding(
-                                padding: const EdgeInsets.only(left: 5, right: 5, top: 12, bottom: 15),
+                                padding: const EdgeInsets.only(
+                                    left: 5, right: 5, top: 12, bottom: 15),
                                 child: Container(
                                   child: ListView.builder(
                                     shrinkWrap: true,
@@ -434,33 +474,52 @@ Widget _myListViewBuilder(List<dynamic> data, int index, BuildContext context, L
                                     itemCount: exercises.length,
                                     itemBuilder: (context, itemIndex) {
                                       return Padding(
-                                        padding: const EdgeInsets.only(bottom: 5),
+                                        padding:
+                                            const EdgeInsets.only(bottom: 5),
                                         child: Padding(
-                                          padding: const EdgeInsets.fromLTRB(20, 5, 20, 0),
+                                          padding: const EdgeInsets.fromLTRB(
+                                              20, 5, 20, 0),
                                           child: TextField(
                                             onChanged: (value) {
-                                              updateExercises![muscleIndex]![itemIndex] = true;
+                                              updateExercises![muscleIndex]![
+                                                  itemIndex] = true;
                                             },
-                                            controller: exercisesTextEditingControllers[itemIndex],
+                                            controller:
+                                                exercisesTextEditingControllers[
+                                                    itemIndex],
                                             decoration: InputDecoration(
                                               filled: true,
-                                              fillColor: ColorsProvider.getColor2(context),
+                                              fillColor:
+                                                  ColorsProvider.getColor2(
+                                                      context),
                                               enabledBorder: OutlineInputBorder(
-                                                borderRadius: BorderRadius.circular(12),
-                                                borderSide: BorderSide(color: Colors.black, width: 2),
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                                borderSide: BorderSide(
+                                                    color: Colors.black,
+                                                    width: 2),
                                               ),
                                               focusedBorder: OutlineInputBorder(
-                                                borderRadius: BorderRadius.circular(12),
-                                                borderSide: BorderSide(color: Colors.black, width: 3.5),
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                                borderSide: BorderSide(
+                                                    color: Colors.black,
+                                                    width: 3.5),
                                               ),
                                               border: OutlineInputBorder(
-                                                borderRadius: BorderRadius.circular(12),
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
                                               ),
-                                              contentPadding: EdgeInsets.symmetric(horizontal: 10.0),
+                                              contentPadding:
+                                                  EdgeInsets.symmetric(
+                                                      horizontal: 10.0),
                                             ),
-                                            cursorColor: ColorsProvider.getColor8(context),
+                                            cursorColor:
+                                                ColorsProvider.getColor8(
+                                                    context),
                                             style: TextStyle(
-                                              color: ColorsProvider.getColor8(context),
+                                              color: ColorsProvider.getColor8(
+                                                  context),
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),

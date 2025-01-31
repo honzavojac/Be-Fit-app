@@ -62,6 +62,7 @@
   "enter_name_of_split": "Enter Workout Name",
   "enter_name_of_muscle": "Enter Muscle Name",
   "save": "Save",
+  "enter_exercise_description": "Enter exercise description",
   "error_name_of_split_is_empty": "Workout Name is empty",
   "error_you_have_not_selected_any_muscle": "You have not selected any muscle",
   "error_the_name_of_new_exercise_cannot_be_empty": "Exercise Name cannot be empty",

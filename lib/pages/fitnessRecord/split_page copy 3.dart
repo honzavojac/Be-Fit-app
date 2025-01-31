@@ -4,12 +4,12 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
 import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
-import 'package:kaloricke_tabulky_02/providers/variables_provider.dart';
 import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:provider/provider.dart';
 
 import '../../init_page.dart';
 import '../../providers/colors_provider.dart';
+import '../../variables.dart';
 import 'add_split_box copy.dart';
 import 'new_exercise_box copy.dart';
 
@@ -31,7 +31,8 @@ class SplitPageCopy extends StatefulWidget {
   State<SplitPageCopy> createState() => _SplitPageCopyState();
 }
 
-class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateMixin {
+class _SplitPageCopyState extends State<SplitPageCopy>
+    with TickerProviderStateMixin {
   late TabController _tabController = TabController(length: 0, vsync: this);
   // List<TextEditingController> splitTextEditingControllers = [];
   List<TextEditingController> muscleTextEditingControllers = [];
@@ -88,11 +89,13 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
       // Přidejte kontroler pouze pokud ještě neexistuje
       if (splitIndexMap[split.supabaseIdSplit!] == null) {
         // splitTextEditingControllers.add(TextEditingController(text: split.nameSplit));
-        splitIndexMap[split.supabaseIdSplit!] = TextEditingController(text: split.nameSplit); // Uložení indexu do mapy
+        splitIndexMap[split.supabaseIdSplit!] = TextEditingController(
+            text: split.nameSplit); // Uložení indexu do mapy
       }
 
       for (var selectedMuscle in split.selectedMuscle!) {
-        selectedMuscle.selectedExercises!.removeWhere((selectedExercise) => selectedExercise.action == 3);
+        selectedMuscle.selectedExercises!
+            .removeWhere((selectedExercise) => selectedExercise.action == 3);
       }
     }
 
@@ -101,7 +104,8 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
       a++;
     }
 
-    _tabController = TabController(length: splits.length, vsync: this, initialIndex: clickedSplitTab);
+    _tabController = TabController(
+        length: splits.length, vsync: this, initialIndex: clickedSplitTab);
     widget.loadParent();
     setState(() {});
   }
@@ -118,8 +122,6 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
   late int clickedSplitTab;
   @override
   Widget build(BuildContext context) {
-    var variablesProvider = Provider.of<VariablesProvider>(context);
-
     // loadData();
     // print(splits);
     print(widget.clickedSplitTab);
@@ -284,7 +286,8 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
                                 splashFactory: NoSplash.splashFactory,
                                 tabAlignment: TabAlignment.start,
                                 controller: _tabController,
-                                indicatorColor: ColorsProvider.getColor2(context),
+                                indicatorColor:
+                                    ColorsProvider.getColor2(context),
                                 dividerColor: ColorsProvider.color_4,
                                 labelColor: ColorsProvider.getColor2(context),
                                 // unselectedLabelColor: Colors.white,
@@ -295,7 +298,9 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
                                     constraints: BoxConstraints(minWidth: 80),
                                     child: IntrinsicWidth(
                                       child: Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 5.0), // 5px padding on each side
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal:
+                                                5.0), // 5px padding on each side
                                         child: Center(
                                             child: Text(
                                           record.nameSplit.toString(),
@@ -338,81 +343,147 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
                                   children: [
                                     Expanded(
                                       child: Padding(
-                                        padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+                                        padding: const EdgeInsets.fromLTRB(
+                                            0, 10, 0, 0),
                                         child: ListView(
                                           children: [
                                             Column(
                                               children: [
                                                 Padding(
-                                                  padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                                  padding:
+                                                      const EdgeInsets.fromLTRB(
+                                                          0, 0, 0, 0),
                                                   child: Container(
                                                     height: 50,
-                                                    width: 200, // Zmenšete šířku podle potřeby
+                                                    width:
+                                                        200, // Zmenšete šířku podle potřeby
                                                     // color: Colors.blue,
                                                     child: Center(
                                                       child: TextField(
-                                                        onChanged: (value) async {
-                                                          clickedSplitTab = await _tabController.index;
+                                                        onChanged:
+                                                            (value) async {
+                                                          clickedSplitTab =
+                                                              await _tabController
+                                                                  .index;
                                                           // print(value);
-                                                          switch (record.action) {
+                                                          switch (
+                                                              record.action) {
                                                             case 0:
                                                               print("object 0");
-                                                              await dbFitness.UpdateSplitAndSetAction(value, record.supabaseIdSplit!, 2);
+                                                              await dbFitness
+                                                                  .UpdateSplitAndSetAction(
+                                                                      value,
+                                                                      record
+                                                                          .supabaseIdSplit!,
+                                                                      2);
                                                               record.action = 2;
                                                               break;
                                                             case 1:
                                                               print("object 1");
-                                                              await dbFitness.UpdateSplitAndSetAction(value, record.supabaseIdSplit!, 1);
+                                                              await dbFitness
+                                                                  .UpdateSplitAndSetAction(
+                                                                      value,
+                                                                      record
+                                                                          .supabaseIdSplit!,
+                                                                      1);
                                                               record.action = 1;
                                                               break;
                                                             case 2:
                                                               print("object 2");
-                                                              await dbFitness.UpdateSplitAndSetAction(value, record.supabaseIdSplit!, 2);
+                                                              await dbFitness
+                                                                  .UpdateSplitAndSetAction(
+                                                                      value,
+                                                                      record
+                                                                          .supabaseIdSplit!,
+                                                                      2);
                                                               record.action = 2;
                                                               break;
                                                             default:
-                                                              print("ostatní stavy které by neměly být dostupné");
+                                                              print(
+                                                                  "ostatní stavy které by neměly být dostupné");
                                                           }
 
                                                           // print(clickedSplitTab);
                                                           widget.loadParent();
-                                                          record.nameSplit = value;
+                                                          record.nameSplit =
+                                                              value;
                                                         },
-                                                        controller: splitIndexMap[record.supabaseIdSplit!],
-                                                        decoration: InputDecoration(
+                                                        controller:
+                                                            splitIndexMap[record
+                                                                .supabaseIdSplit!],
+                                                        decoration:
+                                                            InputDecoration(
                                                           filled: true,
-                                                          fillColor: ColorsProvider.getColor2(context),
-                                                          enabledBorder: OutlineInputBorder(
-                                                            borderRadius: BorderRadius.circular(12),
-                                                            borderSide: BorderSide(color: Colors.black, width: 2),
+                                                          fillColor:
+                                                              ColorsProvider
+                                                                  .getColor2(
+                                                                      context),
+                                                          enabledBorder:
+                                                              OutlineInputBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        12),
+                                                            borderSide:
+                                                                BorderSide(
+                                                                    color: Colors
+                                                                        .black,
+                                                                    width: 2),
                                                           ),
-                                                          focusedBorder: OutlineInputBorder(
-                                                            borderRadius: BorderRadius.circular(12),
-                                                            borderSide: BorderSide(color: Colors.black, width: 3.5),
+                                                          focusedBorder:
+                                                              OutlineInputBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        12),
+                                                            borderSide:
+                                                                BorderSide(
+                                                                    color: Colors
+                                                                        .black,
+                                                                    width: 3.5),
                                                           ),
-                                                          border: OutlineInputBorder(
-                                                            borderRadius: BorderRadius.circular(12),
+                                                          border:
+                                                              OutlineInputBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        12),
                                                           ),
-                                                          contentPadding: EdgeInsets.symmetric(
+                                                          contentPadding:
+                                                              EdgeInsets
+                                                                  .symmetric(
                                                             horizontal: 20.0,
                                                           ),
                                                         ),
-                                                        cursorColor: ColorsProvider.getColor8(context),
+                                                        cursorColor:
+                                                            ColorsProvider
+                                                                .getColor8(
+                                                                    context),
                                                         style: TextStyle(
-                                                          color: ColorsProvider.getColor8(context),
-                                                          fontWeight: FontWeight.bold,
+                                                          color: ColorsProvider
+                                                              .getColor8(
+                                                                  context),
+                                                          fontWeight:
+                                                              FontWeight.bold,
                                                           fontSize: 23,
                                                         ),
-                                                        textAlign: TextAlign.center, // Zarovnání textu na střed
+                                                        textAlign: TextAlign
+                                                            .center, // Zarovnání textu na střed
                                                       ),
                                                     ),
                                                   ),
                                                 ),
                                                 Padding(
-                                                  padding: const EdgeInsets.all(8.0),
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
                                                   child: Container(
                                                     height: 5,
-                                                    decoration: BoxDecoration(color: ColorsProvider.getColor2(context), borderRadius: BorderRadius.circular(50)),
+                                                    decoration: BoxDecoration(
+                                                        color: ColorsProvider
+                                                            .getColor2(context),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(50)),
                                                   ),
                                                 ),
                                                 SizedBox(
@@ -421,37 +492,79 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
                                                 Container(
                                                   child: ListView.builder(
                                                     shrinkWrap: true,
-                                                    physics: NeverScrollableScrollPhysics(),
-                                                    itemCount: record.selectedMuscle!.length,
-                                                    itemBuilder: (context, muscleIndex) {
-                                                      int idSelectedMuscle = record.selectedMuscle![muscleIndex].supabaseIdSelectedMuscle!;
-                                                      int idMuscle = record.selectedMuscle![muscleIndex].musclesIdMuscle!;
-                                                      List<Exercise> exercises = record.selectedMuscle![muscleIndex].muscles!.exercises!;
+                                                    physics:
+                                                        NeverScrollableScrollPhysics(),
+                                                    itemCount: record
+                                                        .selectedMuscle!.length,
+                                                    itemBuilder:
+                                                        (context, muscleIndex) {
+                                                      int idSelectedMuscle = record
+                                                          .selectedMuscle![
+                                                              muscleIndex]
+                                                          .supabaseIdSelectedMuscle!;
+                                                      int idMuscle = record
+                                                          .selectedMuscle![
+                                                              muscleIndex]
+                                                          .musclesIdMuscle!;
+                                                      List<Exercise> exercises =
+                                                          record
+                                                              .selectedMuscle![
+                                                                  muscleIndex]
+                                                              .muscles!
+                                                              .exercises!;
                                                       return Padding(
-                                                        padding: const EdgeInsets.only(bottom: 15, left: 10, right: 10),
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(
+                                                                bottom: 15,
+                                                                left: 10,
+                                                                right: 10),
                                                         child: Container(
-                                                          decoration: BoxDecoration(color: ColorsProvider.getColor2(context), borderRadius: BorderRadius.circular(20)),
+                                                          decoration: BoxDecoration(
+                                                              color: ColorsProvider
+                                                                  .getColor2(
+                                                                      context),
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          20)),
                                                           child: Column(
                                                             children: [
                                                               Padding(
-                                                                padding: const EdgeInsets.fromLTRB(5, 5, 5, 0),
-                                                                child: Container(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .fromLTRB(
+                                                                        5,
+                                                                        5,
+                                                                        5,
+                                                                        0),
+                                                                child:
+                                                                    Container(
                                                                   height: 40,
-                                                                  decoration: BoxDecoration(
+                                                                  decoration:
+                                                                      BoxDecoration(
                                                                     // color: ColorsProvider.getColor2(context),
-                                                                    borderRadius: variablesProvider.zaobleni,
+                                                                    borderRadius:
+                                                                        zaobleni,
                                                                   ),
                                                                   child: Row(
-                                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .spaceBetween,
                                                                     children: [
                                                                       SizedBox(
-                                                                        width: 20,
+                                                                        width:
+                                                                            20,
                                                                       ),
                                                                       Expanded(
-                                                                        child: Center(
-                                                                          child: Container(
-                                                                            width: 180,
-                                                                            child: TextField(
+                                                                        child:
+                                                                            Center(
+                                                                          child:
+                                                                              Container(
+                                                                            width:
+                                                                                180,
+                                                                            child:
+                                                                                TextField(
                                                                               onChanged: (value) async {
                                                                                 clickedSplitTab = await _tabController.index;
                                                                                 switch (record.selectedMuscle![muscleIndex].muscles!.action) {
@@ -509,11 +622,15 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
                                                                         ),
                                                                       ),
                                                                       GestureDetector(
-                                                                        onTap: () {
-                                                                          clickedSplitTab = _tabController.index;
+                                                                        onTap:
+                                                                            () {
+                                                                          clickedSplitTab =
+                                                                              _tabController.index;
                                                                           showDialog(
-                                                                            context: context,
-                                                                            builder: (BuildContext context) {
+                                                                            context:
+                                                                                context,
+                                                                            builder:
+                                                                                (BuildContext context) {
                                                                               return Center(
                                                                                   child: NewExerciseBoxCopy(
                                                                                 idMuscle: idMuscle,
@@ -523,52 +640,101 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
                                                                             },
                                                                           );
                                                                         },
-                                                                        child: Icon(
-                                                                          Icons.add_circle_outline_outlined,
-                                                                          color: Colors.black,
-                                                                          size: 35,
+                                                                        child:
+                                                                            Icon(
+                                                                          Icons
+                                                                              .add_circle_outline_outlined,
+                                                                          color:
+                                                                              Colors.black,
+                                                                          size:
+                                                                              35,
                                                                         ),
                                                                       ),
                                                                       SizedBox(
-                                                                        width: 20,
+                                                                        width:
+                                                                            20,
                                                                       )
                                                                     ],
                                                                   ),
                                                                 ),
                                                               ),
                                                               Padding(
-                                                                padding: const EdgeInsets.only(left: 5, right: 5, top: 12, bottom: 15),
-                                                                child: Container(
-                                                                  child: ListView.builder(
-                                                                    shrinkWrap: true,
-                                                                    physics: NeverScrollableScrollPhysics(),
-                                                                    itemCount: exercises.length,
-                                                                    itemBuilder: (context, itemIndex) {
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .only(
+                                                                        left: 5,
+                                                                        right:
+                                                                            5,
+                                                                        top: 12,
+                                                                        bottom:
+                                                                            15),
+                                                                child:
+                                                                    Container(
+                                                                  child: ListView
+                                                                      .builder(
+                                                                    shrinkWrap:
+                                                                        true,
+                                                                    physics:
+                                                                        NeverScrollableScrollPhysics(),
+                                                                    itemCount:
+                                                                        exercises
+                                                                            .length,
+                                                                    itemBuilder:
+                                                                        (context,
+                                                                            itemIndex) {
                                                                       // var exercises = record.selectedMuscle![muscleIndex].muscles!.exercises;
-                                                                      var selectedExercises = record.selectedMuscle![muscleIndex].selectedExercises!;
-                                                                      String nameOfExercise = exercises[itemIndex].nameOfExercise!;
-                                                                      int supabaseIdExercise = exercises[itemIndex].supabaseIdExercise!;
-                                                                      int order = 0;
+                                                                      var selectedExercises = record
+                                                                          .selectedMuscle![
+                                                                              muscleIndex]
+                                                                          .selectedExercises!;
+                                                                      String
+                                                                          nameOfExercise =
+                                                                          exercises[itemIndex]
+                                                                              .nameOfExercise!;
+                                                                      int supabaseIdExercise =
+                                                                          exercises[itemIndex]
+                                                                              .supabaseIdExercise!;
+                                                                      int order =
+                                                                          0;
 
-                                                                      bool isChecked = false;
+                                                                      bool
+                                                                          isChecked =
+                                                                          false;
 
                                                                       function:
-                                                                      for (var j = 0; j < selectedExercises.length; j++) {
+                                                                      for (var j =
+                                                                              0;
+                                                                          j < selectedExercises.length;
+                                                                          j++) {
                                                                         // print(selectedExercises[j].action);
-                                                                        if (exercises[itemIndex].supabaseIdExercise == selectedExercises[j].exercises!.supabaseIdExercise) {
-                                                                          isChecked = true;
-                                                                          order = j + 1;
+                                                                        if (exercises[itemIndex].supabaseIdExercise ==
+                                                                            selectedExercises[j].exercises!.supabaseIdExercise) {
+                                                                          isChecked =
+                                                                              true;
+                                                                          order =
+                                                                              j + 1;
                                                                           break function;
                                                                         } else {
                                                                           // order = 1;
-                                                                          isChecked = false;
+                                                                          isChecked =
+                                                                              false;
                                                                         }
                                                                       }
                                                                       return Padding(
-                                                                        padding: const EdgeInsets.only(bottom: 5),
-                                                                        child: Padding(
-                                                                          padding: const EdgeInsets.fromLTRB(20, 5, 20, 0),
-                                                                          child: Row(
+                                                                        padding: const EdgeInsets
+                                                                            .only(
+                                                                            bottom:
+                                                                                5),
+                                                                        child:
+                                                                            Padding(
+                                                                          padding: const EdgeInsets
+                                                                              .fromLTRB(
+                                                                              20,
+                                                                              5,
+                                                                              20,
+                                                                              0),
+                                                                          child:
+                                                                              Row(
                                                                             // mainAxisAlignment: MainAxisAlignment.,
                                                                             children: [
                                                                               Expanded(
@@ -602,6 +768,8 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
                                                                                     widget.loadParent();
                                                                                   },
                                                                                   // controller: exercisesTextEditingControllers[itemIndex],
+                                                                                  minLines: 1,
+                                                                                  maxLines: null,
                                                                                   decoration: InputDecoration(
                                                                                     filled: true,
                                                                                     fillColor: ColorsProvider.getColor2(context),
@@ -750,46 +918,48 @@ class _SplitPageCopyState extends State<SplitPageCopy> with TickerProviderStateM
                                                 ),
                                               ],
                                             ),
+                                            SizedBox(
+                                              height: 10,
+                                            )
                                           ],
                                         ),
                                       ),
                                     ),
-                                    _deleteSplit(
-                                      context: context,
-                                      record: record,
-                                      a: a,
-                                      notifyParent: loadData,
-                                      foundActiveSplit: widget.foundActiveSplit,
-                                      onPressed: () async {
-                                        print("update is_active in split");
-                                        switch (record.action) {
-                                          case 0:
-                                            await dbFitness.DeleteSplit(record.supabaseIdSplit!, 2);
-                                            break;
-                                          case 1:
-                                            await dbFitness.DeleteSplit(record.supabaseIdSplit!, 1);
-
-                                            break;
-                                          case 2:
-                                            await dbFitness.DeleteSplit(record.supabaseIdSplit!, 2);
-
-                                            break;
-                                          case 3:
-                                            break;
-                                          case 4:
-                                            break;
-                                          default:
-                                        }
-
-                                        // widget.loadParent;
-                                        clickedSplitTab = 0;
-                                        // splitTextEditingControllers.removeAt(splits.indexOf(record));
-                                        // loadData();
-                                        // ScaffoldMessenger.of(context).hideCurrentSnackBar();
-
-                                        await loadData();
-                                      },
-                                    )
+                                    //   _deleteSplit(
+                                    //     context: context,
+                                    //     record: record,
+                                    //     a: a,
+                                    //     notifyParent: loadData,
+                                    //     foundActiveSplit: widget.foundActiveSplit,
+                                    //     onPressed: () async {
+                                    //       print("update is_active in split");
+                                    //       switch (record.action) {
+                                    //         case 0:
+                                    //           await dbFitness.DeleteSplit(
+                                    //               record.supabaseIdSplit!, 2);
+                                    //           break;
+                                    //         case 1:
+                                    //           await dbFitness.DeleteSplit(
+                                    //               record.supabaseIdSplit!, 1);
+                                    //           break;
+                                    //         case 2:
+                                    //           await dbFitness.DeleteSplit(
+                                    //               record.supabaseIdSplit!, 2);
+                                    //           break;
+                                    //         case 3:
+                                    //           break;
+                                    //         case 4:
+                                    //           break;
+                                    //         default:
+                                    //       }
+                                    //       // widget.loadParent;
+                                    //       clickedSplitTab = 0;
+                                    //       // splitTextEditingControllers.removeAt(splits.indexOf(record));
+                                    //       // loadData();
+                                    //       // ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                                    //       await loadData();
+                                    //     },
+                                    //   )
                                   ],
                                 );
                               },
@@ -895,7 +1065,8 @@ class __deleteSplitState extends State<_deleteSplit> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("${"delete".tr()} ${widget.record.nameSplit} ${"split_delete".tr()}"),
+                    Text(
+                        "${"delete".tr()} ${widget.record.nameSplit} ${"split_delete".tr()}"),
                     SizedBox(width: 20),
                     Icon(Icons.delete),
                   ],
@@ -909,13 +1080,15 @@ class __deleteSplitState extends State<_deleteSplit> {
                   foregroundColor: ColorsProvider.color_6,
                   backgroundColor: ColorsProvider.color_5,
                   disabledForegroundColor: ColorsProvider.color_6,
-                  disabledBackgroundColor: ColorsProvider.color_5.withOpacity(0.35), // Barva pozadí, když je tlačítko deaktivováno
+                  disabledBackgroundColor: ColorsProvider.color_5.withOpacity(
+                      0.35), // Barva pozadí, když je tlačítko deaktivováno
                 ),
                 onPressed: null,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("You can't delete ${widget.record.nameSplit.toUpperCase()} right now"),
+                    Text(
+                        "You can't delete ${widget.record.nameSplit.toUpperCase()} right now"),
                     // SizedBox(width: 20),
                     // Icon(Icons.delete),
                   ],
