@@ -1,7 +1,7 @@
 {
   "cmake.sourceDirectory": "C:/Users/Honza/Desktop/Apps/Flutter_zkousky/linux",
   "java.configuration.updateBuildConfiguration": "automatic",
-  "editor.wordWrap": "wordWrapColumn",
+  "editor.wordWrap": "off",
   "editor.autoIndent": "full",
   "editor.bracketPairColorization.enabled": true,
   "diffEditor.wordWrap": "off",
@@ -18,5 +18,6 @@
   "editor.minimap.renderCharacters": true,
   "editor.minimap.scale": 1,
   "editor.minimap.size": "fit",
-  "editor.cursorStyle": "line"
+  "editor.cursorStyle": "line",
+  "editor.insertSpaces": false
 }

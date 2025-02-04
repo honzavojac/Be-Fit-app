@@ -19,6 +19,7 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
+import 'data.dart';
 import 'pages/fitnessRecord/add_split_box copy.dart';
 import 'pages/fitnessRecord/exercise_page copy.dart';
 import 'pages/fitnessRecord/new_muscle_box copy.dart';
@@ -110,16 +111,13 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
   Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
     super.didChangeAppLifecycleState(state);
 
-    if (state == AppLifecycleState.paused ||
-        state == AppLifecycleState.detached) {
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.detached) {
       if (!checkActiveExercisePage()) {
         var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
         var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false);
-        print(
-            "**********začátek ukládání po zavření nebo vypnutí mobilu**********");
+        print("**********začátek ukládání po zavření nebo vypnutí mobilu**********");
         await dbFitness.SaveToSupabaseAndOrderSqlite(dbSupabase);
-        print(
-            "**********konec ukládání po zavření nebo vypnutí mobilu**********");
+        print("**********konec ukládání po zavření nebo vypnutí mobilu**********");
       }
     }
   }
@@ -170,31 +168,19 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
         dbFitness.SelectUser(),
       ]);
 
-      List<Muscle> sqfliteMuscleList = result[0];
-      List<Exercise> sqfliteExerciseList = result[1];
-      List<ExerciseData> sqfliteExerciseDataList = result[2];
-      List<MySplit> sqfliteSplitList = result[3];
-      List<SelectedMuscle> sqfliteSelectedMuscleList = result[4];
-      List<SelectedExercise> sqfliteSelectedExerciseList = result[5];
-      List<SplitStartedCompleted> sqfliteSplitStartedCompletedList = result[6];
-      List<Measurements> sqfliteBodyMeasurementsList = result[7];
-      List<IntakeCategories> sqfliteIntakeCategoriesList = result[8];
-      List<NutriIntake> sqfliteNutriIntakeList = result[9];
-      List<Food> sqfliteFoodList = result[10];
+      sqfliteMuscleList = result[0];
+      sqfliteExerciseList = result[1];
+      sqfliteExerciseDataList = result[2];
+      sqfliteSplitList = result[3];
+      sqfliteSelectedMuscleList = result[4];
+      sqfliteSelectedExerciseList = result[5];
+      sqfliteSplitStartedCompletedList = result[6];
+      sqfliteBodyMeasurementsList = result[7];
+      sqfliteIntakeCategoriesList = result[8];
+      sqfliteNutriIntakeList = result[9];
+      sqfliteFoodList = result[10];
       UserSupabase? sqfliteUser = result[11];
-
-      if (sqfliteMuscleList.isEmpty ||
-          sqfliteExerciseList.isEmpty ||
-          sqfliteExerciseDataList.isEmpty ||
-          sqfliteSplitList.isEmpty ||
-          sqfliteSelectedMuscleList.isEmpty ||
-          sqfliteSelectedExerciseList.isEmpty ||
-          sqfliteSplitStartedCompletedList.isEmpty ||
-          sqfliteBodyMeasurementsList.isEmpty ||
-          sqfliteIntakeCategoriesList.isEmpty ||
-          sqfliteNutriIntakeList.isEmpty ||
-          sqfliteFoodList.isEmpty ||
-          sqfliteUser == null) {
+      if (sqfliteMuscleList.isEmpty || sqfliteExerciseList.isEmpty || sqfliteExerciseDataList.isEmpty || sqfliteSplitList.isEmpty || sqfliteSelectedMuscleList.isEmpty || sqfliteSelectedExerciseList.isEmpty || sqfliteSplitStartedCompletedList.isEmpty || sqfliteBodyMeasurementsList.isEmpty || sqfliteIntakeCategoriesList.isEmpty || sqfliteNutriIntakeList.isEmpty || sqfliteFoodList.isEmpty || sqfliteUser == null) {
         if (iconPage) {
           iconPage = false;
         } else {
@@ -212,16 +198,16 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
             dbSupabase.getUser(),
           ]);
           // Načtení dat ze Supabase
-          supabaseMuscleList = result[0];
-          supabaseExerciseList = result[1];
-          supabaseExerciseDataList = result[2];
-          supabaseSplitList = result[3];
-          supabaseSelectedMuscleList = result[4];
-          supabaseSelectedExerciseList = result[5];
-          supabaseSplitStartedCompletedList = result[6];
-          supabaseBodyMeasurementsList = result[7];
-          supabaseIntakeCategoriesList = result[8];
-          supabaseNutriIntakeList = result[9];
+          supabaseMuscleList = sqfliteMuscleList = result[0];
+          supabaseExerciseList = sqfliteExerciseList = result[1];
+          supabaseExerciseDataList = sqfliteExerciseDataList = result[2];
+          supabaseSplitList = sqfliteSplitList = result[3];
+          supabaseSelectedMuscleList = sqfliteSelectedMuscleList = result[4];
+          supabaseSelectedExerciseList = sqfliteSelectedExerciseList = result[5];
+          supabaseSplitStartedCompletedList = sqfliteSplitStartedCompletedList = result[6];
+          supabaseBodyMeasurementsList = sqfliteBodyMeasurementsList = result[7];
+          supabaseIntakeCategoriesList = sqfliteIntakeCategoriesList = result[8];
+          supabaseNutriIntakeList = sqfliteNutriIntakeList = result[9];
           supabaseUser = result[10];
           // final MuscleLoading = dbSupabase.MuscleTable();
           // final ExerciseLoading = dbSupabase.ExerciseTable();
@@ -266,13 +252,7 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
 
             if (sqfliteExerciseList.isEmpty) {
               for (var exercise in supabaseExerciseList) {
-                dbFitness.TxnInsertExercise(
-                    txn,
-                    exercise.idExercise!,
-                    exercise.nameOfExercise!,
-                    exercise.comment ?? "",
-                    exercise.musclesIdMuscle!,
-                    0);
+                dbFitness.TxnInsertExercise(txn, exercise.idExercise!, exercise.nameOfExercise!, exercise.comment ?? "", exercise.musclesIdMuscle!, 0);
               }
             }
 
@@ -296,36 +276,24 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
 
             if (sqfliteSplitList.isEmpty) {
               for (var split in supabaseSplitList) {
-                dbFitness.TxnInsertSplit(txn, split.idSplit!, split.nameSplit,
-                    split.createdAt!, split.isActive, 0);
+                dbFitness.TxnInsertSplit(txn, split.idSplit!, split.nameSplit, split.createdAt!, split.isActive, 0);
               }
             }
 
             if (sqfliteSelectedMuscleList.isEmpty) {
               for (var selectedMuscle in supabaseSelectedMuscleList) {
-                dbFitness.TxnInsertSelectedMuscle(
-                    txn,
-                    selectedMuscle.idSelectedMuscle!,
-                    selectedMuscle.splitIdSplit!,
-                    selectedMuscle.musclesIdMuscle!,
-                    0);
+                dbFitness.TxnInsertSelectedMuscle(txn, selectedMuscle.idSelectedMuscle!, selectedMuscle.splitIdSplit!, selectedMuscle.musclesIdMuscle!, 0);
               }
             }
 
             if (sqfliteSelectedExerciseList.isEmpty) {
               for (var selectedExercise in supabaseSelectedExerciseList) {
-                dbFitness.TxnInsertSelectedExercise(
-                    txn,
-                    selectedExercise.idSelectedExercise!,
-                    selectedExercise.idExercise!,
-                    selectedExercise.idSelectedMuscle!,
-                    0);
+                dbFitness.TxnInsertSelectedExercise(txn, selectedExercise.idSelectedExercise!, selectedExercise.idExercise!, selectedExercise.idSelectedMuscle!, 0);
               }
             }
 
             if (sqfliteSplitStartedCompletedList.isEmpty) {
-              for (var splitStartedCompleted
-                  in supabaseSplitStartedCompletedList) {
+              for (var splitStartedCompleted in supabaseSplitStartedCompletedList) {
                 dbFitness.TxnInsertSplitStartedCompleted(
                   txn,
                   splitStartedCompleted.idStartedCompleted!,
@@ -346,8 +314,7 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
 
             if (sqfliteIntakeCategoriesList.isEmpty) {
               for (var intakeCategory in supabaseIntakeCategoriesList) {
-                dbFitness.TxninsertIntakeCategory(txn, intakeCategory.name!, 0,
-                    intakeCategory.idIntakeCategory!);
+                dbFitness.TxninsertIntakeCategory(txn, intakeCategory.name!, 0, intakeCategory.idIntakeCategory!);
               }
             }
 
@@ -356,8 +323,7 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
                 print("**** nutri intake **** ${nutriIntake.createdAt}");
                 try {
                   sqfliteNutriIntakeList.add(nutriIntake);
-                  dbFitness.TxnInsertNutriIntake(
-                      txn, nutriIntake, nutriIntake.idNutriIntake!, 0);
+                  dbFitness.TxnInsertNutriIntake(txn, nutriIntake, nutriIntake.idNutriIntake!, 0);
                 } on Exception catch (e) {
                   print("nastala chyba při insert nutri intake: $e");
                 }
@@ -369,10 +335,8 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
           });
 
           if (sqfliteFoodList.isEmpty) {
-            Set<int> foodIds =
-                sqfliteNutriIntakeList.map((e) => e.idFood!).toSet();
-            List<Food?> foodList =
-                await dbSupabase.selectSpecificFoods(foodIds);
+            Set<int> foodIds = sqfliteNutriIntakeList.map((e) => e.idFood!).toSet();
+            List<Food?> foodList = await dbSupabase.selectSpecificFoods(foodIds);
             for (var food in foodList) {
               dbFitness.InsertOrUpdateFood(food!, 0);
             }
@@ -402,9 +366,7 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
     createTutorial();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? tutorialShow = await prefs.getString("show_tutorial");
-    if (tutorialShow == "true" ||
-        tutorialShow == null ||
-        tutorialShow.isEmpty) {
+    if (tutorialShow == "true" || tutorialShow == null || tutorialShow.isEmpty) {
       showTutorial();
       print("show tutorial");
       await prefs.setString("show_tutorial", "false");
@@ -640,8 +602,7 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
               paddingFocus: 0, // Žádné odsazení
               enableTargetTab: true,
               enableOverlayTab: true,
-              keyTarget:
-                  keyWelcomeDummy, // Nezadáváme enableTargetTab: true,enableOverlayTab: false,keyTarget, protože nechceme zaměřit žádný konkrétní prvek
+              keyTarget: keyWelcomeDummy, // Nezadáváme enableTargetTab: true,enableOverlayTab: false,keyTarget, protože nechceme zaměřit žádný konkrétní prvek
               contents: [
                 TargetContent(
                   // align: ContentAlign.bottom, // Pozice obsahu, můžeš změnit podle potřeby
@@ -657,8 +618,7 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
                               "tutorial_hello".tr(),
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                color: Colors
-                                    .white, // Bílá barva, aby vynikl na tmavém pozadí
+                                color: Colors.white, // Bílá barva, aby vynikl na tmavém pozadí
                                 fontSize: 25.0,
                               ),
                             ),
@@ -667,8 +627,7 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
                               "tutorial_hello.1".tr(),
                               softWrap: true,
                               style: TextStyle(
-                                color: Colors
-                                    .white, // Bílá barva, aby vynikl na tmavém pozadí
+                                color: Colors.white, // Bílá barva, aby vynikl na tmavém pozadí
                                 fontSize: 20.0,
                               ),
                             ),
@@ -702,10 +661,7 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
                   children: [
                     Text(
                       "Home".tr(),
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          fontSize: 25.0),
+                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 25.0),
                     ),
                     Padding(
                       padding: EdgeInsets.only(
@@ -748,10 +704,7 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
                   children: [
                     Text(
                       "Fitness".tr(),
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          fontSize: 25.0),
+                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 25.0),
                     ),
                     Padding(
                       padding: EdgeInsets.only(
@@ -799,10 +752,7 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
                     ),
                     Text(
                       "tutorial_2".tr(),
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          fontSize: 25.0),
+                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 25.0),
                     ),
                     Padding(
                       padding: EdgeInsets.only(
@@ -847,10 +797,7 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
                     ),
                     Text(
                       "tutorial_3".tr(),
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          fontSize: 25.0),
+                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 25.0),
                     ),
                     Padding(
                       padding: EdgeInsets.only(
@@ -895,10 +842,7 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
                     ),
                     Text(
                       "tutorial_4".tr(),
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          fontSize: 25.0),
+                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 25.0),
                     ),
                     Padding(
                       padding: EdgeInsets.only(
@@ -943,10 +887,7 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
                     ),
                     Text(
                       "new_muscle".tr(),
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          fontSize: 25.0),
+                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 25.0),
                     ),
                     Padding(
                       padding: EdgeInsets.only(
@@ -974,8 +915,7 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
         paddingFocus: 0, // Žádné odsazení
         enableTargetTab: true,
         enableOverlayTab: true,
-        keyTarget:
-            keySplitDummy, // Nezadáváme enableTargetTab: true,enableOverlayTab: false,keyTarget, protože nechceme zaměřit žádný konkrétní prvek
+        keyTarget: keySplitDummy, // Nezadáváme enableTargetTab: true,enableOverlayTab: false,keyTarget, protože nechceme zaměřit žádný konkrétní prvek
         contents: [
           TargetContent(
             // align: ContentAlign.bottom, // Pozice obsahu, můžeš změnit podle potřeby
@@ -991,10 +931,7 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
                       ),
                       Text(
                         "name_of_split".tr(),
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontSize: 25.0),
+                        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 25.0),
                       ),
                       Padding(
                         padding: EdgeInsets.only(
@@ -1015,8 +952,7 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
                         "tutorial_7".tr(),
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: Colors
-                              .white, // Bílá barva, aby vynikl na tmavém pozadí
+                          color: Colors.white, // Bílá barva, aby vynikl na tmavém pozadí
                           fontSize: 25.0,
                         ),
                       ),
@@ -1101,8 +1037,7 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
         paddingFocus: 0, // Žádné odsazení
         enableTargetTab: true,
         enableOverlayTab: true,
-        keyTarget:
-            keySplitDummy, // Nezadáváme enableTargetTab: true,enableOverlayTab: false,keyTarget, protože nechceme zaměřit žádný konkrétní prvek
+        keyTarget: keySplitDummy, // Nezadáváme enableTargetTab: true,enableOverlayTab: false,keyTarget, protože nechceme zaměřit žádný konkrétní prvek
         contents: [
           TargetContent(
             // align: ContentAlign.bottom, // Pozice obsahu, můžeš změnit podle potřeby
@@ -1118,8 +1053,7 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
                         "tutorial_9".tr(),
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: Colors
-                              .white, // Bílá barva, aby vynikl na tmavém pozadí
+                          color: Colors.white, // Bílá barva, aby vynikl na tmavém pozadí
                           fontSize: 25.0,
                         ),
                       ),
@@ -1231,8 +1165,7 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
         paddingFocus: 0, // Žádné odsazení
         enableTargetTab: true,
         enableOverlayTab: true,
-        keyTarget:
-            keyDummy1, // Nezadáváme enableTargetTab: true,enableOverlayTab: false,keyTarget, protože nechceme zaměřit žádný konkrétní prvek
+        keyTarget: keyDummy1, // Nezadáváme enableTargetTab: true,enableOverlayTab: false,keyTarget, protože nechceme zaměřit žádný konkrétní prvek
         contents: [
           TargetContent(
             // align: ContentAlign.bottom, // Pozice obsahu, můžeš změnit podle potřeby
@@ -1248,8 +1181,7 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
                         "tutorial_11".tr(),
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: Colors
-                              .white, // Bílá barva, aby vynikl na tmavém pozadí
+                          color: Colors.white, // Bílá barva, aby vynikl na tmavém pozadí
                           fontSize: 25.0,
                         ),
                       ),
@@ -1286,8 +1218,7 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
         paddingFocus: 0, // Žádné odsazení
         enableTargetTab: true,
         enableOverlayTab: true,
-        keyTarget:
-            keyDummy1, // Nezadáváme enableTargetTab: true,enableOverlayTab: false,keyTarget, protože nechceme zaměřit žádný konkrétní prvek
+        keyTarget: keyDummy1, // Nezadáváme enableTargetTab: true,enableOverlayTab: false,keyTarget, protože nechceme zaměřit žádný konkrétní prvek
         contents: [
           TargetContent(
             // align: ContentAlign.bottom, // Pozice obsahu, můžeš změnit podle potřeby
@@ -1303,8 +1234,7 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
                         "tutorial_12".tr(),
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: Colors
-                              .white, // Bílá barva, aby vynikl na tmavém pozadí
+                          color: Colors.white, // Bílá barva, aby vynikl na tmavém pozadí
                           fontSize: 25.0,
                         ),
                       ),
@@ -1326,8 +1256,7 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
                         "tutorial_12.2".tr(),
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: Colors
-                              .white, // Bílá barva, aby vynikl na tmavém pozadí
+                          color: Colors.white, // Bílá barva, aby vynikl na tmavém pozadí
                           fontSize: 25.0,
                         ),
                       ),
@@ -1388,8 +1317,7 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
         paddingFocus: 0, // Žádné odsazení
         enableTargetTab: true,
         enableOverlayTab: true,
-        keyTarget:
-            keyDummy1, // Nezadáváme enableTargetTab: true,enableOverlayTab: false,keyTarget, protože nechceme zaměřit žádný konkrétní prvek
+        keyTarget: keyDummy1, // Nezadáváme enableTargetTab: true,enableOverlayTab: false,keyTarget, protože nechceme zaměřit žádný konkrétní prvek
         contents: [
           TargetContent(
             // align: ContentAlign.bottom, // Pozice obsahu, můžeš změnit podle potřeby
@@ -1407,8 +1335,7 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: Colors
-                              .white, // Bílá barva, aby vynikl na tmavém pozadí
+                          color: Colors.white, // Bílá barva, aby vynikl na tmavém pozadí
                           fontSize: 25.0,
                         ),
                       ),
@@ -1463,10 +1390,7 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
                   children: [
                     Text(
                       "Food".tr(),
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          fontSize: 25.0),
+                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 25.0),
                     ),
                     Padding(
                       padding: EdgeInsets.only(
@@ -1515,10 +1439,7 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
                     ),
                     Text(
                       "tutorial_15".tr(),
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          fontSize: 25.0),
+                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 25.0),
                     ),
                     Padding(
                       padding: EdgeInsets.only(
@@ -1606,10 +1527,7 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
                     ),
                     Text(
                       "tutorial_16".tr(),
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          fontSize: 25.0),
+                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 25.0),
                     ),
                     Padding(
                       padding: EdgeInsets.only(
@@ -1655,10 +1573,7 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
                     ),
                     Text(
                       "tutorial_17".tr(),
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          fontSize: 25.0),
+                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 25.0),
                     ),
                     SizedBox(
                       height: 20,
@@ -1695,10 +1610,7 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
                     ),
                     Text(
                       "tutorial_18".tr(),
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          fontSize: 25.0),
+                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 25.0),
                     ),
                     SizedBox(
                       height: 80,
@@ -1760,10 +1672,7 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
                               height: 70,
                               child: Text(
                                 "Welcome",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 35,
-                                    color: ColorsProvider.getColor8(context)),
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 35, color: ColorsProvider.getColor8(context)),
                               ),
                             ),
                             // LoadingAnimationWidget.staggeredDotsWave(
@@ -1805,10 +1714,7 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
                               height: 50,
                               child: Text(
                                 "Loading data",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 35,
-                                    color: ColorsProvider.getColor8(context)),
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 35, color: ColorsProvider.getColor8(context)),
                               ),
                             ),
                           ],
@@ -1867,57 +1773,19 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
                     child: _categoryWidget('Food'.tr()),
                   ),
 
-                  _buttonWidget(
-                      dbSupabase,
-                      context,
-                      '/scanFood',
-                      'scan_food'.tr(),
-                      Icons.fit_screen_rounded,
-                      false,
-                      problemWidth),
-                  _buttonWidget(dbSupabase, context, '/newFood',
-                      'add_new_food'.tr(), Icons.add, true, problemWidth),
-                  _buttonWidget(dbSupabase, context, '/newFood',
-                      'new_food'.tr(), Icons.add, false, problemWidth),
-                  _buttonWidget(
-                      dbSupabase,
-                      context,
-                      '/foodStatistic',
-                      'statistic'.tr(),
-                      Icons.bar_chart_rounded,
-                      false,
-                      problemWidth),
+                  _buttonWidget(dbSupabase, context, '/scanFood', 'scan_food'.tr(), Icons.fit_screen_rounded, false, problemWidth),
+                  _buttonWidget(dbSupabase, context, '/newFood', 'add_new_food'.tr(), Icons.add, true, problemWidth),
+                  _buttonWidget(dbSupabase, context, '/newFood', 'new_food'.tr(), Icons.add, false, problemWidth),
+                  _buttonWidget(dbSupabase, context, '/foodStatistic', 'statistic'.tr(), Icons.bar_chart_rounded, false, problemWidth),
                   _categoryWidget('workout'.tr()),
                   // _buttonWidget(dbSupabase, context, '/fitnessNames', 'Manage fitness names', Icons.text_fields_rounded),
                   // _buttonWidget(dbSupabase, context, '/editDeleteExerciseData', 'Edit/Delete exercise data', Icons.edit_rounded),
-                  _buttonWidget(
-                      dbSupabase,
-                      context,
-                      '/fitnessStatistic',
-                      'statistic'.tr(),
-                      Icons.insights_rounded,
-                      true,
-                      problemWidth),
+                  _buttonWidget(dbSupabase, context, '/fitnessStatistic', 'statistic'.tr(), Icons.insights_rounded, true, problemWidth),
                   _categoryWidget('body'.tr()),
-                  _buttonWidget(
-                      dbSupabase,
-                      context,
-                      '/measurements',
-                      'measurement'.tr(),
-                      Icons.straighten_outlined,
-                      true,
-                      problemWidth),
+                  _buttonWidget(dbSupabase, context, '/measurements', 'measurement'.tr(), Icons.straighten_outlined, true, problemWidth),
                   Spacer(),
                   Center(
-                    child: _buttonWidget(
-                        dbSupabase,
-                        context,
-                        '/settings',
-                        'settings'.tr(),
-                        Icons.settings_outlined,
-                        true,
-                        problemWidth,
-                        paddingLeft: 0),
+                    child: _buttonWidget(dbSupabase, context, '/settings', 'settings'.tr(), Icons.settings_outlined, true, problemWidth, paddingLeft: 0),
                   ),
                   SizedBox(height: 10),
                 ],
@@ -1990,10 +1858,8 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
           animationDuration: const Duration(milliseconds: 1000),
           destinations: [
             _navigation(null, null, "Fitness".tr(), keyBottomNavigation1),
-            _navigation(Icons.home, Icons.home_outlined, "Home".tr(),
-                keyBottomNavigation2),
-            _navigation(Icons.fastfood_rounded, Icons.fastfood, "Food".tr(),
-                keyBottomNavigation3),
+            _navigation(Icons.home, Icons.home_outlined, "Home".tr(), keyBottomNavigation2),
+            _navigation(Icons.fastfood_rounded, Icons.fastfood, "Food".tr(), keyBottomNavigation3),
           ],
         ),
       );
@@ -2023,8 +1889,7 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
     );
   }
 
-  Widget _navigation(IconData? primaryIconData, IconData? secondaryIconDaty,
-      String name, Key key) {
+  Widget _navigation(IconData? primaryIconData, IconData? secondaryIconDaty, String name, Key key) {
     return NavigationDestination(
       key: key,
       selectedIcon: primaryIconData != null
@@ -2036,8 +1901,7 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
               'assets/icons/icon_half_bodybuilder.png', // Cesta k vašemu obrázku
               // width: 24,
               height: 32,
-              color: ColorsProvider.getColor8(
-                  context), // Volitelně můžete nastavit barvu obrázku
+              color: ColorsProvider.getColor8(context), // Volitelně můžete nastavit barvu obrázku
             ),
       icon: secondaryIconDaty != null
           ? Icon(
@@ -2054,9 +1918,7 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
     );
   }
 
-  Widget _buttonWidget(SupabaseProvider dbSupabase, BuildContext context,
-      String page, String name, IconData icon, bool show, double widthOfRow,
-      {double paddingLeft = 20}) {
+  Widget _buttonWidget(SupabaseProvider dbSupabase, BuildContext context, String page, String name, IconData icon, bool show, double widthOfRow, {double paddingLeft = 20}) {
     return GestureDetector(
       onTap: () async {
         if (show == false) {
@@ -2074,18 +1936,14 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
         // color: ColorsProvider.getColor2(context),
         // color: Colors.black,
         child: Row(
-          mainAxisAlignment: page == '/settings'
-              ? MainAxisAlignment.center
-              : MainAxisAlignment.start,
+          mainAxisAlignment: page == '/settings' ? MainAxisAlignment.center : MainAxisAlignment.start,
           children: [
             SizedBox(
               width: paddingLeft,
             ),
             Icon(
               icon,
-              color: show == true
-                  ? ColorsProvider.getColor8(context)
-                  : ColorsProvider.getColor8(context).withAlpha(100),
+              color: show == true ? ColorsProvider.getColor8(context) : ColorsProvider.getColor8(context).withAlpha(100),
             ),
             SizedBox(
               width: 5,
@@ -2094,14 +1952,11 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
                 ? Text(
                     '$name',
                     softWrap: true, // Povolení zalamování textu
-                    overflow: TextOverflow
-                        .visible, // Text se prostě rozšiřuje do dalšího řádku
+                    overflow: TextOverflow.visible, // Text se prostě rozšiřuje do dalšího řádku
 
                     style: TextStyle(
                       fontSize: 18,
-                      color: show == true
-                          ? ColorsProvider.getColor8(context)
-                          : ColorsProvider.getColor8(context).withAlpha(100),
+                      color: show == true ? ColorsProvider.getColor8(context) : ColorsProvider.getColor8(context).withAlpha(100),
                       fontWeight: FontWeight.bold,
                     ),
                   )
@@ -2110,14 +1965,11 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
                     child: Text(
                       '$name',
                       softWrap: true, // Povolení zalamování textu
-                      overflow: TextOverflow
-                          .visible, // Text se prostě rozšiřuje do dalšího řádku
+                      overflow: TextOverflow.visible, // Text se prostě rozšiřuje do dalšího řádku
 
                       style: TextStyle(
                         fontSize: 18,
-                        color: show == true
-                            ? ColorsProvider.getColor8(context)
-                            : ColorsProvider.getColor8(context).withAlpha(100),
+                        color: show == true ? ColorsProvider.getColor8(context) : ColorsProvider.getColor8(context).withAlpha(100),
                         fontWeight: FontWeight.bold,
                       ),
                     ),

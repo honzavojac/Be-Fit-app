@@ -53,7 +53,7 @@ void main() async {
 
   FitnessProvider dbFitness = FitnessProvider();
   await dbFitness.initializeDB();
-  dbFitness.selectAllCommentFromExercises();
+  // dbFitness.selectAllCommentFromExercises();
   // await dbFitness.deleteFile("fitnessDatabase.db");
   // dbFitness.DeleteMuscle(1);
   // dbFitness.SelectMuscles();

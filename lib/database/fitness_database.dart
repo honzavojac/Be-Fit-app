@@ -383,7 +383,7 @@ class FitnessProvider extends ChangeNotifier {
         //data jsou stejné
         // var responseData = await _database.rawQuery('''SELECT * FROM $dbTable;''');
         finalSupabaseIdItem = supabaseIdItem;
-        print("nic se neinsertovalo");
+        // print("nic se neinsertovalo");
         break;
       case 1:
         // funguje
@@ -560,13 +560,13 @@ class FitnessProvider extends ChangeNotifier {
   }
 
   SaveToSupabaseAndOrderSqlite(SupabaseProvider dbSupabase) async {
+    print("Začátek synchronizace");
     Stopwatch stopwatch = Stopwatch()..start();
     if (_isSyncing) {
       print(
           "Syncing is already in progress. Skipping this call.*************************************************************************");
       return;
     }
-    print("object");
     if (!await isConnectedToInternet()) {
       print("No internet connection. Synchronization aborted.");
       return;
@@ -657,7 +657,6 @@ class FitnessProvider extends ChangeNotifier {
 
           for (var splitStartedCompletedItem
               in split.splitStartedCompleted ?? []) {
-            print("začátek");
             if (split.supabaseIdSplit == splitStartedCompletedItem.splitId) {
               splitStartedCompletedItem.splitId = supabaseIdSplit;
               int splitStartedCompletedAction =
@@ -668,7 +667,6 @@ class FitnessProvider extends ChangeNotifier {
                   splitStartedCompletedItem,
                   splitStartedCompletedAction);
               if (supabaseIdStartedCompleted != null) {
-                print("splitstartedcompleted není null");
                 await UpadateExerciseDataIdStartedCompleted(
                     supabaseIdStartedCompleted,
                     splitStartedCompletedItem.supabaseIdStartedCompleted ?? 0);
@@ -703,7 +701,6 @@ class FitnessProvider extends ChangeNotifier {
           }
         }
       }
-      print("measurements");
       for (var measurement in measurements) {
         int bodyMeasurementsAction = measurement.action ?? 0;
         int? supabaseIdBodyMeasurements = await SyncSqfliteToSupabase(
@@ -716,7 +713,6 @@ class FitnessProvider extends ChangeNotifier {
               supabaseIdBodyMeasurements, measurement.idBodyMeasurements ?? 0);
         }
       }
-      print("intake category");
       for (var intakeCategory in intakeCategories) {
         int intakeCategoryAction = intakeCategory.action ?? 0;
         int? supabaseIdIntakeCategory = await SyncSqfliteToSupabase(dbSupabase,
@@ -726,7 +722,6 @@ class FitnessProvider extends ChangeNotifier {
               supabaseIdIntakeCategory, intakeCategory.idIntakeCategory ?? 0);
         }
       }
-      print("nutri intake **********************************");
       nutriIntakes.sort(
         (a, b) => a.supabaseIdNutriIntake!.compareTo(b.supabaseIdNutriIntake!),
       );
@@ -2462,7 +2457,6 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
         final Map<String, dynamic> userMap = result.first;
         // Vytvoření instance UserSupabase
         UserSupabase user = UserSupabase.fromJson(userMap);
-        print("*************${user}**************");
         return user;
       } else {
         print('No user found.');

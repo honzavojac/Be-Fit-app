@@ -84,11 +84,6 @@ class _FitnessRecordScreenState extends State<FitnessRecordScreen> {
         var finalData = dataSplit[j];
         // print(dataSplit.length);
         if (finalData.ended == false) {
-          print("i: $i");
-          print("j: $j");
-          print("idStartedCompleted: ${finalData.idStartedCompleted}");
-          print("splitId: ${finalData.splitId}");
-          print("**************************");
           // for (var element in rawData) {
           //   print("idSplit: ${element.idSplit} nameSplit: ${element.nameSplit}");
           // }
