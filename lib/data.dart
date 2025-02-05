@@ -12,4 +12,12 @@ late List<IntakeCategories> sqfliteIntakeCategoriesList;
 late List<NutriIntake> sqfliteNutriIntakeList;
 late List<Food> sqfliteFoodList;
 
+Map<int, Muscle> muscleMap = {};
+Map<int, Exercise> exerciseMap = {};
+
+Map<int, List<SelectedMuscle>> selectedMuscleMap = {};
+Map<int, List<int>> selectedExerciseMap = {};
+
+late int idkIndex;
+
 int selectedSplit = 0;

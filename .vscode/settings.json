@@ -19,5 +19,7 @@
   "editor.minimap.scale": 1,
   "editor.minimap.size": "fit",
   "editor.cursorStyle": "line",
-  "editor.insertSpaces": false
+  "editor.insertSpaces": false,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "notebook.defaultFormatter": "esbenp.prettier-vscode"
 }

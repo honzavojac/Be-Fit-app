@@ -34,8 +34,7 @@ class FitnessRecordScreenCopy extends StatefulWidget {
   const FitnessRecordScreenCopy({super.key});
 
   @override
-  State<FitnessRecordScreenCopy> createState() =>
-      _FitnessRecordScreenCopyState();
+  State<FitnessRecordScreenCopy> createState() => _FitnessRecordScreenCopyState();
 }
 
 int selectedSplit = 0;
@@ -63,28 +62,22 @@ class _FitnessRecordScreenCopyState extends State<FitnessRecordScreenCopy> {
       for (var split in exercisesData) {
         for (var splitStartedCompleted in split.splitStartedCompleted!) {
           if (splitStartedCompleted.ended == false) {
-            idSplitStartedCompleted =
-                splitStartedCompleted.supabaseIdStartedCompleted!;
+            idSplitStartedCompleted = splitStartedCompleted.supabaseIdStartedCompleted!;
             foundActiveSplit = true;
             selectedSplit = i;
-            List<ExerciseData> exerciseDataItems =
-                await dbFitness.SelectCurrentExerciseDataWhereId(
-                    idSplitStartedCompleted!);
+            List<ExerciseData> exerciseDataItems = await dbFitness.SelectCurrentExerciseDataWhereId(idSplitStartedCompleted!);
 
             for (var selectedMuscle in split.selectedMuscle!) {
               for (var selectedExercise in selectedMuscle.selectedExercises!) {
                 selectedExercise.exercises!.exerciseData = [];
                 for (var item in exerciseDataItems) {
-                  if (selectedExercise.exercises!.supabaseIdExercise ==
-                      item.exercisesIdExercise) {
+                  if (selectedExercise.exercises!.supabaseIdExercise == item.exercisesIdExercise) {
                     selectedExercise.exercises!.exerciseData!.add(item);
                   }
                 }
-                selectedExercise.exercises!.exerciseData!
-                    .removeWhere((data) => data.action == 3);
+                selectedExercise.exercises!.exerciseData!.removeWhere((data) => data.action == 3);
               }
-              selectedMuscle.selectedExercises!
-                  .removeWhere((exercise) => exercise.action == 3);
+              selectedMuscle.selectedExercises!.removeWhere((exercise) => exercise.action == 3);
             }
             break activeSplit;
           }
@@ -94,8 +87,7 @@ class _FitnessRecordScreenCopyState extends State<FitnessRecordScreenCopy> {
 
       for (var split in exercisesData) {
         for (var selectedMuscle in split.selectedMuscle!) {
-          selectedMuscle.selectedExercises!
-              .removeWhere((selectedExercise) => selectedExercise.action == 3);
+          selectedMuscle.selectedExercises!.removeWhere((selectedExercise) => selectedExercise.action == 3);
         }
       }
       loaded = true;
@@ -107,8 +99,7 @@ class _FitnessRecordScreenCopyState extends State<FitnessRecordScreenCopy> {
   }
 
   Future<void> refresh() async {
-    print(
-        "*******************************refresh*******************************");
+    print("*******************************refresh*******************************");
     selectedSplit = 0;
     loadData();
     setState(() {});
@@ -161,11 +152,8 @@ class _FitnessRecordScreenCopyState extends State<FitnessRecordScreenCopy> {
                                   onChanged: (value) {
                                     setState(() {
                                       supabaseIdSplit = value;
-                                      for (var i = 0;
-                                          i < exercisesData.length;
-                                          i++) {
-                                        if (exercisesData[i].supabaseIdSplit ==
-                                            value) {
+                                      for (var i = 0; i < exercisesData.length; i++) {
+                                        if (exercisesData[i].supabaseIdSplit == value) {
                                           selectedSplit = i;
                                         }
                                       }
@@ -182,8 +170,7 @@ class _FitnessRecordScreenCopyState extends State<FitnessRecordScreenCopy> {
                                 )
                               : FitnessRecordEndSplit(
                                   splitName: splitName,
-                                  idSplitStartedCompleted:
-                                      idSplitStartedCompleted!,
+                                  idSplitStartedCompleted: idSplitStartedCompleted!,
                                   refresh: refresh,
                                   loadData: loadData,
                                   onChanged: (value) {},
@@ -198,31 +185,21 @@ class _FitnessRecordScreenCopyState extends State<FitnessRecordScreenCopy> {
                             child: ListView.builder(
                               physics: NeverScrollableScrollPhysics(),
                               shrinkWrap: true,
-                              itemCount: exercisesData[selectedSplit]
-                                  .selectedMuscle!
-                                  .length,
+                              itemCount: exercisesData[selectedSplit].selectedMuscle!.length,
                               itemBuilder: (context, muscleIndex) {
-                                String muscle = exercisesData[selectedSplit]
-                                    .selectedMuscle![muscleIndex]
-                                    .muscles!
-                                    .nameOfMuscle!;
-                                if (exercisesData[selectedSplit]
-                                    .selectedMuscle![muscleIndex]
-                                    .selectedExercises!
-                                    .isEmpty) {
+                                String muscle = exercisesData[selectedSplit].selectedMuscle![muscleIndex].muscles!.nameOfMuscle!;
+                                if (exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises!.isEmpty) {
                                   return Padding(
                                     padding: const EdgeInsets.only(bottom: 15),
                                     child: Container(
                                       decoration: BoxDecoration(
-                                        color:
-                                            ColorsProvider.getColor2(context),
+                                        color: ColorsProvider.getColor2(context),
                                         borderRadius: BorderRadius.circular(20),
                                       ),
                                       child: Column(
                                         children: [
                                           Padding(
-                                            padding: const EdgeInsets.fromLTRB(
-                                                5, 10, 5, 0),
+                                            padding: const EdgeInsets.fromLTRB(5, 10, 5, 0),
                                             child: Container(
                                               height: 30,
                                               decoration: BoxDecoration(
@@ -233,8 +210,7 @@ class _FitnessRecordScreenCopyState extends State<FitnessRecordScreenCopy> {
                                                 child: Text(
                                                   "$muscle".toUpperCase(),
                                                   style: TextStyle(
-                                                    color: ColorsProvider
-                                                        .getColor8(context),
+                                                    color: ColorsProvider.getColor8(context),
                                                     fontWeight: FontWeight.bold,
                                                     fontSize: 25,
                                                     // letterSpacing: 2,
@@ -252,11 +228,7 @@ class _FitnessRecordScreenCopyState extends State<FitnessRecordScreenCopy> {
                                             child: Container(
                                               child: Text(
                                                 "No exercises",
-                                                style: TextStyle(
-                                                    color: ColorsProvider
-                                                        .getColor8(context),
-                                                    fontWeight:
-                                                        FontWeight.bold),
+                                                style: TextStyle(color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold),
                                               ),
                                             ),
                                           ),
@@ -271,16 +243,11 @@ class _FitnessRecordScreenCopyState extends State<FitnessRecordScreenCopy> {
                                   return Padding(
                                     padding: const EdgeInsets.only(bottom: 15),
                                     child: Container(
-                                      decoration: BoxDecoration(
-                                          color:
-                                              ColorsProvider.getColor2(context),
-                                          borderRadius:
-                                              BorderRadius.circular(20)),
+                                      decoration: BoxDecoration(color: ColorsProvider.getColor2(context), borderRadius: BorderRadius.circular(20)),
                                       child: Column(
                                         children: [
                                           Padding(
-                                            padding: const EdgeInsets.fromLTRB(
-                                                5, 10, 5, 0),
+                                            padding: const EdgeInsets.fromLTRB(5, 10, 5, 0),
                                             child: Container(
                                               height: 30,
                                               decoration: BoxDecoration(
@@ -291,8 +258,7 @@ class _FitnessRecordScreenCopyState extends State<FitnessRecordScreenCopy> {
                                                 child: Text(
                                                   "$muscle".toUpperCase(),
                                                   style: TextStyle(
-                                                    color: ColorsProvider
-                                                        .getColor8(context),
+                                                    color: ColorsProvider.getColor8(context),
                                                     fontWeight: FontWeight.bold,
                                                     fontSize: 25,
                                                     letterSpacing: 2,
@@ -310,80 +276,32 @@ class _FitnessRecordScreenCopyState extends State<FitnessRecordScreenCopy> {
                                             child: Container(
                                               child: ListView.builder(
                                                 shrinkWrap: true,
-                                                physics:
-                                                    NeverScrollableScrollPhysics(),
-                                                itemCount:
-                                                    exercisesData[selectedSplit]
-                                                        .selectedMuscle![
-                                                            muscleIndex]
-                                                        .selectedExercises!
-                                                        .length,
-                                                itemBuilder:
-                                                    (context, exerciseIndex) {
-                                                  String nameOfExercise =
-                                                      exercisesData[
-                                                              selectedSplit]
-                                                          .selectedMuscle![
-                                                              muscleIndex]
-                                                          .selectedExercises![
-                                                              exerciseIndex]
-                                                          .exercises!
-                                                          .nameOfExercise!;
-                                                  int supabaseIdExercise =
-                                                      exercisesData[
-                                                              selectedSplit]
-                                                          .selectedMuscle![
-                                                              muscleIndex]
-                                                          .selectedExercises![
-                                                              exerciseIndex]
-                                                          .exercises!
-                                                          .supabaseIdExercise!;
-                                                  int idSplit = exercisesData[
-                                                          selectedSplit]
-                                                      .supabaseIdSplit!;
-                                                  var exerciseDataItem =
-                                                      exercisesData[
-                                                              selectedSplit]
-                                                          .selectedMuscle![
-                                                              muscleIndex]
-                                                          .selectedExercises![
-                                                              exerciseIndex]
-                                                          .exercises!
-                                                          .exerciseData;
+                                                physics: NeverScrollableScrollPhysics(),
+                                                itemCount: exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises!.length,
+                                                itemBuilder: (context, exerciseIndex) {
+                                                  String nameOfExercise = exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises![exerciseIndex].exercises!.nameOfExercise!;
+                                                  int supabaseIdExercise = exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises![exerciseIndex].exercises!.supabaseIdExercise!;
+                                                  int idSplit = exercisesData[selectedSplit].supabaseIdSplit!;
+                                                  var exerciseDataItem = exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises![exerciseIndex].exercises!.exerciseData;
                                                   return GestureDetector(
                                                     onTap: () async {
-                                                      ExerciseData
-                                                          .resetCounter();
-                                                      if (idSplitStartedCompleted !=
-                                                          null) {}
+                                                      ExerciseData.resetCounter();
+                                                      if (idSplitStartedCompleted != null) {}
 
                                                       Navigator.push(
                                                         context,
                                                         MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              ExercisePageCopy(
-                                                            onExerciseDataReturned:
-                                                                (List<ExerciseData>
-                                                                    returnedData) {
+                                                          builder: (context) => ExercisePageCopy(
+                                                            onExerciseDataReturned: (List<ExerciseData> returnedData) {
                                                               setState(() {
-                                                                exercisesData[
-                                                                        selectedSplit]
-                                                                    .selectedMuscle![
-                                                                        muscleIndex]
-                                                                    .selectedExercises![
-                                                                        exerciseIndex]
-                                                                    .exercises!
-                                                                    .exerciseData = returnedData;
+                                                                exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises![exerciseIndex].exercises!.exerciseData = returnedData;
 
-                                                                print(
-                                                                    "převzány hodnoty");
+                                                                print("převzány hodnoty");
                                                               });
                                                             },
                                                             loadData: loadData,
-                                                            nameOfExercise:
-                                                                nameOfExercise,
-                                                            supabaseIdExercise:
-                                                                supabaseIdExercise,
+                                                            nameOfExercise: nameOfExercise,
+                                                            supabaseIdExercise: supabaseIdExercise,
                                                             idSplit: idSplit,
                                                           ),
                                                         ),
@@ -391,46 +309,25 @@ class _FitnessRecordScreenCopyState extends State<FitnessRecordScreenCopy> {
                                                       // setState(() {});
                                                     },
                                                     child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              bottom: 5),
+                                                      padding: const EdgeInsets.only(bottom: 5),
                                                       child: Container(
                                                         // height: 120,
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(10),
-                                                          color: ColorsProvider
-                                                              .getColor2(
-                                                                  context),
+                                                        decoration: BoxDecoration(
+                                                          borderRadius: BorderRadius.circular(10),
+                                                          color: ColorsProvider.getColor2(context),
                                                         ),
                                                         child: Column(
                                                           children: [
                                                             Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .center,
+                                                              mainAxisAlignment: MainAxisAlignment.center,
                                                               children: [
                                                                 Expanded(
-                                                                  child:
-                                                                      Container(
-                                                                    alignment:
-                                                                        Alignment
-                                                                            .center, // Center the container content
+                                                                  child: Container(
+                                                                    alignment: Alignment.center, // Center the container content
                                                                     child: Text(
-                                                                      nameOfExercise
-                                                                          .toUpperCase(),
-                                                                      style: TextStyle(
-                                                                          fontSize:
-                                                                              18,
-                                                                          fontWeight: FontWeight
-                                                                              .bold,
-                                                                          color:
-                                                                              ColorsProvider.getColor8(context)),
-                                                                      textAlign:
-                                                                          TextAlign
-                                                                              .center,
+                                                                      nameOfExercise.toUpperCase(),
+                                                                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: ColorsProvider.getColor8(context)),
+                                                                      textAlign: TextAlign.center,
                                                                       // textDirection: TextDirection.LTR,
                                                                     ),
                                                                     //     TextScroll(
@@ -474,43 +371,18 @@ class _FitnessRecordScreenCopyState extends State<FitnessRecordScreenCopy> {
                                                               ],
                                                             ),
                                                             Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .only(
-                                                                      left: 5,
-                                                                      right: 5,
-                                                                      bottom:
-                                                                          2),
+                                                              padding: const EdgeInsets.only(left: 5, right: 5, bottom: 2),
                                                               child: Container(
                                                                 height: 85,
-                                                                decoration: BoxDecoration(
-                                                                    color: Color
-                                                                        .fromARGB(
-                                                                            125,
-                                                                            0,
-                                                                            0,
-                                                                            0),
-                                                                    borderRadius:
-                                                                        variablesProvider
-                                                                            .zaobleni),
+                                                                decoration: BoxDecoration(color: Color.fromARGB(125, 0, 0, 0), borderRadius: variablesProvider.zaobleni),
                                                                 child: Row(
                                                                   children: [
                                                                     Padding(
-                                                                      padding: const EdgeInsets
-                                                                          .only(
-                                                                          left:
-                                                                              5,
-                                                                          right:
-                                                                              5,
-                                                                          bottom:
-                                                                              2),
-                                                                      child:
-                                                                          Container(
+                                                                      padding: const EdgeInsets.only(left: 5, right: 5, bottom: 2),
+                                                                      child: Container(
                                                                         // width: 76,
-                                                                        child:
-                                                                            Column(
-                                                                          mainAxisAlignment:
-                                                                              MainAxisAlignment.spaceEvenly,
+                                                                        child: Column(
+                                                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                                                           children: [
                                                                             Text(
                                                                               "set".tr(),
@@ -533,15 +405,11 @@ class _FitnessRecordScreenCopyState extends State<FitnessRecordScreenCopy> {
                                                                     ),
                                                                     Container(
                                                                       width: 1,
-                                                                      color: ColorsProvider
-                                                                          .getColor8(
-                                                                              context),
+                                                                      color: ColorsProvider.getColor8(context),
                                                                     ),
-                                                                    exerciseDataItem !=
-                                                                            null
+                                                                    exerciseDataItem != null
                                                                         ? Expanded(
-                                                                            child:
-                                                                                Padding(
+                                                                            child: Padding(
                                                                               padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
                                                                               child: Container(
                                                                                 child: ListView.builder(
@@ -652,8 +520,7 @@ class _FitnessRecordScreenCopyState extends State<FitnessRecordScreenCopy> {
               height: 90,
               child: ClipRect(
                 child: BackdropFilter(
-                  filter: ImageFilter.blur(
-                      sigmaX: 3, sigmaY: 3, tileMode: TileMode.repeated),
+                  filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3, tileMode: TileMode.repeated),
                   child: Container(
                     color: Colors.transparent,
                   ),
@@ -752,10 +619,8 @@ class _CustomAppBarState extends State<CustomAppBar> {
               elevation: WidgetStatePropertyAll(5),
               // overlayColor: WidgetStatePropertyAll(Colors.blue),
               shadowColor: WidgetStatePropertyAll(Colors.black),
-              backgroundColor:
-                  WidgetStateProperty.all(ColorsProvider.getColor2(context)),
-              foregroundColor:
-                  WidgetStateProperty.all(ColorsProvider.getColor8(context)),
+              backgroundColor: WidgetStateProperty.all(ColorsProvider.getColor2(context)),
+              foregroundColor: WidgetStateProperty.all(ColorsProvider.getColor8(context)),
             ),
           ),
         ),
@@ -850,8 +715,7 @@ class _FitnessRecordDropdownState extends State<FitnessRecordDropdown> {
                       maxHeight: 200,
                       decoration: BoxDecoration(
                         borderRadius: zaobleni,
-                        border: Border.all(
-                            width: 2, color: ColorsProvider.getColor2(context)),
+                        border: Border.all(width: 2, color: ColorsProvider.getColor2(context)),
                       ),
                       offset: const Offset(0, -0),
                       scrollbarTheme: ScrollbarThemeData(
@@ -939,10 +803,7 @@ class _FitnessRecordEndSplitState extends State<FitnessRecordEndSplit> {
                                     child: Center(
                                       child: Text(
                                         'Cancel',
-                                        style: TextStyle(
-                                            color: ColorsProvider.getColor8(
-                                                context),
-                                            fontWeight: FontWeight.bold),
+                                        style: TextStyle(color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold),
                                       ),
                                     ),
                                   ),
@@ -952,14 +813,10 @@ class _FitnessRecordEndSplitState extends State<FitnessRecordEndSplit> {
                                     //yes
                                     DateTime dateTime = DateTime.now();
                                     String now = dateTime.toString();
-                                    await dbFitness.UpdateSplitStartedCompleted(
-                                        true,
-                                        now,
-                                        widget.idSplitStartedCompleted);
+                                    await dbFitness.UpdateSplitStartedCompleted(true, now, widget.idSplitStartedCompleted);
                                     widget.loadData();
                                     widget.refresh;
-                                    dbFitness.SaveToSupabaseAndOrderSqlite(
-                                        dbSupabase);
+                                    dbFitness.SaveToSupabaseAndOrderSqlite(dbSupabase);
                                     Navigator.of(context).pop();
                                   },
                                   child: Container(
@@ -973,9 +830,7 @@ class _FitnessRecordEndSplitState extends State<FitnessRecordEndSplit> {
                                     child: Center(
                                       child: Text(
                                         'Yes',
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold),
+                                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                                       ),
                                     ),
                                   ),
@@ -988,19 +843,15 @@ class _FitnessRecordEndSplitState extends State<FitnessRecordEndSplit> {
                     );
                   },
                   style: ButtonStyle(
-                    backgroundColor:
-                        WidgetStatePropertyAll(ColorsProvider.color_5),
+                    backgroundColor: WidgetStatePropertyAll(ColorsProvider.color_5),
                     overlayColor: WidgetStatePropertyAll(Colors.transparent),
                   ),
                   child: Row(
-                    mainAxisSize: MainAxisSize
-                        .min, // Aby se řádek smrskl na minimální možnou šířku
+                    mainAxisSize: MainAxisSize.min, // Aby se řádek smrskl na minimální možnou šířku
                     children: [
                       Text(
                         "end_this_split".tr(),
-                        style: TextStyle(
-                            color: ColorsProvider.color_3,
-                            fontWeight: FontWeight.bold),
+                        style: TextStyle(color: ColorsProvider.color_3, fontWeight: FontWeight.bold),
                       ),
                       SizedBox(width: 8), // Oddělovač mezi textem a ikonou
                       Icon(

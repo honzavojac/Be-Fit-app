@@ -198,16 +198,16 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
             dbSupabase.getUser(),
           ]);
           // Načtení dat ze Supabase
-          supabaseMuscleList = sqfliteMuscleList = result[0];
-          supabaseExerciseList = sqfliteExerciseList = result[1];
-          supabaseExerciseDataList = sqfliteExerciseDataList = result[2];
-          supabaseSplitList = sqfliteSplitList = result[3];
-          supabaseSelectedMuscleList = sqfliteSelectedMuscleList = result[4];
-          supabaseSelectedExerciseList = sqfliteSelectedExerciseList = result[5];
-          supabaseSplitStartedCompletedList = sqfliteSplitStartedCompletedList = result[6];
-          supabaseBodyMeasurementsList = sqfliteBodyMeasurementsList = result[7];
-          supabaseIntakeCategoriesList = sqfliteIntakeCategoriesList = result[8];
-          supabaseNutriIntakeList = sqfliteNutriIntakeList = result[9];
+          supabaseMuscleList = List.from(result[0]);
+          supabaseExerciseList = List.from(result[1]);
+          supabaseExerciseDataList = List.from(result[2]);
+          supabaseSplitList = List.from(result[3]);
+          supabaseSelectedMuscleList = List.from(result[4]);
+          supabaseSelectedExerciseList = List.from(result[5]);
+          supabaseSplitStartedCompletedList = List.from(result[6]);
+          supabaseBodyMeasurementsList = List.from(result[7]);
+          supabaseIntakeCategoriesList = List.from(result[8]);
+          supabaseNutriIntakeList = List.from(result[9]);
           supabaseUser = result[10];
           // final MuscleLoading = dbSupabase.MuscleTable();
           // final ExerciseLoading = dbSupabase.ExerciseTable();
@@ -243,7 +243,7 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
             action
           ) 
           VALUES (?, ?, ?)
-        ''', [muscle.idMuscle, muscle.nameOfMuscle, 0]);
+          ''', [muscle.idMuscle, muscle.nameOfMuscle, 0]);
                 } catch (e) {
                   print("Error inserting muscle: $e");
                 }
@@ -341,6 +341,33 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
               dbFitness.InsertOrUpdateFood(food!, 0);
             }
           }
+          List newResult = await Future.wait([
+            dbFitness.SelectMuscles(),
+            dbFitness.SelectExercises(),
+            dbFitness.SelectExerciseData(),
+            dbFitness.SelectSplit(),
+            dbFitness.SelectSelectedMuscles(),
+            dbFitness.SelectSelectedExercises(),
+            dbFitness.SelectSplitStartedCompleted(),
+            dbFitness.SelectMeasurements(),
+            dbFitness.SelectIntakeCategories(),
+            dbFitness.SelectNutriIntakes(),
+            dbFitness.SelectFood(),
+            dbFitness.SelectUser(),
+          ]);
+
+          sqfliteMuscleList = newResult[0];
+          sqfliteExerciseList = newResult[1];
+          sqfliteExerciseDataList = newResult[2];
+          sqfliteSplitList = newResult[3];
+          sqfliteSelectedMuscleList = newResult[4];
+          sqfliteSelectedExerciseList = newResult[5];
+          sqfliteSplitStartedCompletedList = newResult[6];
+          sqfliteBodyMeasurementsList = newResult[7];
+          sqfliteIntakeCategoriesList = newResult[8];
+          sqfliteNutriIntakeList = newResult[9];
+          sqfliteFoodList = newResult[10];
+
           loading = false;
         }
       } else {
@@ -1776,7 +1803,7 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
                   _buttonWidget(dbSupabase, context, '/scanFood', 'scan_food'.tr(), Icons.fit_screen_rounded, false, problemWidth),
                   _buttonWidget(dbSupabase, context, '/newFood', 'add_new_food'.tr(), Icons.add, true, problemWidth),
                   _buttonWidget(dbSupabase, context, '/newFood', 'new_food'.tr(), Icons.add, false, problemWidth),
-                  _buttonWidget(dbSupabase, context, '/foodStatistic', 'statistic'.tr(), Icons.bar_chart_rounded, false, problemWidth),
+                  _buttonWidget(dbSupabase, context, '/foodStatistic', 'statistic'.tr(), Icons.bar_chart_rounded, true, problemWidth),
                   _categoryWidget('workout'.tr()),
                   // _buttonWidget(dbSupabase, context, '/fitnessNames', 'Manage fitness names', Icons.text_fields_rounded),
                   // _buttonWidget(dbSupabase, context, '/editDeleteExerciseData', 'Edit/Delete exercise data', Icons.edit_rounded),

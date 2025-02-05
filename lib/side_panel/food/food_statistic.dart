@@ -24,12 +24,12 @@ class foodStatistic extends StatefulWidget {
   State<foodStatistic> createState() => _foodStatisticState();
 }
 
-int selectedSplit = 0;
+// int selectedSplit = 0;
 
 class _foodStatisticState extends State<foodStatistic> {
   void initState() {
     super.initState();
-    loadData();
+    // loadData();
   }
 
 //proměnná pro vykreslení žádného widgetu
@@ -37,66 +37,85 @@ class _foodStatisticState extends State<foodStatistic> {
   // int? idStartedCompleted;
   late bool foundActiveSplit;
   bool loaded = false;
+
   loadData() {
     print("load");
 
     // Vytvoření mapy muscleId → Muscle
-    Map<int, Muscle> muscleMap = {
+    muscleMap = {
       for (var muscle in sqfliteMuscleList)
         if (muscle.supabaseIdMuscle != null) muscle.supabaseIdMuscle!: muscle
     };
 
-    // Vytvoření mapy splitId → List<muscleId>
-    Map<int, List<int>> splitMuscleMap = {};
-    Map<int, List<int>> selectedMuscleExerciseMap = {};
+    exerciseMap = {
+      for (var exercise in sqfliteExerciseList)
+        if (exercise.supabaseIdExercise != null) exercise.supabaseIdExercise!: exercise
+    };
 
-    // Inicializace mapy s prázdnými seznamy (pokud klíče už existují)
-    for (var split in sqfliteSplitList) {
-      splitMuscleMap[split.supabaseIdSplit!] = [];
-    }
+// Vytvoření mapy splitId → List<muscleId>
+    // for (var split in sqfliteSplitList) {
+    //   selectedMuscleMap[split.supabaseIdSplit!] = [];
+    // }
 
-    // Přidání svalů do existujících seznamů
+// Přidání svalů do seznamu v mapě
+    selectedMuscleMap.clear();
+    selectedExerciseMap.clear();
+
     for (var selectedMuscle in sqfliteSelectedMuscleList) {
-      splitMuscleMap[selectedMuscle.splitIdSplit]!.add(selectedMuscle.musclesIdMuscle!);
-      selectedMuscleExerciseMap[selectedMuscle.idSelectedMuscle!] = [];
-    }
+      if (!selectedMuscleMap.containsKey(selectedMuscle.splitIdSplit)) {
+        selectedMuscleMap[selectedMuscle.splitIdSplit!] = [];
+      }
 
-    // Přidání cviků k danému selectedMuscle
+      // Přidání objektu SelectedMuscle místo pouze ID
+      selectedMuscleMap[selectedMuscle.splitIdSplit!]!.add(selectedMuscle);
+    }
+    // selectedMuscleMap = mapa;
+
     for (var selectedExercise in sqfliteSelectedExerciseList) {
-      int muscleId = selectedExercise.idSelectedMuscle!; // ID svalu
+      int muscleId = selectedExercise.idSelectedMuscle!;
 
-      // Pokud klíč neexistuje, inicializujeme prázdný seznam
-      selectedMuscleExerciseMap.putIfAbsent(muscleId, () => []);
-
-      // Přidáme cvik do seznamu (kontrolujeme, zda idSelectedExercise není null)
-      if (selectedExercise.idSelectedExercise != null) {
-        selectedMuscleExerciseMap[muscleId]!.add(selectedExercise.idSelectedExercise!);
+      // Zajisti, že pro daný muscleId existuje seznam v mapě
+      if (!selectedExerciseMap.containsKey(muscleId)) {
+        selectedExerciseMap[muscleId] = []; // Inicializuj prázdný seznam, pokud neexistuje
       }
+
+      // Přidej idExercise do seznamu
+      selectedExerciseMap[muscleId]!.add(selectedExercise.idExercise!);
     }
 
-    // Iterace přes `sqfliteSplitList` s využitím mapy
-    for (var split in sqfliteSplitList) {
-      print("***** " + split.nameSplit);
-      int? idSplit = split.supabaseIdSplit;
+    print(muscleMap);
+    print(exerciseMap);
+    print("${selectedMuscleMap}");
+    print("${selectedExerciseMap}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 
-      if (idSplit != null && splitMuscleMap.containsKey(idSplit)) {
-        for (var muscleId in splitMuscleMap[idSplit]!) {
-          if (muscleMap.containsKey(muscleId)) {
-            Muscle muscle = muscleMap[muscleId]!;
-            print("  - " + muscle.nameOfMuscle!);
+// Iterace přes `sqfliteSplitList` s využitím mapy
+    // for (var split in sqfliteSplitList) {
+    //   print("***** " + split.nameSplit);
+    //   int? idSplit = split.supabaseIdSplit;
 
-            // Výpis cviků pro tento sval
-            if (selectedMuscleExerciseMap.containsKey(muscleId)) {
-              for (var exerciseId in selectedMuscleExerciseMap[muscleId]!) {
-                print("    * Exercise ID: $exerciseId");
-              }
-            } else {
-              print("    (No exercises assigned)");
-            }
-          }
-        }
-      }
-    }
+    //   if (idSplit != null && selectedMuscleMap.containsKey(idSplit)) {
+    //     for (var muscleId in selectedMuscleMap[idSplit]!) {
+    //       if (muscleMap.containsKey(muscleId)) {
+    //         Muscle muscle = muscleMap[muscleId]!;
+    //         print("  - " + muscle.nameOfMuscle! + " ${muscleId}");
+
+    //         // Výpis cviků pro tento sval
+    //         if (selectedMuscleExerciseMap.containsKey(muscleId) && selectedMuscleExerciseMap[muscleId]!.isNotEmpty) {
+    //           for (var exerciseId in selectedMuscleExerciseMap[muscleId]!) {
+    //             if (exerciseMap.containsKey(exerciseId)) {
+    //               Exercise exercise = exerciseMap[exerciseId]!;
+    //               print("    * exercise: ${exercise.nameOfExercise}");
+    //             }
+    //           }
+    //         } else {
+    //           print("    (No exercises assigned to this muscle)");
+    //         }
+    //       }
+    //     }
+    //   }
+    // }
+
+    loaded = true;
   }
 
   Future<void> refresh() async {
@@ -111,503 +130,185 @@ class _foodStatisticState extends State<foodStatistic> {
 
   @override
   Widget build(BuildContext context) {
+    idkIndex = sqfliteSplitList[selectedSplit].supabaseIdSplit!;
     loadData();
-    var variablesProvider = Provider.of<VariablesProvider>(context);
-    Provider.of<FitnessProvider>(context);
-    if (selectedSplit > exercisesData.length) {
-      selectedSplit = 0;
-    }
-    if (exercisesData.isNotEmpty) {
-      supabaseIdSplit = exercisesData[selectedSplit].supabaseIdSplit!;
-    }
 
     return Scaffold(
       body: Container(
         child: Stack(
           children: [
-            Positioned(
-              top: -100, // Mimo zobrazení
-              left: -100,
-              child: Container(
-                key: keyDummy1, // Používáme prázdný prvek jako cíl
-                width: 0,
-                height: 0,
-              ),
-            ),
             loaded == true
-                ? exercisesData.isNotEmpty
-                    ? Container(
-                        // color: const Color.fromARGB(66, 33, 149, 243),
-                        child: ListView(
-                          shrinkWrap: false,
-                          children: [
-                            SizedBox(
-                              height: 65,
-                            ),
-                            foundActiveSplit == false
-                                ? Padding(
-                                    padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Expanded(
-                                          child: Padding(
-                                            padding: const EdgeInsets.fromLTRB(55, 8, 55, 5),
-                                            child: Container(
-                                              height: 40,
-                                              child: DropdownButtonHideUnderline(
-                                                child: DropdownButton2<String>(
-                                                  isExpanded: true,
-                                                  value: sqfliteSplitList[selectedSplit].nameSplit,
-                                                  items: List.generate(
-                                                    sqfliteSplitList.length,
-                                                    (index) {
-                                                      return DropdownMenuItem(
-                                                        value: sqfliteSplitList[index].nameSplit,
-                                                        child: Center(
-                                                          child: Text(sqfliteSplitList[index].nameSplit),
-                                                        ),
-                                                      );
-                                                    },
-                                                  ),
-                                                  onChanged: (value) {
-                                                    // Přidej logiku pro změnu hodnoty
-                                                    selectedSplit = sqfliteSplitList.indexWhere((split) => split.nameSplit == value);
-                                                    setState(() {});
-                                                  },
-                                                  buttonStyleData: ButtonStyleData(
-                                                    width: 180,
-                                                    padding: const EdgeInsets.symmetric(horizontal: 14),
-                                                    decoration: BoxDecoration(
-                                                      borderRadius: zaobleni,
-                                                      border: Border.all(
-                                                        color: ColorsProvider.getColor2(context),
-                                                        width: 0.5,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  iconStyleData: IconStyleData(
-                                                    icon: Icon(Icons.keyboard_arrow_down_outlined),
-                                                    iconSize: 17,
-                                                    iconEnabledColor: ColorsProvider.getColor2(context),
-                                                  ),
-                                                  dropdownStyleData: DropdownStyleData(
-                                                    maxHeight: 200,
-                                                    decoration: BoxDecoration(
-                                                      borderRadius: zaobleni,
-                                                      border: Border.all(width: 2, color: ColorsProvider.getColor2(context)),
-                                                    ),
-                                                    offset: const Offset(0, -0),
-                                                    scrollbarTheme: ScrollbarThemeData(
-                                                      radius: const Radius.circular(40),
-                                                      thickness: WidgetStateProperty.all(6),
-                                                      thumbVisibility: WidgetStateProperty.all(true),
-                                                    ),
-                                                  ),
-                                                  menuItemStyleData: const MenuItemStyleData(
-                                                    height: 40,
-                                                    padding: EdgeInsets.only(left: 0, right: 18),
-                                                  ),
-                                                ),
+                ? Container(
+                    // color: Colors.blue,
+                    // color: const Color.fromARGB(66, 33, 149, 243),
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          height: 65,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.fromLTRB(55, 8, 55, 5),
+                                  child: Container(
+                                    height: 40,
+                                    child: DropdownButtonHideUnderline(
+                                      child: DropdownButton2<String>(
+                                        isExpanded: true,
+                                        value: sqfliteSplitList[selectedSplit].nameSplit,
+                                        items: List.generate(
+                                          sqfliteSplitList.length,
+                                          (index) {
+                                            return DropdownMenuItem(
+                                              value: sqfliteSplitList[index].nameSplit,
+                                              child: Center(
+                                                child: Text(sqfliteSplitList[index].nameSplit),
                                               ),
+                                            );
+                                          },
+                                        ),
+                                        onChanged: (value) {
+                                          // Přidej logiku pro změnu hodnoty
+                                          idkIndex = sqfliteSplitList[selectedSplit].supabaseIdSplit!;
+                                          selectedSplit = sqfliteSplitList.indexWhere((split) => split.nameSplit == value);
+                                          setState(() {});
+                                        },
+                                        buttonStyleData: ButtonStyleData(
+                                          width: 180,
+                                          padding: const EdgeInsets.symmetric(horizontal: 14),
+                                          decoration: BoxDecoration(
+                                            borderRadius: zaobleni,
+                                            border: Border.all(
+                                              color: ColorsProvider.getColor2(context),
+                                              width: 0.5,
                                             ),
                                           ),
                                         ),
-                                      ],
-                                    ),
-                                  )
-                                : FitnessRecordEndSplit(
-                                    idSplitStartedCompleted: idSplitStartedCompleted!,
-                                    refresh: refresh,
-                                    loadData: loadData,
-                                    onChanged: (value) {},
-                                  ),
-                            SizedBox(
-                              height: 15,
-                            ),
-                            Container(
-                              key: keyFitnesRecordPage,
-                              // color: Color.fromARGB(99, 94, 94, 94),
-                              margin: EdgeInsets.only(left: 10, right: 10),
-                              child: ListView.builder(
-                                physics: NeverScrollableScrollPhysics(),
-                                shrinkWrap: true,
-                                itemCount: exercisesData[selectedSplit].selectedMuscle!.length,
-                                itemBuilder: (context, muscleIndex) {
-                                  String muscle = exercisesData[selectedSplit].selectedMuscle![muscleIndex].muscles!.nameOfMuscle!;
-                                  if (exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises!.isEmpty) {
-                                    return Padding(
-                                      padding: const EdgeInsets.only(bottom: 15),
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          color: ColorsProvider.getColor2(context),
-                                          borderRadius: BorderRadius.circular(20),
+                                        iconStyleData: IconStyleData(
+                                          icon: Icon(Icons.keyboard_arrow_down_outlined),
+                                          iconSize: 17,
+                                          iconEnabledColor: ColorsProvider.getColor2(context),
                                         ),
-                                        child: Column(
-                                          children: [
-                                            Padding(
-                                              padding: const EdgeInsets.fromLTRB(5, 10, 5, 0),
-                                              child: Container(
-                                                height: 30,
-                                                decoration: BoxDecoration(
-                                                  // color: ColorsProvider.getColor2(context),
-                                                  borderRadius: zaobleni,
-                                                ),
-                                                child: Center(
-                                                  child: Text(
-                                                    "$muscle".toUpperCase(),
-                                                    style: TextStyle(
-                                                      color: ColorsProvider.getColor8(context),
-                                                      fontWeight: FontWeight.bold,
-                                                      fontSize: 25,
-                                                      // letterSpacing: 2,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                left: 5,
-                                                right: 5,
-                                                top: 10,
-                                              ),
-                                              child: Container(
-                                                child: Text(
-                                                  "No exercises",
-                                                  style: TextStyle(color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold),
-                                                ),
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              height: 10,
-                                            )
-                                          ],
+                                        dropdownStyleData: DropdownStyleData(
+                                          maxHeight: 200,
+                                          decoration: BoxDecoration(
+                                            borderRadius: zaobleni,
+                                            border: Border.all(width: 2, color: ColorsProvider.getColor2(context)),
+                                          ),
+                                          offset: const Offset(0, -0),
+                                          scrollbarTheme: ScrollbarThemeData(
+                                            radius: const Radius.circular(40),
+                                            thickness: WidgetStateProperty.all(6),
+                                            thumbVisibility: WidgetStateProperty.all(true),
+                                          ),
+                                        ),
+                                        menuItemStyleData: const MenuItemStyleData(
+                                          height: 40,
+                                          padding: EdgeInsets.only(left: 0, right: 18),
                                         ),
                                       ),
-                                    );
-                                  } else {
-                                    return Padding(
-                                      padding: const EdgeInsets.only(bottom: 15),
-                                      child: Container(
-                                        decoration: BoxDecoration(color: ColorsProvider.getColor2(context), borderRadius: BorderRadius.circular(20)),
-                                        child: Column(
-                                          children: [
-                                            Padding(
-                                              padding: const EdgeInsets.fromLTRB(5, 10, 5, 0),
-                                              child: Container(
-                                                height: 30,
-                                                decoration: BoxDecoration(
-                                                  // color: ColorsProvider.getColor2(context),
-                                                  borderRadius: zaobleni,
-                                                ),
-                                                child: Center(
-                                                  child: Text(
-                                                    "$muscle".toUpperCase(),
-                                                    style: TextStyle(
-                                                      color: ColorsProvider.getColor8(context),
-                                                      fontWeight: FontWeight.bold,
-                                                      fontSize: 25,
-                                                      letterSpacing: 2,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          child: Text(""),
+                        ),
+                        Expanded(
+                          child: Column(
+                            children: [
+                              Expanded(
+                                child: Container(
+                                  color: Colors.amber,
+                                  child: ListView.builder(
+                                    itemCount: selectedMuscleMap[idkIndex]!.length,
+                                    itemBuilder: (context, index) {
+                                      int musclesIdMuscle = selectedMuscleMap[idkIndex]![index].musclesIdMuscle!;
+                                      Muscle muscle = muscleMap[musclesIdMuscle]!;
+
+                                      int supabaseIdSelectedMuscle = selectedMuscleMap[idkIndex]![index].supabaseIdSelectedMuscle!;
+
+                                      return Padding(
+                                        padding: const EdgeInsets.only(bottom: 20),
+                                        child: Container(
+                                          // height: 50,
+                                          color: index % 2 == 0 ? Colors.blueAccent : Colors.green,
+                                          child: Column(
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                children: [
+                                                  Container(
+                                                    height: 50,
+                                                    child: Center(
+                                                      child: Text(
+                                                        "${muscle.nameOfMuscle.toString()}  || ${supabaseIdSelectedMuscle}",
+                                                        style: TextStyle(color: Colors.black, fontSize: 20),
+                                                      ),
                                                     ),
                                                   ),
-                                                ),
+                                                ],
                                               ),
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                left: 5,
-                                                right: 5,
-                                                top: 12,
-                                              ),
-                                              child: Container(
-                                                child: ListView.builder(
-                                                  shrinkWrap: true,
-                                                  physics: NeverScrollableScrollPhysics(),
-                                                  itemCount: exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises!.length,
-                                                  itemBuilder: (context, exerciseIndex) {
-                                                    String nameOfExercise = exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises![exerciseIndex].exercises!.nameOfExercise!;
-                                                    int supabaseIdExercise = exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises![exerciseIndex].exercises!.supabaseIdExercise!;
-                                                    int idSplit = exercisesData[selectedSplit].supabaseIdSplit!;
-                                                    var exerciseDataItem = exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises![exerciseIndex].exercises!.exerciseData;
-                                                    return GestureDetector(
-                                                      onTap: () async {
-                                                        ExerciseData.resetCounter();
-                                                        if (idSplitStartedCompleted != null) {}
-
-                                                        Navigator.push(
-                                                          context,
-                                                          MaterialPageRoute(
-                                                            builder: (context) => ExercisePageCopy(
-                                                              onExerciseDataReturned: (List<ExerciseData> returnedData) {
-                                                                setState(() {
-                                                                  exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises![exerciseIndex].exercises!.exerciseData = returnedData;
-
-                                                                  print("převzány hodnoty");
-                                                                });
-                                                              },
-                                                              loadData: loadData,
-                                                              nameOfExercise: nameOfExercise,
-                                                              supabaseIdExercise: supabaseIdExercise,
-                                                              idSplit: idSplit,
-                                                            ),
+                                              selectedExerciseMap[supabaseIdSelectedMuscle] != null
+                                                  ? ListView.builder(
+                                                      shrinkWrap: true,
+                                                      physics: NeverScrollableScrollPhysics(),
+                                                      itemCount: selectedExerciseMap[supabaseIdSelectedMuscle]!.length,
+                                                      itemBuilder: (context, exerciseIndex) {
+                                                        int supabaseIdExercise = selectedExerciseMap[supabaseIdSelectedMuscle]![exerciseIndex];
+                                                        Exercise exercise = exerciseMap[supabaseIdExercise]!;
+                                                        return GestureDetector(
+                                                          onTap: () async {
+                                                            // await selectedExerciseMap[supabaseIdSelectedMuscle]!.removeAt(index);
+                                                            sqfliteSelectedExerciseList.removeWhere(
+                                                              (element) => element.idExercise == supabaseIdExercise,
+                                                            );
+                                                            setState(() {});
+                                                          },
+                                                          child: Container(
+                                                            color: exerciseIndex % 2 == 0 ? Colors.pink : Colors.pink.shade700,
+                                                            height: 40,
+                                                            child: Center(child: Text("${exercise.nameOfExercise}  || ${exercise.supabaseIdExercise}")),
                                                           ),
                                                         );
-                                                        // setState(() {});
                                                       },
-                                                      child: Padding(
-                                                        padding: const EdgeInsets.only(bottom: 5),
-                                                        child: Container(
-                                                          // height: 120,
-                                                          decoration: BoxDecoration(
-                                                            borderRadius: BorderRadius.circular(10),
-                                                            color: ColorsProvider.getColor2(context),
-                                                          ),
-                                                          child: Column(
-                                                            children: [
-                                                              Row(
-                                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                                children: [
-                                                                  Expanded(
-                                                                    child: Container(
-                                                                      alignment: Alignment.center, // Center the container content
-                                                                      child: Text(
-                                                                        nameOfExercise.toUpperCase(),
-                                                                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: ColorsProvider.getColor8(context)),
-                                                                        textAlign: TextAlign.center,
-                                                                        // textDirection: TextDirection.LTR,
-                                                                      ),
-                                                                      //     TextScroll(
-                                                                      //   intervalSpaces:
-                                                                      //       5,
-                                                                      //   "${nameOfExercise.toUpperCase()}",
-                                                                      //   mode: TextScrollMode
-                                                                      //       .endless,
-                                                                      //   velocity: Velocity(
-                                                                      //       pixelsPerSecond: Offset(
-                                                                      //           35,
-                                                                      //           0)),
-                                                                      //   delayBefore:
-                                                                      //       Duration(
-                                                                      //           milliseconds: 1000),
-                                                                      //   pauseBetween:
-                                                                      //       Duration(
-                                                                      //           milliseconds: 1000),
-                                                                      //   style:
-                                                                      //       TextStyle(
-                                                                      //     fontSize:
-                                                                      //         18,
-                                                                      //     fontWeight:
-                                                                      //         FontWeight.bold,
-                                                                      //     color: ColorsProvider.getColor8(
-                                                                      //         context),
-                                                                      //   ),
-                                                                      //   textAlign:
-                                                                      //       TextAlign
-                                                                      //           .center,
-                                                                      //   // textDirection: TextDirection.LTR,
-                                                                      //   selectable:
-                                                                      //       false,
-                                                                      // ),
-                                                                    ),
-                                                                  ),
-                                                                  // Text(
-                                                                  //   "$nameOfExercise".toUpperCase(),
-                                                                  //   style: TextStyle(color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold, fontSize: 18),
-                                                                  // ),
-                                                                ],
-                                                              ),
-                                                              Padding(
-                                                                padding: const EdgeInsets.only(left: 5, right: 5, bottom: 2),
-                                                                child: Container(
-                                                                  height: 85,
-                                                                  decoration: BoxDecoration(color: Color.fromARGB(125, 0, 0, 0), borderRadius: variablesProvider.zaobleni),
-                                                                  child: Row(
-                                                                    children: [
-                                                                      Padding(
-                                                                        padding: const EdgeInsets.only(left: 5, right: 5, bottom: 2),
-                                                                        child: Container(
-                                                                          // width: 76,
-                                                                          child: Column(
-                                                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                                                            children: [
-                                                                              Text(
-                                                                                "set".tr(),
-                                                                                style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
-                                                                              ),
-                                                                              Text(
-                                                                                "exercise_weight".tr(),
-                                                                                style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
-                                                                              ),
-                                                                              Text(
-                                                                                "reps".tr(),
-                                                                                style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
-                                                                              ),
-                                                                              SizedBox(
-                                                                                height: 2,
-                                                                              )
-                                                                            ],
-                                                                          ),
-                                                                        ),
-                                                                      ),
-                                                                      Container(
-                                                                        width: 1,
-                                                                        color: ColorsProvider.getColor8(context),
-                                                                      ),
-                                                                      exerciseDataItem != null
-                                                                          ? Expanded(
-                                                                              child: Padding(
-                                                                                padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
-                                                                                child: Container(
-                                                                                  child: ListView.builder(
-                                                                                    itemCount: exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises![exerciseIndex].exercises!.exerciseData!.length,
-                                                                                    scrollDirection: Axis.horizontal,
-                                                                                    itemBuilder: (context, index) {
-                                                                                      var data = exercisesData[selectedSplit].selectedMuscle![muscleIndex].selectedExercises![exerciseIndex].exercises!.exerciseData![index];
-                                                                                      String reps;
-                                                                                      String? weight;
-                                                                                      int? difficulty;
-                                                                                      // if (DateTime.now().toString().replaceRange(10, null, '') == exercisesData[selectedSplit].selectedMuscle![muscleIndex].muscles.exercises![exerciseIndex].exerciseData![index].time!.replaceRange(10, null, '')) {
-                                                                                      reps = (data.reps == null ? "" : data.reps!).toString();
-                                                                                      weight = (data.weight == null ? "" : data.weight!).toString();
-                                                                                      ;
-                                                                                      difficulty = data.difficulty;
-                                                                                      // } else {}
-                                                                                      return Padding(
-                                                                                        padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
-                                                                                        child: Container(
-                                                                                          width: 40,
-                                                                                          child: Column(
-                                                                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                                                                            children: [
-                                                                                              Text(
-                                                                                                "${index + 1}",
-                                                                                                style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
-                                                                                              ),
-                                                                                              Text(
-                                                                                                "$weight",
-                                                                                                style: TextStyle(
-                                                                                                  fontWeight: FontWeight.bold,
-                                                                                                  fontSize: 16,
-                                                                                                  color: difficulty == 0
-                                                                                                      ? Colors.white
-                                                                                                      : difficulty == 1
-                                                                                                          ? Colors.green
-                                                                                                          : difficulty == 2
-                                                                                                              ? Colors.lightGreen
-                                                                                                              : difficulty == 3
-                                                                                                                  ? Colors.yellow
-                                                                                                                  : difficulty == 4
-                                                                                                                      ? Colors.orange
-                                                                                                                      : ColorsProvider.color_9,
-                                                                                                ),
-                                                                                              ),
-                                                                                              Text(
-                                                                                                "$reps",
-                                                                                                style: TextStyle(
-                                                                                                  fontWeight: FontWeight.bold,
-                                                                                                  fontSize: 16,
-                                                                                                  color: difficulty == 0
-                                                                                                      ? Colors.white
-                                                                                                      : difficulty == 1
-                                                                                                          ? Colors.green
-                                                                                                          : difficulty == 2
-                                                                                                              ? Colors.lightGreen
-                                                                                                              : difficulty == 3
-                                                                                                                  ? Colors.yellow
-                                                                                                                  : difficulty == 4
-                                                                                                                      ? Colors.orange
-                                                                                                                      : ColorsProvider.color_9,
-                                                                                                ),
-                                                                                              ),
-                                                                                              SizedBox(
-                                                                                                height: 2,
-                                                                                              )
-                                                                                            ],
-                                                                                          ),
-                                                                                        ),
-                                                                                      );
-                                                                                    },
-                                                                                  ),
-                                                                                ),
-                                                                              ),
-                                                                            )
-                                                                          : Container(),
-                                                                    ],
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ),
+                                                    )
+                                                  : Container(),
+                                              ElevatedButton(
+                                                  // 217
+                                                  onPressed: () {
+                                                    sqfliteSelectedExerciseList.add(
+                                                      SelectedExercise(
+                                                        action: 0,
+                                                        idExercise: 217,
+                                                        idSelectedMuscle: 83,
                                                       ),
                                                     );
+                                                    setState(() {});
                                                   },
-                                                ),
-                                              ),
-                                            ),
-                                          ],
+                                                  child: Text("add"))
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                    );
-                                  }
-                                },
+                                      );
+                                    },
+                                  ),
+                                ),
                               ),
-                            )
-                          ],
+                            ],
+                          ),
                         ),
-                      )
-                    : Container()
-                : Container(),
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: Container(
-                height: 90,
-                child: ClipRect(
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3, tileMode: TileMode.repeated),
-                    child: Container(
-                      color: Colors.transparent,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            exercisesData.isEmpty
-                ? Container(
-                    height: 80,
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(0, 40, 15, 0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          CustomAppBar(
-                            refresh: refresh,
-                            loadParent: loadData,
-                            foundActiveSplit: foundActiveSplit,
-                          )
-                        ],
-                      ),
+                      ],
                     ),
                   )
-                : Container(
-                    height: 80,
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(0, 40, 15, 0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          CustomAppBar(
-                            refresh: refresh,
-                            loadParent: loadData,
-                            foundActiveSplit: foundActiveSplit,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                : Container(),
           ],
         ),
       ),
