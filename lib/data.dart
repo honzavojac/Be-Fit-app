@@ -17,7 +17,10 @@ Map<int, Exercise> exerciseMap = {};
 
 Map<int, List<SelectedMuscle>> selectedMuscleMap = {};
 Map<int, List<int>> selectedExerciseMap = {};
+Map<int, List<ExerciseData>> exerciseData = {};
 
-late int idkIndex;
+SplitStartedCompleted? splitStartedCompleted;
 
-int selectedSplit = 0;
+// late int idkIndex;
+
+// int selectedSplit = 0;

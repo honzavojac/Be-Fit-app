@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kaloricke_tabulky_02/bloc/fitness_bloc.dart';
+import 'package:kaloricke_tabulky_02/bloc/fitness_state.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
 import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
 import 'package:provider/provider.dart';
 
+import '../../bloc/fitness_event.dart';
 import '../../data.dart';
 import '../../init_page.dart';
-import '../../pages/fitnessRecord/exercise_page copy.dart';
 import '../../pages/fitnessRecord/split_page copy 3.dart';
 import '../../providers/colors_provider.dart';
 import '../../providers/variables_provider.dart';
 import '../../supabase/supabase.dart';
 import '../../variables.dart';
 import 'dart:async';
-import 'dart:ui';
 
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -24,7 +26,7 @@ class foodStatistic extends StatefulWidget {
   State<foodStatistic> createState() => _foodStatisticState();
 }
 
-// int selectedSplit = 0;
+int selectedSplit = 0;
 
 class _foodStatisticState extends State<foodStatistic> {
   void initState() {
@@ -33,9 +35,9 @@ class _foodStatisticState extends State<foodStatistic> {
   }
 
 //proměnná pro vykreslení žádného widgetu
-  List<MySplit> exercisesData = [];
+  // List<MySplit> exercisesData = [];
   // int? idStartedCompleted;
-  late bool foundActiveSplit;
+  // late bool foundActiveSplit;
   bool loaded = false;
 
   loadData() {
@@ -51,6 +53,24 @@ class _foodStatisticState extends State<foodStatistic> {
       for (var exercise in sqfliteExerciseList)
         if (exercise.supabaseIdExercise != null) exercise.supabaseIdExercise!: exercise
     };
+    for (var startedCompleted in sqfliteSplitStartedCompletedList) {
+      if (startedCompleted.ended == false) {
+        splitStartedCompleted = startedCompleted;
+        int splitIndex = sqfliteSplitList.indexWhere(
+          (split) => split.supabaseIdSplit == startedCompleted.splitId,
+        );
+        context.read<FitnessBloc>().add(SelectedSplit(splitIndex));
+      }
+    }
+    exerciseData.clear();
+    for (var exerciseDataItem in sqfliteExerciseDataList) {
+      if (splitStartedCompleted != null && exerciseDataItem.idStartedCompleted == splitStartedCompleted!.supabaseIdStartedCompleted) {
+        if (!exerciseData.containsKey(exerciseDataItem.exercisesIdExercise)) {
+          exerciseData[exerciseDataItem.exercisesIdExercise!] = [];
+        }
+        exerciseData[exerciseDataItem.exercisesIdExercise]!.add(exerciseDataItem);
+      }
+    }
 
 // Vytvoření mapy splitId → List<muscleId>
     // for (var split in sqfliteSplitList) {
@@ -114,13 +134,11 @@ class _foodStatisticState extends State<foodStatistic> {
     //     }
     //   }
     // }
-
-    loaded = true;
   }
 
   Future<void> refresh() async {
     print("*******************************refresh*******************************");
-    selectedSplit = 0;
+    // selectedSplit = 0;
     loadData();
     setState(() {});
   }
@@ -130,8 +148,9 @@ class _foodStatisticState extends State<foodStatistic> {
 
   @override
   Widget build(BuildContext context) {
-    idkIndex = sqfliteSplitList[selectedSplit].supabaseIdSplit!;
+    // idkIndex = sqfliteSplitList[selectedSplit].supabaseIdSplit!;
     loadData();
+    loaded = true;
 
     return Scaffold(
       body: Container(
@@ -146,161 +165,65 @@ class _foodStatisticState extends State<foodStatistic> {
                         SizedBox(
                           height: 65,
                         ),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.fromLTRB(55, 8, 55, 5),
+                        splitStartedCompleted == null
+                            ? FitnessRecordDropdown()
+                            : Container(
+                                child: Text("Zrušit split"),
+                              ),
+                        Container(
+                          child: Text(""),
+                        ),
+                        BlocBuilder<FitnessBloc, FitnessState>(
+                          builder: (context, state) {
+                            return Text(
+                              '${state.counter}',
+                              style: TextStyle(fontSize: 40),
+                            );
+                          },
+                        ),
+                        Row(
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                context.read<FitnessBloc>().add(Decrement());
+                              },
+                              child: Text("minus"),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {
+                                return context.read<FitnessBloc>().add(Increment());
+                              },
+                              child: Text("add"),
+                            ),
+                          ],
+                        ),
+                        BlocBuilder<FitnessBloc, FitnessState>(
+                          builder: (context, state) {
+                            return Row(
+                              children: [
+                                Expanded(
                                   child: Container(
-                                    height: 40,
-                                    child: DropdownButtonHideUnderline(
-                                      child: DropdownButton2<String>(
-                                        isExpanded: true,
-                                        value: sqfliteSplitList[selectedSplit].nameSplit,
-                                        items: List.generate(
-                                          sqfliteSplitList.length,
-                                          (index) {
-                                            return DropdownMenuItem(
-                                              value: sqfliteSplitList[index].nameSplit,
-                                              child: Center(
-                                                child: Text(sqfliteSplitList[index].nameSplit),
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                        onChanged: (value) {
-                                          // Přidej logiku pro změnu hodnoty
-                                          idkIndex = sqfliteSplitList[selectedSplit].supabaseIdSplit!;
-                                          selectedSplit = sqfliteSplitList.indexWhere((split) => split.nameSplit == value);
-                                          setState(() {});
-                                        },
-                                        buttonStyleData: ButtonStyleData(
-                                          width: 180,
-                                          padding: const EdgeInsets.symmetric(horizontal: 14),
-                                          decoration: BoxDecoration(
-                                            borderRadius: zaobleni,
-                                            border: Border.all(
-                                              color: ColorsProvider.getColor2(context),
-                                              width: 0.5,
-                                            ),
-                                          ),
-                                        ),
-                                        iconStyleData: IconStyleData(
-                                          icon: Icon(Icons.keyboard_arrow_down_outlined),
-                                          iconSize: 17,
-                                          iconEnabledColor: ColorsProvider.getColor2(context),
-                                        ),
-                                        dropdownStyleData: DropdownStyleData(
-                                          maxHeight: 200,
-                                          decoration: BoxDecoration(
-                                            borderRadius: zaobleni,
-                                            border: Border.all(width: 2, color: ColorsProvider.getColor2(context)),
-                                          ),
-                                          offset: const Offset(0, -0),
-                                          scrollbarTheme: ScrollbarThemeData(
-                                            radius: const Radius.circular(40),
-                                            thickness: WidgetStateProperty.all(6),
-                                            thumbVisibility: WidgetStateProperty.all(true),
-                                          ),
-                                        ),
-                                        menuItemStyleData: const MenuItemStyleData(
-                                          height: 40,
-                                          padding: EdgeInsets.only(left: 0, right: 18),
-                                        ),
+                                    height: 50,
+                                    color: Colors.blue,
+                                    child: Center(
+                                      child: Text(
+                                        "-- ${state.selectedSplitIndex} --",
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
+                              ],
+                            );
+                          },
                         ),
-                        Container(
-                          child: Text(""),
+                        SizedBox(
+                          height: 50,
                         ),
                         Expanded(
                           child: Column(
                             children: [
                               Expanded(
-                                child: Container(
-                                  color: Colors.amber,
-                                  child: ListView.builder(
-                                    itemCount: selectedMuscleMap[idkIndex]!.length,
-                                    itemBuilder: (context, index) {
-                                      int musclesIdMuscle = selectedMuscleMap[idkIndex]![index].musclesIdMuscle!;
-                                      Muscle muscle = muscleMap[musclesIdMuscle]!;
-
-                                      int supabaseIdSelectedMuscle = selectedMuscleMap[idkIndex]![index].supabaseIdSelectedMuscle!;
-
-                                      return Padding(
-                                        padding: const EdgeInsets.only(bottom: 20),
-                                        child: Container(
-                                          // height: 50,
-                                          color: index % 2 == 0 ? Colors.blueAccent : Colors.green,
-                                          child: Column(
-                                            children: [
-                                              Row(
-                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                children: [
-                                                  Container(
-                                                    height: 50,
-                                                    child: Center(
-                                                      child: Text(
-                                                        "${muscle.nameOfMuscle.toString()}  || ${supabaseIdSelectedMuscle}",
-                                                        style: TextStyle(color: Colors.black, fontSize: 20),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              selectedExerciseMap[supabaseIdSelectedMuscle] != null
-                                                  ? ListView.builder(
-                                                      shrinkWrap: true,
-                                                      physics: NeverScrollableScrollPhysics(),
-                                                      itemCount: selectedExerciseMap[supabaseIdSelectedMuscle]!.length,
-                                                      itemBuilder: (context, exerciseIndex) {
-                                                        int supabaseIdExercise = selectedExerciseMap[supabaseIdSelectedMuscle]![exerciseIndex];
-                                                        Exercise exercise = exerciseMap[supabaseIdExercise]!;
-                                                        return GestureDetector(
-                                                          onTap: () async {
-                                                            // await selectedExerciseMap[supabaseIdSelectedMuscle]!.removeAt(index);
-                                                            sqfliteSelectedExerciseList.removeWhere(
-                                                              (element) => element.idExercise == supabaseIdExercise,
-                                                            );
-                                                            setState(() {});
-                                                          },
-                                                          child: Container(
-                                                            color: exerciseIndex % 2 == 0 ? Colors.pink : Colors.pink.shade700,
-                                                            height: 40,
-                                                            child: Center(child: Text("${exercise.nameOfExercise}  || ${exercise.supabaseIdExercise}")),
-                                                          ),
-                                                        );
-                                                      },
-                                                    )
-                                                  : Container(),
-                                              ElevatedButton(
-                                                  // 217
-                                                  onPressed: () {
-                                                    sqfliteSelectedExerciseList.add(
-                                                      SelectedExercise(
-                                                        action: 0,
-                                                        idExercise: 217,
-                                                        idSelectedMuscle: 83,
-                                                      ),
-                                                    );
-                                                    setState(() {});
-                                                  },
-                                                  child: Text("add"))
-                                            ],
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
+                                child: MuscleListViewBuilder(),
                               ),
                             ],
                           ),
@@ -311,6 +234,391 @@ class _foodStatisticState extends State<foodStatistic> {
                 : Container(),
           ],
         ),
+      ),
+    );
+  }
+}
+
+Widget MuscleListViewBuilder() {
+  return BlocBuilder<FitnessBloc, FitnessState>(
+    builder: (context, state) {
+      int splitIndex = sqfliteSplitList[state.selectedSplitIndex].supabaseIdSplit!;
+      return ListView.builder(
+        itemCount: selectedMuscleMap[splitIndex]!.length,
+        itemBuilder: (context, index) {
+          int musclesIdMuscle = selectedMuscleMap[splitIndex]![index].musclesIdMuscle!;
+          Muscle muscle = muscleMap[musclesIdMuscle]!;
+
+          int supabaseIdSelectedMuscle = selectedMuscleMap[splitIndex]![index].supabaseIdSelectedMuscle!;
+
+          if (selectedExerciseMap.isEmpty) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 15),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: ColorsProvider.getColor2(context),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(5, 10, 5, 0),
+                      child: Container(
+                        height: 30,
+                        decoration: BoxDecoration(
+                          // color: ColorsProvider.getColor2(context),
+                          borderRadius: zaobleni,
+                        ),
+                        child: Center(
+                          child: Text(
+                            "${muscle.nameOfMuscle}".toUpperCase(),
+                            style: TextStyle(
+                              color: ColorsProvider.getColor8(context),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 25,
+                              // letterSpacing: 2,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        left: 5,
+                        right: 5,
+                        top: 10,
+                      ),
+                      child: Container(
+                        child: Text(
+                          "No exercises",
+                          style: TextStyle(color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    )
+                  ],
+                ),
+              ),
+            );
+          } else {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 15),
+              child: Container(
+                decoration: BoxDecoration(color: ColorsProvider.getColor2(context), borderRadius: BorderRadius.circular(20)),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(5, 10, 5, 0),
+                      child: Container(
+                        height: 30,
+                        decoration: BoxDecoration(
+                          // color: ColorsProvider.getColor2(context),
+                          borderRadius: zaobleni,
+                        ),
+                        child: Center(
+                          child: Text(
+                            "${muscle.nameOfMuscle}".toUpperCase(),
+                            style: TextStyle(
+                              color: ColorsProvider.getColor8(context),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 25,
+                              letterSpacing: 2,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        left: 5,
+                        right: 5,
+                        top: 12,
+                      ),
+                    ),
+                    ExerciseListViewBuilder(supabaseIdSelectedMuscle),
+                    SizedBox(
+                      height: 10,
+                    )
+                  ],
+                ),
+              ),
+            );
+          }
+        },
+      );
+    },
+  );
+}
+
+Widget ExerciseListViewBuilder(int supabaseIdSelectedMuscle) {
+  return ListView.builder(
+    shrinkWrap: true,
+    physics: NeverScrollableScrollPhysics(),
+    itemCount: selectedExerciseMap[supabaseIdSelectedMuscle]!.length,
+    itemBuilder: (context, exerciseIndex) {
+      int supabaseIdExercise = selectedExerciseMap[supabaseIdSelectedMuscle]![exerciseIndex];
+      Exercise exercise = exerciseMap[supabaseIdExercise]!;
+      List<ExerciseData>? _exerciseData = exerciseData[supabaseIdExercise];
+      print(_exerciseData);
+      return GestureDetector(
+        onTap: () async {
+          // setState(() {});
+        },
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 5),
+          child: Container(
+            // height: 120,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: ColorsProvider.getColor2(context),
+            ),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Container(
+                        alignment: Alignment.center, // Center the container content
+                        child: Text(
+                          exercise.nameOfExercise!.toUpperCase(),
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: ColorsProvider.getColor8(context)),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 5, right: 5, bottom: 2),
+                  child: Container(
+                    height: 85,
+                    decoration: BoxDecoration(
+                      borderRadius: zaobleni,
+                      color: Color.fromARGB(125, 0, 0, 0),
+                    ),
+                    child: Row(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(left: 5, right: 5, bottom: 2),
+                          child: Container(
+                            // width: 76,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Text(
+                                  "set".tr(),
+                                  style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
+                                ),
+                                Text(
+                                  "exercise_weight".tr(),
+                                  style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
+                                ),
+                                Text(
+                                  "reps".tr(),
+                                  style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
+                                ),
+                                SizedBox(
+                                  height: 2,
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                        Container(
+                          width: 1,
+                          color: ColorsProvider.getColor8(context),
+                        ),
+                        (splitStartedCompleted != null && _exerciseData != null)
+                            ? Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
+                                  child: ExerciseDataListViewBuilder(_exerciseData),
+                                ),
+                              )
+                            : Container(),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    },
+  );
+}
+
+Widget ExerciseDataListViewBuilder(List<ExerciseData> _exerciseData) {
+  return ListView.builder(
+    itemCount: _exerciseData.length,
+    scrollDirection: Axis.horizontal,
+    itemBuilder: (context, index) {
+      String? reps = _exerciseData[index].reps.toString();
+      String? weight = _exerciseData[index].weight.toString();
+      int? difficulty = _exerciseData[index].difficulty;
+      // if (DateTime.now().toString().replaceRange(10, null, '') == exercisesData[selectedSplit].selectedMuscle![muscleIndex].muscles.exercises![exerciseIndex].exerciseData![index].time!.replaceRange(10, null, '')) {
+      // reps = (data.reps == null ? "" : data.reps!).toString();
+      // weight = (data.weight == null ? "" : data.weight!).toString();
+      // ;
+      // difficulty = data.difficulty;
+      // } else {}
+      return Padding(
+        padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
+        child: Container(
+          width: 40,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Text(
+                "${index + 1}",
+                style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
+              ),
+              Text(
+                "$weight",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: difficulty == 0
+                      ? Colors.white
+                      : difficulty == 1
+                          ? Colors.green
+                          : difficulty == 2
+                              ? Colors.lightGreen
+                              : difficulty == 3
+                                  ? Colors.yellow
+                                  : difficulty == 4
+                                      ? Colors.orange
+                                      : ColorsProvider.color_9,
+                ),
+              ),
+              Text(
+                "$reps",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: difficulty == 0
+                      ? Colors.white
+                      : difficulty == 1
+                          ? Colors.green
+                          : difficulty == 2
+                              ? Colors.lightGreen
+                              : difficulty == 3
+                                  ? Colors.yellow
+                                  : difficulty == 4
+                                      ? Colors.orange
+                                      : ColorsProvider.color_9,
+                ),
+              ),
+              SizedBox(
+                height: 2,
+              )
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
+
+class FitnessRecordDropdown extends StatefulWidget {
+  const FitnessRecordDropdown({super.key});
+
+  @override
+  State<FitnessRecordDropdown> createState() => FitnessRecordDropdownState();
+}
+
+class FitnessRecordDropdownState extends State<FitnessRecordDropdown> {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(55, 8, 55, 5),
+              child: Container(
+                height: 40,
+                child: BlocBuilder<FitnessBloc, FitnessState>(
+                  builder: (context, state) {
+                    int selectedSplit = state.selectedSplitIndex;
+                    return DropdownButtonHideUnderline(
+                      child: DropdownButton2<String>(
+                        isExpanded: true,
+                        value: sqfliteSplitList[selectedSplit].nameSplit,
+                        items: List.generate(
+                          sqfliteSplitList.length,
+                          (index) {
+                            return DropdownMenuItem(
+                              value: sqfliteSplitList[index].nameSplit,
+                              child: Center(
+                                child: Text(
+                                  sqfliteSplitList[index].nameSplit.toString().toUpperCase(),
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: ColorsProvider.getColor2(context),
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        onChanged: (value) {
+                          // Přidej logiku pro změnu hodnoty
+                          // idkIndex = sqfliteSplitList[selectedSplit].supabaseIdSplit!;
+                          int selectedSplitIndex = sqfliteSplitList.indexWhere((split) => split.nameSplit == value);
+                          context.read<FitnessBloc>().add(SelectedSplit(selectedSplitIndex));
+
+                          setState(() {});
+                        },
+                        buttonStyleData: ButtonStyleData(
+                          width: 180,
+                          padding: const EdgeInsets.symmetric(horizontal: 14),
+                          decoration: BoxDecoration(
+                            borderRadius: zaobleni,
+                            border: Border.all(
+                              color: ColorsProvider.getColor2(context),
+                              width: 0.5,
+                            ),
+                          ),
+                        ),
+                        iconStyleData: IconStyleData(
+                          icon: Icon(Icons.keyboard_arrow_down_outlined),
+                          iconSize: 17,
+                          iconEnabledColor: ColorsProvider.getColor2(context),
+                        ),
+                        dropdownStyleData: DropdownStyleData(
+                          maxHeight: 200,
+                          decoration: BoxDecoration(
+                            borderRadius: zaobleni,
+                            border: Border.all(width: 2, color: ColorsProvider.getColor2(context)),
+                          ),
+                          offset: const Offset(0, -0),
+                          scrollbarTheme: ScrollbarThemeData(
+                            radius: const Radius.circular(40),
+                            thickness: WidgetStateProperty.all(6),
+                            thumbVisibility: WidgetStateProperty.all(true),
+                          ),
+                        ),
+                        menuItemStyleData: const MenuItemStyleData(
+                          height: 40,
+                          padding: EdgeInsets.only(left: 0, right: 18),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -381,14 +689,14 @@ class _CustomAppBarState extends State<CustomAppBar> {
   }
 }
 
-class FitnessRecordDropdown extends StatefulWidget {
+class oldFitnessRecordDropdown extends StatefulWidget {
   final List<MySplit> splits;
   final int? supabaseIdSplit;
   final int selectedSplit;
   final void Function() refresh;
   final void Function(int) onChanged;
 
-  const FitnessRecordDropdown({
+  const oldFitnessRecordDropdown({
     Key? key,
     required this.supabaseIdSplit,
     required this.splits,
@@ -398,10 +706,10 @@ class FitnessRecordDropdown extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _FitnessRecordDropdownState createState() => _FitnessRecordDropdownState();
+  old_FitnessRecordDropdownState createState() => old_FitnessRecordDropdownState();
 }
 
-class _FitnessRecordDropdownState extends State<FitnessRecordDropdown> {
+class old_FitnessRecordDropdownState extends State<oldFitnessRecordDropdown> {
   @override
   Widget build(BuildContext context) {
     List<MySplit> splits = widget.splits;

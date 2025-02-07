@@ -11,6 +11,9 @@ import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
+import '../../pages/homePage/date_row.dart';
+import '../../pages/homePage/home_page.dart';
+
 class MeasurementsWidget extends StatefulWidget {
   const MeasurementsWidget({super.key});
 
@@ -21,18 +24,12 @@ class MeasurementsWidget extends StatefulWidget {
 class _MeasurementsWidgetState extends State<MeasurementsWidget> {
   TextEditingController weightTextEditingController = TextEditingController();
   TextEditingController heightTextEditingController = TextEditingController();
-  TextEditingController abdominalCircumferenceTextEditingController =
-      TextEditingController();
-  TextEditingController chestCircumferenceTextEditingController =
-      TextEditingController();
-  TextEditingController waistCircumferenceTextEditingController =
-      TextEditingController();
-  TextEditingController thighCircumferenceTextEditingController =
-      TextEditingController();
-  TextEditingController neckCircumferenceTextEditingController =
-      TextEditingController();
-  TextEditingController bicepsCircumferenceTextEditingController =
-      TextEditingController();
+  TextEditingController abdominalCircumferenceTextEditingController = TextEditingController();
+  TextEditingController chestCircumferenceTextEditingController = TextEditingController();
+  TextEditingController waistCircumferenceTextEditingController = TextEditingController();
+  TextEditingController thighCircumferenceTextEditingController = TextEditingController();
+  TextEditingController neckCircumferenceTextEditingController = TextEditingController();
+  TextEditingController bicepsCircumferenceTextEditingController = TextEditingController();
 
   double? weight;
   int? height;
@@ -53,10 +50,22 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
 
   loadData() async {
     var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
+    DateTime dateTime = DateTime.now();
+    String now = dateTime.toString().replaceRange(10, null, "");
     measurements = await dbFitness.SelectMeasurements();
     measurements.sort(
       (a, b) => b.createdAt!.compareTo(a.createdAt!),
     );
+    Measurements measurement = measurements.firstWhere((element) => element.createdAt == now.toString());
+    weightTextEditingController = TextEditingController(text: (measurement.weight ?? "").toString());
+    heightTextEditingController = TextEditingController(text: (measurement.height ?? "").toString());
+    abdominalCircumferenceTextEditingController = TextEditingController(text: (measurement.abdominalCircumference ?? "").toString());
+    chestCircumferenceTextEditingController = TextEditingController(text: (measurement.chestCircumference ?? "").toString());
+    waistCircumferenceTextEditingController = TextEditingController(text: (measurement.waistCircumference ?? "").toString());
+    thighCircumferenceTextEditingController = TextEditingController(text: (measurement.thighCircumference ?? "").toString());
+    neckCircumferenceTextEditingController = TextEditingController(text: (measurement.neckCircumference ?? "").toString());
+    bicepsCircumferenceTextEditingController = TextEditingController(text: (measurement.bicepsCircumference ?? "").toString());
+
     show = true;
     setState(() {});
   }
@@ -69,65 +78,27 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
 
     try {
       // Získání textu z textových polí
-      String weightText =
-          weightTextEditingController.text.trim().replaceAll(',', '.');
-      String heightText =
-          heightTextEditingController.text.trim().replaceAll(',', '.');
-      String abdominalCircumferenceText =
-          abdominalCircumferenceTextEditingController.text
-              .trim()
-              .replaceAll(',', '.');
-      String chestCircumferenceText = chestCircumferenceTextEditingController
-          .text
-          .trim()
-          .replaceAll(',', '.');
-      String waistCircumferenceText = waistCircumferenceTextEditingController
-          .text
-          .trim()
-          .replaceAll(',', '.');
-      String thighCircumferenceText = thighCircumferenceTextEditingController
-          .text
-          .trim()
-          .replaceAll(',', '.');
-      String neckCircumferenceText = neckCircumferenceTextEditingController.text
-          .trim()
-          .replaceAll(',', '.');
-      String bicepsCircumferenceText = bicepsCircumferenceTextEditingController
-          .text
-          .trim()
-          .replaceAll(',', '.');
+      String weightText = weightTextEditingController.text.trim().replaceAll(',', '.');
+      String heightText = heightTextEditingController.text.trim().replaceAll(',', '.');
+      String abdominalCircumferenceText = abdominalCircumferenceTextEditingController.text.trim().replaceAll(',', '.');
+      String chestCircumferenceText = chestCircumferenceTextEditingController.text.trim().replaceAll(',', '.');
+      String waistCircumferenceText = waistCircumferenceTextEditingController.text.trim().replaceAll(',', '.');
+      String thighCircumferenceText = thighCircumferenceTextEditingController.text.trim().replaceAll(',', '.');
+      String neckCircumferenceText = neckCircumferenceTextEditingController.text.trim().replaceAll(',', '.');
+      String bicepsCircumferenceText = bicepsCircumferenceTextEditingController.text.trim().replaceAll(',', '.');
 
       // Kontrola a převod textu na číslo, pokud text není prázdný
       weight = weightText.isNotEmpty ? double.tryParse(weightText) : null;
       height = heightText.isNotEmpty ? int.tryParse(heightText) : null;
-      abdominalCircumference = abdominalCircumferenceText.isNotEmpty
-          ? double.tryParse(abdominalCircumferenceText)
-          : null;
-      chestCircumference = chestCircumferenceText.isNotEmpty
-          ? double.tryParse(chestCircumferenceText)
-          : null;
-      waistCircumference = waistCircumferenceText.isNotEmpty
-          ? double.tryParse(waistCircumferenceText)
-          : null;
-      thighCircumference = thighCircumferenceText.isNotEmpty
-          ? double.tryParse(thighCircumferenceText)
-          : null;
-      neckCircumference = neckCircumferenceText.isNotEmpty
-          ? double.tryParse(neckCircumferenceText)
-          : null;
-      bicepsCircumference = bicepsCircumferenceText.isNotEmpty
-          ? double.tryParse(bicepsCircumferenceText)
-          : null;
+      abdominalCircumference = abdominalCircumferenceText.isNotEmpty ? double.tryParse(abdominalCircumferenceText) : null;
+      chestCircumference = chestCircumferenceText.isNotEmpty ? double.tryParse(chestCircumferenceText) : null;
+      waistCircumference = waistCircumferenceText.isNotEmpty ? double.tryParse(waistCircumferenceText) : null;
+      thighCircumference = thighCircumferenceText.isNotEmpty ? double.tryParse(thighCircumferenceText) : null;
+      neckCircumference = neckCircumferenceText.isNotEmpty ? double.tryParse(neckCircumferenceText) : null;
+      bicepsCircumference = bicepsCircumferenceText.isNotEmpty ? double.tryParse(bicepsCircumferenceText) : null;
 
       // Podmínka, která zabrání vložení, pokud jsou všechny hodnoty prázdné nebo null
-      if (weight == null &&
-          height == null &&
-          abdominalCircumference == null &&
-          chestCircumference == null &&
-          waistCircumference == null &&
-          thighCircumference == null &&
-          neckCircumference == null &&
-          bicepsCircumference == null) {
+      if (weight == null && height == null && abdominalCircumference == null && chestCircumference == null && waistCircumference == null && thighCircumference == null && neckCircumference == null && bicepsCircumference == null) {
         print('Žádné měření nebylo zadáno. Vložení do databáze bylo zrušeno.');
         return false; // Žádné hodnoty k uložení
       }
@@ -151,8 +122,7 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
         loadData();
         return true; // Úspěšně uloženo
       } on Exception catch (e) {
-        print(
-            "Stala se chyba při vkládání hodnot do sqflite databáze, chyba: $e");
+        print("Stala se chyba při vkládání hodnot do sqflite databáze, chyba: $e");
         return false; // Chyba při ukládání
       }
     } catch (e) {
@@ -164,6 +134,8 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
 
   @override
   Widget build(BuildContext context) {
+    DateTime now = DateTime.now();
+
     final _sheet = GlobalKey();
 
     return Scaffold(
@@ -171,9 +143,7 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
         centerTitle: true,
         title: Text(
           "measurement".tr(),
-          style: TextStyle(
-              color: ColorsProvider.getColor2(context),
-              fontWeight: FontWeight.bold),
+          style: TextStyle(color: ColorsProvider.getColor2(context), fontWeight: FontWeight.bold),
         ),
       ),
       body: Stack(
@@ -234,8 +204,7 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
                             height: 90,
                             // color: Colors.amber,
                             child: Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 20, right: 20),
+                              padding: const EdgeInsets.only(left: 20, right: 20),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -269,30 +238,21 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
                                       height: 100,
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(10),
-                                        color:
-                                            ColorsProvider.getColor2(context),
+                                        color: ColorsProvider.getColor2(context),
                                       ),
                                       child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
+                                        mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
                                           Padding(
                                             padding: const EdgeInsets.only(
                                               top: 5,
                                             ),
                                             child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
+                                              mainAxisAlignment: MainAxisAlignment.center,
                                               children: [
                                                 Text(
-                                                  "there_are_no_measurement"
-                                                      .tr(),
-                                                  style: TextStyle(
-                                                      color: ColorsProvider
-                                                          .getColor8(context),
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 20),
+                                                  "there_are_no_measurement".tr(),
+                                                  style: TextStyle(color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold, fontSize: 20),
                                                 )
                                               ],
                                             ),
@@ -306,17 +266,14 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
                                   childCount: measurements.length,
                                   (BuildContext context, int index) {
                                     var measurement = measurements[index];
-                                    String now =
-                                        "${measurement.createdAt!.replaceRange(0, 8, "")}.${measurement.createdAt!.replaceRange(0, 5, "").replaceRange(2, null, "")}.${measurement.createdAt!.replaceRange(4, null, "")}";
+                                    String now = "${measurement.createdAt!.replaceRange(0, 8, "")}.${measurement.createdAt!.replaceRange(0, 5, "").replaceRange(2, null, "")}.${measurement.createdAt!.replaceRange(4, null, "")}";
                                     return Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Container(
                                         height: 180,
                                         decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          color:
-                                              ColorsProvider.getColor2(context),
+                                          borderRadius: BorderRadius.circular(10),
+                                          color: ColorsProvider.getColor2(context),
                                         ),
                                         child: Column(
                                           children: [
@@ -325,75 +282,37 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
                                                 top: 5,
                                               ),
                                               child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
+                                                mainAxisAlignment: MainAxisAlignment.center,
                                                 children: [
                                                   Text(
                                                     "${now}",
-                                                    style: TextStyle(
-                                                        color: ColorsProvider
-                                                            .getColor8(context),
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 20),
+                                                    style: TextStyle(color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold, fontSize: 20),
                                                   )
                                                 ],
                                               ),
                                             ),
                                             Expanded(
                                               child: Padding(
-                                                padding: const EdgeInsets.only(
-                                                    left: 5,
-                                                    right: 5,
-                                                    top: 5,
-                                                    bottom: 5),
+                                                padding: const EdgeInsets.only(left: 5, right: 5, top: 5, bottom: 5),
                                                 child: Container(
-                                                  decoration: BoxDecoration(
-                                                      color: Color.fromARGB(
-                                                          135, 0, 0, 0),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              12)),
+                                                  decoration: BoxDecoration(color: Color.fromARGB(135, 0, 0, 0), borderRadius: BorderRadius.circular(12)),
                                                   child: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceEvenly,
+                                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                                     children: [
                                                       Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .only(
-                                                                left: 5,
-                                                                right: 2,
-                                                                bottom: 2),
+                                                        padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
                                                         child: Container(
                                                           width: 105,
                                                           child: Column(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .spaceEvenly,
+                                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                                             children: [
                                                               Text(
                                                                 "${"weight".tr()}: ${measurement.weight ?? ""}",
-                                                                style: TextStyle(
-                                                                    color: Colors
-                                                                        .white,
-                                                                    fontSize:
-                                                                        15,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w400),
+                                                                style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
                                                               ),
                                                               Text(
                                                                 "${"height".tr()}: ${measurement.height ?? ""}",
-                                                                style: TextStyle(
-                                                                    color: Colors
-                                                                        .white,
-                                                                    fontSize:
-                                                                        15,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w400),
+                                                                style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
                                                               ),
                                                             ],
                                                           ),
@@ -404,16 +323,8 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
                                                           Row(
                                                             children: [
                                                               Text(
-                                                                "circumference"
-                                                                    .tr(),
-                                                                style: TextStyle(
-                                                                    color: Colors
-                                                                        .white,
-                                                                    fontSize:
-                                                                        17,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w400),
+                                                                "circumference".tr(),
+                                                                style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w400),
                                                               )
                                                             ],
                                                           ),
@@ -421,88 +332,46 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
                                                             child: Row(
                                                               children: [
                                                                 Padding(
-                                                                  padding:
-                                                                      const EdgeInsets
-                                                                          .only(
-                                                                          left:
-                                                                              5,
-                                                                          right:
-                                                                              2,
-                                                                          bottom:
-                                                                              2),
-                                                                  child:
-                                                                      Container(
+                                                                  padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
+                                                                  child: Container(
                                                                     width: 150,
-                                                                    child:
-                                                                        Column(
-                                                                      mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .spaceEvenly,
+                                                                    child: Column(
+                                                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                                                       children: [
                                                                         Text(
                                                                           "${"abdominal".tr()}: ${measurement.abdominalCircumference ?? ""}",
-                                                                          style: TextStyle(
-                                                                              color: Colors.white,
-                                                                              fontSize: 15,
-                                                                              fontWeight: FontWeight.w400),
+                                                                          style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
                                                                         ),
                                                                         Text(
                                                                           "${"chest".tr()}: ${measurement.chestCircumference ?? ""}",
-                                                                          style: TextStyle(
-                                                                              color: Colors.white,
-                                                                              fontSize: 15,
-                                                                              fontWeight: FontWeight.w400),
+                                                                          style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
                                                                         ),
                                                                         Text(
                                                                           "${"waist".tr()}: ${measurement.waistCircumference ?? ""}",
-                                                                          style: TextStyle(
-                                                                              color: Colors.white,
-                                                                              fontSize: 15,
-                                                                              fontWeight: FontWeight.w400),
+                                                                          style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
                                                                         ),
                                                                       ],
                                                                     ),
                                                                   ),
                                                                 ),
                                                                 Padding(
-                                                                  padding:
-                                                                      const EdgeInsets
-                                                                          .only(
-                                                                          left:
-                                                                              5,
-                                                                          right:
-                                                                              2,
-                                                                          bottom:
-                                                                              2),
-                                                                  child:
-                                                                      Container(
+                                                                  padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
+                                                                  child: Container(
                                                                     width: 100,
-                                                                    child:
-                                                                        Column(
-                                                                      mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .spaceEvenly,
+                                                                    child: Column(
+                                                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                                                       children: [
                                                                         Text(
                                                                           "${"thigh".tr()}: ${measurement.thighCircumference ?? ""}",
-                                                                          style: TextStyle(
-                                                                              color: Colors.white,
-                                                                              fontSize: 15,
-                                                                              fontWeight: FontWeight.w400),
+                                                                          style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
                                                                         ),
                                                                         Text(
                                                                           "${"neck".tr()}: ${measurement.neckCircumference ?? ""}",
-                                                                          style: TextStyle(
-                                                                              color: Colors.white,
-                                                                              fontSize: 15,
-                                                                              fontWeight: FontWeight.w400),
+                                                                          style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
                                                                         ),
                                                                         Text(
                                                                           "${"biceps".tr()}: ${measurement.bicepsCircumference ?? ""}",
-                                                                          style: TextStyle(
-                                                                              color: Colors.white,
-                                                                              fontSize: 15,
-                                                                              fontWeight: FontWeight.w400),
+                                                                          style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
                                                                         ),
                                                                       ],
                                                                     ),
@@ -645,8 +514,7 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
       child: GestureDetector(
         onTap: () async {
           var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
-          var dbSupabase =
-              Provider.of<SupabaseProvider>(context, listen: false);
+          var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false);
 
           bool success = await processMeasurements();
           // ignore: unused_local_variable
@@ -666,8 +534,7 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
                 ),
               ),
               // persistent: true,
-              onAnimationControllerInit: (controller) =>
-                  localAnimationController = controller,
+              onAnimationControllerInit: (controller) => localAnimationController = controller,
               displayDuration: Duration(microseconds: 750),
               dismissType: DismissType.onSwipe,
               dismissDirection: [DismissDirection.endToStart],
@@ -698,8 +565,7 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
                 ),
               ),
               // persistent: true,
-              onAnimationControllerInit: (controller) =>
-                  localAnimationController = controller,
+              onAnimationControllerInit: (controller) => localAnimationController = controller,
               displayDuration: Duration(microseconds: 750),
               dismissType: DismissType.onSwipe,
               dismissDirection: [DismissDirection.endToStart],
@@ -734,8 +600,7 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
     );
   }
 
-  Widget TextFieldWidget(
-      String category, TextEditingController textEditingController) {
+  Widget TextFieldWidget(String category, TextEditingController textEditingController) {
     String text = category.toLowerCase().tr();
     return Column(
       // mainAxisAlignment: MainAxisAlignment.center,
@@ -819,8 +684,7 @@ class CustomTextInputFormatter extends TextInputFormatter {
   final String category;
   CustomTextInputFormatter({required this.category});
   @override
-  TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue, TextEditingValue newValue) {
+  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
     // Získání nového textu
     String newText = newValue.text;
     if (category == "Weight") {

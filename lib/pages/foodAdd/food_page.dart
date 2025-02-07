@@ -51,8 +51,7 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
     foodList = [];
 
     var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
-    nutriIntakes = await dbFitness.SelectNutriIntake(
-        "${selectedDate.toString().replaceRange(10, null, "")}");
+    nutriIntakes = await dbFitness.SelectNutriIntake("${selectedDate.toString().replaceRange(10, null, "")}");
     // print(selectedDate.toString().replaceRange(10, null, ""));
     for (var nutriIntake in nutriIntakes) {
       if (nutriIntake.action == 3) {
@@ -63,17 +62,14 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
         Food? food = await dbFitness.selectSpecificFood(nutriIntake.idFood!);
         food = Food(
           idFood: food!.idFood,
+          hasMultipleIngredients: food.hasMultipleIngredients,
           name: food.name,
           weight: weight,
           kcal: food.kcal != null ? (food.kcal! / 100 * weight).toDouble() : 0,
-          protein: food.protein != null
-              ? (food.protein! / 100 * weight).toDouble()
-              : 0,
-          carbs:
-              food.carbs != null ? (food.carbs! / 100 * weight).toDouble() : 0,
+          protein: food.protein != null ? (food.protein! / 100 * weight).toDouble() : 0,
+          carbs: food.carbs != null ? (food.carbs! / 100 * weight).toDouble() : 0,
           fat: food.fat != null ? (food.fat! / 100 * weight).toDouble() : 0,
-          fiber:
-              food.fiber != null ? (food.fiber! / 100 * weight).toDouble() : 0,
+          fiber: food.fiber != null ? (food.fiber! / 100 * weight).toDouble() : 0,
           idNutriIntake: nutriIntake.idNutriIntake,
           intakeCategory: nutriIntake.intakeCategory,
           action: nutriIntake.action,
@@ -142,10 +138,7 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                               height: 35,
                               // width: 135,
                             ),
-                            selectedDate
-                                        .toString()
-                                        .replaceRange(10, null, "") !=
-                                    now.toString().replaceRange(10, null, "")
+                            selectedDate.toString().replaceRange(10, null, "") != now.toString().replaceRange(10, null, "")
                                 ? Container(
                                     height: 35,
                                     child: ElevatedButton.icon(
@@ -162,10 +155,7 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                                       ),
                                       style: ButtonStyle(
                                         // backgroundColor: WidgetStateProperty.all(ColorsProvider.getColor2(context).withAlpha(50)),
-                                        foregroundColor:
-                                            WidgetStateProperty.all(
-                                                ColorsProvider.getColor2(
-                                                    context)),
+                                        foregroundColor: WidgetStateProperty.all(ColorsProvider.getColor2(context)),
                                       ),
                                     ),
                                   )
@@ -198,10 +188,8 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                                   ),
                                 ),
                                 style: ButtonStyle(
-                                  backgroundColor: WidgetStateProperty.all(
-                                      ColorsProvider.getColor2(context)),
-                                  foregroundColor: WidgetStateProperty.all(
-                                      ColorsProvider.getColor8(context)),
+                                  backgroundColor: WidgetStateProperty.all(ColorsProvider.getColor2(context)),
+                                  foregroundColor: WidgetStateProperty.all(ColorsProvider.getColor8(context)),
                                 ),
                               ),
                             ),
@@ -265,20 +253,16 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                               onDateSelected: (value) {
                                 selectedDate = value;
                                 load();
-                                Navigator.of(context)
-                                    .pop(); // Close the dialog when a date is selected
+                                Navigator.of(context).pop(); // Close the dialog when a date is selected
                               },
                               currentDateDecoration: BoxDecoration(
-                                border: Border.all(
-                                    color: ColorsProvider.getColor2(context)),
+                                border: Border.all(color: ColorsProvider.getColor2(context)),
                                 shape: BoxShape.circle,
                               ),
-                              daysOfTheWeekTextStyle: TextStyle(
-                                  color: ColorsProvider.getColor2(context)),
+                              daysOfTheWeekTextStyle: TextStyle(color: ColorsProvider.getColor2(context)),
                               enabledCellsDecoration: BoxDecoration(),
                               initialPickerType: PickerType.days,
-                              leadingDateTextStyle: TextStyle(
-                                  color: ColorsProvider.getColor2(context)),
+                              leadingDateTextStyle: TextStyle(color: ColorsProvider.getColor2(context)),
                               slidersColor: ColorsProvider.getColor2(context),
                               slidersSize: 25,
                               selectedCellDecoration: BoxDecoration(
@@ -327,8 +311,7 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    if (selectedDate.toString().replaceRange(10, null, "") ==
-                        now.toString().replaceRange(10, null, "")) {
+                    if (selectedDate.toString().replaceRange(10, null, "") == now.toString().replaceRange(10, null, "")) {
                     } else {
                       selectedDate = selectedDate.add(Duration(days: 1));
                       load();
@@ -356,8 +339,7 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                               height: 50,
                               // color: Colors.blue,
                               child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                 children: [
                                   Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -366,45 +348,28 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                                         children: [
                                           Text(
                                             calories.toInt().toString(),
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                color: ColorsProvider.getColor2(
-                                                    context),
-                                                fontWeight: FontWeight.bold),
+                                            style: TextStyle(fontSize: 16, color: ColorsProvider.getColor2(context), fontWeight: FontWeight.bold),
                                           ),
                                           Text(
                                             " Kcal",
-                                            style: TextStyle(
-                                                fontSize: 15,
-                                                color: ColorsProvider.getColor2(
-                                                    context),
-                                                fontWeight: FontWeight.bold),
+                                            style: TextStyle(fontSize: 15, color: ColorsProvider.getColor2(context), fontWeight: FontWeight.bold),
                                           ),
                                         ],
                                       ),
                                     ],
                                   ),
                                   Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
+                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
                                     children: [
                                       Row(
                                         children: [
                                           Text(
                                             "${"protein".tr()}: ",
-                                            style: TextStyle(
-                                                fontSize: 15,
-                                                color: ColorsProvider.getColor2(
-                                                    context),
-                                                fontWeight: FontWeight.bold),
+                                            style: TextStyle(fontSize: 15, color: ColorsProvider.getColor2(context), fontWeight: FontWeight.bold),
                                           ),
                                           Text(
                                             protein.toInt().toString(),
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                color: ColorsProvider.getColor2(
-                                                    context),
-                                                fontWeight: FontWeight.bold),
+                                            style: TextStyle(fontSize: 16, color: ColorsProvider.getColor2(context), fontWeight: FontWeight.bold),
                                           ),
                                         ],
                                       ),
@@ -412,45 +377,28 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                                         children: [
                                           Text(
                                             "${"fat".tr()}: ",
-                                            style: TextStyle(
-                                                fontSize: 15,
-                                                color: ColorsProvider.getColor2(
-                                                    context),
-                                                fontWeight: FontWeight.bold),
+                                            style: TextStyle(fontSize: 15, color: ColorsProvider.getColor2(context), fontWeight: FontWeight.bold),
                                           ),
                                           Text(
                                             fat.toInt().toString(),
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                color: ColorsProvider.getColor2(
-                                                    context),
-                                                fontWeight: FontWeight.bold),
+                                            style: TextStyle(fontSize: 16, color: ColorsProvider.getColor2(context), fontWeight: FontWeight.bold),
                                           ),
                                         ],
                                       ),
                                     ],
                                   ),
                                   Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
+                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
                                     children: [
                                       Row(
                                         children: [
                                           Text(
                                             "${"carbs".tr()}: ",
-                                            style: TextStyle(
-                                                fontSize: 15,
-                                                color: ColorsProvider.getColor2(
-                                                    context),
-                                                fontWeight: FontWeight.bold),
+                                            style: TextStyle(fontSize: 15, color: ColorsProvider.getColor2(context), fontWeight: FontWeight.bold),
                                           ),
                                           Text(
                                             carbs.toInt().toString(),
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                color: ColorsProvider.getColor2(
-                                                    context),
-                                                fontWeight: FontWeight.bold),
+                                            style: TextStyle(fontSize: 16, color: ColorsProvider.getColor2(context), fontWeight: FontWeight.bold),
                                           ),
                                         ],
                                       ),
@@ -458,19 +406,11 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                                         children: [
                                           Text(
                                             "${"fiber".tr()}: ",
-                                            style: TextStyle(
-                                                fontSize: 15,
-                                                color: ColorsProvider.getColor2(
-                                                    context),
-                                                fontWeight: FontWeight.bold),
+                                            style: TextStyle(fontSize: 15, color: ColorsProvider.getColor2(context), fontWeight: FontWeight.bold),
                                           ),
                                           Text(
                                             fiber.toInt().toString(),
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                color: ColorsProvider.getColor2(
-                                                    context),
-                                                fontWeight: FontWeight.bold),
+                                            style: TextStyle(fontSize: 16, color: ColorsProvider.getColor2(context), fontWeight: FontWeight.bold),
                                           ),
                                         ],
                                       ),
@@ -484,85 +424,57 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                             ),
                             Expanded(
                               child: ReorderableListView.builder(
-                                padding:
-                                    const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                                padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                                 itemCount: intakeCategories.length,
                                 onReorder: (int oldIndex, int newIndex) async {
-                                  print(
-                                      "oldIndex: $oldIndex    newIndex: $newIndex");
+                                  print("oldIndex: $oldIndex    newIndex: $newIndex");
 
                                   if (oldIndex < newIndex) {
                                     newIndex -= 1;
                                   }
 
-                                  final IntakeCategories item =
-                                      intakeCategories.removeAt(oldIndex);
+                                  final IntakeCategories item = intakeCategories.removeAt(oldIndex);
                                   intakeCategories.insert(newIndex, item);
 
                                   // Seřazení dočasných kategorií podle jména
-                                  List<IntakeCategories> tempIntakeCategories =
-                                      List.from(intakeCategories);
-                                  tempIntakeCategories.sort(
-                                      (a, b) => a.name!.compareTo(b.name!));
+                                  List<IntakeCategories> tempIntakeCategories = List.from(intakeCategories);
+                                  tempIntakeCategories.sort((a, b) => a.name!.compareTo(b.name!));
 
                                   // První smyčka: Aktualizace s negativním ID
-                                  for (var i = 0;
-                                      i < intakeCategories.length;
-                                      i++) {
-                                    await dbFitness.UpdateDailyNutriIntakeToMinus(
-                                        i * -1,
-                                        "${selectedDate.toString().replaceRange(10, null, "")}",
-                                        intakeCategories[i]
-                                            .supabaseIdIntakeCategory!);
-                                    print(
-                                        "${intakeCategories[i].name}    ${tempIntakeCategories[i].name}");
+                                  for (var i = 0; i < intakeCategories.length; i++) {
+                                    await dbFitness.UpdateDailyNutriIntakeToMinus(i * -1, "${selectedDate.toString().replaceRange(10, null, "")}", intakeCategories[i].supabaseIdIntakeCategory!);
+                                    print("${intakeCategories[i].name}    ${tempIntakeCategories[i].name}");
                                   }
 
                                   // Druhá smyčka: Aktualizace kategorií na základě action
-                                  for (var i = 0;
-                                      i < intakeCategories.length;
-                                      i++) {
+                                  for (var i = 0; i < intakeCategories.length; i++) {
                                     for (var element in nutriIntakes) {
-                                      if (element.intakeCategory ==
-                                          intakeCategories[i]
-                                              .supabaseIdIntakeCategory) {
-                                        int action =
-                                            0; // Defaultní hodnota pro action
+                                      if (element.intakeCategory == intakeCategories[i].supabaseIdIntakeCategory) {
+                                        int action = 0; // Defaultní hodnota pro action
                                         // Vyhodnocení a aktualizace action na základě hodnoty element.action
                                         switch (element.action) {
                                           case 0:
                                             print("object 0");
-                                            action =
-                                                2; // Nebo uprav podle logiky
+                                            action = 2; // Nebo uprav podle logiky
                                             break;
                                           case 1:
                                             print("object 1");
-                                            action =
-                                                1; // Nebo uprav podle logiky
+                                            action = 1; // Nebo uprav podle logiky
                                             break;
                                           case 2:
                                             print("object 2");
-                                            action =
-                                                2; // Nebo uprav podle logiky
+                                            action = 2; // Nebo uprav podle logiky
                                             break;
                                           case 3:
                                           case 4:
-                                            print(
-                                                "No action needed for object ${element.action}");
+                                            print("No action needed for object ${element.action}");
                                             break;
                                           default:
-                                            print(
-                                                "Unknown action for element ${element.action}");
+                                            print("Unknown action for element ${element.action}");
                                         }
 
                                         // Aktualizace v databázi s novou action
-                                        await dbFitness
-                                            .UpdateDailyNutriIntakeToOriginal(
-                                                tempIntakeCategories[i]
-                                                    .supabaseIdIntakeCategory!,
-                                                "${selectedDate.toString().replaceRange(10, null, "")}",
-                                                i * -1,
-                                                action);
+                                        await dbFitness.UpdateDailyNutriIntakeToOriginal(tempIntakeCategories[i].supabaseIdIntakeCategory!, "${selectedDate.toString().replaceRange(10, null, "")}", i * -1, action);
                                       }
                                     }
                                   }
@@ -575,8 +487,7 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                                   List<Food> newFoodList = [];
                                   foodList.forEach(
                                     (element) {
-                                      if (category.supabaseIdIntakeCategory ==
-                                          element.intakeCategory) {
+                                      if (category.supabaseIdIntakeCategory == element.intakeCategory) {
                                         newFoodList.add(element);
                                       }
                                     },
@@ -594,22 +505,17 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                                     sumOfFat += food.fat!;
                                     sumOfFiber += food.fiber!;
                                   }
-                                  sumOfProtein = (sumOfProtein * 10).round() /
-                                      10.toDouble();
-                                  sumOfCarbs =
-                                      (sumOfCarbs * 10).round() / 10.toDouble();
-                                  sumOfFat =
-                                      (sumOfFat * 10).round() / 10.toDouble();
-                                  sumOfFiber =
-                                      (sumOfFiber * 10).round() / 10.toDouble();
+                                  sumOfProtein = (sumOfProtein * 10).round() / 10.toDouble();
+                                  sumOfCarbs = (sumOfCarbs * 10).round() / 10.toDouble();
+                                  sumOfFat = (sumOfFat * 10).round() / 10.toDouble();
+                                  sumOfFiber = (sumOfFiber * 10).round() / 10.toDouble();
                                   return // Změna Container na použití 'Expanded' a nastavení výšky 'ListView.builder'
                                       Padding(
                                     key: Key('$index'),
                                     padding: const EdgeInsets.only(bottom: 10),
                                     child: Container(
                                       decoration: BoxDecoration(
-                                        color:
-                                            ColorsProvider.getColor2(context),
+                                        color: ColorsProvider.getColor2(context),
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                       child: SingleChildScrollView(
@@ -617,8 +523,7 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                                         child:
                                             // Zajištění, že Row má pevně daný prostor
                                             Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
+                                          mainAxisAlignment: MainAxisAlignment.start,
                                           children: [
                                             GestureDetector(
                                               onDoubleTap: () {
@@ -626,31 +531,18 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                                                 showDialog(
                                                   useSafeArea: true,
                                                   context: context,
-                                                  builder:
-                                                      (BuildContext context) {
+                                                  builder: (BuildContext context) {
                                                     return Center(
                                                       child: Container(
                                                           height: 280,
-                                                          width: MediaQuery.of(
-                                                                      context)
-                                                                  .size
-                                                                  .width *
-                                                              0.7,
-                                                          decoration:
-                                                              BoxDecoration(
+                                                          width: MediaQuery.of(context).size.width * 0.7,
+                                                          decoration: BoxDecoration(
                                                             border: Border.all(
-                                                              color: ColorsProvider
-                                                                  .getColor8(
-                                                                      context),
+                                                              color: ColorsProvider.getColor8(context),
                                                               width: 2,
                                                             ),
-                                                            color: ColorsProvider
-                                                                .getColor2(
-                                                                    context),
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        18),
+                                                            color: ColorsProvider.getColor2(context),
+                                                            borderRadius: BorderRadius.circular(18),
                                                           ),
                                                           child: Column(
                                                             children: [
@@ -659,14 +551,10 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                                                                   Row(
                                                                     children: [
                                                                       Expanded(
-                                                                        child:
-                                                                            Center(
-                                                                          child:
-                                                                              Container(
-                                                                            height:
-                                                                                50,
-                                                                            child:
-                                                                                Padding(
+                                                                        child: Center(
+                                                                          child: Container(
+                                                                            height: 50,
+                                                                            child: Padding(
                                                                               padding: const EdgeInsets.all(8.0),
                                                                               child: Text(
                                                                                 "${category.name}".tr(),
@@ -685,22 +573,16 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                                                                   Row(
                                                                     children: [
                                                                       Expanded(
-                                                                        child:
-                                                                            Container(
-                                                                          height:
-                                                                              50,
-                                                                          decoration:
-                                                                              BoxDecoration(
-                                                                            color:
-                                                                                ColorsProvider.getColor8(context).withOpacity(0.3),
-                                                                            borderRadius:
-                                                                                BorderRadius.only(
+                                                                        child: Container(
+                                                                          height: 50,
+                                                                          decoration: BoxDecoration(
+                                                                            color: ColorsProvider.getColor8(context).withOpacity(0.3),
+                                                                            borderRadius: BorderRadius.only(
                                                                               topLeft: Radius.circular(16),
                                                                               topRight: Radius.circular(16),
                                                                             ),
                                                                           ),
-                                                                          child:
-                                                                              Text(""),
+                                                                          child: Text(""),
                                                                         ),
                                                                       ),
                                                                     ],
@@ -711,133 +593,73 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                                                                 height: 20,
                                                               ),
                                                               Row(
-                                                                mainAxisAlignment:
-                                                                    MainAxisAlignment
-                                                                        .center,
+                                                                mainAxisAlignment: MainAxisAlignment.center,
                                                                 children: [
                                                                   Text(
                                                                     "${sumOfKcal.round()}",
-                                                                    style: TextStyle(
-                                                                        fontSize:
-                                                                            20,
-                                                                        color: ColorsProvider.getColor8(
-                                                                            context),
-                                                                        fontWeight:
-                                                                            FontWeight.bold),
+                                                                    style: TextStyle(fontSize: 20, color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold),
                                                                   ),
-                                                                  SizedBox(
-                                                                      width: 5),
+                                                                  SizedBox(width: 5),
                                                                   Text(
                                                                     "Kcal",
-                                                                    style: TextStyle(
-                                                                        fontSize:
-                                                                            20,
-                                                                        color: ColorsProvider.getColor8(
-                                                                            context),
-                                                                        fontWeight:
-                                                                            FontWeight.bold),
+                                                                    style: TextStyle(fontSize: 20, color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold),
                                                                   ),
                                                                 ],
                                                               ),
                                                               Padding(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .all(
-                                                                        8.0), // Pro přidání mezery okolo
+                                                                padding: const EdgeInsets.all(8.0), // Pro přidání mezery okolo
                                                                 child: Row(
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .center, // Zarovnání na střed
-                                                                  crossAxisAlignment:
-                                                                      CrossAxisAlignment
-                                                                          .start, // Zarovná texty nahoru
+                                                                  mainAxisAlignment: MainAxisAlignment.center, // Zarovnání na střed
+                                                                  crossAxisAlignment: CrossAxisAlignment.start, // Zarovná texty nahoru
                                                                   children: [
                                                                     // První sloupec s popisky
                                                                     Column(
-                                                                      crossAxisAlignment:
-                                                                          CrossAxisAlignment
-                                                                              .start,
+                                                                      crossAxisAlignment: CrossAxisAlignment.start,
                                                                       children: [
                                                                         Text(
                                                                           "${"protein".tr()}:",
-                                                                          style: TextStyle(
-                                                                              fontSize: 20,
-                                                                              color: ColorsProvider.getColor8(context)),
+                                                                          style: TextStyle(fontSize: 20, color: ColorsProvider.getColor8(context)),
                                                                         ),
-                                                                        SizedBox(
-                                                                            height:
-                                                                                8), // Prostor mezi řádky
+                                                                        SizedBox(height: 8), // Prostor mezi řádky
                                                                         Text(
                                                                           "${"carbs".tr()}:",
-                                                                          style: TextStyle(
-                                                                              fontSize: 20,
-                                                                              color: ColorsProvider.getColor8(context)),
+                                                                          style: TextStyle(fontSize: 20, color: ColorsProvider.getColor8(context)),
                                                                         ),
-                                                                        SizedBox(
-                                                                            height:
-                                                                                8),
+                                                                        SizedBox(height: 8),
                                                                         Text(
                                                                           "${"fat".tr()}:",
-                                                                          style: TextStyle(
-                                                                              fontSize: 20,
-                                                                              color: ColorsProvider.getColor8(context)),
+                                                                          style: TextStyle(fontSize: 20, color: ColorsProvider.getColor8(context)),
                                                                         ),
-                                                                        SizedBox(
-                                                                            height:
-                                                                                8),
+                                                                        SizedBox(height: 8),
                                                                         Text(
                                                                           "${"fiber".tr()}:",
-                                                                          style: TextStyle(
-                                                                              fontSize: 20,
-                                                                              color: ColorsProvider.getColor8(context)),
+                                                                          style: TextStyle(fontSize: 20, color: ColorsProvider.getColor8(context)),
                                                                         ),
                                                                       ],
                                                                     ),
-                                                                    SizedBox(
-                                                                        width:
-                                                                            10), // Prostor mezi sloupci
+                                                                    SizedBox(width: 10), // Prostor mezi sloupci
                                                                     // Druhý sloupec s hodnotami
                                                                     Column(
-                                                                      crossAxisAlignment:
-                                                                          CrossAxisAlignment
-                                                                              .end, // Zarovnání doprava
+                                                                      crossAxisAlignment: CrossAxisAlignment.end, // Zarovnání doprava
                                                                       children: [
                                                                         Text(
                                                                           "${sumOfProtein} g",
-                                                                          style: TextStyle(
-                                                                              fontSize: 20,
-                                                                              color: ColorsProvider.getColor8(context),
-                                                                              fontWeight: FontWeight.bold),
+                                                                          style: TextStyle(fontSize: 20, color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold),
                                                                         ),
-                                                                        SizedBox(
-                                                                            height:
-                                                                                8),
+                                                                        SizedBox(height: 8),
                                                                         Text(
                                                                           "${sumOfCarbs} g",
-                                                                          style: TextStyle(
-                                                                              fontSize: 20,
-                                                                              color: ColorsProvider.getColor8(context),
-                                                                              fontWeight: FontWeight.bold),
+                                                                          style: TextStyle(fontSize: 20, color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold),
                                                                         ),
-                                                                        SizedBox(
-                                                                            height:
-                                                                                8),
+                                                                        SizedBox(height: 8),
                                                                         Text(
                                                                           "${sumOfFat} g",
-                                                                          style: TextStyle(
-                                                                              fontSize: 20,
-                                                                              color: ColorsProvider.getColor8(context),
-                                                                              fontWeight: FontWeight.bold),
+                                                                          style: TextStyle(fontSize: 20, color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold),
                                                                         ),
-                                                                        SizedBox(
-                                                                            height:
-                                                                                8),
+                                                                        SizedBox(height: 8),
                                                                         Text(
                                                                           "${sumOfFiber} g",
-                                                                          style: TextStyle(
-                                                                              fontSize: 20,
-                                                                              color: ColorsProvider.getColor8(context),
-                                                                              fontWeight: FontWeight.bold),
+                                                                          style: TextStyle(fontSize: 20, color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold),
                                                                         ),
                                                                       ],
                                                                     ),
@@ -852,77 +674,51 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                                               },
                                               child: Container(
                                                 color: Colors.transparent,
-                                                padding:
-                                                    const EdgeInsets.fromLTRB(
-                                                        0, 10, 0, 10),
+                                                padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
                                                 child: Row(
                                                   children: [
                                                     ReorderableDragStartListener(
                                                       index: index,
                                                       child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .only(left: 10),
+                                                        padding: const EdgeInsets.only(left: 10),
                                                         child: Icon(
-                                                          Icons
-                                                              .drag_handle_rounded,
+                                                          Icons.drag_handle_rounded,
                                                           size: 30,
-                                                          color: ColorsProvider
-                                                              .getColor8(
-                                                                  context),
+                                                          color: ColorsProvider.getColor8(context),
                                                         ),
                                                       ),
                                                     ),
                                                     Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              left: 10),
+                                                      padding: const EdgeInsets.only(left: 10),
                                                       child: Text(
                                                         '${category.name}'.tr(),
                                                         style: TextStyle(
-                                                          color: ColorsProvider
-                                                              .getColor8(
-                                                                  context),
+                                                          color: ColorsProvider.getColor8(context),
                                                           fontSize: 20,
-                                                          fontWeight:
-                                                              FontWeight.bold,
+                                                          fontWeight: FontWeight.bold,
                                                         ),
                                                       ),
                                                     ),
                                                     Expanded(
                                                       child: Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .end,
+                                                        mainAxisAlignment: MainAxisAlignment.end,
                                                         children: [
                                                           sumOfKcal <= 0
                                                               ? Container()
                                                               : Text(
                                                                   '${sumOfKcal.round()} Kcal',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: ColorsProvider
-                                                                        .getColor8(
-                                                                            context),
-                                                                    fontSize:
-                                                                        20,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
+                                                                  style: TextStyle(
+                                                                    color: ColorsProvider.getColor8(context),
+                                                                    fontSize: 20,
+                                                                    fontWeight: FontWeight.bold,
                                                                   ),
                                                                 ),
                                                         ],
                                                       ),
                                                     ),
                                                     Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              right: 5,
-                                                              left: 15),
-                                                      child: openSearchBar(
-                                                          searchController,
-                                                          category
-                                                              .supabaseIdIntakeCategory!),
+                                                      padding: const EdgeInsets.only(right: 5, left: 15),
+                                                      child: openSearchBar(searchController, category.supabaseIdIntakeCategory!),
                                                     ),
                                                   ],
                                                 ),
@@ -936,70 +732,37 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                                                     (food) => Stack(
                                                       children: [
                                                         Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .fromLTRB(
-                                                                  5, 0, 5, 5),
-                                                          child:
-                                                              GestureDetector(
+                                                          padding: const EdgeInsets.fromLTRB(5, 0, 5, 5),
+                                                          child: GestureDetector(
                                                             // onLongPress: () {
                                                             //   print("Logn press");
                                                             // },
                                                             onTap: () async {
-                                                              print(
-                                                                  "tap press");
-                                                              print(food
-                                                                  .idNutriIntake);
-                                                              dbFitness
-                                                                      .selectedIntakeCategoryValue =
-                                                                  food.intakeCategory!;
-                                                              await Navigator.of(
-                                                                      context)
-                                                                  .pushNamed(
-                                                                      '/addIntakePage',
-                                                                      arguments: [
-                                                                    food,
-                                                                    quantity,
-                                                                    false,
-                                                                    intakeCategories
-                                                                  ]);
+                                                              print("tap press");
+                                                              print(food.idNutriIntake);
+                                                              dbFitness.selectedIntakeCategoryValue = food.intakeCategory!;
+                                                              await Navigator.of(context).pushNamed('/addIntakePage', arguments: [food, quantity, false, intakeCategories]);
 
                                                               await load();
                                                             },
                                                             child: Container(
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                color: Color
-                                                                    .fromARGB(
-                                                                        90,
-                                                                        0,
-                                                                        0,
-                                                                        0),
-                                                                borderRadius:
-                                                                    zaobleni,
+                                                              decoration: BoxDecoration(
+                                                                color: Color.fromARGB(90, 0, 0, 0),
+                                                                borderRadius: zaobleni,
                                                               ),
                                                               // height: 80,
                                                               child: Column(
-                                                                mainAxisAlignment:
-                                                                    MainAxisAlignment
-                                                                        .spaceAround,
+                                                                mainAxisAlignment: MainAxisAlignment.spaceAround,
                                                                 children: [
                                                                   Row(
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .center,
+                                                                    mainAxisAlignment: MainAxisAlignment.center,
                                                                     children: [
                                                                       Expanded(
-                                                                        child:
-                                                                            Container(
-                                                                          alignment:
-                                                                              Alignment.center, // Center the container content
-                                                                          child:
-                                                                              Padding(
-                                                                            padding:
-                                                                                EdgeInsets.symmetric(horizontal: 2.0),
-                                                                            child:
-                                                                                TextScroll(
+                                                                        child: Container(
+                                                                          alignment: Alignment.center, // Center the container content
+                                                                          child: Padding(
+                                                                            padding: EdgeInsets.symmetric(horizontal: 2.0),
+                                                                            child: TextScroll(
                                                                               intervalSpaces: 2,
 
                                                                               "${food.name.toString()}",
@@ -1022,24 +785,13 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                                                                     ],
                                                                   ),
                                                                   Row(
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .center,
+                                                                    mainAxisAlignment: MainAxisAlignment.center,
                                                                     children: [
                                                                       SizedBox(
-                                                                        width:
-                                                                            60,
+                                                                        width: 60,
                                                                       ),
-                                                                      customText(
-                                                                          "Weight",
-                                                                          (food.weight ?? 0)
-                                                                              .toDouble(),
-                                                                          context),
-                                                                      customText(
-                                                                          "Kcal",
-                                                                          food.kcal ??
-                                                                              0,
-                                                                          context),
+                                                                      customText("Weight", (food.weight ?? 0).toDouble(), context),
+                                                                      customText("Kcal", food.kcal ?? 0, context),
                                                                     ],
                                                                   ),
                                                                 ],
@@ -1050,24 +802,17 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                                                         Container(
                                                           // height: 80,
                                                           child: Column(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .spaceAround,
+                                                            mainAxisAlignment: MainAxisAlignment.spaceAround,
                                                             children: [
                                                               Container(
                                                                 child: Column(
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .center,
+                                                                  mainAxisAlignment: MainAxisAlignment.center,
                                                                   children: [
                                                                     Row(
-                                                                      mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .end,
+                                                                      mainAxisAlignment: MainAxisAlignment.end,
                                                                       children: [
                                                                         GestureDetector(
-                                                                          onTap:
-                                                                              () {
+                                                                          onTap: () {
                                                                             print("delete");
                                                                             showDialog(
                                                                               context: context,
@@ -1178,14 +923,10 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
                                                                               },
                                                                             );
                                                                           },
-                                                                          child:
-                                                                              Container(
-                                                                            height:
-                                                                                60, // color: Colors.red,
-                                                                            width:
-                                                                                45,
-                                                                            child:
-                                                                                Center(
+                                                                          child: Container(
+                                                                            height: 60, // color: Colors.red,
+                                                                            width: 45,
+                                                                            child: Center(
                                                                               child: Icon(
                                                                                 Icons.close_rounded,
                                                                                 color: ColorsProvider.getColor8(context),
@@ -1228,17 +969,14 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
     );
   }
 
-  Widget openSearchBar(
-      SearchController searchController, int idIntakeCategory) {
+  Widget openSearchBar(SearchController searchController, int idIntakeCategory) {
     var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
 
     return GestureDetector(
       child: Container(
         height: 40,
         width: 40,
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(18),
-            color: ColorsProvider.getColor8(context)),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(18), color: ColorsProvider.getColor8(context)),
         child: Center(
           child: Icon(
             Icons.add,
@@ -1251,8 +989,7 @@ class _FoodRecordScreenState extends State<FoodRecordScreen> {
         searchController.openView();
 
         for (var i = 0; i < intakeCategories.length; i++) {
-          if (intakeCategories[i].supabaseIdIntakeCategory ==
-              idIntakeCategory) {
+          if (intakeCategories[i].supabaseIdIntakeCategory == idIntakeCategory) {
             dbFitness.selectedIntakeCategoryValue = idIntakeCategory;
             print(dbFitness.selectedIntakeCategoryValue);
           }
@@ -1277,8 +1014,7 @@ class MarqueeText extends StatefulWidget {
   _MarqueeTextState createState() => _MarqueeTextState();
 }
 
-class _MarqueeTextState extends State<MarqueeText>
-    with SingleTickerProviderStateMixin {
+class _MarqueeTextState extends State<MarqueeText> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
 

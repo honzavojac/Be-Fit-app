@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kaloricke_tabulky_02/chose_init_data_page.dart';
 import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
 import 'package:kaloricke_tabulky_02/login_supabase/auth_page.dart';
@@ -27,7 +28,9 @@ import 'package:kaloricke_tabulky_02/init_page.dart';
 import 'package:kaloricke_tabulky_02/login_supabase/login_page.dart';
 import 'package:kaloricke_tabulky_02/login_supabase/splash_page.dart';
 
+import 'bloc/fitness_bloc.dart';
 import 'login_supabase/reset_password_get_token.dart';
+import 'pages/foodAdd/createFood/createFood.dart';
 import 'side_panel/body/measurements.dart';
 import 'package:flutter/services.dart';
 
@@ -66,6 +69,7 @@ void main() async {
   SupabaseProvider dbSupabase = SupabaseProvider();
   await dbSupabase.initialize();
   dbSupabase.getUser();
+  dbSupabase.ComplexFoodTable();
 
   // dbSupabase.initFoodApi();
 
@@ -91,7 +95,11 @@ void main() async {
         path: 'assets/langs',
         fallbackLocale: Locale('en'),
         startLocale: startLocale,
-        child: MyApp(),
+        child: MultiBlocProvider(providers: [
+          BlocProvider<FitnessBloc>(
+            create: (context) => FitnessBloc(),
+          )
+        ], child: MyApp()),
       ),
     ),
   );
@@ -177,6 +185,7 @@ class _MyAppState extends State<MyApp> {
                 '100g',
               ],
             ),
+        '/createFood': (context) => Createfood(),
         '/foodStatistic': (context) => foodStatistic(),
         '/measurements': (context) => MeasurementsWidget(),
         '/addIntakePage': (context) => AddIntakePage(),

@@ -149,6 +149,7 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
     List<Measurements> supabaseBodyMeasurementsList = [];
     List<IntakeCategories> supabaseIntakeCategoriesList = [];
     List<NutriIntake> supabaseNutriIntakeList = [];
+    List<ComplexFood> supabaseComplexFood = [];
     late UserSupabase supabaseUser;
 
     if (loading) {
@@ -195,6 +196,7 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
             dbSupabase.BodyMeasurementsTable(),
             dbSupabase.IntakeCategoriesTable(),
             dbSupabase.NutriIntakeTable(),
+            dbSupabase.ComplexFoodTable(),
             dbSupabase.getUser(),
           ]);
           // Načtení dat ze Supabase
@@ -208,7 +210,8 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
           supabaseBodyMeasurementsList = List.from(result[7]);
           supabaseIntakeCategoriesList = List.from(result[8]);
           supabaseNutriIntakeList = List.from(result[9]);
-          supabaseUser = result[10];
+          supabaseComplexFood = List.from(result[10]);
+          supabaseUser = result[11];
           // final MuscleLoading = dbSupabase.MuscleTable();
           // final ExerciseLoading = dbSupabase.ExerciseTable();
           // final ExerciseDataLoading = dbSupabase.ExerciseDataTable();
@@ -320,7 +323,6 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
 
             if (sqfliteNutriIntakeList.isEmpty) {
               for (var nutriIntake in supabaseNutriIntakeList) {
-                print("**** nutri intake **** ${nutriIntake.createdAt}");
                 try {
                   sqfliteNutriIntakeList.add(nutriIntake);
                   dbFitness.TxnInsertNutriIntake(txn, nutriIntake, nutriIntake.idNutriIntake!, 0);
@@ -338,6 +340,7 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
             Set<int> foodIds = sqfliteNutriIntakeList.map((e) => e.idFood!).toSet();
             List<Food?> foodList = await dbSupabase.selectSpecificFoods(foodIds);
             for (var food in foodList) {
+              print("********************${food!.hasMultipleIngredients.toString()}");
               dbFitness.InsertOrUpdateFood(food!, 0);
             }
           }
@@ -1802,8 +1805,8 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
 
                   _buttonWidget(dbSupabase, context, '/scanFood', 'scan_food'.tr(), Icons.fit_screen_rounded, false, problemWidth),
                   _buttonWidget(dbSupabase, context, '/newFood', 'add_new_food'.tr(), Icons.add, true, problemWidth),
-                  _buttonWidget(dbSupabase, context, '/newFood', 'new_food'.tr(), Icons.add, false, problemWidth),
-                  _buttonWidget(dbSupabase, context, '/foodStatistic', 'statistic'.tr(), Icons.bar_chart_rounded, true, problemWidth),
+                  _buttonWidget(dbSupabase, context, '/createFood', 'new_food'.tr(), Icons.add, true, problemWidth),
+                  _buttonWidget(dbSupabase, context, '/foodStatistic', 'statistic'.tr(), Icons.bar_chart_rounded, false, problemWidth),
                   _categoryWidget('workout'.tr()),
                   // _buttonWidget(dbSupabase, context, '/fitnessNames', 'Manage fitness names', Icons.text_fields_rounded),
                   // _buttonWidget(dbSupabase, context, '/editDeleteExerciseData', 'Edit/Delete exercise data', Icons.edit_rounded),

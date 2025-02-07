@@ -225,7 +225,10 @@ class _MySearchBarState extends State<MySearchBar> {
                               ),
                             );
                           },
-                          icon: Icon(Icons.add_circle_outline),
+                          icon: Icon(
+                            Icons.add_circle_outline,
+                            color: ColorsProvider.getColor8(context),
+                          ),
                           label: Text(
                             'new_food'.tr(),
                             style: TextStyle(

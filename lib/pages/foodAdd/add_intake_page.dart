@@ -47,19 +47,20 @@ class _AddIntakePageState extends State<AddIntakePage> {
     final args = ModalRoute.of(context)!.settings.arguments as List<dynamic>;
     food = args[0];
     newItem = args[2];
-    print("1**************  ${weightController.text}");
     if (newItem == true || (food.weight == 0)) {
       food = Food(
-          idFood: food.idFood!,
-          name: food.name!,
-          unaccentName: removeDiacritics(food.name!.toLowerCase()),
-          kcal: food.kcal ?? 0,
-          protein: food.protein ?? 0,
-          carbs: food.carbs ?? 0,
-          fat: food.fat ?? 0,
-          fiber: food.fiber ?? 0,
-          action: food.action,
-          idNutriIntake: food.idNutriIntake ?? null);
+        idFood: food.idFood!,
+        name: food.name!,
+        unaccentName: removeDiacritics(food.name!.toLowerCase()),
+        kcal: food.kcal ?? 0,
+        protein: food.protein ?? 0,
+        carbs: food.carbs ?? 0,
+        fat: food.fat ?? 0,
+        fiber: food.fiber ?? 0,
+        action: food.action,
+        idNutriIntake: food.idNutriIntake ?? null,
+        hasMultipleIngredients: food.hasMultipleIngredients,
+      );
     } else {
       weightController.text = food.weight!.toString();
       food = Food(
@@ -67,23 +68,15 @@ class _AddIntakePageState extends State<AddIntakePage> {
         name: food.name!,
         unaccentName: removeDiacritics(food.name!.toLowerCase()),
         idNutriIntake: food.idNutriIntake,
-        kcal: food.kcal != null
-            ? (food.kcal! / food.weight! * 100).toDouble()
-            : null,
-        protein: food.protein != null
-            ? (food.protein! / food.weight! * 100).toDouble()
-            : null,
-        carbs: food.carbs != null
-            ? (food.carbs! / food.weight! * 100).toDouble()
-            : null,
-        fat: food.fat != null
-            ? (food.fat! / food.weight! * 100).toDouble()
-            : null,
-        fiber: food.fiber != null
-            ? (food.fiber! / food.weight! * 100).toDouble()
-            : null,
+        kcal: food.kcal != null ? (food.kcal! / food.weight! * 100).toDouble() : null,
+        protein: food.protein != null ? (food.protein! / food.weight! * 100).toDouble() : null,
+        carbs: food.carbs != null ? (food.carbs! / food.weight! * 100).toDouble() : null,
+        fat: food.fat != null ? (food.fat! / food.weight! * 100).toDouble() : null,
+        fiber: food.fiber != null ? (food.fiber! / food.weight! * 100).toDouble() : null,
         action: food.action,
+        hasMultipleIngredients: food.hasMultipleIngredients,
       );
+      print("${food.hasMultipleIngredients}***************************************************************");
       recountFood();
     }
     quantity = args[1];
@@ -99,21 +92,11 @@ class _AddIntakePageState extends State<AddIntakePage> {
     double weight = double.tryParse(weightController.text.trim()) ?? 0;
     recountedFood = Food(
       idFood: food.idFood,
-      kcal: food.kcal != null
-          ? ((food.kcal! / 100 * weight * 1000).round() / 1000.toDouble())
-          : null,
-      protein: food.protein != null
-          ? ((food.protein! / 100 * weight * 1000).round() / 1000.toDouble())
-          : null,
-      carbs: food.carbs != null
-          ? ((food.carbs! / 100 * weight * 1000).round() / 1000.toDouble())
-          : null,
-      fat: food.fat != null
-          ? ((food.fat! / 100 * weight * 1000).round() / 1000.toDouble())
-          : null,
-      fiber: food.fiber != null
-          ? ((food.fiber! / 100 * weight * 1000).round() / 1000.toDouble())
-          : null,
+      kcal: food.kcal != null ? ((food.kcal! / 100 * weight * 1000).round() / 1000.toDouble()) : null,
+      protein: food.protein != null ? ((food.protein! / 100 * weight * 1000).round() / 1000.toDouble()) : null,
+      carbs: food.carbs != null ? ((food.carbs! / 100 * weight * 1000).round() / 1000.toDouble()) : null,
+      fat: food.fat != null ? ((food.fat! / 100 * weight * 1000).round() / 1000.toDouble()) : null,
+      fiber: food.fiber != null ? ((food.fiber! / 100 * weight * 1000).round() / 1000.toDouble()) : null,
     );
     grams = weight;
     switch (selectedQuantity) {
@@ -123,21 +106,11 @@ class _AddIntakePageState extends State<AddIntakePage> {
         grams *= 100;
         recountedFood = Food(
           idFood: recountedFood.idFood,
-          kcal: recountedFood.kcal != null
-              ? (recountedFood.kcal! * 100).toDouble()
-              : null,
-          protein: recountedFood.protein != null
-              ? recountedFood.protein! * 100.toDouble()
-              : null,
-          carbs: recountedFood.carbs != null
-              ? recountedFood.carbs! * 100.toDouble()
-              : null,
-          fat: recountedFood.fat != null
-              ? recountedFood.fat! * 100.toDouble()
-              : null,
-          fiber: recountedFood.fiber != null
-              ? recountedFood.fiber! * 100.toDouble()
-              : null,
+          kcal: recountedFood.kcal != null ? (recountedFood.kcal! * 100).toDouble() : null,
+          protein: recountedFood.protein != null ? recountedFood.protein! * 100.toDouble() : null,
+          carbs: recountedFood.carbs != null ? recountedFood.carbs! * 100.toDouble() : null,
+          fat: recountedFood.fat != null ? recountedFood.fat! * 100.toDouble() : null,
+          fiber: recountedFood.fiber != null ? recountedFood.fiber! * 100.toDouble() : null,
         );
         break;
       default:
@@ -247,8 +220,7 @@ class _AddIntakePageState extends State<AddIntakePage> {
       floatingActionButton: show == true
           ? GestureDetector(
               onTap: () async {
-                double isWeightControllerNull =
-                    double.tryParse(weightController.text.trim()) ?? 0;
+                double isWeightControllerNull = double.tryParse(weightController.text.trim()) ?? 0;
 
                 if (weightController.text.isEmpty) {
                   showTopSnackBar(
@@ -268,10 +240,7 @@ class _AddIntakePageState extends State<AddIntakePage> {
                     onAnimationControllerInit: (controller) => controller,
                     displayDuration: Duration(microseconds: 750),
                     dismissType: DismissType.onSwipe,
-                    dismissDirection: [
-                      DismissDirection.up,
-                      DismissDirection.horizontal
-                    ],
+                    dismissDirection: [DismissDirection.up, DismissDirection.horizontal],
                     reverseAnimationDuration: Duration(milliseconds: 250),
                     onTap: () {},
                   );
@@ -293,10 +262,7 @@ class _AddIntakePageState extends State<AddIntakePage> {
                     onAnimationControllerInit: (controller) => controller,
                     displayDuration: Duration(microseconds: 750),
                     dismissType: DismissType.onSwipe,
-                    dismissDirection: [
-                      DismissDirection.up,
-                      DismissDirection.horizontal
-                    ],
+                    dismissDirection: [DismissDirection.up, DismissDirection.horizontal],
                     reverseAnimationDuration: Duration(milliseconds: 250),
                     onTap: () {},
                   );
@@ -307,40 +273,30 @@ class _AddIntakePageState extends State<AddIntakePage> {
                   print(weightController.text);
                   NutriIntake nutriIntake = await NutriIntake(
                     createdAt: now,
-                    weight: dbFitness.selectedQuantity == 0
-                        ? int.parse(weightController.text.trim())
-                        : int.parse(weightController.text.trim()) * 100,
+                    weight: dbFitness.selectedQuantity == 0 ? int.parse(weightController.text.trim()) : int.parse(weightController.text.trim()) * 100,
                     idFood: recountedFood.idFood,
                     intakeCategory: dbFitness.selectedIntakeCategoryValue,
                     quantity: "1g",
                     action: 1,
                   );
-                  print(
-                      "intakeCategory: ${dbFitness.selectedIntakeCategoryValue}");
+                  print("intakeCategory: ${dbFitness.selectedIntakeCategoryValue}");
                   // Insert do Sqflite pro ofline režim
                   food.weight = int.tryParse(weightController.text.trim()) ?? 0;
-                  await dbFitness.InsertOrUpdateFood(food,
-                      0); //action 0 protože se to nebude insertovat do supabase, tam to je a nepotřeboju duplicity
+                  print("aaaaaaaaaaaaaaaaaaaaaaa   ${food.hasMultipleIngredients}");
+                  await dbFitness.InsertOrUpdateFood(food, 0); //action 0 protože se to nebude insertovat do supabase, tam to je a nepotřeboju duplicity
                   if (newItem == true) {
                     print("INSERT ITEM");
-                    NutriIntake? lastSupabaseIdNutriIntake =
-                        await dbFitness.SelectLastNutriIntake();
-                    int newSupabaseIdNutriIntake =
-                        (lastSupabaseIdNutriIntake?.supabaseIdNutriIntake ??
-                                0) +
-                            1;
+                    NutriIntake? lastSupabaseIdNutriIntake = await dbFitness.SelectLastNutriIntake();
+                    int newSupabaseIdNutriIntake = (lastSupabaseIdNutriIntake?.supabaseIdNutriIntake ?? 0) + 1;
 
                     print(now.toString());
                     print(selectedDate.toString());
 
-                    if (selectedDate.toString().replaceRange(10, null, "") ==
-                        now.toString().replaceRange(10, null, "")) {
-                      await dbFitness.InsertNutriIntake(
-                          nutriIntake, newSupabaseIdNutriIntake, 1);
+                    if (selectedDate.toString().replaceRange(10, null, "") == now.toString().replaceRange(10, null, "")) {
+                      await dbFitness.InsertNutriIntake(nutriIntake, newSupabaseIdNutriIntake, 1);
                     } else {
                       nutriIntake.createdAt = selectedDate.toString();
-                      await dbFitness.InsertNutriIntake(
-                          nutriIntake, newSupabaseIdNutriIntake, 1);
+                      await dbFitness.InsertNutriIntake(nutriIntake, newSupabaseIdNutriIntake, 1);
                     }
                   } else {
                     print("UPDATE ITEM");
@@ -348,16 +304,13 @@ class _AddIntakePageState extends State<AddIntakePage> {
                     switch (food.action) {
                       case 0 || null:
                         print(food);
-                        await dbFitness.UpdateNutriIntake(
-                            food.idNutriIntake!, nutriIntake, 2);
+                        await dbFitness.UpdateNutriIntake(food.idNutriIntake!, nutriIntake, 2);
                         break;
                       case 1:
-                        await dbFitness.UpdateNutriIntake(
-                            food.idNutriIntake!, nutriIntake, 1);
+                        await dbFitness.UpdateNutriIntake(food.idNutriIntake!, nutriIntake, 1);
                         break;
                       case 2:
-                        await dbFitness.UpdateNutriIntake(
-                            food.idNutriIntake!, nutriIntake, 2);
+                        await dbFitness.UpdateNutriIntake(food.idNutriIntake!, nutriIntake, 2);
 
                         break;
                       case 3:
@@ -387,9 +340,7 @@ class _AddIntakePageState extends State<AddIntakePage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        newItem == true
-                            ? "add_nutri_intake".tr()
-                            : "update_nutri_intake".tr(),
+                        newItem == true ? "add_nutri_intake".tr() : "update_nutri_intake".tr(),
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
@@ -437,8 +388,7 @@ Widget InfoBox(
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  FoodItem(
-                      "", double.parse((grams ?? 100).toString()), 3, context),
+                  FoodItem("", double.parse((grams ?? 100).toString()), 3, context),
                 ],
               ),
               Column(
@@ -510,8 +460,7 @@ Widget inputFoodItems(
         // Pokud keyboard není "text", povoluje pouze číslice
         if (keyboard != "text") FilteringTextInputFormatter.digitsOnly,
       ],
-      keyboardType:
-          keyboard == "text" ? TextInputType.text : TextInputType.number,
+      keyboardType: keyboard == "text" ? TextInputType.text : TextInputType.number,
       decoration: InputDecoration(
         labelText: labelText,
         labelStyle: TextStyle(
@@ -537,9 +486,7 @@ Widget inputFoodItems(
         ),
         contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 15),
         // hintText: 'Enter name of $latelText:',
-        hintStyle: TextStyle(
-            color: ColorsProvider.getColor2(context),
-            fontSize: 15), // zobrazí se pokud je textové pole prázdné
+        hintStyle: TextStyle(color: ColorsProvider.getColor2(context), fontSize: 15), // zobrazí se pokud je textové pole prázdné
       ),
       controller: item,
       onChanged: onChanged,
@@ -547,8 +494,7 @@ Widget inputFoodItems(
   );
 }
 
-Widget FoodItem(
-    String category, double? value, int widget, BuildContext context) {
+Widget FoodItem(String category, double? value, int widget, BuildContext context) {
   TextStyle textStyle = TextStyle(
     fontSize: widget == 1
         ? 20
@@ -633,8 +579,7 @@ class _SelectFoodCategoryState extends State<SelectFoodCategory> {
     funkce:
     for (var i = 0; i < widget.intakeCategories.length; i++) {
       IntakeCategories intakeCategory = widget.intakeCategories[i];
-      if (widget.intakeCategories[i].supabaseIdIntakeCategory ==
-          dbFitness.selectedIntakeCategoryValue) {
+      if (widget.intakeCategories[i].supabaseIdIntakeCategory == dbFitness.selectedIntakeCategoryValue) {
         selectedValue = intakeCategory.name!;
         break funkce;
       } else {
@@ -645,8 +590,7 @@ class _SelectFoodCategoryState extends State<SelectFoodCategory> {
     widget.intakeCategories.forEach(
       (element) {
         if (element.name == selectedValue) {
-          dbFitness.selectedIntakeCategoryValue =
-              element.supabaseIdIntakeCategory!;
+          dbFitness.selectedIntakeCategoryValue = element.supabaseIdIntakeCategory!;
           print(dbFitness.selectedIntakeCategoryValue);
         }
       },
@@ -675,10 +619,7 @@ class _SelectFoodCategoryState extends State<SelectFoodCategory> {
                         value: item,
                         child: Text(
                           item.tr(),
-                          style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: ColorsProvider.getColor2(context)),
+                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: ColorsProvider.getColor2(context)),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
@@ -691,10 +632,8 @@ class _SelectFoodCategoryState extends State<SelectFoodCategory> {
                     widget.intakeCategories.forEach(
                       (element) {
                         if (element.name == selectedValue) {
-                          dbFitness.selectedIntakeCategoryValue =
-                              element.supabaseIdIntakeCategory!;
-                          print(
-                              "selectedIntakeCategoryValue: ${dbFitness.selectedIntakeCategoryValue}");
+                          dbFitness.selectedIntakeCategoryValue = element.supabaseIdIntakeCategory!;
+                          print("selectedIntakeCategoryValue: ${dbFitness.selectedIntakeCategoryValue}");
                         }
                       },
                     );
@@ -725,8 +664,7 @@ class _SelectFoodCategoryState extends State<SelectFoodCategory> {
                   height: 38,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                        width: 0.5, color: ColorsProvider.getColor2(context)),
+                    border: Border.all(width: 0.5, color: ColorsProvider.getColor2(context)),
                   ),
                   overlayColor: WidgetStatePropertyAll(Colors.transparent),
                 ),
