@@ -907,9 +907,7 @@ class SupabaseProvider extends ChangeNotifier {
     });
 
     complexFoodDataList.sort((a, b) => a.idComplexFood!.compareTo(b.idComplexFood!));
-    complexFoodDataList.forEach(
-      (element) => print("****${element.toString()}"),
-    );
+
     return complexFoodDataList;
   }
 

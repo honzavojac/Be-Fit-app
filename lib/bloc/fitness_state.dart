@@ -1,14 +1,70 @@
-abstract class FitnessState {
-  final int counter;
+import '../data_classes.dart';
+
+// STATE
+abstract class FitnessState {}
+
+class FitnessInitial extends FitnessState {}
+
+class FitnessLoaded extends FitnessState {
+  final List<MySplit> splits;
+  final List<Muscle> muscles;
+  final List<Exercise> exercises;
+  final List<ExerciseData> exerciseData;
+  final int splitIndex;
   final int selectedSplitIndex;
+  final Map<int, MySplit> splitMap;
+  final Map<int, Muscle> muscleMap;
+  final Map<int, Exercise> exerciseMap;
+  final Map<int, List<SelectedMuscle>> selectedMuscleMap;
+  final Map<int, List<SelectedExercise>> selectedExerciseMap;
+  final SplitStartedCompleted? splitStartedCompleted;
+  final Map<int, List<ExerciseData>> exerciseDataMap;
 
-  FitnessState(this.counter, this.selectedSplitIndex);
-}
+  FitnessLoaded({
+    required this.splits,
+    required this.muscles,
+    required this.exercises,
+    required this.exerciseData,
+    required this.splitIndex,
+    required this.selectedSplitIndex,
+    required this.splitMap,
+    required this.muscleMap,
+    required this.exerciseMap,
+    required this.selectedMuscleMap,
+    required this.selectedExerciseMap,
+    required this.splitStartedCompleted,
+    required this.exerciseDataMap,
+  });
 
-class FitnessInitial extends FitnessState {
-  FitnessInitial() : super(0, 0);
-}
-
-class FitnessUpdated extends FitnessState {
-  FitnessUpdated(int counter, int selectedSplitIndex) : super(counter, selectedSplitIndex);
+  FitnessLoaded copyWith({
+    List<MySplit>? splits,
+    List<Muscle>? muscles,
+    List<Exercise>? exercises,
+    List<ExerciseData>? exerciseData,
+    int? splitIndex,
+    int? selectedSplitIndex,
+    Map<int, MySplit>? splitMap,
+    Map<int, Muscle>? muscleMap,
+    Map<int, Exercise>? exerciseMap,
+    Map<int, List<SelectedMuscle>>? selectedMuscleMap,
+    Map<int, List<SelectedExercise>>? selectedExerciseMap,
+    SplitStartedCompleted? splitStartedCompleted,
+    Map<int, List<ExerciseData>>? exerciseDataMap,
+  }) {
+    return FitnessLoaded(
+      splits: splits ?? this.splits,
+      muscles: muscles ?? this.muscles,
+      exercises: exercises ?? this.exercises,
+      exerciseData: exerciseData ?? this.exerciseData,
+      splitIndex: splitIndex ?? this.splitIndex,
+      selectedSplitIndex: selectedSplitIndex ?? this.selectedSplitIndex,
+      splitMap: splitMap ?? this.splitMap,
+      muscleMap: muscleMap ?? this.muscleMap,
+      exerciseMap: exerciseMap ?? this.exerciseMap,
+      selectedMuscleMap: selectedMuscleMap ?? this.selectedMuscleMap,
+      selectedExerciseMap: selectedExerciseMap ?? this.selectedExerciseMap,
+      splitStartedCompleted: splitStartedCompleted,
+      exerciseDataMap: exerciseDataMap ?? this.exerciseDataMap,
+    );
+  }
 }

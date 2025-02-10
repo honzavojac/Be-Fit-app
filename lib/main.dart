@@ -29,8 +29,10 @@ import 'package:kaloricke_tabulky_02/login_supabase/login_page.dart';
 import 'package:kaloricke_tabulky_02/login_supabase/splash_page.dart';
 
 import 'bloc/fitness_bloc.dart';
+import 'bloc/fitness_event.dart';
 import 'login_supabase/reset_password_get_token.dart';
-import 'pages/foodAdd/createFood/createFood.dart';
+import 'side_panel/fitness/fitness_record/test_page.dart';
+import 'side_panel/food/createFood.dart';
 import 'side_panel/body/measurements.dart';
 import 'package:flutter/services.dart';
 
@@ -96,8 +98,11 @@ void main() async {
         fallbackLocale: Locale('en'),
         startLocale: startLocale,
         child: MultiBlocProvider(providers: [
+          // BlocProvider<FitnessBloc>(
+          //   create: (context) => FitnessBloc(),
+          // ),
           BlocProvider<FitnessBloc>(
-            create: (context) => FitnessBloc(),
+            create: (_) => FitnessBloc()..add(LoadFitnessData()),
           )
         ], child: MyApp()),
       ),
@@ -189,6 +194,7 @@ class _MyAppState extends State<MyApp> {
         '/foodStatistic': (context) => foodStatistic(),
         '/measurements': (context) => MeasurementsWidget(),
         '/addIntakePage': (context) => AddIntakePage(),
+        '/testPage': (context) => TestPage(),
       },
     );
   }

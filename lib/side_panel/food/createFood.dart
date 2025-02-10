@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/variables.dart';
 import 'package:provider/provider.dart';
 
-import '../../../data_classes.dart';
-import '../../../database/fitness_database.dart';
-import '../../../providers/colors_provider.dart';
-import '../my_search_bar.dart';
+import '../../data_classes.dart';
+import '../../database/fitness_database.dart';
+import '../../providers/colors_provider.dart';
+import '../../pages/foodAdd/my_search_bar.dart';
 
 class Createfood extends StatefulWidget {
   const Createfood({super.key});

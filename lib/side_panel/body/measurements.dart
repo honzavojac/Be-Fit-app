@@ -56,16 +56,19 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
     measurements.sort(
       (a, b) => b.createdAt!.compareTo(a.createdAt!),
     );
-    Measurements measurement = measurements.firstWhere((element) => element.createdAt == now.toString());
-    weightTextEditingController = TextEditingController(text: (measurement.weight ?? "").toString());
-    heightTextEditingController = TextEditingController(text: (measurement.height ?? "").toString());
-    abdominalCircumferenceTextEditingController = TextEditingController(text: (measurement.abdominalCircumference ?? "").toString());
-    chestCircumferenceTextEditingController = TextEditingController(text: (measurement.chestCircumference ?? "").toString());
-    waistCircumferenceTextEditingController = TextEditingController(text: (measurement.waistCircumference ?? "").toString());
-    thighCircumferenceTextEditingController = TextEditingController(text: (measurement.thighCircumference ?? "").toString());
-    neckCircumferenceTextEditingController = TextEditingController(text: (measurement.neckCircumference ?? "").toString());
-    bicepsCircumferenceTextEditingController = TextEditingController(text: (measurement.bicepsCircumference ?? "").toString());
-
+    try {
+      Measurements? measurement = measurements.firstWhere((element) => element.createdAt == now.toString());
+      weightTextEditingController = TextEditingController(text: (measurement.weight ?? "").toString());
+      heightTextEditingController = TextEditingController(text: (measurement.height ?? "").toString());
+      abdominalCircumferenceTextEditingController = TextEditingController(text: (measurement.abdominalCircumference ?? "").toString());
+      chestCircumferenceTextEditingController = TextEditingController(text: (measurement.chestCircumference ?? "").toString());
+      waistCircumferenceTextEditingController = TextEditingController(text: (measurement.waistCircumference ?? "").toString());
+      thighCircumferenceTextEditingController = TextEditingController(text: (measurement.thighCircumference ?? "").toString());
+      neckCircumferenceTextEditingController = TextEditingController(text: (measurement.neckCircumference ?? "").toString());
+      bicepsCircumferenceTextEditingController = TextEditingController(text: (measurement.bicepsCircumference ?? "").toString());
+    } catch (e) {
+      print(e);
+    }
     show = true;
     setState(() {});
   }
