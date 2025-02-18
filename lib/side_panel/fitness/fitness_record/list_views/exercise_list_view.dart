@@ -2,6 +2,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
+import 'package:kaloricke_tabulky_02/pages/fitnessRecord/exercise_page%20copy.dart';
+import 'package:kaloricke_tabulky_02/side_panel/fitness/fitness_record/exercise_input/exercise_page.dart';
 
 import '../../../../bloc/fitness_bloc.dart';
 import '../../../../bloc/fitness_state.dart';
@@ -9,12 +11,40 @@ import '../../../../providers/colors_provider.dart';
 import '../../../../variables.dart';
 import 'exercise_data_list_view.dart';
 
-Widget ExerciseListViewBuilder(int supabaseIdSelectedMuscle, Map<int, List<SelectedExercise>> selectedExerciseMap, Map<int, Exercise> exerciseMap) {
+Widget ExerciseListViewBuilder(int supabaseIdSelectedMuscle, Map<int, List<SelectedExercise>>? selectedExerciseMap, Map<int, Exercise> exerciseMap) {
   // print(object)
   return BlocBuilder<FitnessBloc, FitnessState>(
     builder: (context, state) {
       if (state is FitnessLoaded) {
         Map<int, List<ExerciseData>> exerciseDataMap = state.exerciseDataMap;
+        if (selectedExerciseMap == null || selectedExerciseMap[supabaseIdSelectedMuscle] == null) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 15),
+            child: Container(
+              decoration: BoxDecoration(
+                color: ColorsProvider.getColor2(context),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(
+                  left: 5,
+                  right: 5,
+                  top: 10,
+                ),
+                child: Container(
+                  child: Text(
+                    "no_exercises".tr(),
+                    style: TextStyle(
+                      color: ColorsProvider.getColor8(context),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        }
         return ListView.builder(
           shrinkWrap: true,
           physics: NeverScrollableScrollPhysics(),
@@ -26,6 +56,15 @@ Widget ExerciseListViewBuilder(int supabaseIdSelectedMuscle, Map<int, List<Selec
             return GestureDetector(
               onTap: () async {
                 // setState(() {});
+                print("tap on exercise ${exercise.nameOfExercise}");
+                // ExercisePageCopy(onExerciseDataReturned: onExerciseDataReturned, loadData: loadData, nameOfExercise: nameOfExercise, supabaseIdExercise: supabaseIdExercise, idSplit: idSplit)
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ExercisePageNew(
+                            exercise: exercise,
+                          )),
+                );
               },
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 5),
@@ -65,7 +104,6 @@ Widget ExerciseListViewBuilder(int supabaseIdSelectedMuscle, Map<int, List<Selec
                               Padding(
                                 padding: const EdgeInsets.only(left: 5, right: 5, bottom: 2),
                                 child: Container(
-                                  // width: 76,
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                     children: [

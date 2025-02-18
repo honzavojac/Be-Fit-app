@@ -15,9 +15,9 @@ Widget ExerciseDataListViewBuilder(List<ExerciseData> _exerciseData) {
     scrollDirection: Axis.horizontal,
     itemBuilder: (context, index) {
       ExerciseData exerciseData = _exerciseData[index];
-      String? reps = exerciseData.reps.toString();
-      String? weight = exerciseData.weight.toString();
-      int? difficulty = exerciseData.difficulty;
+      String? reps = exerciseData.reps == null ? "" : exerciseData.reps.toString();
+      String? weight = exerciseData.weight == null ? "" : exerciseData.weight.toString();
+      int? difficulty = exerciseData.difficulty ?? 0;
 
       return Padding(
         padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
@@ -49,7 +49,7 @@ Widget ExerciseDataListViewBuilder(List<ExerciseData> _exerciseData) {
                 ),
               ),
               Text(
-                "$reps",
+                "${reps.isEmpty ? "" : reps}",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,

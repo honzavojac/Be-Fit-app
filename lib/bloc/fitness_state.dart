@@ -19,6 +19,10 @@ class FitnessLoaded extends FitnessState {
   final Map<int, List<SelectedExercise>> selectedExerciseMap;
   final SplitStartedCompleted? splitStartedCompleted;
   final Map<int, List<ExerciseData>> exerciseDataMap;
+  final Map<int, List<SplitStartedCompleted>> splitStartedCompletedMap;
+  final Map<int, Map<int, List<ExerciseData>>> oldExerciseDataMap;
+  final List<SplitStartedCompleted> splitStartedCompletedList;
+  final Map<int, List<Exercise>> muscleExerciseMap;
 
   FitnessLoaded({
     required this.splits,
@@ -34,6 +38,10 @@ class FitnessLoaded extends FitnessState {
     required this.selectedExerciseMap,
     required this.splitStartedCompleted,
     required this.exerciseDataMap,
+    required this.splitStartedCompletedMap,
+    required this.oldExerciseDataMap,
+    required this.splitStartedCompletedList,
+    required this.muscleExerciseMap,
   });
 
   FitnessLoaded copyWith({
@@ -50,6 +58,11 @@ class FitnessLoaded extends FitnessState {
     Map<int, List<SelectedExercise>>? selectedExerciseMap,
     SplitStartedCompleted? splitStartedCompleted,
     Map<int, List<ExerciseData>>? exerciseDataMap,
+    bool explicitNull = false,
+    Map<int, List<SplitStartedCompleted>>? splitStartedCompletedMap,
+    Map<int, Map<int, List<ExerciseData>>>? oldExerciseDataMap,
+    List<SplitStartedCompleted>? splitStartedCompletedList,
+    Map<int, List<Exercise>>? muscleExerciseMap,
   }) {
     return FitnessLoaded(
       splits: splits ?? this.splits,
@@ -63,8 +76,12 @@ class FitnessLoaded extends FitnessState {
       exerciseMap: exerciseMap ?? this.exerciseMap,
       selectedMuscleMap: selectedMuscleMap ?? this.selectedMuscleMap,
       selectedExerciseMap: selectedExerciseMap ?? this.selectedExerciseMap,
-      splitStartedCompleted: splitStartedCompleted,
+      splitStartedCompleted: explicitNull ? null : (splitStartedCompleted ?? this.splitStartedCompleted),
       exerciseDataMap: exerciseDataMap ?? this.exerciseDataMap,
+      splitStartedCompletedMap: splitStartedCompletedMap ?? this.splitStartedCompletedMap,
+      oldExerciseDataMap: oldExerciseDataMap ?? this.oldExerciseDataMap,
+      splitStartedCompletedList: splitStartedCompletedList ?? this.splitStartedCompletedList,
+      muscleExerciseMap: muscleExerciseMap ?? this.muscleExerciseMap,
     );
   }
 }

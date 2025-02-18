@@ -1812,6 +1812,7 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
                   // _buttonWidget(dbSupabase, context, '/editDeleteExerciseData', 'Edit/Delete exercise data', Icons.edit_rounded),
                   _buttonWidget(dbSupabase, context, '/fitnessStatistic', 'statistic'.tr(), Icons.insights_rounded, true, problemWidth),
                   _buttonWidget(dbSupabase, context, '/testPage', 'test', Icons.airplanemode_off, true, problemWidth),
+                  _buttonWidget(dbSupabase, context, '/testSplitPage', 'test Split', Icons.airplanemode_off, true, problemWidth),
 
                   _categoryWidget('body'.tr()),
                   _buttonWidget(dbSupabase, context, '/measurements', 'measurement'.tr(), Icons.straighten_outlined, true, problemWidth),

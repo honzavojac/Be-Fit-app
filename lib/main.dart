@@ -32,6 +32,7 @@ import 'bloc/fitness_bloc.dart';
 import 'bloc/fitness_event.dart';
 import 'login_supabase/reset_password_get_token.dart';
 import 'side_panel/fitness/fitness_record/test_page.dart';
+import 'side_panel/fitness/fitness_record/test_split_page.dart';
 import 'side_panel/food/createFood.dart';
 import 'side_panel/body/measurements.dart';
 import 'package:flutter/services.dart';
@@ -195,6 +196,7 @@ class _MyAppState extends State<MyApp> {
         '/measurements': (context) => MeasurementsWidget(),
         '/addIntakePage': (context) => AddIntakePage(),
         '/testPage': (context) => TestPage(),
+        '/testSplitPage': (context) => TestSplitPage(),
       },
     );
   }

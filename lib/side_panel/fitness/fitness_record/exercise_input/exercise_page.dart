@@ -1,0 +1,1228 @@
+import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kaloricke_tabulky_02/bloc/fitness_bloc.dart';
+import 'package:kaloricke_tabulky_02/bloc/fitness_event.dart';
+import 'package:kaloricke_tabulky_02/data_classes.dart';
+import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
+import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
+import 'package:kaloricke_tabulky_02/variables.dart';
+import 'package:provider/provider.dart';
+
+import '../../../../bloc/fitness_state.dart';
+import 'my_app_lifecycle_listener.dart';
+// class ExercisePageCopy extends StatefulWidget {
+//   final Function(List<ExerciseData>) onExerciseDataReturned;
+
+//   final Function() loadData;
+//   final String nameOfExercise;
+//   final int supabaseIdExercise;
+//   final int idSplit;
+//   const ExercisePageCopy({
+//     required this.onExerciseDataReturned,
+//     super.key,
+//     required this.loadData,
+//     required this.nameOfExercise,
+//     required this.supabaseIdExercise,
+//     required this.idSplit,
+//   });
+
+//   @override
+//   State<ExercisePageCopy> createState() => _ExercisePageCopyState();
+// }
+class ExercisePageNew extends StatefulWidget {
+  final Exercise exercise;
+
+  const ExercisePageNew({
+    required this.exercise,
+    super.key,
+  });
+
+  @override
+  State<ExercisePageNew> createState() => _ExercisePageNewState();
+}
+
+// double initialDragableSize = 0.1;
+final GlobalKey exercisePageKey = GlobalKey();
+
+class _ExercisePageNewState extends State<ExercisePageNew> with WidgetsBindingObserver {
+  // String? nameOfExercise;
+  // int? idExerxise;
+  // int? idSplit;
+  // int? idStartedCompleted;
+  bool showWidget = false;
+  List<ExerciseData> newExerciseData = [ExerciseData(weight: 10, reps: 10, difficulty: 5)];
+  // List<ExerciseData> finalExerciseData = [];
+  // List<ExerciseData> tempExerciseData = [];
+  // List<SplitStartedCompleted> splitStartedCompleted = [];
+
+  // List<TextEditingController> weightController = [TextEditingController(text: "10")];
+  // List<TextEditingController> repsController = [TextEditingController(text: "10")];
+  List<int> difficultyController = [5];
+  // List<TextEditingController> tempWeightController = [];
+  // List<TextEditingController> tempRepsController = [];
+  // List<int> tempDifficultyController = [];
+
+  // TextEditingController? commentController;
+  // late int commentAction;
+  // TextEditingController _descriptionController = TextEditingController();
+
+  late int supabaseIdExercise;
+
+  // AppLifecycleState? _lastLifecycleState;
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    // ignore: unused_local_variable
+    // bool paused = false;
+    // // Pokud je aktuální stav stejný jako poslední stav, neprovádějte nic
+    // if (_lastLifecycleState == state) return;
+
+    // if (state == AppLifecycleState.paused) {
+    //   if (mounted) {
+    //     try {
+    //       await saveToDatabase();
+    //       print("saved to sqflite *************************************************");
+    //       // widget.loadData();
+    //       paused = true;
+    //     } catch (e) {
+    //       print("chyba v exercisePage při vkládání dat změněním stavu aplikace (zavřená app): $e");
+    //     }
+    //   } else if (state == AppLifecycleState.resumed) {
+    //     paused = false;
+    //   }
+    // }
+    // _lastLifecycleState = state;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addObserver(this);
+    // loadOldData();
+  }
+
+  // Future<void> loadData(bool notify) async {
+  //   print("loadData");
+  //   try {
+  //     var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
+
+  //     nameOfExercise = widget.nameOfExercise;
+  //     supabaseIdExercise = widget.supabaseIdExercise;
+  //     idSplit = widget.idSplit;
+  //     splitStartedCompleted = await dbFitness.SelectSplitStartedCompletedWhereEnded(false);
+  //     if (splitStartedCompleted.isNotEmpty) {
+  //       idStartedCompleted = splitStartedCompleted[0].supabaseIdStartedCompleted!;
+  //     }
+
+  //     if (idStartedCompleted != null) {
+  //       List<ExerciseData> exerciseData = await dbFitness.SelectCurrentExerciseDataWhereExerciseIdExerciseAndIdStCo(supabaseIdExercise, idStartedCompleted!);
+  //       finalExerciseData.clear();
+  //       weightController.clear();
+  //       repsController.clear();
+  //       difficultyController.clear();
+
+  //       for (var exerciseDataItem in exerciseData) {
+  //         int action = exerciseDataItem.action!;
+  //         if (action != 3 && action != 4) {
+  //           finalExerciseData.add(exerciseDataItem);
+  //           String weight = exerciseDataItem.weight != null ? exerciseDataItem.weight.toString() : "";
+  //           String reps = exerciseDataItem.reps != null ? exerciseDataItem.reps.toString() : "";
+  //           int difficulty = exerciseDataItem.difficulty ?? 0;
+  //           weightController.add(TextEditingController(text: weight));
+  //           repsController.add(TextEditingController(text: reps));
+  //           difficultyController.add(difficulty);
+  //         }
+  //       }
+
+  //       tempExerciseData = List.from(finalExerciseData);
+  //       tempWeightController = List.from(weightController);
+  //       tempRepsController = List.from(repsController);
+  //       tempDifficultyController = List.from(difficultyController);
+  //     }
+  //     try {
+  //       var data = await dbFitness.selectExerciseComment(supabaseIdExercise);
+  //       String comment = data[0];
+  //       commentAction = data[1];
+  //       commentController = TextEditingController(text: comment);
+  //     } on Exception catch (e) {
+  //       // TODO
+
+  //       print(e);
+  //       commentController = TextEditingController(text: "");
+  //       commentAction = 0;
+  //       print("chyba");
+  //     }
+  //     showWidget = true;
+  //     // notify == true ?
+  //     setState(() {});
+  //     //  : null;
+  //   } catch (e) {
+  //     print("Error loading data: $e");
+  //   }
+  // }
+
+  // saveToDatabase() async {
+  //   try {
+  //     var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
+
+  //     for (var i = 0; i < tempExerciseData.length; i++) {
+  //       ExerciseData exerciseDataItem = tempExerciseData[i];
+  //       int? weightControllerItem = tempWeightController[i].text.isNotEmpty ? int.parse(tempWeightController[i].text) : null;
+  //       int? repsControllerItem = tempRepsController[i].text.isNotEmpty ? int.parse(tempRepsController[i].text) : null;
+  //       int difficultyControllerItem = tempDifficultyController[i];
+  //       if (exerciseDataItem.action == 0 || exerciseDataItem.action == 1 || exerciseDataItem.action == 2) {
+  //         if (exerciseDataItem.weight != weightControllerItem || exerciseDataItem.reps != repsControllerItem || exerciseDataItem.difficulty != difficultyControllerItem) {
+  //           switch (exerciseDataItem.action) {
+  //             case 0:
+  //               await dbFitness.UpdateExerciseData(weightControllerItem, repsControllerItem, difficultyControllerItem, exerciseDataItem.supabaseIdExData!, 2);
+  //               break;
+  //             case 1:
+  //               await dbFitness.UpdateExerciseData(weightControllerItem, repsControllerItem, difficultyControllerItem, exerciseDataItem.supabaseIdExData!, 1);
+  //               break;
+  //             case 2:
+  //               await dbFitness.UpdateExerciseData(weightControllerItem, repsControllerItem, difficultyControllerItem, exerciseDataItem.supabaseIdExData!, 2);
+  //               break;
+  //             default:
+  //           }
+  //         }
+  //       } else if (exerciseDataItem.action == 3) {
+  //         // future delete from supabase
+  //         await dbFitness.UpdateExerciseData(weightControllerItem, repsControllerItem, difficultyControllerItem, exerciseDataItem.supabaseIdExData!, 3);
+  //       } else if (exerciseDataItem.action == 4) {
+  //         await dbFitness.DeleteExerciseData(exerciseDataItem.supabaseIdExData!);
+  //       }
+  //     }
+  //     print("Data saved successfully to sqflite.");
+  //   } catch (e) {
+  //     print("Error saving data: $e");
+  //   }
+  // }
+
+  // List<SplitStartedCompleted> oldDataFinal = [];
+
+  // loadOldData() async {
+  //   print("******* old data *******");
+  //   var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
+  //   oldDataFinal.clear();
+  //   List<SplitStartedCompleted> temp = await dbFitness.SelectAllHistoricalData(widget.supabaseIdExercise);
+
+  //   for (var splitStartedCompletedItem in temp) {
+  //     List<ExerciseData> exerciseDataTemp = [];
+  //     for (var element in splitStartedCompletedItem.exerciseData!) {
+  //       if (element.exercisesIdExercise == widget.supabaseIdExercise) {
+  //         exerciseDataTemp.add(element);
+  //       }
+  //       // print("idExercise ${element.exercisesIdExercise}");
+  //     }
+  //     if (exerciseDataTemp.isNotEmpty) {
+  //       SplitStartedCompleted newSplitStartedCompletedItem = SplitStartedCompleted(
+  //         idStartedCompleted: splitStartedCompletedItem.idStartedCompleted,
+  //         splitId: splitStartedCompletedItem.splitId,
+  //         createdAt: splitStartedCompletedItem.createdAt,
+  //         endedAt: splitStartedCompletedItem.endedAt,
+  //         ended: splitStartedCompletedItem.ended,
+  //         exerciseData: exerciseDataTemp,
+  //       );
+  //       oldDataFinal.add(newSplitStartedCompletedItem);
+  //     }
+  //   }
+  //   oldDataFinal.sort(
+  //     (a, b) => b.createdAt!.compareTo(a.createdAt!),
+  //   );
+  //   setState(() {});
+  // }
+
+  // addExerciseData() async {
+  //   var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
+
+  //   try {
+  //     await saveToDatabase();
+  //     print("Data saved successfully.");
+  //   } catch (e) {
+  //     print("Error saving to database: $e");
+  //   }
+
+  //   try {
+  //     DateTime dateTime = DateTime.now();
+  //     String now = dateTime.toString();
+  //     int newSupabaseIdSplitStartedCompleted;
+  //     if (idStartedCompleted == null) {
+  //       List<SplitStartedCompleted> splitStartedCompleted = await dbFitness.SelectSplitStartedCompleted();
+  //       newSupabaseIdSplitStartedCompleted = 1 + (splitStartedCompleted.isNotEmpty ? splitStartedCompleted.last.supabaseIdStartedCompleted! : 0);
+  //       await dbFitness.InsertSplitStartedCompleted(newSupabaseIdSplitStartedCompleted, now, null, idSplit!, false, 1);
+  //       widget.loadData();
+  //     } else {
+  //       newSupabaseIdSplitStartedCompleted = idStartedCompleted!;
+  //     }
+
+  //     List<ExerciseData> exerciseDataMaxIdExercise = await dbFitness.selectMaxExerciseData();
+  //     int newSupabaseIdExercise = 1 + (exerciseDataMaxIdExercise.isNotEmpty ? exerciseDataMaxIdExercise[0].supabaseIdExData ?? 0 : 0);
+  //     print("New Supabase ID for Exercise: $newSupabaseIdExercise");
+
+  //     await dbFitness.InsertExerciseData(newSupabaseIdExercise, null, null, 0, null, null, now, supabaseIdExercise, newSupabaseIdSplitStartedCompleted, 1);
+
+  //     loadData(true);
+  //   } catch (e) {
+  //     print("Error adding values: $e");
+  //   }
+  // }
+
+  List<FocusNode> focusNodes = [FocusNode(), FocusNode()];
+  // Funkce pro výpočet výšky AppBaru
+
+  @override
+  Widget build(BuildContext context) {
+    var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
+    // showWidget = true;
+    final _sheet = GlobalKey();
+    return BlocBuilder<FitnessBloc, FitnessState>(builder: (context, state) {
+      if (state is FitnessLoaded) {
+        List<TextEditingController>? weigthControlers = [];
+        List<TextEditingController>? repsControlers = [];
+
+        Map<int, List<ExerciseData>>? exerciseDataMap = state.exerciseDataMap;
+        int exerciseId = widget.exercise.supabaseIdExercise!;
+        List<ExerciseData>? exerciseData = exerciseDataMap[exerciseId];
+        Map<int, List<SplitStartedCompleted>>? splitStartedCompletedMap = state.splitStartedCompletedMap;
+        Map<int, Map<int, List<ExerciseData>>>? oldExerciseDataMap = state.oldExerciseDataMap;
+        if (exerciseData == null)
+          return Scaffold(
+            body: SafeArea(
+                child: Stack(
+              children: [
+                Column(
+                  children: [
+                    header(context, widget.exercise),
+                    Expanded(
+                      child: CustomScrollView(
+                        slivers: [
+                          SliverFillRemaining(
+                            hasScrollBody: true,
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(0, 10, 2, 0),
+                              child: Column(
+                                children: [
+                                  categoryRow(),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    CommnentBox(context, widget.exercise),
+                    SizedBox(
+                      height: 100,
+                    ),
+                  ],
+                ),
+                _dragableScrollableSheet(_sheet, widget.exercise, splitStartedCompletedMap, oldExerciseDataMap),
+              ],
+            )),
+          );
+
+        for (var item in exerciseData) {
+          weigthControlers.add(TextEditingController(text: "${item.weight == null ? "" : item.weight}"));
+          repsControlers.add(TextEditingController(text: "${item.reps == null ? "" : item.reps}"));
+        }
+
+        return PopScope(
+          // ignore: deprecated_member_use
+          onPopInvoked: (didPop) async {
+            print("onPopInvoked**********************");
+
+            exerciseDataMap[exerciseId] = exerciseData;
+            context.read<FitnessBloc>().add(UpdateExerciseData(exerciseDataMap));
+          },
+          child: MyAppLifecycleListener(
+            exerciseDataMap: exerciseDataMap,
+            exerciseData: exerciseData,
+            exercise: widget.exercise,
+            child: Scaffold(
+              key: exercisePageKey,
+              body: GestureDetector(
+                onTap: () {
+                  FocusScope.of(context).requestFocus(FocusNode());
+                },
+                child: Stack(
+                  children: [
+                    SafeArea(
+                      child: Column(
+                        children: [
+                          header(context, widget.exercise),
+                          Expanded(
+                            child: CustomScrollView(
+                              slivers: [
+                                SliverFillRemaining(
+                                  hasScrollBody: true,
+                                  child: Padding(
+                                    padding: const EdgeInsets.fromLTRB(0, 10, 2, 0),
+                                    child: Column(
+                                      children: [
+                                        categoryRow(),
+                                        SizedBox(
+                                          height: 15,
+                                        ),
+                                        state.splitStartedCompleted == null
+                                            ? Expanded(child: Container())
+                                            : Expanded(
+                                                child: ListView.builder(
+                                                  shrinkWrap: false,
+                                                  // physics: NeverScrollableScrollPhysics(),
+                                                  itemCount: exerciseData.length,
+                                                  itemBuilder: (context, itemIndex) {
+                                                    int setNumber = itemIndex + 1;
+                                                    int? difficulty = exerciseData[itemIndex].difficulty ?? 0;
+                                                    return Padding(
+                                                      padding: const EdgeInsets.only(bottom: 15),
+                                                      child: Container(
+                                                        child: Column(
+                                                          children: [
+                                                            Container(
+                                                              height: 50,
+                                                              child: Dismissible(
+                                                                direction: DismissDirection.endToStart,
+                                                                key: ValueKey<int>(exerciseData[itemIndex].id),
+                                                                background: Container(
+                                                                  color: ColorsProvider.color_9,
+                                                                  child: Align(
+                                                                    child: Padding(
+                                                                      padding: const EdgeInsets.only(right: 16),
+                                                                      child: Icon(Icons.delete),
+                                                                    ),
+                                                                    alignment: Alignment.centerRight,
+                                                                  ),
+                                                                ),
+                                                                onDismissed: (direction) async {},
+                                                                confirmDismiss: (direction) async {
+                                                                  // try {
+                                                                  //   if (exerciseData[itemIndex].action == 1) {
+                                                                  //     for (var i = 0; i < tempExerciseData.length; i++) {
+                                                                  //       if (tempExerciseData[i].idExData == exerciseData[itemIndex].idExData) {
+                                                                  //         tempExerciseData[i].action = 4;
+                                                                  //       }
+                                                                  //     }
+                                                                  //   } else if (exerciseData[itemIndex].action == 0 || exerciseData[itemIndex].action == 2) {
+                                                                  //     for (var i = 0; i < tempExerciseData.length; i++) {
+                                                                  //       if (tempExerciseData[i].idExData == exerciseData[itemIndex].idExData) {
+                                                                  //         tempExerciseData[i].action = 3;
+                                                                  //       }
+                                                                  //     }
+                                                                  //   }
+                                                                  // exerciseData.removeAt(itemIndex);
+                                                                  // weightController.removeAt(itemIndex);
+                                                                  // repsController.removeAt(itemIndex);
+                                                                  // difficultyController.removeAt(itemIndex);
+                                                                  // saveToDatabase();
+                                                                  //   setState(() {});
+                                                                  //   return true;
+                                                                  // } catch (e) {
+                                                                  //   print("Error during confirm dismiss: $e");
+                                                                  //   return false;
+                                                                  // }
+                                                                },
+                                                                child: Container(
+                                                                  child: Center(
+                                                                    child: Row(
+                                                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                                      children: [
+                                                                        Container(
+                                                                          width: 40,
+                                                                          child: Row(
+                                                                            mainAxisAlignment: MainAxisAlignment.center,
+                                                                            children: [
+                                                                              Text(
+                                                                                "${setNumber}",
+                                                                                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500),
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                        ),
+                                                                        Container(
+                                                                          width: 70,
+                                                                          child: Container(
+                                                                            height: 38,
+                                                                            child: Center(
+                                                                              child: TextFormField(
+                                                                                onTap: () {
+                                                                                  weigthControlers[itemIndex].selection = TextSelection(
+                                                                                    baseOffset: 0,
+                                                                                    extentOffset: weigthControlers[itemIndex].text.length,
+                                                                                  );
+                                                                                },
+                                                                                onTapOutside: (event) async {
+                                                                                  print("tapoutside*******************");
+                                                                                  exerciseDataMap[exerciseId]![itemIndex].weight = int.tryParse(weigthControlers[itemIndex].text);
+                                                                                  context.read<FitnessBloc>().add(UpdateExerciseData(exerciseDataMap));
+
+                                                                                  // await saveToDatabase();
+                                                                                  // await loadData(false);
+                                                                                  // widget.loadData;
+                                                                                },
+                                                                                onChanged: (value) {
+                                                                                  exerciseData[itemIndex].weight = int.tryParse(value);
+                                                                                  // Handle text changes here
+                                                                                },
+                                                                                controller: weigthControlers[itemIndex],
+                                                                                keyboardType: TextInputType.numberWithOptions(), // Ensure same keyboard type
+                                                                                // textInputAction: TextInputAction.next, // Ensure consistent action
+                                                                                inputFormatters: [
+                                                                                  LengthLimitingTextInputFormatter(3),
+                                                                                  FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                                                                                ],
+                                                                                decoration: InputDecoration(
+                                                                                  labelStyle: TextStyle(
+                                                                                    color: ColorsProvider.getColor2(context), // Replace with your color
+                                                                                  ),
+                                                                                  enabledBorder: OutlineInputBorder(
+                                                                                    borderRadius: BorderRadius.all(
+                                                                                      Radius.circular(12),
+                                                                                    ),
+                                                                                    borderSide: BorderSide(
+                                                                                      color: ColorsProvider.getColor2(context), // Replace with your color
+                                                                                      width: 0.5,
+                                                                                    ),
+                                                                                  ),
+                                                                                  focusedBorder: OutlineInputBorder(
+                                                                                    borderRadius: BorderRadius.all(
+                                                                                      Radius.circular(12),
+                                                                                    ),
+                                                                                    borderSide: BorderSide(
+                                                                                      color: ColorsProvider.getColor2(context), // Replace with your color
+                                                                                      width: 2.0,
+                                                                                    ),
+                                                                                  ),
+                                                                                  contentPadding: EdgeInsets.symmetric(
+                                                                                    vertical: 0,
+                                                                                    horizontal: 15,
+                                                                                  ),
+                                                                                ),
+                                                                                textAlign: TextAlign.center,
+                                                                                style: TextStyle(
+                                                                                  color: difficulty == 0
+                                                                                      ? Colors.white
+                                                                                      : difficulty == 1
+                                                                                          ? Colors.green
+                                                                                          : difficulty == 2
+                                                                                              ? Colors.lightGreen
+                                                                                              : difficulty == 3
+                                                                                                  ? Colors.yellow
+                                                                                                  : difficulty == 4
+                                                                                                      ? Colors.orange
+                                                                                                      : difficulty == 5
+                                                                                                          ? Colors.red
+                                                                                                          : null,
+                                                                                  fontWeight: FontWeight.bold,
+                                                                                  fontSize: 18,
+                                                                                ),
+                                                                              ),
+                                                                            ),
+                                                                          ),
+                                                                        ),
+
+                                                                        Container(
+                                                                          width: 70,
+                                                                          child: Container(
+                                                                            height: 38,
+                                                                            child: Center(
+                                                                              child: TextFormField(
+                                                                                onTap: () {
+                                                                                  repsControlers[itemIndex].selection = TextSelection(
+                                                                                    baseOffset: 0,
+                                                                                    extentOffset: repsControlers[itemIndex].text.length,
+                                                                                  );
+                                                                                },
+                                                                                onTapOutside: (event) async {
+                                                                                  print("tapoutside*******************");
+                                                                                  exerciseDataMap[exerciseId]![itemIndex].reps = int.tryParse(repsControlers[itemIndex].text);
+                                                                                  context.read<FitnessBloc>().add(UpdateExerciseData(exerciseDataMap));
+
+                                                                                  // await saveToDatabase();
+                                                                                  // await loadData(false);
+                                                                                  // widget.loadData();
+                                                                                },
+                                                                                onChanged: (value) {
+                                                                                  exerciseData[itemIndex].reps = int.tryParse(value);
+                                                                                  // Handle text changes here
+                                                                                },
+                                                                                controller: repsControlers[itemIndex],
+                                                                                keyboardType: TextInputType.numberWithOptions(), // Ensure same keyboard type
+                                                                                // textInputAction: TextInputAction.next, // Ensure consistent action
+                                                                                inputFormatters: [
+                                                                                  LengthLimitingTextInputFormatter(3),
+                                                                                  FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                                                                                ],
+                                                                                decoration: InputDecoration(
+                                                                                  labelStyle: TextStyle(
+                                                                                    color: ColorsProvider.getColor2(context), // Replace with your color
+                                                                                  ),
+                                                                                  enabledBorder: OutlineInputBorder(
+                                                                                    borderRadius: BorderRadius.all(
+                                                                                      Radius.circular(12),
+                                                                                    ),
+                                                                                    borderSide: BorderSide(
+                                                                                      color: ColorsProvider.getColor2(context), // Replace with your color
+                                                                                      width: 0.5,
+                                                                                    ),
+                                                                                  ),
+                                                                                  focusedBorder: OutlineInputBorder(
+                                                                                    borderRadius: BorderRadius.all(
+                                                                                      Radius.circular(12),
+                                                                                    ),
+                                                                                    borderSide: BorderSide(
+                                                                                      color: ColorsProvider.getColor2(context), // Replace with your color
+                                                                                      width: 2.0,
+                                                                                    ),
+                                                                                  ),
+                                                                                  contentPadding: EdgeInsets.symmetric(
+                                                                                    vertical: 0,
+                                                                                    horizontal: 15,
+                                                                                  ),
+                                                                                ),
+                                                                                textAlign: TextAlign.center,
+                                                                                style: TextStyle(
+                                                                                  color: difficulty == 0
+                                                                                      ? Colors.white
+                                                                                      : difficulty == 1
+                                                                                          ? Colors.green
+                                                                                          : difficulty == 2
+                                                                                              ? Colors.lightGreen
+                                                                                              : difficulty == 3
+                                                                                                  ? Colors.yellow
+                                                                                                  : difficulty == 4
+                                                                                                      ? Colors.orange
+                                                                                                      : difficulty == 5
+                                                                                                          ? Colors.red
+                                                                                                          : null,
+                                                                                  fontWeight: FontWeight.bold,
+                                                                                  fontSize: 18,
+                                                                                ),
+                                                                              ),
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                        Container(
+                                                                          width: 70,
+                                                                          child: DropdownButtonHideUnderline(
+                                                                            child: GestureDetector(
+                                                                              onTap: () {
+                                                                                // _focusNode.unfocus(); // Close the keyboard
+                                                                                // FocusScope.of(context).requestFocus(FocusNode());
+                                                                              },
+                                                                              child: DropdownButton2<int>(
+                                                                                alignment: Alignment.center,
+                                                                                style: TextStyle(
+                                                                                  // color: ColorsProvider.getColor8(context),
+                                                                                  fontWeight: FontWeight.bold,
+                                                                                  fontSize: 5,
+                                                                                ),
+                                                                                isDense: true,
+                                                                                menuItemStyleData: MenuItemStyleData(
+                                                                                  height: 37,
+                                                                                ),
+                                                                                isExpanded: true,
+                                                                                dropdownStyleData: DropdownStyleData(
+                                                                                  offset: Offset(-0, -3),
+                                                                                  elevation: 2,
+                                                                                  // width: 90,
+                                                                                  decoration: BoxDecoration(
+                                                                                    borderRadius: BorderRadius.circular(12),
+                                                                                    color: Color.fromARGB(195, 0, 0, 0),
+                                                                                  ),
+                                                                                ),
+                                                                                buttonStyleData: ButtonStyleData(
+                                                                                  height: 38,
+                                                                                  decoration: BoxDecoration(
+                                                                                    borderRadius: BorderRadius.circular(12),
+                                                                                    border: Border.all(width: 0.5, color: ColorsProvider.getColor2(context)),
+                                                                                  ),
+                                                                                  overlayColor: WidgetStatePropertyAll(Colors.transparent),
+                                                                                ),
+                                                                                value: exerciseData[itemIndex].difficulty ?? null,
+                                                                                onChanged: (int? value) async {
+                                                                                  exerciseDataMap[exerciseId]![itemIndex].difficulty = value!;
+                                                                                  context.read<FitnessBloc>().add(UpdateExerciseData(exerciseDataMap));
+                                                                                  exerciseData[itemIndex].difficulty = value;
+                                                                                  // difficultyController[itemIndex] = value ?? 0;
+                                                                                  // for (int i = 0; i < tempExerciseData.length; i++) {
+                                                                                  //   if (tempExerciseData[i].supabaseIdExData == exerciseData[itemIndex].supabaseIdExData) {
+                                                                                  //     tempDifficultyController[i] = value ?? 0;
+                                                                                  //   }
+                                                                                  // }
+                                                                                  // await saveToDatabase();
+                                                                                  // loadData(true);
+                                                                                },
+                                                                                items: List.generate(
+                                                                                  5,
+                                                                                  (index) {
+                                                                                    int difficulty = index + 1; // Začíná od 1 místo 0
+                                                                                    return DropdownMenuItem<int>(
+                                                                                      value: difficulty,
+                                                                                      alignment: Alignment.center,
+                                                                                      child: Text(
+                                                                                        difficulty.toString(),
+                                                                                        style: TextStyle(
+                                                                                          fontSize: 16,
+                                                                                          fontWeight: FontWeight.bold,
+                                                                                          color: difficulty == 0
+                                                                                              ? Colors.white
+                                                                                              : difficulty == 1
+                                                                                                  ? Colors.green
+                                                                                                  : difficulty == 2
+                                                                                                      ? Colors.lightGreen
+                                                                                                      : difficulty == 3
+                                                                                                          ? Colors.yellow
+                                                                                                          : difficulty == 4
+                                                                                                              ? Colors.orange
+                                                                                                              : ColorsProvider.color_9,
+                                                                                        ),
+                                                                                        overflow: TextOverflow.ellipsis,
+                                                                                      ),
+                                                                                    );
+                                                                                  },
+                                                                                ).toList(),
+                                                                              ),
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                        // Container(
+                                                                        //   width: 50,
+                                                                        //   child: Text("Normal"),
+                                                                        // ),
+                                                                      ],
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+
+                                                            // Container(
+                                                            //   color: Colors.blue,
+                                                            //   height: 25,
+                                                            // )
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                        CommnentBox(context, widget.exercise),
+                                        SizedBox(
+                                          height: 100,
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    _dragableScrollableSheet(_sheet, widget.exercise, splitStartedCompletedMap, oldExerciseDataMap),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+      return Container();
+    });
+  }
+}
+
+Widget CommnentBox(BuildContext context, Exercise exercise) {
+  return Padding(
+    padding: const EdgeInsets.all(8.0),
+    child: ConstrainedBox(
+      constraints: BoxConstraints(
+        maxHeight: 200,
+        minHeight: 50,
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          // color: Colors.amber,
+          borderRadius: zaobleni,
+          border: Border.all(
+            width: 2,
+            color: ColorsProvider.getColor2(
+              context,
+            ),
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
+          child: TextField(
+            controller: TextEditingController(text: exercise.comment),
+            onTapOutside: (event) async {
+              print("tapoutside*******************");
+
+              context.read<FitnessBloc>().add(UpdateExerciseMap(exercise));
+
+              // await saveToDatabase();
+              // await loadData(false);
+              // loadData();
+            },
+            onChanged: (value) async {
+              exercise.comment = value;
+
+              // late int action;
+              // switch (commentAction) {
+              //   case 0:
+              //     action = 2;
+              //     break;
+              //   case 1:
+              //     action = 1;
+              //     break;
+              //   case 2:
+              //     action = 2;
+              //     break;
+              //   case 3:
+              //     action = 3;
+              //     break;
+              //   case 4:
+              //     action = 4;
+              //     break;
+              //   default:
+              // }
+              // await dbFitness.UpdateExerciseComment(value.trim(), supabaseIdExercise, action);
+            },
+            cursorColor: ColorsProvider.getColor2(context),
+            maxLines: null,
+            minLines: 1,
+            decoration: InputDecoration(
+              hintText: "${"enter_exercise_description".tr()}...",
+              border: InputBorder.none, // Odstranění spodního borderu
+              enabledBorder: InputBorder.none, // Odstranění borderu při aktivaci
+              focusedBorder: InputBorder.none, // Odstranění borderu při focusu
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+Widget header(BuildContext context, Exercise exercise) {
+  return Row(
+    children: [
+      Padding(
+        padding: const EdgeInsets.only(left: 10),
+        child: IconButton(
+          icon: Icon(
+            Icons.arrow_back,
+            color: ColorsProvider.getColor2(context),
+          ), // Ikona zpětné šipky
+          onPressed: () async {
+            Navigator.of(context).pop(true);
+          },
+        ),
+      ),
+      Expanded(
+        child: Text(
+          textAlign: TextAlign.center,
+          '${exercise.nameOfExercise!.trim()}',
+          softWrap: true,
+          overflow: TextOverflow.visible,
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: ColorsProvider.getColor2(context),
+          ),
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.only(right: 10),
+        child: Opacity(
+          opacity: 0,
+          child: IgnorePointer(
+            ignoring: true,
+            child: IconButton(
+              icon: Icon(
+                Icons.arrow_back,
+                color: Colors.transparent,
+              ), // Ikona zpětné šipky
+              onPressed: () async {},
+            ),
+          ),
+        ),
+      ),
+    ],
+  );
+}
+
+Widget _dragableScrollableSheet(Key _sheet, Exercise exercise, Map<int, List<SplitStartedCompleted>>? splitStartedCompletedMap, Map<int, Map<int, List<ExerciseData>>>? oldExerciseDataMap) {
+  DraggableScrollableController _controller = DraggableScrollableController();
+  int exerciseId = exercise.supabaseIdExercise!;
+  return DraggableScrollableSheet(
+    key: _sheet,
+    // shouldCloseOnMinExtent: false,
+    initialChildSize: 0.1,
+    maxChildSize: 0.6,
+    minChildSize: 0.1,
+    snapAnimationDuration: Duration(milliseconds: 100),
+    expand: true,
+    snap: false,
+    snapSizes: [
+      0.1,
+      0.6,
+    ],
+    controller: _controller,
+    builder: (context, scrollController) {
+      return Stack(
+        children: [
+          DecoratedBox(
+            decoration: BoxDecoration(
+              color: colorBlack,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(25),
+                topRight: Radius.circular(25),
+              ),
+            ),
+            child: CustomScrollView(
+              controller: scrollController,
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Container(
+                    height: 90,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 20, right: 20),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'swipe_up'.tr(),
+                            style: TextStyle(
+                              color: ColorsProvider.getColor2(context),
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Icon(
+                            Icons.arrow_upward_rounded,
+                            size: 25,
+                            color: ColorsProvider.getColor2(context),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                SliverList.list(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "old values".toUpperCase(),
+                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 20),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                splitStartedCompletedMap == null
+                    ? SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          childCount: 0,
+                          (context, index) => Container(),
+                        ),
+                      )
+                    : SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          childCount: splitStartedCompletedMap[exerciseId] != null ? splitStartedCompletedMap[exerciseId]!.length : 0,
+                          (BuildContext context, int splitStartedindex) {
+                            int splitStartedCompletedIndex = splitStartedCompletedMap[exerciseId]![splitStartedindex].supabaseIdStartedCompleted!;
+                            String? rawDate = splitStartedCompletedMap[exerciseId]![splitStartedindex].createdAt!.substring(0, 25 - 15);
+                            DateTime dateTime = DateTime.parse(rawDate);
+                            DateFormat formatter = DateFormat('dd.MM.yyyy');
+                            String date = formatter.format(dateTime);
+                            // splitStartedCompletedMap[exerciseId]![splitStartedindex].ended.toString();
+
+                            if (splitStartedCompletedMap[exerciseId]![splitStartedindex].ended == false) {
+                              return Container(
+                                height: 0,
+                              );
+                            }
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Container(
+                                height: 135,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: ColorsProvider.getColor2(context),
+                                ),
+                                child: Column(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                        top: 5,
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            "$date",
+                                            style: TextStyle(color: ColorsProvider.getColor8(context), fontWeight: FontWeight.bold, fontSize: 20),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(left: 5, right: 5, top: 5, bottom: 5),
+                                        child: Container(
+                                          decoration: BoxDecoration(color: Color.fromARGB(135, 0, 0, 0), borderRadius: BorderRadius.circular(12)),
+                                          child: Row(
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.only(left: 5, right: 5, bottom: 2),
+                                                child: Container(
+                                                  // width: 75,
+                                                  child: Column(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                    children: [
+                                                      Text(
+                                                        "set".tr(),
+                                                        style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
+                                                      ),
+                                                      Text(
+                                                        "exercise_weight".tr(),
+                                                        style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
+                                                      ),
+                                                      Text(
+                                                        "reps".tr(),
+                                                        style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
+                                                      ),
+                                                      SizedBox(
+                                                        height: 2,
+                                                      )
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                              Container(
+                                                width: 1,
+                                                color: ColorsProvider.getColor8(context),
+                                              ),
+                                              Expanded(
+                                                child: Padding(
+                                                  padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
+                                                  child: Container(
+                                                    child: ListView.builder(
+                                                      itemCount: oldExerciseDataMap![splitStartedCompletedIndex] != null ? oldExerciseDataMap[splitStartedCompletedIndex]![exerciseId]!.length : 0,
+                                                      scrollDirection: Axis.horizontal,
+                                                      itemBuilder: (context, index) {
+                                                        var data = oldExerciseDataMap[splitStartedCompletedIndex]![exerciseId]![index];
+                                                        int? reps;
+                                                        int? weight;
+                                                        int? difficulty;
+                                                        // if (DateTime.now().toString().replaceRange(10, null, '') == splits[selectedSplit].selectedMuscle![muscleIndex].muscles.exercises![exerciseIndex].exerciseData![index].time!.replaceRange(10, null, '')) {
+                                                        reps = data.reps ?? 0;
+                                                        weight = data.weight ?? 0;
+                                                        difficulty = data.difficulty ?? 0;
+                                                        // } else {}
+                                                        return Padding(
+                                                          padding: const EdgeInsets.only(left: 5, right: 2, bottom: 2),
+                                                          child: Container(
+                                                            width: 30,
+                                                            child: Column(
+                                                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                              children: [
+                                                                Text(
+                                                                  "${index + 1}",
+                                                                  style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
+                                                                ),
+                                                                Text(
+                                                                  "${weight ?? "-"}",
+                                                                  style: TextStyle(
+                                                                    fontWeight: FontWeight.bold,
+                                                                    fontSize: 16,
+                                                                    color: difficulty == 0
+                                                                        ? Colors.white
+                                                                        : difficulty == 1
+                                                                            ? Colors.green
+                                                                            : difficulty == 2
+                                                                                ? Colors.lightGreen
+                                                                                : difficulty == 3
+                                                                                    ? Colors.yellow
+                                                                                    : difficulty == 4
+                                                                                        ? Colors.orange
+                                                                                        : ColorsProvider.color_9,
+                                                                  ),
+                                                                ),
+                                                                Text(
+                                                                  "${reps ?? "-"}",
+                                                                  style: TextStyle(
+                                                                    fontWeight: FontWeight.bold,
+                                                                    fontSize: 16,
+                                                                    color: difficulty == 0
+                                                                        ? Colors.white
+                                                                        : difficulty == 1
+                                                                            ? Colors.green
+                                                                            : difficulty == 2
+                                                                                ? Colors.lightGreen
+                                                                                : difficulty == 3
+                                                                                    ? Colors.yellow
+                                                                                    : difficulty == 4
+                                                                                        ? Colors.orange
+                                                                                        : ColorsProvider.color_9,
+                                                                  ),
+                                                                ),
+                                                                SizedBox(
+                                                                  height: 2,
+                                                                )
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        );
+                                                      },
+                                                    ),
+                                                  ),
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      )
+              ],
+            ),
+          ),
+          Positioned(
+            top: 15,
+            left: 0,
+            right: 20,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                BlocBuilder<FitnessBloc, FitnessState>(
+                  builder: (context, state) {
+                    if (state is FitnessLoaded) {
+                      return GestureDetector(
+                        onTap: () async {
+                          // addExerciseData();
+                          context.read<FitnessBloc>().add(CreateExerciseData(exercise));
+                          // setState(() {});
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            // borderRadius: BorderRadius.circular(50),
+                            shape: BoxShape.circle,
+                            color: ColorsProvider.getColor8(context),
+                          ),
+                          child: Icon(
+                            Icons.add_circle_outline_outlined,
+                            color: ColorsProvider.getColor2(context),
+                            size: 50,
+                          ),
+                        ),
+                      );
+                    }
+                    return Container();
+                  },
+                ),
+              ],
+            ),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+class CustomInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+    final String newText = newValue.text;
+
+    // Povolený regex pro formát: buď prázdný řetězec, nebo "-" následované 1-3 číslicemi, nebo 1-3 číslice.
+    final RegExp regExp = RegExp(r'^-?\d{0,3}$');
+
+    if (regExp.hasMatch(newText)) {
+      return newValue;
+    } else {
+      return oldValue;
+    }
+  }
+}
+
+Widget categoryRow() {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    children: [
+      Container(
+        width: 40,
+        child: Center(
+          child: Text(
+            "set".tr(),
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
+      ),
+      Container(
+        width: 70,
+        child: Center(
+          child: Text(
+            "exercise_weight".tr(),
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
+      ),
+      Container(
+        width: 70,
+        child: Center(
+          child: Text(
+            "reps".tr(),
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
+      ),
+      Container(
+        width: 70,
+        child: Center(
+          child: Text(
+            "difficulty".tr(),
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
+      ),
+      // Container(
+      //   width: 50,
+      //   child: Center(
+      //     child: Text(
+      //       "Special",
+      //       style: TextStyle(fontWeight: FontWeight.bold),
+      //     ),
+      //   ),
+      // ),
+    ],
+  );
+}
+
+extension TextEditingControllerExt on TextEditingController {
+  void selectAll() {
+    if (text.isEmpty) return;
+    selection = TextSelection(baseOffset: 0, extentOffset: text.length);
+  }
+}
