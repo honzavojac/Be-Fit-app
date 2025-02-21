@@ -1,7 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:kaloricke_tabulky_02/bloc/fitness_event.dart';
-import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
 import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:provider/provider.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
@@ -29,7 +28,6 @@ class _TestNewMuscleState extends State<TestNewMuscle> {
 
   @override
   Widget build(BuildContext context) {
-    var dbFitness = Provider.of<FitnessProvider>(context);
     Provider.of<SupabaseProvider>(context);
 
     return AlertDialog(
@@ -123,7 +121,7 @@ class _TestNewMuscleState extends State<TestNewMuscle> {
                   child: TextButton(
                     onPressed: () async {
                       if (textController.text.isNotEmpty) {
-                        context.read<FitnessBloc>().add(AddNewMuscle(textController.text));
+                        context.read<FitnessBloc>().add(AddNewMuscleBloc(textController.text));
 
                         Navigator.of(context).pop();
                       } else {

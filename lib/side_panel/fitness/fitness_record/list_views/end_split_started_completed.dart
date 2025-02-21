@@ -54,7 +54,7 @@ Widget endSplitStartedCompleted(BuildContext context) {
                               GestureDetector(
                                 onTap: () {
                                   //yes
-                                  context.read<FitnessBloc>().add(UpdateSplitStartedCompleted(null, true));
+                                  context.read<FitnessBloc>().add(UpdateSplitStartedCompletedBloc(null, true));
                                   Navigator.of(context).pop();
                                 },
                                 child: Container(

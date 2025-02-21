@@ -112,7 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
     var dbFitness = Provider.of<FitnessProvider>(context, listen: false);
     var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false);
 
-    dbFitness.SaveToSupabaseAndOrderSqlite(dbSupabase);
+    dbFitness.SaveToSupabaseAndOrderSqlite(dbSupabase, context);
     load();
   }
 

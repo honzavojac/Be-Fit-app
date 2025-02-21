@@ -1,6 +1,7 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
 import 'package:kaloricke_tabulky_02/init_page.dart';
 import 'package:kaloricke_tabulky_02/login_supabase/splash_page.dart';
@@ -78,7 +79,7 @@ class _SettingsState extends State<Settings> {
 
     data1 = await dbFitness.SyncFromSupabase(context);
     language = await _getLanguage();
-    await dbFitness.SaveToSupabaseAndOrderSqlite(dbSupabase);
+    await dbFitness.SaveToSupabaseAndOrderSqlite(dbSupabase, context);
     print("saved to supabase");
 
     setState(() {});
@@ -138,7 +139,7 @@ class _SettingsState extends State<Settings> {
       // Re-check the value of syncing
       syncing = dbFitness.checkIfSyncing();
     }
-    await dbFitness.SaveToSupabaseAndOrderSqlite(dbSupabase);
+    await dbFitness.SaveToSupabaseAndOrderSqlite(dbSupabase, context);
     print("uloženo a sjednoceny databáze");
   }
 
@@ -188,10 +189,7 @@ class _SettingsState extends State<Settings> {
                           children: [
                             Text(
                               "Deleting user data",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 35,
-                                  color: Colors.white),
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 35, color: Colors.white),
                             ),
                             // LoadingAnimationWidget.waveDots(color: Colors.white, size: 20)
                           ],
@@ -216,9 +214,9 @@ class _SettingsState extends State<Settings> {
               await dbFitness.deleteAllData();
               user = null;
               dbSupabase.clearUserData();
-              SharedPreferences preferences =
-                  await SharedPreferences.getInstance();
+              SharedPreferences preferences = await SharedPreferences.getInstance();
               await preferences.clear();
+
               _signOut();
             },
             icon: Icon(
@@ -263,14 +261,7 @@ class _SettingsState extends State<Settings> {
                         // height: 20,
                         width: 100,
                         decoration: BoxDecoration(
-                          color: locales[index]
-                                      .languageCode
-                                      .toString()
-                                      .toLowerCase() ==
-                                  language.toString().toLowerCase()
-                              ? ColorsProvider.getColor2(context)
-                              : Colors
-                                  .transparent, // Výchozí barva nebo jiná barva
+                          color: locales[index].languageCode.toString().toLowerCase() == language.toString().toLowerCase() ? ColorsProvider.getColor2(context) : Colors.transparent, // Výchozí barva nebo jiná barva
                           borderRadius: BorderRadius.circular(18),
                         ),
                         child: Padding(
@@ -331,8 +322,7 @@ class _SettingsState extends State<Settings> {
                         inactiveTrackColor: ColorsProvider.getColor8(context),
                         value: isDarkMode,
                         onChanged: (value) async {
-                          SharedPreferences prefs =
-                              await SharedPreferences.getInstance();
+                          SharedPreferences prefs = await SharedPreferences.getInstance();
                           prefs.getString('themeMode');
                           if (!isDarkMode) {
                             widget.notifyMyApp(ThemeMode.dark);
@@ -394,8 +384,7 @@ class _SettingsState extends State<Settings> {
                                 }).toList(),
                                 onChanged: (value) async {
                                   int index = appColors.indexOf(value!);
-                                  SharedPreferences prefs =
-                                      await SharedPreferences.getInstance();
+                                  SharedPreferences prefs = await SharedPreferences.getInstance();
                                   prefs.setInt('appColor', index);
 
                                   selectedAppColor = index;
@@ -403,8 +392,7 @@ class _SettingsState extends State<Settings> {
                                 },
                                 buttonStyleData: ButtonStyleData(
                                   // width: 180,
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 14),
+                                  padding: const EdgeInsets.symmetric(horizontal: 14),
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(18),
                                     border: Border.all(
@@ -414,11 +402,9 @@ class _SettingsState extends State<Settings> {
                                   ),
                                 ),
                                 iconStyleData: IconStyleData(
-                                  icon:
-                                      Icon(Icons.keyboard_arrow_down_outlined),
+                                  icon: Icon(Icons.keyboard_arrow_down_outlined),
                                   iconSize: 17,
-                                  iconEnabledColor:
-                                      ColorsProvider.getColor2(context),
+                                  iconEnabledColor: ColorsProvider.getColor2(context),
                                 ),
                                 dropdownStyleData: DropdownStyleData(
                                   maxHeight: 200,
@@ -434,8 +420,7 @@ class _SettingsState extends State<Settings> {
                                     radius: const Radius.circular(40),
                                     interactive: true,
                                     thickness: WidgetStateProperty.all(6),
-                                    thumbVisibility:
-                                        WidgetStateProperty.all(true),
+                                    thumbVisibility: WidgetStateProperty.all(true),
                                   ),
                                 ),
                                 menuItemStyleData: const MenuItemStyleData(
@@ -556,15 +541,13 @@ class _SettingsState extends State<Settings> {
                               value: country['code'],
                               child: Text(
                                 country['name']!,
-                                style: TextStyle(
-                                    color: ColorsProvider.getColor2(context)),
+                                style: TextStyle(color: ColorsProvider.getColor2(context)),
                               ),
                             );
                           }).toList(),
                           onChanged: (value) async {
                             selectedCountry = value;
-                            await dbFitness
-                                .updateUserFoodDatabaseLanguage(value!);
+                            await dbFitness.updateUserFoodDatabaseLanguage(value!);
                             user!.country = value;
                             setState(() {});
                           },
@@ -610,8 +593,7 @@ class _SettingsState extends State<Settings> {
                     ),
                     Padding(
                       padding: const EdgeInsets.only(left: 8.0),
-                      child: HelpButton(
-                          helpText: "change_food_database_help".tr()),
+                      child: HelpButton(helpText: "change_food_database_help".tr()),
                     ),
                   ],
                 ),

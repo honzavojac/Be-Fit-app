@@ -59,8 +59,8 @@ class _MyAppLifecycleListenerState extends State<MyAppLifecycleListener> with Wi
     Exercise exercise = widget.exercise;
 
     exerciseDataMap[widget.exercise.supabaseIdExercise!] = exerciseData;
-    context.read<FitnessBloc>().add(UpdateExerciseData(exerciseDataMap));
-    context.read<FitnessBloc>().add(UpdateExerciseMap(exercise));
+    context.read<FitnessBloc>().add(UpdateExerciseDataBloc(exerciseDataMap));
+    context.read<FitnessBloc>().add(UpdateExerciseMapBloc(exercise));
 
     print("data byla uložena");
   }

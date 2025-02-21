@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:diacritic/diacritic.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:kaloricke_tabulky_02/bloc/fitness_bloc.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
 import 'package:kaloricke_tabulky_02/main.dart';
 import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
@@ -11,6 +12,11 @@ import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:http/http.dart' as http;
+
+import '../../../../bloc/fitness_bloc.dart';
+import '../../../../bloc/fitness_event.dart';
+import '../../../../data_classes.dart';
+import '../../../bloc/fitness_state.dart';
 
 ///supabase je jen databáze když změním zařízení tak ať uživatel má data a načtou se mu do aplikace
 ///
@@ -534,7 +540,9 @@ class FitnessProvider extends ChangeNotifier {
     }
   }
 
-  SaveToSupabaseAndOrderSqlite(SupabaseProvider dbSupabase) async {
+  SaveToSupabaseAndOrderSqlite(SupabaseProvider dbSupabase, BuildContext context) async {
+    final bloc = context.read<FitnessBloc>();
+
     print("Začátek synchronizace");
     Stopwatch stopwatch = Stopwatch()..start();
     if (_isSyncing) {
@@ -564,8 +572,10 @@ class FitnessProvider extends ChangeNotifier {
         int? supabaseIdMuscle = await SyncSqfliteToSupabase(dbSupabase, "muscles", muscle, muscleAction);
         if (supabaseIdMuscle != null) {
           await UpdateSelectedMuscleMusclesIdMuscle(supabaseIdMuscle, muscle.supabaseIdMuscle ?? 0);
-          await UpadateExercisesMusclesIdMuscle(supabaseIdMuscle, muscle.supabaseIdMuscle ?? 0);
 
+          Muscle updatedMuscle = muscle.copyWith(supabaseIdMuscle: supabaseIdMuscle);
+          bloc.add(UpdateMuscleBloc(updatedMuscle));
+          await UpadateExercisesMusclesIdMuscle(supabaseIdMuscle, muscle.supabaseIdMuscle ?? 0);
           for (var exercise in exercises) {
             if (muscle.supabaseIdMuscle == exercise.musclesIdMuscle) {
               exercise.musclesIdMuscle = supabaseIdMuscle;
@@ -574,6 +584,8 @@ class FitnessProvider extends ChangeNotifier {
               if (supabaseIdExercise != null) {
                 await UpadateExerciseDataExercisesIdExercise(supabaseIdExercise, exercise.supabaseIdExercise ?? 0);
                 await UpadateSelectedExerciseIdExercise(supabaseIdExercise, exercise.supabaseIdExercise ?? 0);
+                Exercise updatedExercise = exercise.copyWith(supabaseIdExercise: supabaseIdExercise);
+                bloc.add(UpdateExerciseBloc(updatedExercise));
               }
             }
           }
@@ -586,14 +598,19 @@ class FitnessProvider extends ChangeNotifier {
         if (supabaseIdSplit != null) {
           await UpadateSelectedMusclesSplitIdSplit(supabaseIdSplit, split.supabaseIdSplit ?? 0);
           await UpadateSplitStartedCompletedSplitId(supabaseIdSplit, split.supabaseIdSplit ?? 0);
+          MySplit updatedSplit = split.copyWith(supabaseIdSplit: supabaseIdSplit);
+          bloc.add(UpdateSplitBloc(updatedSplit));
 
           for (var selectedMuscle in split.selectedMuscle ?? []) {
             if (split.supabaseIdSplit == selectedMuscle.splitIdSplit) {
+              final int oldSupabaseSelectedMuscleId = selectedMuscle.splitIdSplit;
               selectedMuscle.splitIdSplit = supabaseIdSplit;
               int selectedMuscleAction = selectedMuscle.action ?? 0;
               int? supabaseIdSelectedMuscle = await SyncSqfliteToSupabase(dbSupabase, "selected_muscles", selectedMuscle, selectedMuscleAction);
               if (supabaseIdSelectedMuscle != null) {
                 await UpadateSelectedExerciseIdSelectedMuscle(supabaseIdSelectedMuscle, selectedMuscle.supabaseIdSelectedMuscle ?? 0);
+                SelectedMuscle updatedSelectedMuscle = selectedMuscle.copyWith(supabaseIdSelectedMuscle: supabaseIdSelectedMuscle);
+                bloc.add(UpdateSelectedMuscleBloc(updatedSelectedMuscle, oldSupabaseSelectedMuscleId));
 
                 for (var selectedExercise in selectedMuscle.selectedExercises ?? []) {
                   if (selectedMuscle.supabaseIdSelectedMuscle == selectedExercise.idSelectedMuscle) {
@@ -1049,6 +1066,10 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     await _database.rawQuery('''UPDATE muscles SET name_of_muscle = '$text' WHERE supabase_id_muscle = $id''');
   }
 
+  NewUpdateMuscle(Muscle muscle) async {
+    await _database.rawQuery('''UPDATE muscles SET name_of_muscle = '${muscle.nameOfMuscle}' WHERE supabase_id_muscle = ${muscle.supabaseIdMuscle}''');
+  }
+
   UpdateMuscleAndSetAction(String text, int id, int action) async {
     await _database.rawQuery('''UPDATE muscles SET name_of_muscle = '$text', action = '$action' WHERE supabase_id_muscle = $id''');
   }
@@ -1162,6 +1183,10 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
 
   UpdateExercise(String nameOfExercise, int supabaseIdExercise) async {
     await _database.rawQuery('''UPDATE exercises SET name_of_exercise = '$nameOfExercise' WHERE supabase_id_exercise = $supabaseIdExercise''');
+  }
+
+  NewUpdateExercise(Exercise exercise) async {
+    await _database.rawQuery('''UPDATE exercises SET name_of_exercise = '${exercise.nameOfExercise}' WHERE supabase_id_exercise = ${exercise.supabaseIdExercise}''');
   }
 
   UpdateExerciseComment(String comment, int supabaseIdExercise, int action) async {
@@ -1417,6 +1442,10 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
 
   UpdateSplit(String nameOfSplit, int supabaseIdSplit) async {
     await _database.rawQuery('''UPDATE split SET name_split = '$nameOfSplit'WHERE supabase_id_split = $supabaseIdSplit''');
+  }
+
+  NewUpdateSplit(MySplit split) async {
+    await _database.rawQuery('''UPDATE split SET name_split = '${split.nameSplit}'WHERE supabase_id_split = ${split.supabaseIdSplit}''');
   }
 
   UpdateSplitAndSetAction(String nameOfSplit, int supabaseIdSplit, int action) async {
@@ -2413,5 +2442,68 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
 
   int selectedQuantity = 0;
 
-  transaction(Future<Null> Function(dynamic txn) param0) {}
+  // transaction(Future<Null> Function(dynamic txn) param0) {}
+
+  NewInsertMuscle(Muscle muscle) async {
+    await _database.insert(
+      'muscles',
+      muscle.toDatabase(),
+      conflictAlgorithm: ConflictAlgorithm.rollback,
+    );
+  }
+
+  NewInsertSplit(MySplit split) async {
+    await _database.insert(
+      'split',
+      split.toDatabase(),
+      conflictAlgorithm: ConflictAlgorithm.rollback,
+    );
+  }
+
+  NewInsertSelectedMuscle(SelectedMuscle selectedMuscle) async {
+    await _database.insert(
+      'selected_muscles',
+      selectedMuscle.toDatabase(),
+      conflictAlgorithm: ConflictAlgorithm.rollback,
+    );
+  }
+
+  NewInsertExercise(Exercise exercise) async {
+    await _database.insert(
+      'exercises',
+      exercise.toDatabase(),
+      conflictAlgorithm: ConflictAlgorithm.rollback,
+    );
+  }
+
+  NewInsertSelectedExercise(SelectedExercise selectedExercise) async {
+    await _database.insert(
+      'selected_exercise',
+      selectedExercise.toDatabase(),
+    );
+  }
+
+  NewDeleteSelectedExercise(SelectedExercise selectedExercise) async {
+    await _database.delete(
+      'selected_exercise',
+      where: 'supabase_id_selected_exercise = ?',
+      whereArgs: [selectedExercise.supabaseIdSelectedExercise!],
+    );
+  }
+
+  Future<void> NewUpdateSelectedExercise(SelectedExercise selectedExercise) async {
+    await _database.update(
+      'selected_exercise',
+      selectedExercise.toDatabase(),
+      where: 'supabase_id_selected_exercise = ?',
+      whereArgs: [selectedExercise.supabaseIdSelectedExercise!],
+    );
+  }
+
+  // NewInsertSelectedMuscle(SelectedMuscle selectedMuscle) async {
+  //   await _database.insert(
+  //     'selected_muscles',
+  //     selectedMuscle.toMap(),
+  //   );
+  // }
 }

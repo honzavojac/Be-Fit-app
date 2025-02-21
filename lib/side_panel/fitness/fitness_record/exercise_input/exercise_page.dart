@@ -336,7 +336,7 @@ class _ExercisePageNewState extends State<ExercisePageNew> with WidgetsBindingOb
             print("onPopInvoked**********************");
 
             exerciseDataMap[exerciseId] = exerciseData;
-            context.read<FitnessBloc>().add(UpdateExerciseData(exerciseDataMap));
+            context.read<FitnessBloc>().add(UpdateExerciseDataBloc(exerciseDataMap));
           },
           child: MyAppLifecycleListener(
             exerciseDataMap: exerciseDataMap,
@@ -457,7 +457,7 @@ class _ExercisePageNewState extends State<ExercisePageNew> with WidgetsBindingOb
                                                                                 onTapOutside: (event) async {
                                                                                   print("tapoutside*******************");
                                                                                   exerciseDataMap[exerciseId]![itemIndex].weight = int.tryParse(weigthControlers[itemIndex].text);
-                                                                                  context.read<FitnessBloc>().add(UpdateExerciseData(exerciseDataMap));
+                                                                                  context.read<FitnessBloc>().add(UpdateExerciseDataBloc(exerciseDataMap));
 
                                                                                   // await saveToDatabase();
                                                                                   // await loadData(false);
@@ -539,7 +539,7 @@ class _ExercisePageNewState extends State<ExercisePageNew> with WidgetsBindingOb
                                                                                 onTapOutside: (event) async {
                                                                                   print("tapoutside*******************");
                                                                                   exerciseDataMap[exerciseId]![itemIndex].reps = int.tryParse(repsControlers[itemIndex].text);
-                                                                                  context.read<FitnessBloc>().add(UpdateExerciseData(exerciseDataMap));
+                                                                                  context.read<FitnessBloc>().add(UpdateExerciseDataBloc(exerciseDataMap));
 
                                                                                   // await saveToDatabase();
                                                                                   // await loadData(false);
@@ -645,7 +645,7 @@ class _ExercisePageNewState extends State<ExercisePageNew> with WidgetsBindingOb
                                                                                 value: exerciseData[itemIndex].difficulty ?? null,
                                                                                 onChanged: (int? value) async {
                                                                                   exerciseDataMap[exerciseId]![itemIndex].difficulty = value!;
-                                                                                  context.read<FitnessBloc>().add(UpdateExerciseData(exerciseDataMap));
+                                                                                  context.read<FitnessBloc>().add(UpdateExerciseDataBloc(exerciseDataMap));
                                                                                   exerciseData[itemIndex].difficulty = value;
                                                                                   // difficultyController[itemIndex] = value ?? 0;
                                                                                   // for (int i = 0; i < tempExerciseData.length; i++) {
@@ -764,7 +764,7 @@ Widget CommnentBox(BuildContext context, Exercise exercise) {
             onTapOutside: (event) async {
               print("tapoutside*******************");
 
-              context.read<FitnessBloc>().add(UpdateExerciseMap(exercise));
+              context.read<FitnessBloc>().add(UpdateExerciseMapBloc(exercise));
 
               // await saveToDatabase();
               // await loadData(false);
@@ -1122,7 +1122,7 @@ Widget _dragableScrollableSheet(Key _sheet, Exercise exercise, Map<int, List<Spl
                       return GestureDetector(
                         onTap: () async {
                           // addExerciseData();
-                          context.read<FitnessBloc>().add(CreateExerciseData(exercise));
+                          context.read<FitnessBloc>().add(CreateExerciseDataBloc(exercise));
                           // setState(() {});
                         },
                         child: Container(

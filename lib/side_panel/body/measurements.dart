@@ -552,7 +552,7 @@ class _MeasurementsWidgetState extends State<MeasurementsWidget> {
             thighCircumferenceTextEditingController.clear();
             neckCircumferenceTextEditingController.clear();
             bicepsCircumferenceTextEditingController.clear();
-            await dbFitness.SaveToSupabaseAndOrderSqlite(dbSupabase);
+            await dbFitness.SaveToSupabaseAndOrderSqlite(dbSupabase, context);
           } else {
             showTopSnackBar(
               Overlay.of(context),

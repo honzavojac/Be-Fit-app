@@ -186,7 +186,7 @@ class _TestNewSplitState extends State<TestNewSplit> {
                                     selectedMuscles.add(muscles[i]);
                                   }
                                 }
-                                context.read<FitnessBloc>().add(AddNewSplit(_textController.text, selectedMuscles));
+                                context.read<FitnessBloc>().add(AddNewSplitBloc(_textController.text, selectedMuscles));
 
                                 Navigator.of(context).pop();
                               } else {

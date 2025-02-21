@@ -53,6 +53,31 @@ class Muscle {
     };
   }
 
+  Map<String, dynamic> toDatabase() {
+    return {
+      'id_muscle': idMuscle,
+      'supabase_id_muscle': supabaseIdMuscle,
+      'name_of_muscle': nameOfMuscle,
+      'action': action,
+    };
+  }
+
+  Muscle copyWith({
+    int? idMuscle,
+    String? nameOfMuscle,
+    int? action,
+    int? supabaseIdMuscle,
+    List<Exercise>? exercises,
+  }) {
+    return Muscle(
+      idMuscle: idMuscle ?? this.idMuscle,
+      nameOfMuscle: nameOfMuscle ?? this.nameOfMuscle,
+      action: action ?? this.action,
+      supabaseIdMuscle: supabaseIdMuscle ?? this.supabaseIdMuscle,
+      exercises: exercises ?? this.exercises,
+    );
+  }
+
   printMuscle() {
     print(
       "id_muscle: $idMuscle  *** supabase_id_muscle: $supabaseIdMuscle *** action: $action *** name_of_muscle: $nameOfMuscle",
@@ -120,6 +145,39 @@ class Exercise {
       // 'action': action,
       // 'users_id_user': idUser,
     };
+  }
+
+  Map<String, dynamic> toDatabase() {
+    return {
+      'id_exercise': idExercise,
+      'supabase_id_exercise': supabaseIdExercise,
+      'muscles_id_muscle': musclesIdMuscle,
+      'name_of_exercise': nameOfExercise,
+      'comment': comment,
+      'action': action,
+    };
+  }
+
+  Exercise copyWith({
+    int? idExercise,
+    String? nameOfExercise,
+    int? musclesIdMuscle,
+    int? supabaseIdExercise,
+    int? action,
+    int? idUser,
+    String? comment,
+    List<ExerciseData>? exerciseData,
+  }) {
+    return Exercise(
+      idExercise: idExercise ?? this.idExercise,
+      nameOfExercise: nameOfExercise ?? this.nameOfExercise,
+      musclesIdMuscle: musclesIdMuscle ?? this.musclesIdMuscle,
+      supabaseIdExercise: supabaseIdExercise ?? this.supabaseIdExercise,
+      action: action ?? this.action,
+      idUser: idUser ?? this.idUser,
+      comment: comment ?? this.comment,
+      exerciseData: exerciseData ?? this.exerciseData,
+    );
   }
 
   printComment() {
@@ -205,6 +263,40 @@ class ExerciseData {
       data['id_ex_data'] = idExData;
     }
     return data;
+  }
+
+  ExerciseData copyWith({
+    int? idExData,
+    int? weight,
+    int? reps,
+    int? difficulty,
+    String? technique,
+    String? comment,
+    String? time,
+    int? exercisesIdExercise,
+    int? idStartedCompleted,
+    int? supabaseIdExData,
+    int? action,
+    int? id,
+    int? operation,
+    int? idUser,
+  }) {
+    return ExerciseData(
+      idExData: idExData ?? this.idExData,
+      weight: weight ?? this.weight,
+      reps: reps ?? this.reps,
+      difficulty: difficulty ?? this.difficulty,
+      technique: technique ?? this.technique,
+      comment: comment ?? this.comment,
+      time: time ?? this.time,
+      exercisesIdExercise: exercisesIdExercise ?? this.exercisesIdExercise,
+      idStartedCompleted: idStartedCompleted ?? this.idStartedCompleted,
+      supabaseIdExData: supabaseIdExData ?? this.supabaseIdExData,
+      action: action ?? this.action,
+      // id: id ?? this.id,
+      operation: operation ?? this.operation,
+      idUser: idUser ?? this.idUser,
+    );
   }
 
   // Static method to increment the counter and return the new value
@@ -299,6 +391,43 @@ class MySplit {
     };
   }
 
+  Map<String, dynamic> toDatabase() {
+    DateTime date = DateTime.now();
+    String formattedDate = DateFormat('yyyy:MM:dd').format(date);
+    return {
+      'id_split': idSplit,
+      'supabase_id_split': supabaseIdSplit,
+      'name_split': nameSplit,
+      'created_at': createdAt ?? formattedDate,
+      'is_active': isActive == true ? 1 : 0,
+      'action': action,
+    };
+  }
+
+  MySplit copyWith({
+    int? idSplit,
+    String? nameSplit,
+    String? createdAt,
+    int? supabaseIdSplit,
+    int? action,
+    List<SelectedMuscle>? selectedMuscle,
+    List<SplitStartedCompleted>? splitStartedCompleted,
+    int? idUser,
+    bool? isActive,
+  }) {
+    return MySplit(
+      idSplit: idSplit ?? this.idSplit,
+      nameSplit: nameSplit ?? this.nameSplit,
+      createdAt: createdAt ?? this.createdAt,
+      supabaseIdSplit: supabaseIdSplit ?? this.supabaseIdSplit,
+      action: action ?? this.action,
+      selectedMuscle: selectedMuscle ?? this.selectedMuscle,
+      splitStartedCompleted: splitStartedCompleted ?? this.splitStartedCompleted,
+      idUser: idUser ?? this.idUser,
+      isActive: isActive ?? this.isActive,
+    );
+  }
+
   printSplit() {
     print("id_split: $idSplit *** is_active: $isActive *** name_split: $nameSplit *** created_at: $createdAt ***  action: $action *** supabase_id_split: $supabaseIdSplit *** selected_muscles: $selectedMuscle");
   }
@@ -369,6 +498,38 @@ class SelectedMuscle {
     };
   }
 
+  Map<String, dynamic> toDatabase() {
+    return {
+      'id_selected_muscle': idSelectedMuscle,
+      'supabase_id_selected_muscle': supabaseIdSelectedMuscle,
+      'split_id_split': splitIdSplit,
+      'muscles_id_muscle': musclesIdMuscle,
+      'action': action,
+    };
+  }
+
+  SelectedMuscle copyWith({
+    int? idSelectedMuscle,
+    int? splitIdSplit,
+    int? musclesIdMuscle,
+    int? supabaseIdSelectedMuscle,
+    int? action,
+    Muscle? muscles,
+    List<SelectedExercise>? selectedExercises,
+    int? idUser,
+  }) {
+    return SelectedMuscle(
+      idSelectedMuscle: idSelectedMuscle ?? this.idSelectedMuscle,
+      splitIdSplit: splitIdSplit ?? this.splitIdSplit,
+      musclesIdMuscle: musclesIdMuscle ?? this.musclesIdMuscle,
+      supabaseIdSelectedMuscle: supabaseIdSelectedMuscle ?? this.supabaseIdSelectedMuscle,
+      action: action ?? this.action,
+      muscles: muscles ?? this.muscles,
+      selectedExercises: selectedExercises ?? this.selectedExercises,
+      idUser: idUser ?? this.idUser,
+    );
+  }
+
   printSelectedMuscle() {
     print("id_selected_muscle: $idSelectedMuscle *** split_id_split: $splitIdSplit *** muscles_id_muscle: $musclesIdMuscle *** supabase_id_muscle: $supabaseIdSelectedMuscle *** action: $action *** muscles: $muscles ");
   }
@@ -428,6 +589,36 @@ class SelectedExercise {
       // 'exercises': exercises!.toJson(),
       // 'users_id_user': idUser,
     };
+  }
+
+  Map<String, dynamic> toDatabase() {
+    return {
+      'id_selected_exercise': idSelectedExercise,
+      'supabase_id_selected_exercise': supabaseIdSelectedExercise,
+      'id_exercise': idExercise,
+      'id_selected_muscle': idSelectedMuscle,
+      'action': action,
+    };
+  }
+
+  SelectedExercise copyWith({
+    int? idSelectedExercise,
+    int? idExercise,
+    int? idSelectedMuscle,
+    int? supabaseIdSelectedExercise,
+    int? action,
+    Exercise? exercises,
+    int? idUser,
+  }) {
+    return SelectedExercise(
+      idSelectedExercise: idSelectedExercise ?? this.idSelectedExercise,
+      idExercise: idExercise ?? this.idExercise,
+      idSelectedMuscle: idSelectedMuscle ?? this.idSelectedMuscle,
+      supabaseIdSelectedExercise: supabaseIdSelectedExercise ?? this.supabaseIdSelectedExercise,
+      action: action ?? this.action,
+      exercises: exercises ?? this.exercises,
+      idUser: idUser ?? this.idUser,
+    );
   }
 
   printSelectedExercise() {
@@ -516,6 +707,36 @@ class SplitStartedCompleted {
     };
   }
 
+  SplitStartedCompleted copyWith({
+    int? idStartedCompleted,
+    String? createdAt,
+    int? splitId,
+    String? endedAt,
+    bool? ended,
+    int? supabaseIdStartedCompleted,
+    int? action,
+    List<ExerciseData>? exerciseData,
+    int? idUser,
+    String? name,
+    int? numberOfSets,
+    int? totalWorkVolume,
+  }) {
+    return SplitStartedCompleted(
+      idStartedCompleted: idStartedCompleted ?? this.idStartedCompleted,
+      createdAt: createdAt ?? this.createdAt,
+      splitId: splitId ?? this.splitId,
+      endedAt: endedAt ?? this.endedAt,
+      ended: ended ?? this.ended,
+      supabaseIdStartedCompleted: supabaseIdStartedCompleted ?? this.supabaseIdStartedCompleted,
+      action: action ?? this.action,
+      exerciseData: exerciseData ?? this.exerciseData,
+      idUser: idUser ?? this.idUser,
+      name: name ?? this.name,
+      numberOfSets: numberOfSets ?? this.numberOfSets,
+      totalWorkVolume: totalWorkVolume ?? this.totalWorkVolume,
+    );
+  }
+
   printSplitStartedCompleted() {
     print(
       "id_started_completed: $idStartedCompleted *** created_at: $createdAt *** split_id: $splitId *** ended_at: $endedAt *** ended: $ended *** supabase_is_started_completed: $supabaseIdStartedCompleted *** action: $action *** exercise_data: $exerciseData",
@@ -576,6 +797,28 @@ class UserSupabase {
       'muscles': muscles?.map((e) => e.toJson()).toList(), // Convert each Muscle to JSON
       'split': split?.map((e) => e.toJson()).toList(), // Convert each MySplit to JSON
     };
+  }
+
+  UserSupabase copyWith({
+    int? idUser,
+    String? name,
+    String? email,
+    String? dateOfBirth,
+    String? country,
+    int? action,
+    List<Muscle>? muscles,
+    List<MySplit>? split,
+  }) {
+    return UserSupabase(
+      idUser: idUser ?? this.idUser,
+      name: name ?? this.name,
+      email: email ?? this.email,
+      dateOfBirth: dateOfBirth ?? this.dateOfBirth,
+      country: country ?? this.country,
+      action: action ?? this.action,
+      muscles: muscles ?? this.muscles,
+      split: split ?? this.split,
+    );
   }
 }
 
@@ -656,6 +899,36 @@ class Measurements {
       'supabase_id_body_measurements': supabaseIdBodyMeasurements,
       'action': action,
     };
+  }
+
+  Measurements copyWith({
+    int? idBodyMeasurements,
+    double? weight,
+    int? height,
+    double? abdominalCircumference,
+    double? chestCircumference,
+    double? waistCircumference,
+    double? thighCircumference,
+    double? neckCircumference,
+    double? bicepsCircumference,
+    String? createdAt,
+    int? supabaseIdBodyMeasurements,
+    int? action,
+  }) {
+    return Measurements(
+      idBodyMeasurements: idBodyMeasurements ?? this.idBodyMeasurements,
+      weight: weight ?? this.weight,
+      height: height ?? this.height,
+      abdominalCircumference: abdominalCircumference ?? this.abdominalCircumference,
+      chestCircumference: chestCircumference ?? this.chestCircumference,
+      waistCircumference: waistCircumference ?? this.waistCircumference,
+      thighCircumference: thighCircumference ?? this.thighCircumference,
+      neckCircumference: neckCircumference ?? this.neckCircumference,
+      bicepsCircumference: bicepsCircumference ?? this.bicepsCircumference,
+      createdAt: createdAt ?? this.createdAt,
+      supabaseIdBodyMeasurements: supabaseIdBodyMeasurements ?? this.supabaseIdBodyMeasurements,
+      action: action ?? this.action,
+    );
   }
 }
 
@@ -767,6 +1040,64 @@ class Food {
       'inserted_by_id_user': insertedByIdUser,
       'has_multiple_ingredients': hasMultipleIngredients,
     };
+  }
+
+  Food copyWith({
+    int? idFood,
+    String? country,
+    String? name,
+    String? unaccentName,
+    String? recentlyUsed,
+    int? weight,
+    String? quantity,
+    double? kcal,
+    double? protein,
+    double? carbs,
+    double? sugar,
+    double? fat,
+    double? fatSatureated,
+    double? fatTrans,
+    double? fatMonounsatureted,
+    double? fatPolyunsatureted,
+    double? fiber,
+    double? water,
+    double? cholesterol,
+    int? intakeCategory,
+    int? supabaseIdFood,
+    int? action,
+    String? createdAt,
+    int? idNutriIntake,
+    int? insertedByIdUser,
+    var hasMultipleIngredients,
+  }) {
+    return Food(
+      idFood: idFood ?? this.idFood,
+      country: country ?? this.country,
+      name: name ?? this.name,
+      unaccentName: unaccentName ?? this.unaccentName,
+      recentlyUsed: recentlyUsed ?? this.recentlyUsed,
+      weight: weight ?? this.weight,
+      quantity: quantity ?? this.quantity,
+      kcal: kcal ?? this.kcal,
+      protein: protein ?? this.protein,
+      carbs: carbs ?? this.carbs,
+      sugar: sugar ?? this.sugar,
+      fat: fat ?? this.fat,
+      fatSatureated: fatSatureated ?? this.fatSatureated,
+      fatTrans: fatTrans ?? this.fatTrans,
+      fatMonounsatureted: fatMonounsatureted ?? this.fatMonounsatureted,
+      fatPolyunsatureted: fatPolyunsatureted ?? this.fatPolyunsatureted,
+      fiber: fiber ?? this.fiber,
+      water: water ?? this.water,
+      cholesterol: cholesterol ?? this.cholesterol,
+      intakeCategory: intakeCategory ?? this.intakeCategory,
+      supabaseIdFood: supabaseIdFood ?? this.supabaseIdFood,
+      action: action ?? this.action,
+      createdAt: createdAt ?? this.createdAt,
+      idNutriIntake: idNutriIntake ?? this.idNutriIntake,
+      insertedByIdUser: insertedByIdUser ?? this.insertedByIdUser,
+      hasMultipleIngredients: hasMultipleIngredients ?? this.hasMultipleIngredients,
+    );
   }
 
   @override

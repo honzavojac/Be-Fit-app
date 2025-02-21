@@ -103,7 +103,7 @@ void main() async {
           //   create: (context) => FitnessBloc(),
           // ),
           BlocProvider<FitnessBloc>(
-            create: (_) => FitnessBloc()..add(LoadFitnessData()),
+            create: (_) => FitnessBloc(dbFitness)..add(LoadFitnessData()),
           )
         ], child: MyApp()),
       ),

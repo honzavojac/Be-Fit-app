@@ -3,15 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kaloricke_tabulky_02/bloc/fitness_bloc.dart';
 import 'package:kaloricke_tabulky_02/bloc/fitness_state.dart';
 import 'package:kaloricke_tabulky_02/data_classes.dart';
-import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
-import 'package:provider/provider.dart';
 
 import '../../../bloc/fitness_event.dart';
 import '../../../init_page.dart';
 import '../../../pages/fitnessRecord/split_page copy 3.dart';
 import '../../../providers/colors_provider.dart';
-import '../../../providers/variables_provider.dart';
-import '../../../supabase/supabase.dart';
 import '../../../variables.dart';
 
 import 'package:dropdown_button2/dropdown_button2.dart';
@@ -232,7 +228,7 @@ class FitnessRecordDropdownState extends State<FitnessRecordDropdown> {
                           onChanged: (value) {
                             int selectedSplitIndex = splits.indexWhere((split) => split.nameSplit == value);
 
-                            context.read<FitnessBloc>().add(UpdateSelectedSplitIndex(selectedSplitIndex));
+                            context.read<FitnessBloc>().add(UpdateSelectedSplitIndexBloc(selectedSplitIndex));
 
                             setState(() {});
                           },

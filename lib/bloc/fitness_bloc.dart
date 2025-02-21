@@ -1,5 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kaloricke_tabulky_02/data.dart';
+import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import '../data_classes.dart';
 import 'fitness_event.dart';
@@ -8,22 +10,29 @@ import 'package:collection/collection.dart';
 
 // BLOC
 class FitnessBloc extends Bloc<FitnessEvent, FitnessState> {
-  FitnessBloc() : super(FitnessInitial()) {
+  final FitnessProvider dbFitness;
+
+  FitnessBloc(this.dbFitness) : super(FitnessInitial()) {
     // add(LoadFitnessData());
 
-    on<LoadFitnessData>(_onLoadFitnessData);
-    on<UpdateSelectedSplitIndex>(_onUpdateSelectedSplitIndex);
-    on<UpdateSplitStartedCompleted>(_onUpdateSplitStartedCompleted);
-    on<UpdateExerciseData>(_onUpdateExerciseData);
-    on<UpdateExerciseMap>(_onUpdateExerciseMap);
-    on<CreateExerciseData>(_onCreateExerciseData);
-    on<UpdateSelectedExercise>(_onUpdateSelectedExercise);
-    on<AddNewExercise>(_onAddExercise);
-    on<AddNewSplit>(_onAddSplit);
-    on<AddNewMuscle>(_onAddMuscle);
-    on<UpdateSplit>(_onUpdateSplit);
-    on<UpdateMuscle>(_onUpdateMuscle);
-    on<UpdateExercise>(_onUpdateExercise);
+    on<LoadFitnessData>(_onLoadFitnessData); // Příklad handleru v BLoC
+    on<LogoutEventBloc>((event, emit) {
+      emit(FitnessInitial());
+    });
+
+    on<UpdateSelectedSplitIndexBloc>(_onUpdateSelectedSplitIndex);
+    on<UpdateSplitStartedCompletedBloc>(_onUpdateSplitStartedCompleted);
+    on<UpdateExerciseDataBloc>(_onUpdateExerciseData);
+    on<UpdateExerciseMapBloc>(_onUpdateExerciseMap);
+    on<CreateExerciseDataBloc>(_onCreateExerciseData);
+    on<UpdateSelectedExerciseBloc>(_onUpdateSelectedExercise);
+    on<AddNewExerciseBloc>(_onAddExercise);
+    on<AddNewSplitBloc>(_onAddSplit);
+    on<AddNewMuscleBloc>(_onAddMuscle);
+    on<UpdateSplitBloc>(_onUpdateSplit);
+    on<UpdateMuscleBloc>(_onUpdateMuscle);
+    on<UpdateExerciseBloc>(_onUpdateExercise);
+    on<UpdateSelectedMuscleBloc>(_onUpdateSelectedMuscle);
   }
 
   Future<FitnessLoaded> fetchFitnessData() async {
@@ -84,14 +93,14 @@ class FitnessBloc extends Bloc<FitnessEvent, FitnessState> {
     emit(fitnessData);
   }
 
-  void _onUpdateSelectedSplitIndex(UpdateSelectedSplitIndex event, Emitter<FitnessState> emit) {
+  void _onUpdateSelectedSplitIndex(UpdateSelectedSplitIndexBloc event, Emitter<FitnessState> emit) {
     if (state is FitnessLoaded) {
       final currentState = state as FitnessLoaded;
       emit(currentState.copyWith(selectedSplitIndex: event.selectedSplitIndex));
     }
   }
 
-  void _onUpdateSplitStartedCompleted(UpdateSplitStartedCompleted event, Emitter<FitnessState> emit) {
+  void _onUpdateSplitStartedCompleted(UpdateSplitStartedCompletedBloc event, Emitter<FitnessState> emit) {
     if (state is FitnessLoaded) {
       final currentState = state as FitnessLoaded;
 
@@ -132,14 +141,14 @@ class FitnessBloc extends Bloc<FitnessEvent, FitnessState> {
     return null;
   }
 
-  void _onUpdateExerciseData(UpdateExerciseData event, Emitter<FitnessState> emit) {
+  void _onUpdateExerciseData(UpdateExerciseDataBloc event, Emitter<FitnessState> emit) {
     if (state is FitnessLoaded) {
       final currentState = state as FitnessLoaded;
       emit(currentState.copyWith(exerciseDataMap: event.exerciseDataMap));
     }
   }
 
-  void _onUpdateExerciseMap(UpdateExerciseMap event, Emitter<FitnessState> emit) {
+  void _onUpdateExerciseMap(UpdateExerciseMapBloc event, Emitter<FitnessState> emit) {
     if (state is FitnessLoaded) {
       final currentState = state as FitnessLoaded;
 
@@ -154,7 +163,7 @@ class FitnessBloc extends Bloc<FitnessEvent, FitnessState> {
     }
   }
 
-  void _onCreateExerciseData(CreateExerciseData event, Emitter<FitnessState> emit) {
+  void _onCreateExerciseData(CreateExerciseDataBloc event, Emitter<FitnessState> emit) {
     if (state is! FitnessLoaded) return;
 
     final currentState = state as FitnessLoaded;
@@ -232,14 +241,13 @@ class FitnessBloc extends Bloc<FitnessEvent, FitnessState> {
     );
   }
 
-  void _onUpdateSelectedExercise(UpdateSelectedExercise event, Emitter<FitnessState> emit) {
+  Future<void> _onUpdateSelectedExercise(UpdateSelectedExerciseBloc event, Emitter<FitnessState> emit) async {
     if (state is FitnessLoaded) {
       final currentState = state as FitnessLoaded;
 
       int selectedMuscleId = event.selectedMuscleId;
       Exercise exercise = event.exercise;
       int exerciseId = exercise.supabaseIdExercise!;
-      int muscleId = exercise.musclesIdMuscle!;
       // Zkopírování mapy, aby se neaktualizoval původní stav přímo
       Map<int, List<SelectedExercise>> selectedExerciseMap = Map.from(currentState.selectedExerciseMap);
       // Map<int, List<Exercise>> muscleExerciseMap = Map.from(currentState.muscleExerciseMap);
@@ -247,31 +255,72 @@ class FitnessBloc extends Bloc<FitnessEvent, FitnessState> {
       // Pokud neexistuje seznam pro daný sval, vytvoříme ho
       selectedExerciseMap.putIfAbsent(selectedMuscleId, () => []);
       // muscleExerciseMap.putIfAbsent(muscleId, () => []);
-
       // Získání seznamu cvičení pro daný sval
       List<SelectedExercise> selectedExerciseList = List.from(selectedExerciseMap[selectedMuscleId]!);
       // List<Exercise> exerciseList = List.from(muscleExerciseMap[muscleId]!);
       // Hledání cvičení podle exerciseId
       int selectedExerciseIndex = selectedExerciseList.indexWhere((element) => element.idExercise == exerciseId);
       // int exerciseIndex = exerciseList.indexWhere((element) => element.idExercise == exerciseId);
-
       if (selectedExerciseIndex != -1) {
         // Pokud už cvičení existuje v seznamu, odstraníme ho (toggling funkce)
         print("odebrání cviku");
-        selectedExerciseList.removeAt(selectedExerciseIndex);
+        SelectedExercise selectedExercise = selectedExerciseList[selectedExerciseIndex];
+// TODO musím toto předělat i v test_split_page nebo jak se jmenuje
+
+        switch (selectedExercise.action) {
+          case 0:
+            print("update action na 3  (nezobrazuje se)");
+            //delete supabase (na 3)
+            selectedExercise.action = 3;
+            await dbFitness.NewUpdateSelectedExercise(selectedExercise);
+            break;
+          case 1:
+            print("delete v sql (nezobrazuje se)");
+            //delete sql
+            await dbFitness.NewDeleteSelectedExercise(selectedExercise);
+            selectedExerciseList.removeAt(selectedExerciseIndex);
+
+            break;
+          case 2:
+            break;
+          case 3:
+            print("update action na 0 (zobrazuje se)");
+            // update na 0
+            selectedExercise.action = 0;
+            await dbFitness.NewUpdateSelectedExercise(selectedExercise);
+
+            break;
+
+          default:
+        }
       } else {
+        List<SelectedExercise> selectedExerciseListAll = selectedExerciseMap.values.expand((list) => list).toList();
+        selectedExerciseListAll.sort(
+          (a, b) => a.idSelectedExercise!.compareTo(b.idSelectedExercise!),
+        );
+        int selectedExerciseId = 1 + (selectedExerciseListAll.isNotEmpty ? selectedExerciseListAll.last.idSelectedExercise! : 0);
+
+        selectedExerciseListAll.sort(
+          (a, b) => a.supabaseIdSelectedExercise!.compareTo(b.supabaseIdSelectedExercise!),
+        );
+        int supabaseSelectedExerciseId = 1 + (selectedExerciseListAll.isNotEmpty ? selectedExerciseListAll.last.supabaseIdSelectedExercise! : 0);
+
         // Pokud cvičení neexistuje, přidáme nové
-        print("přidání cviku");
-        selectedExerciseList.add(SelectedExercise(
+        SelectedExercise selectedExercise = SelectedExercise(
+          idSelectedExercise: selectedExerciseId,
+          supabaseIdSelectedExercise: supabaseSelectedExerciseId,
+          action: 1,
           idExercise: exerciseId,
           idSelectedMuscle: selectedMuscleId,
-        ));
+        );
+        print("přidání cviku (action 1)");
+        selectedExerciseList.add(selectedExercise);
+        await dbFitness.NewInsertSelectedExercise(selectedExercise);
       }
 
       // Aktualizace mapy
       selectedExerciseMap[selectedMuscleId] = selectedExerciseList;
       // muscleExerciseMap[muscleId] = List.from(exerciseList);
-
       emit(currentState.copyWith(
         selectedExerciseMap: selectedExerciseMap,
         // muscleExerciseMap: muscleExerciseMap,
@@ -279,22 +328,22 @@ class FitnessBloc extends Bloc<FitnessEvent, FitnessState> {
     }
   }
 
-  void _onAddExercise(AddNewExercise event, Emitter<FitnessState> emit) {
+  Future<void> _onAddExercise(AddNewExerciseBloc event, Emitter<FitnessState> emit) async {
     if (state is FitnessLoaded) {
       final currentState = state as FitnessLoaded;
       List<Exercise>? exercises = List.from(currentState.exercises);
       exercises.sort(
         (a, b) => a.idExercise!.compareTo(b.idExercise!),
       );
-      int idExercise = 1 + (exercises.last.idExercise ?? 0);
-      int supabaseIdExercise = 1 + (exercises.last.supabaseIdExercise ?? 0);
+      int idExercise = 1 + (exercises.isNotEmpty ? exercises.last.idExercise! : 0);
+      int supabaseIdExercise = 1 + (exercises.isNotEmpty ? exercises.last.supabaseIdExercise! : 0);
 
       Exercise exercise = Exercise(
         idExercise: idExercise,
         supabaseIdExercise: supabaseIdExercise,
         nameOfExercise: event.exerciseName,
         musclesIdMuscle: event.muscle.supabaseIdMuscle,
-        action: 0,
+        action: 1,
         comment: "",
       );
 
@@ -304,18 +353,22 @@ class FitnessBloc extends Bloc<FitnessEvent, FitnessState> {
       Map<int, List<Exercise>> muscleExerciseMap = Map.from(currentState.muscleExerciseMap);
       muscleExerciseMap.putIfAbsent(exercise.musclesIdMuscle!, () => []);
       muscleExerciseMap[exercise.musclesIdMuscle]!.add(exercise);
-
-      emit(
-        currentState.copyWith(
-          exercises: newExercises,
-          exerciseMap: exerciseMap,
-          muscleExerciseMap: muscleExerciseMap,
-        ),
-      );
+      try {
+        await dbFitness.NewInsertExercise(exercise);
+        emit(
+          currentState.copyWith(
+            exercises: newExercises,
+            exerciseMap: exerciseMap,
+            muscleExerciseMap: muscleExerciseMap,
+          ),
+        );
+      } on Exception catch (e) {
+        print("chyba při insert new exercise ${e}***************************************************************************************");
+      }
     }
   }
 
-  void _onAddSplit(AddNewSplit event, Emitter<FitnessState> emit) {
+  Future<void> _onAddSplit(AddNewSplitBloc event, Emitter<FitnessState> emit) async {
     if (state is FitnessLoaded) {
       final currentState = state as FitnessLoaded;
       Map<int, MySplit> splitMap = Map.from(currentState.splitMap);
@@ -333,8 +386,9 @@ class FitnessBloc extends Bloc<FitnessEvent, FitnessState> {
         nameSplit: event.nameOfSplit.trim(),
         createdAt: DateTime.now().toString(),
         isActive: true,
-        action: 0,
+        action: 1,
       );
+      await dbFitness.NewInsertSplit(split);
       splitMap.putIfAbsent(supabaseSplitId, () => split);
       splits.add(split);
       selectedMuscleMap.putIfAbsent(
@@ -357,10 +411,12 @@ class FitnessBloc extends Bloc<FitnessEvent, FitnessState> {
           supabaseIdSelectedMuscle: supabaseSelectedMuscleId,
           splitIdSplit: supabaseSplitId,
           musclesIdMuscle: muscle.supabaseIdMuscle,
+          action: 1,
         );
         selectedMuscleId++;
         supabaseSelectedMuscleId++;
         newSelectedMuscleList.add(selectedMuscle);
+        await dbFitness.NewInsertSelectedMuscle(selectedMuscle);
       }
       selectedMuscleMap[supabaseSplitId] = newSelectedMuscleList;
       emit(currentState.copyWith(
@@ -371,7 +427,7 @@ class FitnessBloc extends Bloc<FitnessEvent, FitnessState> {
     }
   }
 
-  void _onAddMuscle(AddNewMuscle event, Emitter<FitnessState> emit) {
+  Future<void> _onAddMuscle(AddNewMuscleBloc event, Emitter<FitnessState> emit) async {
     if (state is FitnessLoaded) {
       final currentState = state as FitnessLoaded;
       Map<int, Muscle> muscleMap = Map.from(currentState.muscleMap);
@@ -387,19 +443,24 @@ class FitnessBloc extends Bloc<FitnessEvent, FitnessState> {
         idMuscle: muscleId,
         supabaseIdMuscle: supabaseMuscleId,
         nameOfMuscle: event.nameOfMuscle.trim(),
-        action: 0,
+        action: 1,
       );
+
       muscles.add(newMuscle);
       muscleMap.putIfAbsent(supabaseMuscleId, () => newMuscle);
-
-      emit(currentState.copyWith(
-        muscleMap: muscleMap,
-        muscles: muscles,
-      ));
+      try {
+        await dbFitness.NewInsertMuscle(newMuscle);
+        emit(currentState.copyWith(
+          muscleMap: muscleMap,
+          muscles: muscles,
+        ));
+      } on Exception catch (e) {
+        print("chyba při insertování svalu $e");
+      }
     }
   }
 
-  void _onUpdateSplit(UpdateSplit event, Emitter<FitnessState> emit) {
+  Future<void> _onUpdateSplit(UpdateSplitBloc event, Emitter<FitnessState> emit) async {
     if (state is FitnessLoaded) {
       final currentState = state as FitnessLoaded;
       MySplit split = event.split;
@@ -407,10 +468,21 @@ class FitnessBloc extends Bloc<FitnessEvent, FitnessState> {
       int? splitIndex = splits.indexWhere(
         (element) => element.supabaseIdSplit == split.supabaseIdSplit,
       );
-      splits[splitIndex] = split;
+      splits[splitIndex >= 0 ? splitIndex : 0] = split;
 
       Map<int, MySplit> splitMap = currentState.splitMap;
       splitMap[split.supabaseIdSplit!] = split;
+      try {
+        // Předpokládám, že metoda NewUpdateExercise je asynchronní
+
+        await dbFitness.NewUpdateSplit(split);
+      } catch (e) {
+        print("Chyba při aktualizaci cvičení: $e");
+        // Můžete přidat další logiku pro chybové hlášení nebo zobrazení notifikace
+      }
+
+      print(currentState.selectedMuscleMap);
+
       emit(currentState.copyWith(
         splits: splits,
         splitMap: splitMap,
@@ -418,7 +490,7 @@ class FitnessBloc extends Bloc<FitnessEvent, FitnessState> {
     }
   }
 
-  void _onUpdateMuscle(UpdateMuscle event, Emitter<FitnessState> emit) {
+  Future<void> _onUpdateMuscle(UpdateMuscleBloc event, Emitter<FitnessState> emit) async {
     if (state is FitnessLoaded) {
       final currentState = state as FitnessLoaded;
       Muscle muscle = event.muscle;
@@ -426,19 +498,25 @@ class FitnessBloc extends Bloc<FitnessEvent, FitnessState> {
       int? muscleIndex = muscles.indexWhere(
         (element) => element.supabaseIdMuscle == muscle.supabaseIdMuscle,
       );
-      muscles[muscleIndex] = muscle;
+      muscles[muscleIndex >= 0 ? muscleIndex : 0] = muscle;
 
       Map<int, Muscle> muscleMap = currentState.muscleMap;
       muscleMap[muscle.supabaseIdMuscle!] = muscle;
-
-      emit(currentState.copyWith(
-        muscles: muscles,
-        muscleMap: muscleMap,
-      ));
+      try {
+        // Předpokládám, že metoda NewUpdateExercise je asynchronní
+        emit(currentState.copyWith(
+          muscles: muscles,
+          muscleMap: muscleMap,
+        ));
+        await dbFitness.NewUpdateMuscle(muscle);
+      } catch (e) {
+        print("Chyba při aktualizaci cvičení: $e");
+        // Můžete přidat další logiku pro chybové hlášení nebo zobrazení notifikace
+      }
     }
   }
 
-  void _onUpdateExercise(UpdateExercise event, Emitter<FitnessState> emit) {
+  Future<void> _onUpdateExercise(UpdateExerciseBloc event, Emitter<FitnessState> emit) async {
     if (state is FitnessLoaded) {
       final currentState = state as FitnessLoaded;
       Exercise exercise = event.exercise;
@@ -446,14 +524,38 @@ class FitnessBloc extends Bloc<FitnessEvent, FitnessState> {
       int? exerciseIndex = exercises.indexWhere(
         (element) => element.supabaseIdExercise == exercise.supabaseIdExercise,
       );
-      exercises[exerciseIndex] = exercise;
-
+      exercises[exerciseIndex >= 0 ? exerciseIndex : 0] = exercise;
+      print(exercise.nameOfExercise);
       Map<int, Exercise> exerciseMap = currentState.exerciseMap;
       exerciseMap[exercise.supabaseIdExercise!] = exercise;
 
+      try {
+        // Předpokládám, že metoda NewUpdateExercise je asynchronní
+        emit(currentState.copyWith(
+          exercises: exercises,
+          exerciseMap: exerciseMap,
+        ));
+        await dbFitness.NewUpdateExercise(exercise);
+      } catch (e) {
+        print("Chyba při aktualizaci cvičení: $e");
+        // Můžete přidat další logiku pro chybové hlášení nebo zobrazení notifikace
+      }
+    }
+  }
+
+  void _onUpdateSelectedMuscle(UpdateSelectedMuscleBloc event, Emitter<FitnessState> emit) {
+    if (state is FitnessLoaded) {
+      final currentState = state as FitnessLoaded;
+      final int oldSupabaseSplitId = event.oldSupabaseSplitId;
+      Map<int, List<SelectedMuscle>> selectedMuscleMap = currentState.selectedMuscleMap;
+      int newSupabaseSplitId = event.selectedMuscle.splitIdSplit!;
+      if (selectedMuscleMap.containsKey(oldSupabaseSplitId)) {
+        selectedMuscleMap.putIfAbsent(newSupabaseSplitId, () => selectedMuscleMap[oldSupabaseSplitId]!); // Přiřadíme hodnotu k novému klíči
+        selectedMuscleMap.remove(oldSupabaseSplitId); // Odstraníme starý klíč
+      }
+
       emit(currentState.copyWith(
-        exercises: exercises,
-        exerciseMap: exerciseMap,
+        selectedMuscleMap: selectedMuscleMap,
       ));
     }
   }

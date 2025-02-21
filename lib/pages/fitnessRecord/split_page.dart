@@ -53,8 +53,7 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
     if (a == 0) {
       int clickedSplitTab = dbSupabase.clickedSplitTab;
       splits = dbSupabase.splits.reversed.toList();
-      _tabController = TabController(
-          length: splits.length, vsync: this, initialIndex: clickedSplitTab);
+      _tabController = TabController(length: splits.length, vsync: this, initialIndex: clickedSplitTab);
       // _tabController.addListener(_handleTabSelection);
       dbSupabase.getAllMuscles();
       // generateIsCheckedList(context);
@@ -185,8 +184,7 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                 ),
                 Container(
                   child: IconButton(
-                    icon: Icon(Icons.add_circle_outline_outlined,
-                        color: ColorsProvider.getColor2(context), size: 35),
+                    icon: Icon(Icons.add_circle_outline_outlined, color: ColorsProvider.getColor2(context), size: 35),
                     onPressed: () {
                       dbSupabase.generateFalseMuscleCheckbox();
                       dbSupabase.getAllMuscles();
@@ -260,64 +258,43 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                                   Column(
                                     children: [
                                       Padding(
-                                        padding: const EdgeInsets.fromLTRB(
-                                            0, 0, 0, 0),
+                                        padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
                                         child: Container(
                                           height: 50,
-                                          width:
-                                              200, // Zmenšete šířku podle potřeby
+                                          width: 200, // Zmenšete šířku podle potřeby
                                           // color: Colors.blue,
                                           child: Center(
                                             child: TextField(
                                               onChanged: (value) async {
-                                                dbSupabase.clickedSplitTab =
-                                                    await _tabController.index;
-                                                upsertToMap(updateSplits,
-                                                    record.idSplit!, value);
+                                                dbSupabase.clickedSplitTab = await _tabController.index;
+                                                upsertToMap(updateSplits, record.idSplit!, value);
                                               },
-                                              controller: TextEditingController(
-                                                  text: record.nameSplit),
+                                              controller: TextEditingController(text: record.nameSplit),
                                               decoration: InputDecoration(
                                                 filled: true,
-                                                fillColor:
-                                                    ColorsProvider.getColor2(
-                                                        context),
-                                                enabledBorder:
-                                                    OutlineInputBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(12),
-                                                  borderSide: BorderSide(
-                                                      color: Colors.black,
-                                                      width: 2),
+                                                fillColor: ColorsProvider.getColor2(context),
+                                                enabledBorder: OutlineInputBorder(
+                                                  borderRadius: BorderRadius.circular(12),
+                                                  borderSide: BorderSide(color: Colors.black, width: 2),
                                                 ),
-                                                focusedBorder:
-                                                    OutlineInputBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(12),
-                                                  borderSide: BorderSide(
-                                                      color: Colors.black,
-                                                      width: 3.5),
+                                                focusedBorder: OutlineInputBorder(
+                                                  borderRadius: BorderRadius.circular(12),
+                                                  borderSide: BorderSide(color: Colors.black, width: 3.5),
                                                 ),
                                                 border: OutlineInputBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(12),
+                                                  borderRadius: BorderRadius.circular(12),
                                                 ),
-                                                contentPadding:
-                                                    EdgeInsets.symmetric(
+                                                contentPadding: EdgeInsets.symmetric(
                                                   horizontal: 20.0,
                                                 ),
                                               ),
-                                              cursorColor:
-                                                  ColorsProvider.getColor8(
-                                                      context),
+                                              cursorColor: ColorsProvider.getColor8(context),
                                               style: TextStyle(
-                                                color: ColorsProvider.getColor8(
-                                                    context),
+                                                color: ColorsProvider.getColor8(context),
                                                 fontWeight: FontWeight.bold,
                                                 fontSize: 23,
                                               ),
-                                              textAlign: TextAlign
-                                                  .center, // Zarovnání textu na střed
+                                              textAlign: TextAlign.center, // Zarovnání textu na střed
                                             ),
                                           ),
                                         ),
@@ -326,11 +303,7 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                                         padding: const EdgeInsets.all(8.0),
                                         child: Container(
                                           height: 5,
-                                          decoration: BoxDecoration(
-                                              color: ColorsProvider.getColor2(
-                                                  context),
-                                              borderRadius:
-                                                  BorderRadius.circular(50)),
+                                          decoration: BoxDecoration(color: ColorsProvider.getColor2(context), borderRadius: BorderRadius.circular(50)),
                                         ),
                                       ),
                                       SizedBox(
@@ -339,113 +312,61 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                                       Container(
                                         child: ListView.builder(
                                           shrinkWrap: true,
-                                          physics:
-                                              NeverScrollableScrollPhysics(),
-                                          itemCount:
-                                              record.selectedMuscle!.length,
+                                          physics: NeverScrollableScrollPhysics(),
+                                          itemCount: record.selectedMuscle!.length,
                                           itemBuilder: (context, muscleIndex) {
-                                            var muscle = record
-                                                .selectedMuscle![muscleIndex];
-                                            var exercises = record
-                                                .selectedMuscle![muscleIndex]
-                                                .muscles!
-                                                .exercises;
+                                            var muscle = record.selectedMuscle![muscleIndex];
+                                            var exercises = record.selectedMuscle![muscleIndex].muscles!.exercises;
                                             return Padding(
-                                              padding: const EdgeInsets.only(
-                                                  bottom: 15,
-                                                  left: 10,
-                                                  right: 10),
+                                              padding: const EdgeInsets.only(bottom: 15, left: 10, right: 10),
                                               child: Container(
-                                                decoration: BoxDecoration(
-                                                    color: ColorsProvider
-                                                        .getColor2(context),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            20)),
+                                                decoration: BoxDecoration(color: ColorsProvider.getColor2(context), borderRadius: BorderRadius.circular(20)),
                                                 child: Column(
                                                   children: [
                                                     Padding(
-                                                      padding: const EdgeInsets
-                                                          .fromLTRB(5, 5, 5, 0),
+                                                      padding: const EdgeInsets.fromLTRB(5, 5, 5, 0),
                                                       child: Container(
                                                         height: 40,
-                                                        decoration:
-                                                            BoxDecoration(
+                                                        decoration: BoxDecoration(
                                                           // color: ColorsProvider.getColor2(context),
-                                                          borderRadius:
-                                                              zaobleni,
+                                                          borderRadius: zaobleni,
                                                         ),
                                                         child: Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .spaceBetween,
+                                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                           children: [
                                                             SizedBox(
                                                               width: 20,
                                                             ),
                                                             Expanded(
                                                               child: Center(
-                                                                child:
-                                                                    Container(
+                                                                child: Container(
                                                                   width: 180,
-                                                                  child:
-                                                                      TextField(
-                                                                    onChanged:
-                                                                        (value) {
+                                                                  child: TextField(
+                                                                    onChanged: (value) {
                                                                       // Vaše logika zde
                                                                     },
-                                                                    controller: TextEditingController(
-                                                                        text: record
-                                                                            .selectedMuscle![muscleIndex]
-                                                                            .muscles!
-                                                                            .nameOfMuscle),
-                                                                    decoration:
-                                                                        InputDecoration(
-                                                                      filled:
-                                                                          true,
-                                                                      fillColor:
-                                                                          ColorsProvider.getColor2(
-                                                                              context),
-                                                                      enabledBorder:
-                                                                          UnderlineInputBorder(
-                                                                        borderSide: BorderSide(
-                                                                            color:
-                                                                                Colors.black,
-                                                                            width: 2),
+                                                                    controller: TextEditingController(text: record.selectedMuscle![muscleIndex].muscles!.nameOfMuscle),
+                                                                    decoration: InputDecoration(
+                                                                      filled: true,
+                                                                      fillColor: ColorsProvider.getColor2(context),
+                                                                      enabledBorder: UnderlineInputBorder(
+                                                                        borderSide: BorderSide(color: Colors.black, width: 2),
                                                                       ),
-                                                                      focusedBorder:
-                                                                          UnderlineInputBorder(
-                                                                        borderSide: BorderSide(
-                                                                            color:
-                                                                                Colors.black,
-                                                                            width: 3.5),
+                                                                      focusedBorder: UnderlineInputBorder(
+                                                                        borderSide: BorderSide(color: Colors.black, width: 3.5),
                                                                       ),
-                                                                      border:
-                                                                          UnderlineInputBorder(),
-                                                                      contentPadding:
-                                                                          EdgeInsets
-                                                                              .symmetric(
-                                                                        horizontal:
-                                                                            20.0,
+                                                                      border: UnderlineInputBorder(),
+                                                                      contentPadding: EdgeInsets.symmetric(
+                                                                        horizontal: 20.0,
                                                                       ),
                                                                     ),
-                                                                    cursorColor:
-                                                                        ColorsProvider.getColor8(
-                                                                            context),
-                                                                    style:
-                                                                        TextStyle(
-                                                                      color: ColorsProvider
-                                                                          .getColor8(
-                                                                              context),
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                      fontSize:
-                                                                          23,
+                                                                    cursorColor: ColorsProvider.getColor8(context),
+                                                                    style: TextStyle(
+                                                                      color: ColorsProvider.getColor8(context),
+                                                                      fontWeight: FontWeight.bold,
+                                                                      fontSize: 23,
                                                                     ),
-                                                                    textAlign:
-                                                                        TextAlign
-                                                                            .center, // Zarovnání textu na střed
+                                                                    textAlign: TextAlign.center, // Zarovnání textu na střed
                                                                   ),
                                                                 ),
                                                               ),
@@ -453,30 +374,20 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                                                             GestureDetector(
                                                               onTap: () {
                                                                 showDialog(
-                                                                  context:
-                                                                      context,
-                                                                  builder:
-                                                                      (BuildContext
-                                                                          context) {
+                                                                  context: context,
+                                                                  builder: (BuildContext context) {
                                                                     return Center(
-                                                                        child:
-                                                                            NewExerciseBox(
-                                                                      splitIndex:
-                                                                          _tabController
-                                                                              .index,
-                                                                      muscleIndex:
-                                                                          muscleIndex,
-                                                                      notifyParent:
-                                                                          refresh,
+                                                                        child: NewExerciseBox(
+                                                                      splitIndex: _tabController.index,
+                                                                      muscleIndex: muscleIndex,
+                                                                      notifyParent: refresh,
                                                                     ));
                                                                   },
                                                                 );
                                                               },
                                                               child: Icon(
-                                                                Icons
-                                                                    .add_circle_outline_outlined,
-                                                                color: Colors
-                                                                    .black,
+                                                                Icons.add_circle_outline_outlined,
+                                                                color: Colors.black,
                                                                 size: 35,
                                                               ),
                                                             ),
@@ -488,136 +399,71 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                                                       ),
                                                     ),
                                                     Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              left: 5,
-                                                              right: 5,
-                                                              top: 12,
-                                                              bottom: 15),
+                                                      padding: const EdgeInsets.only(left: 5, right: 5, top: 12, bottom: 15),
                                                       child: Container(
                                                         child: ListView.builder(
                                                           shrinkWrap: true,
-                                                          physics:
-                                                              NeverScrollableScrollPhysics(),
-                                                          itemCount:
-                                                              exercises!.length,
-                                                          itemBuilder: (context,
-                                                              itemIndex) {
-                                                            var selectedExercises = record
-                                                                .selectedMuscle![
-                                                                    muscleIndex]
-                                                                .selectedExercises;
-                                                            String
-                                                                nameOfExercise =
-                                                                exercises[
-                                                                        itemIndex]
-                                                                    .nameOfExercise!;
+                                                          physics: NeverScrollableScrollPhysics(),
+                                                          itemCount: exercises!.length,
+                                                          itemBuilder: (context, itemIndex) {
+                                                            var selectedExercises = record.selectedMuscle![muscleIndex].selectedExercises;
+                                                            String nameOfExercise = exercises[itemIndex].nameOfExercise!;
                                                             late int order;
-                                                            bool isChecked =
-                                                                false;
+                                                            bool isChecked = false;
 
                                                             function:
-                                                            for (var j = 0;
-                                                                j <
-                                                                    selectedExercises!
-                                                                        .length;
-                                                                j++) {
-                                                              if (exercises[
-                                                                          itemIndex]
-                                                                      .nameOfExercise ==
-                                                                  selectedExercises[
-                                                                          j]
-                                                                      .exercises!
-                                                                      .nameOfExercise) {
-                                                                isChecked =
-                                                                    true;
+                                                            for (var j = 0; j < selectedExercises!.length; j++) {
+                                                              if (exercises[itemIndex].nameOfExercise == selectedExercises[j].exercises!.nameOfExercise) {
+                                                                isChecked = true;
                                                                 order = j + 1;
                                                                 break function;
                                                               } else {
-                                                                isChecked =
-                                                                    false;
+                                                                isChecked = false;
                                                               }
                                                             }
                                                             return Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .only(
-                                                                      bottom:
-                                                                          5),
+                                                              padding: const EdgeInsets.only(bottom: 5),
                                                               child: Padding(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .fromLTRB(
-                                                                        20,
-                                                                        5,
-                                                                        20,
-                                                                        0),
+                                                                padding: const EdgeInsets.fromLTRB(20, 5, 20, 0),
                                                                 child: Row(
                                                                   // mainAxisAlignment: MainAxisAlignment.,
                                                                   children: [
                                                                     Expanded(
-                                                                      child:
-                                                                          TextField(
-                                                                        controller:
-                                                                            TextEditingController(text: nameOfExercise),
+                                                                      child: TextField(
+                                                                        controller: TextEditingController(text: nameOfExercise),
                                                                         // onChanged: (value) {
                                                                         //   updateExercises![muscleIndex]![itemIndex] = true;
                                                                         // },
                                                                         // controller: exercisesTextEditingControllers[itemIndex],
-                                                                        decoration:
-                                                                            InputDecoration(
-                                                                          filled:
-                                                                              true,
-                                                                          fillColor:
-                                                                              ColorsProvider.getColor2(context),
-                                                                          enabledBorder:
-                                                                              OutlineInputBorder(
-                                                                            borderRadius:
-                                                                                BorderRadius.circular(12),
-                                                                            borderSide:
-                                                                                BorderSide(color: Colors.black, width: 2),
+                                                                        decoration: InputDecoration(
+                                                                          filled: true,
+                                                                          fillColor: ColorsProvider.getColor2(context),
+                                                                          enabledBorder: OutlineInputBorder(
+                                                                            borderRadius: BorderRadius.circular(12),
+                                                                            borderSide: BorderSide(color: Colors.black, width: 2),
                                                                           ),
-                                                                          focusedBorder:
-                                                                              OutlineInputBorder(
-                                                                            borderRadius:
-                                                                                BorderRadius.circular(12),
-                                                                            borderSide:
-                                                                                BorderSide(color: Colors.black, width: 3.5),
+                                                                          focusedBorder: OutlineInputBorder(
+                                                                            borderRadius: BorderRadius.circular(12),
+                                                                            borderSide: BorderSide(color: Colors.black, width: 3.5),
                                                                           ),
-                                                                          border:
-                                                                              OutlineInputBorder(
-                                                                            borderRadius:
-                                                                                BorderRadius.circular(12),
+                                                                          border: OutlineInputBorder(
+                                                                            borderRadius: BorderRadius.circular(12),
                                                                           ),
-                                                                          contentPadding:
-                                                                              EdgeInsets.symmetric(horizontal: 10.0),
+                                                                          contentPadding: EdgeInsets.symmetric(horizontal: 10.0),
                                                                         ),
-                                                                        cursorColor:
-                                                                            ColorsProvider.getColor8(context),
-                                                                        style:
-                                                                            TextStyle(
-                                                                          color:
-                                                                              ColorsProvider.getColor8(context),
-                                                                          fontWeight:
-                                                                              FontWeight.bold,
+                                                                        cursorColor: ColorsProvider.getColor8(context),
+                                                                        style: TextStyle(
+                                                                          color: ColorsProvider.getColor8(context),
+                                                                          fontWeight: FontWeight.bold,
                                                                         ),
                                                                       ),
                                                                     ),
                                                                     Padding(
-                                                                      padding: const EdgeInsets
-                                                                          .only(
-                                                                          left:
-                                                                              25,
-                                                                          right:
-                                                                              5),
-                                                                      child:
-                                                                          Center(
-                                                                        child:
-                                                                            GestureDetector(
-                                                                          onTap:
-                                                                              () async {
-                                                                            dbSupabase.clickedSplitTab =
-                                                                                await _tabController.index;
+                                                                      padding: const EdgeInsets.only(left: 25, right: 5),
+                                                                      child: Center(
+                                                                        child: GestureDetector(
+                                                                          onTap: () async {
+                                                                            dbSupabase.clickedSplitTab = await _tabController.index;
                                                                             await saveText(context);
                                                                             // !isCheckedList["${muscle.nameOfMuscle}"]![itemIndex];
                                                                             await dbSupabase.updateSelectedExercise(
@@ -632,12 +478,9 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
 
                                                                             setState(() {});
                                                                           },
-                                                                          child:
-                                                                              Container(
-                                                                            width:
-                                                                                29,
-                                                                            height:
-                                                                                29,
+                                                                          child: Container(
+                                                                            width: 29,
+                                                                            height: 29,
                                                                             // child: Icon(Icons.check_box),
                                                                             child: isChecked == false
                                                                                 ? Container(
@@ -703,8 +546,7 @@ class _SplitPageState extends State<SplitPage> with TickerProviderStateMixin {
                             a: a,
                             notifyParent: widget.notifyParent,
                             onPressed: () async {
-                              ScaffoldMessenger.of(context)
-                                  .hideCurrentSnackBar();
+                              ScaffoldMessenger.of(context).hideCurrentSnackBar();
                               int idSplit = record.idSplit!;
                               await dbSupabase.deleteSplit(idSplit);
                               await dbSupabase.getFitness();
@@ -737,14 +579,7 @@ class _deleteSplit extends StatefulWidget {
   final Function? notifyParent;
   final Function() onPressed;
   // ignore: unused_element
-  _deleteSplit(
-      {super.key,
-      required this.context,
-      required this.dbSupabase,
-      required this.record,
-      required this.a,
-      required this.notifyParent,
-      required this.onPressed});
+  _deleteSplit({required this.context, required this.dbSupabase, required this.record, required this.a, required this.notifyParent, required this.onPressed});
 
   @override
   State<_deleteSplit> createState() => __deleteSplitState();
@@ -782,17 +617,14 @@ class __deleteSplitState extends State<_deleteSplit> {
                               children: [
                                 Text(
                                   'Do you want delete this split?',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 17),
+                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
                                 ),
                                 Text('Data of exercises will stay save in app')
                               ],
                             ),
                             ElevatedButton(
                               style: ButtonStyle(
-                                backgroundColor: WidgetStatePropertyAll(
-                                    ColorsProvider.getColor8(context)),
+                                backgroundColor: WidgetStatePropertyAll(ColorsProvider.getColor8(context)),
                                 foregroundColor: WidgetStatePropertyAll(
                                   ColorsProvider.color_1,
                                 ),

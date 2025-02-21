@@ -231,7 +231,7 @@ class _TestNewExerciseState extends State<TestNewExercise> {
                         child: TextButton(
                           onPressed: () async {
                             if (_textController.text.trim().isNotEmpty) {
-                              context.read<FitnessBloc>().add(AddNewExercise(_textController.text, muscle!));
+                              context.read<FitnessBloc>().add(AddNewExerciseBloc(_textController.text, muscle!));
 
                               Navigator.of(context).pop();
                             } else {

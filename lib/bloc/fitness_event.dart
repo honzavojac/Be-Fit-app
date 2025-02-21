@@ -1,78 +1,86 @@
 import '../data_classes.dart';
 
-class Increment extends FitnessEvent {}
-
-class Decrement extends FitnessEvent {}
-
 // EVENTS
 abstract class FitnessEvent {}
 
 class LoadFitnessData extends FitnessEvent {}
 
-class UpdateSelectedSplitIndex extends FitnessEvent {
+class Increment extends FitnessEvent {}
+
+class Decrement extends FitnessEvent {}
+
+class UpdateSelectedSplitIndexBloc extends FitnessEvent {
   final int selectedSplitIndex;
-  UpdateSelectedSplitIndex(this.selectedSplitIndex);
+  UpdateSelectedSplitIndexBloc(this.selectedSplitIndex);
 }
 
-class UpdateSplitStartedCompleted extends FitnessEvent {
+class UpdateSplitStartedCompletedBloc extends FitnessEvent {
   final SplitStartedCompleted? splitStartedCompleted;
   final bool explicitNull;
-  UpdateSplitStartedCompleted(this.splitStartedCompleted, this.explicitNull);
+  UpdateSplitStartedCompletedBloc(this.splitStartedCompleted, this.explicitNull);
 }
 
-class UpdateExerciseData extends FitnessEvent {
+class UpdateExerciseDataBloc extends FitnessEvent {
   final Map<int, List<ExerciseData>>? exerciseDataMap;
-  UpdateExerciseData(this.exerciseDataMap);
+  UpdateExerciseDataBloc(this.exerciseDataMap);
 }
 
-class UpdateExerciseMap extends FitnessEvent {
+class UpdateExerciseMapBloc extends FitnessEvent {
   final Exercise exercise;
-  UpdateExerciseMap(this.exercise);
+  UpdateExerciseMapBloc(this.exercise);
 }
 
-class CreateExerciseData extends FitnessEvent {
+class CreateExerciseDataBloc extends FitnessEvent {
   final Exercise exercise;
-  CreateExerciseData(
+  CreateExerciseDataBloc(
     this.exercise,
   );
 }
 
-class UpdateSelectedExercise extends FitnessEvent {
+class UpdateSelectedExerciseBloc extends FitnessEvent {
   // final SelectedExercise selectedExercise;
   final int selectedMuscleId;
   final Exercise exercise;
 
-  UpdateSelectedExercise(this.selectedMuscleId, this.exercise);
+  UpdateSelectedExerciseBloc(this.selectedMuscleId, this.exercise);
 }
 
-class AddNewExercise extends FitnessEvent {
+class AddNewExerciseBloc extends FitnessEvent {
   final String exerciseName;
   final Muscle muscle;
-  AddNewExercise(this.exerciseName, this.muscle);
+  AddNewExerciseBloc(this.exerciseName, this.muscle);
 }
 
-class AddNewSplit extends FitnessEvent {
+class AddNewSplitBloc extends FitnessEvent {
   final String nameOfSplit;
   final List<Muscle> selectedMuscles;
-  AddNewSplit(this.nameOfSplit, this.selectedMuscles);
+  AddNewSplitBloc(this.nameOfSplit, this.selectedMuscles);
 }
 
-class AddNewMuscle extends FitnessEvent {
+class AddNewMuscleBloc extends FitnessEvent {
   final String nameOfMuscle;
-  AddNewMuscle(this.nameOfMuscle);
+  AddNewMuscleBloc(this.nameOfMuscle);
 }
 
-class UpdateExercise extends FitnessEvent {
+class UpdateExerciseBloc extends FitnessEvent {
   final Exercise exercise;
-  UpdateExercise(this.exercise);
+  UpdateExerciseBloc(this.exercise);
 }
 
-class UpdateMuscle extends FitnessEvent {
+class UpdateMuscleBloc extends FitnessEvent {
   final Muscle muscle;
-  UpdateMuscle(this.muscle);
+  UpdateMuscleBloc(this.muscle);
 }
 
-class UpdateSplit extends FitnessEvent {
+class UpdateSplitBloc extends FitnessEvent {
   final MySplit split;
-  UpdateSplit(this.split);
+  UpdateSplitBloc(this.split);
 }
+
+class UpdateSelectedMuscleBloc extends FitnessEvent {
+  final SelectedMuscle selectedMuscle;
+  final int oldSupabaseSplitId;
+  UpdateSelectedMuscleBloc(this.selectedMuscle, this.oldSupabaseSplitId);
+}
+
+class LogoutEventBloc extends FitnessEvent {}

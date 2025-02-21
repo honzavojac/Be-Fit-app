@@ -13,7 +13,6 @@ import 'package:kaloricke_tabulky_02/providers/colors_provider.dart';
 import 'package:kaloricke_tabulky_02/providers/variables_provider.dart';
 import 'package:kaloricke_tabulky_02/supabase/supabase.dart';
 import 'package:provider/provider.dart';
-import 'package:text_scroll/text_scroll.dart';
 
 import '../../init_page.dart';
 import '../../variables.dart';
@@ -816,7 +815,7 @@ class _FitnessRecordEndSplitState extends State<FitnessRecordEndSplit> {
                                     await dbFitness.UpdateSplitStartedCompleted(true, now, widget.idSplitStartedCompleted);
                                     widget.loadData();
                                     widget.refresh;
-                                    dbFitness.SaveToSupabaseAndOrderSqlite(dbSupabase);
+                                    dbFitness.SaveToSupabaseAndOrderSqlite(dbSupabase, context);
                                     Navigator.of(context).pop();
                                   },
                                   child: Container(
