@@ -76,7 +76,6 @@ class _ChoseInitDataPageState extends State<ChoseInitDataPage> {
     List<dynamic> finalData = data;
     final List<IntakeCategories> intakeCategories = finalData.map((e) => IntakeCategories.fromJson(e)).toList();
     for (var intakeCategory in intakeCategories) {
-      print(intakeCategory.name);
       await dbFitness.insertIntakeCategory(intakeCategory.name!, 0, intakeCategory.idIntakeCategory!);
     }
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -286,13 +285,9 @@ class _ChoseInitDataPageState extends State<ChoseInitDataPage> {
         onTap: () async {
           if (!isPressedGoToApp) {
             isPressedGoToApp = true;
-            print(isPressedGoToApp);
             await insertUser();
-            print(isPressedGoToApp);
             isPressedGoToApp = false;
-            print(isPressedGoToApp);
           }
-          print(isPressedGoToApp);
         },
         child: Padding(
           padding: const EdgeInsets.only(bottom: 10),

@@ -13,10 +13,8 @@ import 'package:provider/provider.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:http/http.dart' as http;
 
-import '../../../../bloc/fitness_bloc.dart';
 import '../../../../bloc/fitness_event.dart';
-import '../../../../data_classes.dart';
-import '../../../bloc/fitness_state.dart';
+import '../data.dart';
 
 ///supabase je jen databáze když změním zařízení tak ať uživatel má data a načtou se mu do aplikace
 ///
@@ -257,6 +255,7 @@ class FitnessProvider extends ChangeNotifier {
     String idItem = "";
     int? supabaseIdItem;
     String updateDeleteColumn = "";
+    print("začatek sync table:${dbTable}  data:${data} ");
 
     switch (dbTable) {
       case "muscles":
@@ -312,7 +311,6 @@ class FitnessProvider extends ChangeNotifier {
           'split_id_split': data.splitIdSplit,
           'muscles_id_muscle': data.musclesIdMuscle,
         };
-
         idRecord = data.idSelectedMuscle;
         idItem = "id_selected_muscle";
         supabaseIdItem = data.supabaseIdSelectedMuscle;
@@ -323,6 +321,7 @@ class FitnessProvider extends ChangeNotifier {
           'id_exercise': data.idExercise,
           'id_selected_muscle': data.idSelectedMuscle,
         };
+
         idRecord = data.idSelectedExercise;
         idItem = "id_selected_exercise";
         supabaseIdItem = data.supabaseIdSelectedExercise;
@@ -484,7 +483,13 @@ class FitnessProvider extends ChangeNotifier {
   }
 
   UpadateSelectedExerciseIdSelectedMuscle(int newIdSelectedMuscle, int oldIdSelectedMuscle) async {
-    await _database.rawQuery('''UPDATE selected_exercise SET id_selected_muscle = $newIdSelectedMuscle WHERE id_selected_muscle = $newIdSelectedMuscle''');
+    print("*\n***\n*");
+    await _database.rawQuery('''UPDATE selected_exercise SET id_selected_muscle = $newIdSelectedMuscle WHERE id_selected_muscle = $oldIdSelectedMuscle''');
+    print("${newIdSelectedMuscle} || ${oldIdSelectedMuscle}");
+    List<SelectedExercise> ggg = await SelectSelectedExercises();
+    for (var element in ggg) {
+      print("99999999999999999999999999 UpadateSelectedExerciseIdSelectedMuscle ${element.idSelectedMuscle}");
+    }
   }
 
   UpadateSplitStartedCompletedSplitId(int newSplitId, int oldSplitId) async {
@@ -543,12 +548,12 @@ class FitnessProvider extends ChangeNotifier {
   SaveToSupabaseAndOrderSqlite(SupabaseProvider dbSupabase, BuildContext context) async {
     final bloc = context.read<FitnessBloc>();
 
-    print("Začátek synchronizace");
     Stopwatch stopwatch = Stopwatch()..start();
     if (_isSyncing) {
       print("Syncing is already in progress. Skipping this call.*************************************************************************");
       return;
     }
+    print("object");
     if (!await isConnectedToInternet()) {
       print("No internet connection. Synchronization aborted.");
       return;
@@ -564,18 +569,13 @@ class FitnessProvider extends ChangeNotifier {
       List<IntakeCategories> intakeCategories = await SelectIntakeCategoriesWhereActionIsNotZero();
       List<NutriIntake> nutriIntakes = await SelectNutriIntakesWhereActionIsNotZero();
 
-      List<MySplit> allData = await SelectAllData();
-      List<ExerciseData> exercisesData = await SelectExerciseDataWhereActionIsNotZero();
-
       for (var muscle in muscles) {
         int muscleAction = muscle.action ?? 0;
         int? supabaseIdMuscle = await SyncSqfliteToSupabase(dbSupabase, "muscles", muscle, muscleAction);
         if (supabaseIdMuscle != null) {
           await UpdateSelectedMuscleMusclesIdMuscle(supabaseIdMuscle, muscle.supabaseIdMuscle ?? 0);
-
-          Muscle updatedMuscle = muscle.copyWith(supabaseIdMuscle: supabaseIdMuscle);
-          bloc.add(UpdateMuscleBloc(updatedMuscle));
           await UpadateExercisesMusclesIdMuscle(supabaseIdMuscle, muscle.supabaseIdMuscle ?? 0);
+
           for (var exercise in exercises) {
             if (muscle.supabaseIdMuscle == exercise.musclesIdMuscle) {
               exercise.musclesIdMuscle = supabaseIdMuscle;
@@ -584,35 +584,30 @@ class FitnessProvider extends ChangeNotifier {
               if (supabaseIdExercise != null) {
                 await UpadateExerciseDataExercisesIdExercise(supabaseIdExercise, exercise.supabaseIdExercise ?? 0);
                 await UpadateSelectedExerciseIdExercise(supabaseIdExercise, exercise.supabaseIdExercise ?? 0);
-                Exercise updatedExercise = exercise.copyWith(supabaseIdExercise: supabaseIdExercise);
-                bloc.add(UpdateExerciseBloc(updatedExercise));
               }
             }
           }
         }
       }
+      List<MySplit> allData = await SelectAllData();
+      List<ExerciseData> exercisesData = await SelectExerciseDataWhereActionIsNotZero();
 
-      for (var split in allData) {
+      for (MySplit split in allData) {
         int splitAction = split.action ?? 0;
         int? supabaseIdSplit = await SyncSqfliteToSupabase(dbSupabase, "split", split, splitAction);
         if (supabaseIdSplit != null) {
           await UpadateSelectedMusclesSplitIdSplit(supabaseIdSplit, split.supabaseIdSplit ?? 0);
           await UpadateSplitStartedCompletedSplitId(supabaseIdSplit, split.supabaseIdSplit ?? 0);
-          MySplit updatedSplit = split.copyWith(supabaseIdSplit: supabaseIdSplit);
-          bloc.add(UpdateSplitBloc(updatedSplit));
 
-          for (var selectedMuscle in split.selectedMuscle ?? []) {
+          for (SelectedMuscle selectedMuscle in split.selectedMuscle ?? []) {
             if (split.supabaseIdSplit == selectedMuscle.splitIdSplit) {
-              final int oldSupabaseSelectedMuscleId = selectedMuscle.splitIdSplit;
               selectedMuscle.splitIdSplit = supabaseIdSplit;
               int selectedMuscleAction = selectedMuscle.action ?? 0;
               int? supabaseIdSelectedMuscle = await SyncSqfliteToSupabase(dbSupabase, "selected_muscles", selectedMuscle, selectedMuscleAction);
               if (supabaseIdSelectedMuscle != null) {
                 await UpadateSelectedExerciseIdSelectedMuscle(supabaseIdSelectedMuscle, selectedMuscle.supabaseIdSelectedMuscle ?? 0);
-                SelectedMuscle updatedSelectedMuscle = selectedMuscle.copyWith(supabaseIdSelectedMuscle: supabaseIdSelectedMuscle);
-                bloc.add(UpdateSelectedMuscleBloc(updatedSelectedMuscle, oldSupabaseSelectedMuscleId));
 
-                for (var selectedExercise in selectedMuscle.selectedExercises ?? []) {
+                for (SelectedExercise selectedExercise in selectedMuscle.selectedExercises ?? []) {
                   if (selectedMuscle.supabaseIdSelectedMuscle == selectedExercise.idSelectedMuscle) {
                     selectedExercise.idSelectedMuscle = supabaseIdSelectedMuscle;
                     int selectedExerciseAction = selectedExercise.action ?? 0;
@@ -624,11 +619,13 @@ class FitnessProvider extends ChangeNotifier {
           }
 
           for (var splitStartedCompletedItem in split.splitStartedCompleted ?? []) {
+            print("začátek");
             if (split.supabaseIdSplit == splitStartedCompletedItem.splitId) {
               splitStartedCompletedItem.splitId = supabaseIdSplit;
               int splitStartedCompletedAction = splitStartedCompletedItem.action ?? 0;
               int? supabaseIdStartedCompleted = await SyncSqfliteToSupabase(dbSupabase, "split_started_completed", splitStartedCompletedItem, splitStartedCompletedAction);
               if (supabaseIdStartedCompleted != null) {
+                print("splitstartedcompleted není null");
                 await UpadateExerciseDataIdStartedCompleted(supabaseIdStartedCompleted, splitStartedCompletedItem.supabaseIdStartedCompleted ?? 0);
 
                 for (var exerciseDataItem in exercisesData) {
@@ -655,6 +652,7 @@ class FitnessProvider extends ChangeNotifier {
           }
         }
       }
+      print("measurements");
       for (var measurement in measurements) {
         int bodyMeasurementsAction = measurement.action ?? 0;
         int? supabaseIdBodyMeasurements = await SyncSqfliteToSupabase(dbSupabase, "body_measurements", measurement, bodyMeasurementsAction);
@@ -662,6 +660,7 @@ class FitnessProvider extends ChangeNotifier {
           await UpadateBodyMeasurements(supabaseIdBodyMeasurements, measurement.idBodyMeasurements ?? 0);
         }
       }
+      print("intake category");
       for (var intakeCategory in intakeCategories) {
         int intakeCategoryAction = intakeCategory.action ?? 0;
         int? supabaseIdIntakeCategory = await SyncSqfliteToSupabase(dbSupabase, "intake_categories", intakeCategory, intakeCategoryAction);
@@ -669,6 +668,7 @@ class FitnessProvider extends ChangeNotifier {
           await UpadateIntakeCategories(supabaseIdIntakeCategory, intakeCategory.idIntakeCategory ?? 0);
         }
       }
+      print("nutri intake **********************************");
       nutriIntakes.sort(
         (a, b) => a.supabaseIdNutriIntake!.compareTo(b.supabaseIdNutriIntake!),
       );
@@ -694,6 +694,39 @@ class FitnessProvider extends ChangeNotifier {
           }
         }
       }
+      //TODO
+      List newResult = await Future.wait([
+        SelectMuscles(),
+        SelectExercises(),
+        SelectExerciseData(),
+        SelectSplit(),
+        SelectSelectedMuscles(),
+        SelectSelectedExercises(),
+        SelectSplitStartedCompleted(),
+        SelectMeasurements(),
+        SelectIntakeCategories(),
+        SelectNutriIntakes(),
+        SelectFood(),
+        SelectUser(),
+      ]);
+
+      sqfliteMuscleList = newResult[0];
+      sqfliteExerciseList = newResult[1];
+      sqfliteExerciseDataList = newResult[2];
+      sqfliteSplitList = newResult[3];
+      sqfliteSelectedMuscleList = newResult[4];
+      sqfliteSelectedExerciseList = newResult[5];
+      sqfliteSplitStartedCompletedList = newResult[6];
+      sqfliteBodyMeasurementsList = newResult[7];
+      sqfliteIntakeCategoriesList = newResult[8];
+      sqfliteNutriIntakeList = newResult[9];
+      sqfliteFoodList = newResult[10];
+      print(sqfliteSelectedExerciseList);
+      for (var element in sqfliteSelectedExerciseList) {
+        print(element.idSelectedMuscle!);
+      }
+
+      bloc.add(LoadFitnessData());
     } catch (e) {
       print("Error during synchronization: $e");
     } finally {
@@ -856,6 +889,12 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
     exercises = await SelectExercises();
     selectedMuscles = await SelectSelectedMuscles();
     selectedExercises = await SelectSelectedExercises();
+    for (var element in selectedMuscles) {
+      print(element.supabaseIdSelectedMuscle);
+    }
+    for (var selectedExercise in selectedExercises) {
+      print("1111111111111111 selectAllData: ${selectedExercise.idSelectedMuscle}");
+    }
     splitStartedCompleteds = await SelectSplitStartedCompleted();
 
     for (var split in splits) {
@@ -1546,7 +1585,9 @@ LEFT JOIN exercise_data t3 ON t2.supabase_id_exercise = t3.exercises_id_exercise
   Future<List<SelectedExercise>> SelectSelectedExercises() async {
     var data = await _database.rawQuery('''SELECT * FROM selected_exercise''');
     var finalData = data.map((e) => SelectedExercise.fromJson(e)).toList();
-
+    for (var element in finalData) {
+      print(element.idSelectedMuscle!);
+    }
     return finalData;
   }
 

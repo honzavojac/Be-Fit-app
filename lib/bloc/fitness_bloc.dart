@@ -1,7 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kaloricke_tabulky_02/data.dart';
 import 'package:kaloricke_tabulky_02/database/fitness_database.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import '../data_classes.dart';
 import 'fitness_event.dart';
@@ -26,6 +25,7 @@ class FitnessBloc extends Bloc<FitnessEvent, FitnessState> {
     on<UpdateExerciseMapBloc>(_onUpdateExerciseMap);
     on<CreateExerciseDataBloc>(_onCreateExerciseData);
     on<UpdateSelectedExerciseBloc>(_onUpdateSelectedExercise);
+    on<UpdateSelectedExerciseBlocForSync>(_onUpdateSelectedExerciseForSync);
     on<AddNewExerciseBloc>(_onAddExercise);
     on<AddNewSplitBloc>(_onAddSplit);
     on<AddNewMuscleBloc>(_onAddMuscle);
@@ -36,7 +36,6 @@ class FitnessBloc extends Bloc<FitnessEvent, FitnessState> {
   }
 
   Future<FitnessLoaded> fetchFitnessData() async {
-    // print("fetch fitness data ********************************************");
     List<MySplit> splits = sqfliteSplitList;
     List<Muscle> muscles = sqfliteMuscleList;
     muscles.sort(
@@ -55,6 +54,7 @@ class FitnessBloc extends Bloc<FitnessEvent, FitnessState> {
 
     Map<int, List<SelectedMuscle>> selectedMuscleMap = initSelectedMuscle(selectedMuscles);
     Map<int, List<SelectedExercise>> selectedExerciseMap = initSelectedExercise(selectedExercises);
+
     SplitStartedCompleted? splitStartedCompleted = getSplitStartedCompleted(splitStartedCompletedList);
     Map<int, List<ExerciseData>> exerciseDataMap = initExerciseData(exerciseData, splitStartedCompleted);
     Map<int, List<SplitStartedCompleted>> splitStartedCompletedMap = initSplitStartedCompletedMap(exerciseData, splitStartedCompletedList);
@@ -178,8 +178,6 @@ class FitnessBloc extends Bloc<FitnessEvent, FitnessState> {
 
     // 🔹 Pokud není splitStartedCompleted nebo skončil, vytvoř nový
     if (splitStartedCompleted == null || splitStartedCompleted.ended == true) {
-      print("přidání nového řádku do splitStartedCompleted a exerciseData");
-
       if (splitStartedCompletedList.isNotEmpty) {
         splitStartedCompletedList.sort((a, b) => a.idStartedCompleted!.compareTo(b.idStartedCompleted!));
       }
@@ -202,8 +200,6 @@ class FitnessBloc extends Bloc<FitnessEvent, FitnessState> {
       splitStartedCompletedList.add(splitStartedCompleted);
       updatedSplitStartedCompletedMap.putIfAbsent(exercise.supabaseIdExercise!, () => []).add(splitStartedCompleted);
     }
-
-    print("přidání dalšího řádku do exerciseData");
 
     if (exerciseDataList.isNotEmpty) {
       exerciseDataList.sort((a, b) => a.idExData!.compareTo(b.idExData!));
@@ -248,24 +244,16 @@ class FitnessBloc extends Bloc<FitnessEvent, FitnessState> {
       int selectedMuscleId = event.selectedMuscleId;
       Exercise exercise = event.exercise;
       int exerciseId = exercise.supabaseIdExercise!;
-      // Zkopírování mapy, aby se neaktualizoval původní stav přímo
       Map<int, List<SelectedExercise>> selectedExerciseMap = Map.from(currentState.selectedExerciseMap);
-      // Map<int, List<Exercise>> muscleExerciseMap = Map.from(currentState.muscleExerciseMap);
 
-      // Pokud neexistuje seznam pro daný sval, vytvoříme ho
       selectedExerciseMap.putIfAbsent(selectedMuscleId, () => []);
-      // muscleExerciseMap.putIfAbsent(muscleId, () => []);
-      // Získání seznamu cvičení pro daný sval
+
       List<SelectedExercise> selectedExerciseList = List.from(selectedExerciseMap[selectedMuscleId]!);
-      // List<Exercise> exerciseList = List.from(muscleExerciseMap[muscleId]!);
-      // Hledání cvičení podle exerciseId
+
       int selectedExerciseIndex = selectedExerciseList.indexWhere((element) => element.idExercise == exerciseId);
-      // int exerciseIndex = exerciseList.indexWhere((element) => element.idExercise == exerciseId);
       if (selectedExerciseIndex != -1) {
-        // Pokud už cvičení existuje v seznamu, odstraníme ho (toggling funkce)
         print("odebrání cviku");
         SelectedExercise selectedExercise = selectedExerciseList[selectedExerciseIndex];
-// TODO musím toto předělat i v test_split_page nebo jak se jmenuje
 
         switch (selectedExercise.action) {
           case 0:
@@ -321,6 +309,43 @@ class FitnessBloc extends Bloc<FitnessEvent, FitnessState> {
       // Aktualizace mapy
       selectedExerciseMap[selectedMuscleId] = selectedExerciseList;
       // muscleExerciseMap[muscleId] = List.from(exerciseList);
+      emit(currentState.copyWith(
+        selectedExerciseMap: selectedExerciseMap,
+        // muscleExerciseMap: muscleExerciseMap,
+      ));
+    }
+  }
+
+  Future<void> _onUpdateSelectedExerciseForSync(UpdateSelectedExerciseBlocForSync event, Emitter<FitnessState> emit) async {
+    if (state is FitnessLoaded) {
+      final currentState = state as FitnessLoaded;
+
+      SelectedExercise selectedExercise = event.selectedExercise;
+      int oldSelectedMuscleId = event.oldSupabaseSelectedMuscle;
+      int newSelectedMuscleId = selectedExercise.idSelectedMuscle!;
+      Map<int, List<SelectedExercise>> oldSelectedExerciseMap = Map.from(currentState.selectedExerciseMap);
+      Map<int, List<SelectedExercise>> selectedExerciseMap = {};
+      // idselectedMuscle, list<SelectedExercise>
+      selectedExerciseMap = oldSelectedExerciseMap.map((key, value) {
+        if (key == oldSelectedMuscleId) {
+          return MapEntry(
+            newSelectedMuscleId,
+            value.map((SelectedExercise) {
+              if (SelectedExercise.idExercise == selectedExercise.idExercise) {
+                return selectedExercise;
+              } else {
+                return SelectedExercise;
+              }
+            }).toList(),
+          );
+        } else {
+          return MapEntry(
+            key,
+            value.map((SelectedExercise) => SelectedExercise.copyWith()).toList(),
+          );
+        }
+      });
+
       emit(currentState.copyWith(
         selectedExerciseMap: selectedExerciseMap,
         // muscleExerciseMap: muscleExerciseMap,
@@ -464,25 +489,45 @@ class FitnessBloc extends Bloc<FitnessEvent, FitnessState> {
     if (state is FitnessLoaded) {
       final currentState = state as FitnessLoaded;
       MySplit split = event.split;
-      List<MySplit> splits = currentState.splits;
-      int? splitIndex = splits.indexWhere(
+
+      // Správná kopie listu a mapy
+      List<MySplit> splits = List.from(currentState.splits);
+      Map<int, MySplit> splitMap = Map.from(currentState.splitMap);
+
+      // Najdeme index splittu
+      int splitIndex = splits.indexWhere(
         (element) => element.supabaseIdSplit == split.supabaseIdSplit,
       );
-      splits[splitIndex >= 0 ? splitIndex : 0] = split;
 
-      Map<int, MySplit> splitMap = currentState.splitMap;
-      splitMap[split.supabaseIdSplit!] = split;
-      try {
-        // Předpokládám, že metoda NewUpdateExercise je asynchronní
+      // Pokud split existuje, aktualizujeme ho, jinak přidáme nový
+      if (splitIndex >= 0) {
+        splits[splitIndex] = split;
+      } else {
+        splits.add(split);
+      }
+      int oldSplitIndex = splits.indexWhere(
+        (element) => element.supabaseIdSplit == event.oldSupabaseSplitId,
+      );
 
-        await dbFitness.NewUpdateSplit(split);
-      } catch (e) {
-        print("Chyba při aktualizaci cvičení: $e");
-        // Můžete přidat další logiku pro chybové hlášení nebo zobrazení notifikace
+      if (oldSplitIndex >= 0 && (split.supabaseIdSplit != event.oldSupabaseSplitId)) {
+        splits.removeAt(oldSplitIndex);
+      }
+      // Aktualizujeme splitMap jen pokud máme validní ID
+      if (split.supabaseIdSplit != null) {
+        if (!splitMap.containsKey(split.supabaseIdSplit)) {
+          print("Přidávám nový split do splitMap: ${split.supabaseIdSplit}");
+        }
+        splitMap[split.supabaseIdSplit!] = split;
       }
 
-      print(currentState.selectedMuscleMap);
+      try {
+        // Počkej na update v databázi, než se změní stav
+        await dbFitness.NewUpdateSplit(split);
+      } catch (e) {
+        print("Chyba při aktualizaci splittu: $e");
+      }
 
+      // Nyní emitujeme nový stav
       emit(currentState.copyWith(
         splits: splits,
         splitMap: splitMap,
@@ -521,19 +566,23 @@ class FitnessBloc extends Bloc<FitnessEvent, FitnessState> {
       final currentState = state as FitnessLoaded;
       Exercise exercise = event.exercise;
       List<Exercise> exercises = currentState.exercises;
+      Map<int, List<Exercise>> muscleExerciseMap = currentState.muscleExerciseMap;
       int? exerciseIndex = exercises.indexWhere(
-        (element) => element.supabaseIdExercise == exercise.supabaseIdExercise,
+        (element) => element.nameOfExercise == exercise.nameOfExercise,
       );
       exercises[exerciseIndex >= 0 ? exerciseIndex : 0] = exercise;
-      print(exercise.nameOfExercise);
       Map<int, Exercise> exerciseMap = currentState.exerciseMap;
       exerciseMap[exercise.supabaseIdExercise!] = exercise;
-
+      int muscleExerciseIndex = muscleExerciseMap[exercise.musclesIdMuscle]!.indexWhere(
+        (element) => element.nameOfExercise == exercise.nameOfExercise,
+      );
+      muscleExerciseMap[exercise.musclesIdMuscle]![muscleExerciseIndex] = exercise;
       try {
         // Předpokládám, že metoda NewUpdateExercise je asynchronní
         emit(currentState.copyWith(
           exercises: exercises,
           exerciseMap: exerciseMap,
+          muscleExerciseMap: muscleExerciseMap,
         ));
         await dbFitness.NewUpdateExercise(exercise);
       } catch (e) {
@@ -543,19 +592,52 @@ class FitnessBloc extends Bloc<FitnessEvent, FitnessState> {
     }
   }
 
-  void _onUpdateSelectedMuscle(UpdateSelectedMuscleBloc event, Emitter<FitnessState> emit) {
+  Future<void> _onUpdateSelectedMuscle(UpdateSelectedMuscleBloc event, Emitter<FitnessState> emit) async {
     if (state is FitnessLoaded) {
       final currentState = state as FitnessLoaded;
       final int oldSupabaseSplitId = event.oldSupabaseSplitId;
-      Map<int, List<SelectedMuscle>> selectedMuscleMap = currentState.selectedMuscleMap;
-      int newSupabaseSplitId = event.selectedMuscle.splitIdSplit!;
-      if (selectedMuscleMap.containsKey(oldSupabaseSplitId)) {
-        selectedMuscleMap.putIfAbsent(newSupabaseSplitId, () => selectedMuscleMap[oldSupabaseSplitId]!); // Přiřadíme hodnotu k novému klíči
-        selectedMuscleMap.remove(oldSupabaseSplitId); // Odstraníme starý klíč
-      }
+      final int newSupabaseSplitId = event.selectedMuscle.splitIdSplit!;
+
+      // Kopírování mapy pro zachování immutability
+      Map<int, List<SelectedMuscle>> selectedMuscleMap = Map.from(currentState.selectedMuscleMap);
+      Map<int, List<SelectedMuscle>> newSelectedMuscleMap = {};
+
+      newSelectedMuscleMap = selectedMuscleMap.map((key, value) {
+        if (key == oldSupabaseSplitId) {
+          return MapEntry(
+            newSupabaseSplitId,
+            value.map((SelectedMuscle) {
+              if (SelectedMuscle.musclesIdMuscle == event.selectedMuscle.musclesIdMuscle) {
+                return event.selectedMuscle;
+              }
+              return SelectedMuscle.copyWith(
+                splitIdSplit: newSupabaseSplitId,
+              );
+            }).toList(),
+          );
+        } else {
+          return MapEntry(
+            key,
+            value.map((SelectedMuscle) => SelectedMuscle.copyWith()).toList(),
+          );
+        }
+      });
+      // if (oldSupabaseSplitId != newSupabaseSplitId) {
+      //   selectedMuscleMap.putIfAbsent(newSupabaseSplitId, () => []);
+      //   selectedMuscleMap[newSupabaseSplitId] = List.generate(
+      //     selectedMuscleMap[oldSupabaseSplitId]!.length,
+      //     (index) {
+      //       selectedMuscleMap[oldSupabaseSplitId]![index].splitIdSplit = newSupabaseSplitId;
+      //       return selectedMuscleMap[oldSupabaseSplitId]![index];
+      //     },
+      //   );
+      //   selectedMuscleMap.remove(oldSupabaseSplitId);
+      // }
+
+      // // Přidání do nového klíče
 
       emit(currentState.copyWith(
-        selectedMuscleMap: selectedMuscleMap,
+        selectedMuscleMap: newSelectedMuscleMap,
       ));
     }
   }

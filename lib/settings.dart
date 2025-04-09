@@ -480,7 +480,6 @@ class _SettingsState extends State<Settings> {
           //               );
           //             },
           //             onChanged: (value) async {
-          //               print(value);
           //               switch (user!.action) {
           //                 case 0:
           //                   await dbFitness.updateUser(value, 2);

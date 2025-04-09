@@ -1,0 +1,2 @@
+C:/Users/vojacekj/Desktop/Flutter/Be-Fit-app-zaloha/android/app/.cxx/RelWithDebInfo/5n3c5j42/arm64-v8a/CMakeFiles/edit_cache.dir
+C:/Users/vojacekj/Desktop/Flutter/Be-Fit-app-zaloha/android/app/.cxx/RelWithDebInfo/5n3c5j42/arm64-v8a/CMakeFiles/rebuild_cache.dir

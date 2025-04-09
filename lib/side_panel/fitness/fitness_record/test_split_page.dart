@@ -135,16 +135,55 @@ class _TestSplitPageState extends State<TestSplitPage> with TickerProviderStateM
 
     return BlocBuilder<FitnessBloc, FitnessState>(
       builder: (context, state) {
+        // try {
+        // if (state is FitnessError) {
+        //   print("chyba ${state.message}");
+        //   return Center(child: Text("Chyba: ${state.message}"));
+        // } else
         if (state is FitnessLoaded) {
-          List<MySplit> splits = List.from(state.splits);
-          Map<int, List<SelectedMuscle>> selectedMusclesMap = Map.from(state.selectedMuscleMap);
-          Map<int, List<SelectedExercise>> selectedExerciseMap = Map.from(state.selectedExerciseMap);
+          print("************************************************************************************************************-");
+          late List<MySplit> splits;
+          late Map<int, List<SelectedMuscle>> selectedMusclesMap;
+          late Map<int, List<SelectedExercise>> selectedExerciseMap;
 
-          Map<int, Muscle> muscleMap = Map.from(state.muscleMap);
-          Map<int, List<Exercise>> muscleExerciseMap = Map.from(state.muscleExerciseMap);
-          int splitIndex = state.selectedSplitIndex;
+          late Map<int, Muscle> muscleMap;
+          late Map<int, List<Exercise>> muscleExerciseMap;
+          late int splitIndex = 0;
 
-          _tabController = TabController(length: splits.length, vsync: this, initialIndex: _splitIndex ?? splitIndex);
+          try {
+            splits = List.from(state.splits);
+
+            splits.forEach(
+              (element) => print("${element.supabaseIdSplit}  ${element.nameSplit}"),
+            );
+            print("oddelovač *****************--");
+            selectedExerciseMap = Map.from(state.selectedExerciseMap);
+            selectedMusclesMap = Map.from(state.selectedMuscleMap);
+            for (var selectedMuscles in selectedMusclesMap.values) {
+              for (var selectedMuscle in selectedMuscles) {
+                print("${selectedMuscle.supabaseIdSelectedMuscle}  ${selectedMuscle.musclesIdMuscle}");
+              }
+            }
+            print("selectedMuscleMap: $selectedMusclesMap");
+
+            muscleMap = Map.from(state.muscleMap);
+            print(muscleMap);
+            muscleExerciseMap = Map.from(state.muscleExerciseMap);
+            print(muscleExerciseMap);
+            splitIndex = state.selectedSplitIndex;
+            print(splitIndex);
+            _tabController = TabController(length: splits.length, vsync: this, initialIndex: _splitIndex ?? splitIndex);
+            print(_tabController);
+            print(_tabController.index);
+            print(selectedExerciseMap);
+            for (var element in selectedExerciseMap.values) {
+              for (var neco in element) {
+                print("supabaseidseexe: ${neco.supabaseIdSelectedExercise}   idsemuscle: ${neco.idSelectedMuscle}  idExercise: ${neco.idExercise}   ");
+              }
+            }
+          } catch (e) {
+            print(e);
+          }
 
           return TestSplitSaveListener(
             splits: splits,
@@ -347,7 +386,7 @@ class _TestSplitPageState extends State<TestSplitPage> with TickerProviderStateM
                                                         child: ListView.builder(
                                                           shrinkWrap: true,
                                                           physics: NeverScrollableScrollPhysics(),
-                                                          itemCount: selectedMusclesMap[record.supabaseIdSplit]!.length,
+                                                          itemCount: selectedMusclesMap[record.supabaseIdSplit] != null ? selectedMusclesMap[record.supabaseIdSplit]!.length : 0,
                                                           itemBuilder: (context, muscleIndex) {
                                                             SelectedMuscle selectedMuscle = selectedMusclesMap[record.supabaseIdSplit]![muscleIndex];
                                                             int idSelectedMuscle = selectedMuscle.musclesIdMuscle!;
@@ -394,7 +433,7 @@ class _TestSplitPageState extends State<TestSplitPage> with TickerProviderStateM
 
                                                                                       // widget.loadParent();
                                                                                     },
-                                                                                    controller: TextEditingController(text: '${muscle.supabaseIdMuscle} ${muscle.nameOfMuscle}'),
+                                                                                    controller: TextEditingController(text: '||${selectedMuscle.supabaseIdSelectedMuscle} || ${selectedMuscle.splitIdSplit} || ${selectedMuscle.musclesIdMuscle} || ${muscle.nameOfMuscle}'),
                                                                                     decoration: InputDecoration(
                                                                                       filled: true,
                                                                                       fillColor: ColorsProvider.getColor2(context),
@@ -663,6 +702,10 @@ class _TestSplitPageState extends State<TestSplitPage> with TickerProviderStateM
         return Container(
             // color: Colors.amber,
             );
+        // } catch (e) {
+        //   print("2 chyba ${state}");
+        //   return (Container());
+        // }
       },
     );
   }

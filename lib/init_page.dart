@@ -117,7 +117,6 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
         var dbSupabase = Provider.of<SupabaseProvider>(context, listen: false);
         print("**********začátek ukládání po zavření nebo vypnutí mobilu**********");
         await dbFitness.SaveToSupabaseAndOrderSqlite(dbSupabase, context);
-        print("**********konec ukládání po zavření nebo vypnutí mobilu**********");
       }
     }
   }
@@ -340,8 +339,7 @@ class _InitPageState extends State<InitPage> with WidgetsBindingObserver {
             Set<int> foodIds = sqfliteNutriIntakeList.map((e) => e.idFood!).toSet();
             List<Food?> foodList = await dbSupabase.selectSpecificFoods(foodIds);
             for (var food in foodList) {
-              print("********************${food!.hasMultipleIngredients.toString()}");
-              dbFitness.InsertOrUpdateFood(food, 0);
+              dbFitness.InsertOrUpdateFood(food!, 0);
             }
           }
           List newResult = await Future.wait([

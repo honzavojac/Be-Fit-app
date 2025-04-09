@@ -5,6 +5,11 @@ abstract class FitnessState {}
 
 class FitnessInitial extends FitnessState {}
 
+class FitnessError extends FitnessState {
+  final String message;
+  FitnessError(this.message);
+}
+
 class FitnessLoaded extends FitnessState {
   final List<MySplit> splits;
   final List<Muscle> muscles;

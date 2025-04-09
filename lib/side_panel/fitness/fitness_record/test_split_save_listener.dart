@@ -63,7 +63,7 @@ class _TestSplitSaveListenerState extends State<TestSplitSaveListener> with Widg
 
     if (state is FitnessLoaded) {
       for (var split in widget.splits) {
-        context.read<FitnessBloc>().add(UpdateSplitBloc(split));
+        context.read<FitnessBloc>().add(UpdateSplitBloc(split, null));
       }
       widget.muscleMap.forEach(
         (key, value) {

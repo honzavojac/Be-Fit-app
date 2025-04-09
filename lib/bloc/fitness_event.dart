@@ -45,6 +45,13 @@ class UpdateSelectedExerciseBloc extends FitnessEvent {
   UpdateSelectedExerciseBloc(this.selectedMuscleId, this.exercise);
 }
 
+class UpdateSelectedExerciseBlocForSync extends FitnessEvent {
+  final SelectedExercise selectedExercise;
+  final int oldSupabaseSelectedMuscle;
+
+  UpdateSelectedExerciseBlocForSync(this.selectedExercise, this.oldSupabaseSelectedMuscle);
+}
+
 class AddNewExerciseBloc extends FitnessEvent {
   final String exerciseName;
   final Muscle muscle;
@@ -74,7 +81,8 @@ class UpdateMuscleBloc extends FitnessEvent {
 
 class UpdateSplitBloc extends FitnessEvent {
   final MySplit split;
-  UpdateSplitBloc(this.split);
+  int? oldSupabaseSplitId;
+  UpdateSplitBloc(this.split, this.oldSupabaseSplitId);
 }
 
 class UpdateSelectedMuscleBloc extends FitnessEvent {
